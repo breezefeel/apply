@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+모든 요청사항을 반영한 최종 코드입니다!
+html<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -362,6 +363,7 @@
             max-width: 900px;
             width: 100%;
             padding: 20px;
+            padding-bottom: 80px;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
@@ -369,6 +371,7 @@
         @media (min-width: 768px) {
             .final-page {
                 padding: 40px;
+                padding-bottom: 100px;
             }
         }
         
@@ -898,45 +901,6 @@
             }
         }
 
-        .countdown-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .countdown-box {
-                padding: 20px;
-                margin-bottom: 25px;
-            }
-        }
-
-        .countdown-number {
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        @media (min-width: 768px) {
-            .countdown-number {
-                font-size: 48px;
-                margin-bottom: 10px;
-            }
-        }
-
-        .countdown-text {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-
-        @media (min-width: 768px) {
-            .countdown-text {
-                font-size: 14px;
-            }
-        }
-
         .modal-btn {
             width: 100%;
             padding: 16px;
@@ -1029,6 +993,27 @@
                 font-size: 15px;
             }
         }
+
+        .help-note {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .help-note-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .help-note-text {
+            color: #856404;
+            font-size: 13px;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
@@ -1043,9 +1028,21 @@
         <div class="modal-content">
             <div class="modal-icon">📥</div>
             <h2 class="modal-title">신청서를 저장하세요</h2>
+            
+            <div class="help-note">
+                <div class="help-note-title">💡 저장 위치 안내</div>
+                <div class="help-note-text">
+                    저장 버튼을 누르면 신청서가 <strong>다운로드 폴더</strong>에 저장됩니다.<br>
+                    <br>
+                    <strong>📱 모바일:</strong> 파일 앱 → 다운로드 폴더에서 확인<br>
+                    <strong>💻 PC:</strong> 다운로드 폴더에서 확인
+                </div>
+            </div>
+
             <p class="modal-message">
-                아래 버튼을 눌러 신청서를<br>
-                사진첩/갤러리에 저장해주세요
+                저장 후 카카오톡 채널에서<br>
+                <strong>📎 + 버튼 → 파일 → 다운로드 폴더</strong><br>
+                에서 신청서를 선택해 전송해주세요
             </p>
             <button class="modal-btn" onclick="downloadApplication()">
                 신청서 저장하기
@@ -1061,25 +1058,20 @@
             <div class="instruction-list">
                 <div class="instruction-item">
                     <div class="instruction-number">1</div>
-                    <div class="instruction-text">카카오톡 채널 하단의 <strong>+ 버튼</strong>을 누르세요</div>
+                    <div class="instruction-text">카카오톡 채널 하단의 <strong>📎 + 버튼</strong>을 누르세요</div>
                 </div>
                 <div class="instruction-item">
                     <div class="instruction-number">2</div>
-                    <div class="instruction-text">갤러리/사진첩에서 <strong>저장한 신청서</strong>를 선택하세요</div>
+                    <div class="instruction-text"><strong>파일 선택</strong>을 누르고 <strong>다운로드 폴더</strong>에서 신청서를 찾으세요</div>
                 </div>
                 <div class="instruction-item">
                     <div class="instruction-number">3</div>
-                    <div class="instruction-text">신청서 이미지를 <strong>전송</strong>해주세요</div>
+                    <div class="instruction-text">신청서 이미지를 선택하고 <strong>전송</strong>해주세요</div>
                 </div>
             </div>
 
-            <div class="countdown-box">
-                <div class="countdown-number" id="countdownNumber">5</div>
-                <div class="countdown-text">초 후 카카오톡 채널로 이동합니다</div>
-            </div>
-
-            <button class="modal-btn" onclick="openKakaoNow()" style="background: #FEE500; color: #000;">
-                💬 지금 바로 카카오톡 열기
+            <button class="modal-btn" onclick="openKakaoNow()" style="background: #FEE500; color: #000; margin-top: 20px;">
+                💬 지금 바로 카카오 채널로 가기
             </button>
         </div>
     </div>
@@ -1131,7 +1123,7 @@
             </div>
         </div>
         
-        <!-- Page 2: 프로그램 선택 -->
+        <!-- Page 2: 프로그램 선택 (순서 변경) -->
         <div class="card" id="page2">
             <div class="progress-bar">
                 <div class="progress-dot"></div>
@@ -1148,17 +1140,17 @@
             <div class="form-group">
                 <label class="form-label">프로그램 *</label>
                 <div class="program-option">
-                    <input type="radio" name="program" id="stretching" value="리:얼 p-스트레칭">
-                    <label for="stretching">
-                        <div class="program-name">리:얼 p-스트레칭</div>
-                        <div class="program-desc">전문가와 함께하는 맞춤형 스트레칭 프로그램</div>
-                    </label>
-                </div>
-                <div class="program-option">
                     <input type="radio" name="program" id="facecare" value="리:얼 작은얼굴">
                     <label for="facecare">
                         <div class="program-name">리:얼 작은얼굴</div>
                         <div class="program-desc">얼굴 라인 관리 및 페이셜 케어 프로그램</div>
+                    </label>
+                </div>
+                <div class="program-option">
+                    <input type="radio" name="program" id="stretching" value="리:얼 p-스트레칭">
+                    <label for="stretching">
+                        <div class="program-name">리:얼 p-스트레칭</div>
+                        <div class="program-desc">전문가와 함께하는 맞춤형 스트레칭 프로그램</div>
                     </label>
                 </div>
             </div>
@@ -1531,7 +1523,6 @@
         let canvas, ctx;
         let isDrawing = false;
         let capturedBlob = null;
-        let countdownTimer = null;
         
         // 동 입력 - 3자리 입력 시 호수로 이동
         document.getElementById('dong').addEventListener('input', function(e) {
@@ -1578,7 +1569,7 @@
             e.target.value = value;
         });
         
-        // 약관 동의 1 처리 - 화면 하단 스크롤
+        // 약관 동의 1 처리 - 최하단으로 스크롤
         function handleAgree1Change() {
             const agree1 = document.getElementById('agree1').checked;
             const termsBox = document.getElementById('termsBox');
@@ -1609,7 +1600,7 @@
             }
         }
         
-        // 약관 동의 2 처리
+        // 약관 동의 2 처리 - 스크롤 하지 않음
         function handleAgree2Change() {
             const agree2 = document.getElementById('agree2').checked;
             const privacyBox = document.getElementById('privacyBox');
@@ -1622,13 +1613,6 @@
                 signatureGroup.style.display = 'block';
                 agreeOption2.classList.add('checked');
                 setTimeout(initCanvas, 100);
-                
-                setTimeout(() => {
-                    window.scrollTo({
-                        top: document.body.scrollHeight,
-                        behavior: 'smooth'
-                    });
-                }, 100);
             } else {
                 privacyBox.classList.add('expanded');
                 privacyBox.classList.remove('collapsed');
@@ -1929,7 +1913,7 @@
         }
         
         function downloadApplication() {
-            // 브라우저의 다운로드 기능 사용 (모바일에서는 사진첩/갤러리로 저장됨)
+            // 다운로드 폴더에 저장
             const url = URL.createObjectURL(capturedBlob);
             const link = document.createElement('a');
             const name = document.getElementById('name').value || '신청자';
@@ -1948,29 +1932,10 @@
             
             setTimeout(() => {
                 document.getElementById('instructionModal').classList.add('active');
-                startCountdown();
             }, 500);
         }
         
-        function startCountdown() {
-            let count = 5;
-            const countdownElement = document.getElementById('countdownNumber');
-            
-            countdownTimer = setInterval(() => {
-                count--;
-                countdownElement.textContent = count;
-                
-                if (count <= 0) {
-                    clearInterval(countdownTimer);
-                    openKakaoNow();
-                }
-            }, 1000);
-        }
-        
         function openKakaoNow() {
-            if (countdownTimer) {
-                clearInterval(countdownTimer);
-            }
             document.getElementById('instructionModal').classList.remove('active');
             window.open('http://pf.kakao.com/_nVSxdn/chat', '_blank');
         }
