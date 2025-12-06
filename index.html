@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+모든 요청사항을 반영한 최종 코드입니다!
+html<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -356,16 +357,41 @@
             cursor: not-allowed;
         }
         
+        /* 반응형 최종 페이지 */
         .final-page {
             background: white;
             max-width: 900px;
-            padding: 40px;
+            width: 100%;
+            padding: 20px;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
+
+        @media (min-width: 768px) {
+            .final-page {
+                padding: 40px;
+            }
+        }
         
-        /* A4 크기 문서 스타일 */
+        /* 반응형 문서 미리보기 */
+        .document-preview {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        @media (min-width: 768px) {
+            .document-preview {
+                padding: 30px;
+            }
+        }
+        
+        /* A4 크기 문서 스타일 (캡처용, 화면에는 숨김) */
         .a4-document {
+            position: absolute;
+            left: -9999px;
             width: 210mm;
             min-height: 297mm;
             padding: 20mm;
@@ -376,76 +402,152 @@
         
         .document-title {
             text-align: center;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .document-title {
+                font-size: 24px;
+                margin-bottom: 25px;
+            }
         }
         
         .info-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 18px;
+            margin-bottom: 15px;
+            font-size: 11px;
+        }
+
+        @media (min-width: 768px) {
+            .info-table {
+                margin-bottom: 18px;
+                font-size: 13px;
+            }
         }
         
         .info-table td {
             border: 2px solid #000;
-            padding: 8px;
-            font-size: 13px;
+            padding: 6px;
+        }
+
+        @media (min-width: 768px) {
+            .info-table td {
+                padding: 8px;
+            }
         }
         
         .info-table .label {
             background-color: #e8e8e8;
-            width: 100px;
+            width: 80px;
             text-align: center;
             font-weight: bold;
+        }
+
+        @media (min-width: 768px) {
+            .info-table .label {
+                width: 100px;
+            }
         }
         
         .application-section {
             border: 2px solid #000;
-            padding: 15px;
-            margin-bottom: 18px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .application-section {
+                padding: 15px;
+                margin-bottom: 18px;
+            }
         }
         
         .section-title {
             text-align: center;
             font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 12px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .section-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
         }
         
         .agreement-title {
             text-align: center;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: bold;
-            margin: 20px 0 15px 0;
+            margin: 15px 0 12px 0;
+        }
+
+        @media (min-width: 768px) {
+            .agreement-title {
+                font-size: 15px;
+                margin: 20px 0 15px 0;
+            }
         }
         
         .agreement-list {
-            line-height: 1.6;
-            margin-bottom: 15px;
-            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            font-size: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .agreement-list {
+                line-height: 1.6;
+                margin-bottom: 15px;
+                font-size: 12px;
+            }
         }
         
         .agreement-list li {
-            margin-bottom: 6px;
+            margin-bottom: 5px;
+        }
+
+        @media (min-width: 768px) {
+            .agreement-list li {
+                margin-bottom: 6px;
+            }
         }
         
         .note-box {
             text-align: center;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
-            margin: 20px 0;
-            padding: 12px;
+            margin: 15px 0;
+            padding: 10px;
             border: 1px solid #333;
+        }
+
+        @media (min-width: 768px) {
+            .note-box {
+                font-size: 14px;
+                margin: 20px 0;
+                padding: 12px;
+            }
         }
         
         .signature-in-note {
             display: inline-block;
-            width: 120px;
+            width: 100px;
             border-bottom: 1px solid #333;
             vertical-align: middle;
-            height: 35px;
+            height: 30px;
             position: relative;
+        }
+
+        @media (min-width: 768px) {
+            .signature-in-note {
+                width: 120px;
+                height: 35px;
+            }
         }
         
         .signature-in-note img {
@@ -453,59 +555,127 @@
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            height: 30px;
+            height: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .signature-in-note img {
+                height: 30px;
+            }
         }
         
         .detailed-agreement {
-            margin-top: 15px;
-            font-size: 11px;
-            line-height: 1.5;
+            margin-top: 12px;
+            font-size: 9px;
+            line-height: 1.4;
+        }
+
+        @media (min-width: 768px) {
+            .detailed-agreement {
+                margin-top: 15px;
+                font-size: 11px;
+                line-height: 1.5;
+            }
         }
         
         .detailed-agreement h3 {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: bold;
-            margin: 12px 0 8px 0;
+            margin: 10px 0 6px 0;
+        }
+
+        @media (min-width: 768px) {
+            .detailed-agreement h3 {
+                font-size: 13px;
+                margin: 12px 0 8px 0;
+            }
         }
         
         .detailed-agreement p,
         .detailed-agreement li {
-            margin-bottom: 6px;
+            margin-bottom: 5px;
+        }
+
+        @media (min-width: 768px) {
+            .detailed-agreement p,
+            .detailed-agreement li {
+                margin-bottom: 6px;
+            }
         }
         
         .consent-box {
             border: 2px solid #000;
-            padding: 15px;
-            margin-top: 20px;
+            padding: 12px;
+            margin-top: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .consent-box {
+                padding: 15px;
+                margin-top: 20px;
+            }
         }
         
         .consent-box h3 {
             text-align: center;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .consent-box h3 {
+                font-size: 14px;
+                margin-bottom: 12px;
+            }
         }
         
         .consent-box p {
-            line-height: 1.6;
+            line-height: 1.5;
             text-align: center;
-            font-size: 12px;
+            font-size: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .consent-box p {
+                line-height: 1.6;
+                font-size: 12px;
+            }
         }
         
         .signature-section {
-            margin-top: 30px;
+            margin-top: 25px;
             text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .signature-section {
+                margin-top: 30px;
+            }
         }
         
         .signature-line {
             display: inline-block;
-            margin: 15px 30px;
+            margin: 12px 20px;
+        }
+
+        @media (min-width: 768px) {
+            .signature-line {
+                margin: 15px 30px;
+            }
         }
         
         .signature-line label {
             font-weight: bold;
-            margin-right: 8px;
-            font-size: 13px;
+            margin-right: 6px;
+            font-size: 11px;
+        }
+
+        @media (min-width: 768px) {
+            .signature-line label {
+                margin-right: 8px;
+                font-size: 13px;
+            }
         }
         
         .signature-display {
@@ -516,8 +686,14 @@
         }
         
         .signature-display img {
-            height: 50px;
+            height: 40px;
             vertical-align: middle;
+        }
+
+        @media (min-width: 768px) {
+            .signature-display img {
+                height: 50px;
+            }
         }
         
         .loading-overlay {
@@ -563,30 +739,50 @@
         .success-box {
             background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
             color: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             text-align: center;
         }
 
+        @media (min-width: 768px) {
+            .success-box {
+                padding: 30px;
+                margin-bottom: 30px;
+            }
+        }
+
         .success-box h2 {
-            font-size: 24px;
-            margin-bottom: 15px;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        @media (min-width: 768px) {
+            .success-box h2 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
         }
 
         .success-box p {
-            font-size: 16px;
+            font-size: 14px;
             opacity: 0.95;
             line-height: 1.6;
+        }
+
+        @media (min-width: 768px) {
+            .success-box p {
+                font-size: 16px;
+            }
         }
 
         .kakao-btn {
             background: #FEE500;
             color: #000000;
-            padding: 20px;
+            padding: 18px;
             border: none;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
@@ -595,6 +791,13 @@
             justify-content: center;
             gap: 10px;
             transition: all 0.3s;
+        }
+
+        @media (min-width: 768px) {
+            .kakao-btn {
+                padding: 20px;
+                font-size: 18px;
+            }
         }
 
         .kakao-btn:hover {
@@ -634,6 +837,7 @@
             justify-content: center;
             align-items: center;
             z-index: 10000;
+            padding: 20px;
         }
 
         .modal-overlay.active {
@@ -642,62 +846,116 @@
 
         .modal-content {
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 20px;
             text-align: center;
             max-width: 450px;
-            width: 90%;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .modal-content {
+                padding: 40px;
+            }
         }
 
         .modal-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
+            font-size: 48px;
             margin-bottom: 15px;
         }
 
+        @media (min-width: 768px) {
+            .modal-icon {
+                font-size: 64px;
+                margin-bottom: 20px;
+            }
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        @media (min-width: 768px) {
+            .modal-title {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+        }
+
         .modal-message {
-            font-size: 16px;
+            font-size: 14px;
             color: #666;
             line-height: 1.6;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .modal-message {
+                font-size: 16px;
+                margin-bottom: 25px;
+            }
         }
 
         .countdown-box {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .countdown-box {
+                padding: 20px;
+                margin-bottom: 25px;
+            }
         }
 
         .countdown-number {
-            font-size: 48px;
+            font-size: 36px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .countdown-number {
+                font-size: 48px;
+                margin-bottom: 10px;
+            }
         }
 
         .countdown-text {
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0.9;
+        }
+
+        @media (min-width: 768px) {
+            .countdown-text {
+                font-size: 14px;
+            }
         }
 
         .modal-btn {
             width: 100%;
-            padding: 18px;
+            padding: 16px;
             border: none;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             transition: all 0.3s;
+        }
+
+        @media (min-width: 768px) {
+            .modal-btn {
+                padding: 18px;
+                font-size: 18px;
+            }
         }
 
         .modal-btn:hover {
@@ -708,16 +966,30 @@
         .instruction-list {
             text-align: left;
             background: #f8f9fa;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
-            margin: 20px 0;
+            margin: 15px 0;
+        }
+
+        @media (min-width: 768px) {
+            .instruction-list {
+                padding: 20px;
+                margin: 20px 0;
+            }
         }
 
         .instruction-item {
             display: flex;
             align-items: start;
-            margin-bottom: 15px;
-            gap: 12px;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .instruction-item {
+                margin-bottom: 15px;
+                gap: 12px;
+            }
         }
 
         .instruction-item:last-child {
@@ -727,22 +999,36 @@
         .instruction-number {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
             flex-shrink: 0;
+        }
+
+        @media (min-width: 768px) {
+            .instruction-number {
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
+            }
         }
 
         .instruction-text {
             flex: 1;
-            font-size: 15px;
+            font-size: 13px;
             color: #333;
             line-height: 1.5;
+        }
+
+        @media (min-width: 768px) {
+            .instruction-text {
+                font-size: 15px;
+            }
         }
     </style>
 </head>
@@ -792,6 +1078,10 @@
                 <div class="countdown-number" id="countdownNumber">5</div>
                 <div class="countdown-text">초 후 카카오톡 채널로 이동합니다</div>
             </div>
+
+            <button class="modal-btn" onclick="openKakaoNow()" style="background: #FEE500; color: #000;">
+                💬 지금 바로 카카오톡 열기
+            </button>
         </div>
     </div>
 
@@ -1021,46 +1311,46 @@
         </div>
     </div>
     
-    <!-- Final Page -->
+    <!-- Final Page (반응형) -->
     <div class="final-page" id="finalPage" style="display: none;">
         <div class="success-box">
             <h2>✅ 신청서 작성 완료!</h2>
             <p>아래 버튼을 눌러 카카오톡으로 신청서를 전송해주세요</p>
         </div>
 
-        <!-- A4 크기 문서 -->
-        <div id="captureArea" class="a4-document">
+        <!-- 반응형 미리보기 -->
+        <div class="document-preview">
             <h1 class="document-title">G·X) 커뮤니티센터 회원 신청서</h1>
             
             <table class="info-table">
                 <tr>
                     <td class="label">회원성명</td>
-                    <td colspan="3" id="finalName"></td>
+                    <td colspan="3" id="previewName"></td>
                     <td class="label">신청일자</td>
-                    <td id="finalDate"></td>
+                    <td id="previewDate"></td>
                 </tr>
                 <tr>
                     <td class="label">성별</td>
                     <td class="label">남 / 여</td>
                     <td class="label">동 / 호수</td>
-                    <td colspan="2" id="finalAddress"></td>
+                    <td colspan="2" id="previewAddress"></td>
                     <td></td>
                 </tr>
                 <tr>
                     <td class="label">연락처</td>
-                    <td colspan="5" id="finalPhone"></td>
+                    <td colspan="5" id="previewPhone"></td>
                 </tr>
                 <tr>
                     <td class="label">결제금액</td>
-                    <td colspan="5" id="finalAmount"></td>
+                    <td colspan="5" id="previewAmount"></td>
                 </tr>
             </table>
             
             <div class="application-section">
                 <div class="section-title">등록 종목</div>
-                <div style="padding: 15px;">
-                    <div id="finalProgram" style="font-weight: bold; margin-bottom: 8px; font-size: 14px;"></div>
-                    <div id="finalSchedule" style="font-size: 13px;"></div>
+                <div style="padding: 12px;">
+                    <div id="previewProgram" style="font-weight: bold; margin-bottom: 8px; font-size: 13px;"></div>
+                    <div id="previewSchedule" style="font-size: 12px;"></div>
                 </div>
             </div>
             
@@ -1076,7 +1366,7 @@
             </ol>
             
             <div class="note-box">
-                3장 및 4장 내용 확인 [서명 : <span class="signature-in-note" id="noteSignature"></span>]
+                3장 및 4장 내용 확인 [서명 : <span class="signature-in-note" id="previewNoteSignature"></span>]
             </div>
             
             <ol class="agreement-list" start="5">
@@ -1118,21 +1408,123 @@
                 <div class="signature-line">
                     <label>신청인</label>
                     <div class="signature-display">
-                        <img id="finalSignature" src="" alt="서명">
+                        <img id="previewSignature" src="" alt="서명">
                     </div>
                     (인)
                 </div>
                 <div class="signature-line">
                     <label>담당자</label>
-                    <span style="display: inline-block; width: 120px; border-bottom: 2px solid #000; padding: 5px;"></span>
+                    <span style="display: inline-block; width: 100px; border-bottom: 2px solid #000; padding: 5px;"></span>
                     (인)
                 </div>
             </div>
         </div>
         
-        <button class="kakao-btn" onclick="sendToKakao()" style="margin-top: 30px;">
+        <button class="kakao-btn" onclick="sendToKakao()" style="margin-top: 20px;">
             💬 카카오채널로 신청서 보내기
         </button>
+    </div>
+
+    <!-- A4 캡처용 숨김 문서 -->
+    <div id="captureArea" class="a4-document">
+        <h1 class="document-title">G·X) 커뮤니티센터 회원 신청서</h1>
+        
+        <table class="info-table">
+            <tr>
+                <td class="label">회원성명</td>
+                <td colspan="3" id="finalName"></td>
+                <td class="label">신청일자</td>
+                <td id="finalDate"></td>
+            </tr>
+            <tr>
+                <td class="label">성별</td>
+                <td class="label">남 / 여</td>
+                <td class="label">동 / 호수</td>
+                <td colspan="2" id="finalAddress"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="label">연락처</td>
+                <td colspan="5" id="finalPhone"></td>
+            </tr>
+            <tr>
+                <td class="label">결제금액</td>
+                <td colspan="5" id="finalAmount"></td>
+            </tr>
+        </table>
+        
+        <div class="application-section">
+            <div class="section-title">등록 종목</div>
+            <div style="padding: 15px;">
+                <div id="finalProgram" style="font-weight: bold; margin-bottom: 8px; font-size: 14px;"></div>
+                <div id="finalSchedule" style="font-size: 13px;"></div>
+            </div>
+        </div>
+        
+        <div class="agreement-title">[ 이용약관 및 개인정보동의서 ]</div>
+        
+        <ol class="agreement-list">
+            <li>본인 부주의로 발생되는 사고에 대해서는 책임을 지지 않습니다.</li>
+            <li>커뮤니티 시설 이용 신청은 수시접수이며 수업인원에 따라 일할 계산됩니다.</li>
+            <li>해지를 원하시는 일주일은 반드시 안내데스크에 방문하셔서 해지신청서 작성<br>
+            ※ 해지 신청을 하지 않아 발생된 요금의 책임은 본인에게 있습니다.</li>
+            <li>등록 후 미 이용 시 연기 및 환불이 불가하며 반드시 해지신청하셔야 합니다. (질병,복상시에도 불가)<br>
+            ※ 환불규정(전여일수 환불) : 계산 수강료 ÷ 수업일수 = 환불액</li>
+        </ol>
+        
+        <div class="note-box">
+            3장 및 4장 내용 확인 [서명 : <span class="signature-in-note" id="noteSignature"></span>]
+        </div>
+        
+        <ol class="agreement-list" start="5">
+            <li>안전을 위해 영유아, 조등학생, 애완동물의 동반출입을 금지입니다.</li>
+            <li>운동시설 이용 시 운동복과 실내화를 착용해야 합니다.</li>
+            <li>음주 후 출입불가 하며, 모든 음식물 반입을 금지합니다.</li>
+            <li>모든 비품과 시설물 등을 보호에 힘쓰고, 고의나 과실로 파손하거나 훼손한 경우 배상 책임이 있습니다.</li>
+            <li>이용 시 안전사고에 유의하고 관리자의 지시에 따라야 합니다.</li>
+            <li>소지품은 보관해 드리지 않습니다.</li>
+            <li>전술(이사)시에는 반드시 커뮤니티센터 이용요금 정산을 하고 퇴실 하셔야 합니다.</li>
+            <li>이외의 모든 운영규칙을 읽어보고 확인하였습니다.</li>
+            <li>개인 락커 사용시 발생된 분실물은 개인이 책임입니다.</li>
+        </ol>
+        
+        <div class="detailed-agreement">
+            <h3>1. 개인정보동의서</h3>
+            <p>1) 수집, 이용 목적 : 회스테이트지오계약 야파트 커뮤니티센터 운영에 대한 이용약관 동의 및 회원가입 신청</p>
+            <p>2) 수집항목 : 성명, 성별, 생년월일, 주소, 전화번호</p>
+            <p>3) 보유·이용기간 : 이용종료 후 2년</p>
+            <p>4) 동의 거부 고지 : 개인정보 수집, 이용을 거부하실 수 있습니다. 거부할 경우 커뮤니티시설 이용이 제한될 수 있습니다.</p>
+            
+            <h3>2. 제3자 제공 동의</h3>
+            <p>1) 제공받는 자 : (주)스포이즘, 관리사무소</p>
+            <p>2) 제공받는 자의 이용목적 : 커뮤니티시설 이용의 확인 및 입주민 확인</p>
+            <p>3) 제공항목 : 성명, 전화번호, 생년월일, 주소</p>
+            <p>4) 제공받는 자의 보유 : 커뮤니티 이용 종료 후 2년</p>
+            
+            <h3>5) 동의 거부 고지</h3>
+            <p>개인정보 제3자 제공을 거부하실 수 있습니다. 거부할 경우 주민공동시설, 커뮤니티 시설의 이용이 제한될 수 있습니다.</p>
+        </div>
+        
+        <div class="consent-box">
+            <h3>개인정보 수집,이용 및 제3자 제공 동의 ☑</h3>
+            <p>본인은 위 목적으로 위험가입 신청에 저1된 이용약관을 충분히 이해하였습니다.<br>
+            개인정보의 수집 · 이용 · 제공 · 조회에 관하여 동의하며 회원가입을 신청합니다.</p>
+        </div>
+        
+        <div class="signature-section">
+            <div class="signature-line">
+                <label>신청인</label>
+                <div class="signature-display">
+                    <img id="finalSignature" src="" alt="서명">
+                </div>
+                (인)
+            </div>
+            <div class="signature-line">
+                <label>담당자</label>
+                <span style="display: inline-block; width: 120px; border-bottom: 2px solid #000; padding: 5px;"></span>
+                (인)
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1140,6 +1532,7 @@
         let canvas, ctx;
         let isDrawing = false;
         let capturedBlob = null;
+        let countdownTimer = null;
         
         // 동 입력 - 3자리 입력 시 호수로 이동
         document.getElementById('dong').addEventListener('input', function(e) {
@@ -1449,15 +1842,40 @@
             const amountValue = document.getElementById('amount').value.replace(/,/g, '');
             const formattedAmount = parseInt(amountValue).toLocaleString('ko-KR');
             
-            document.getElementById('finalName').textContent = document.getElementById('name').value;
-            document.getElementById('finalDate').textContent = `20${year.toString().slice(2)}.${month}.${day}`;
-            document.getElementById('finalAddress').textContent = `${document.getElementById('dong').value}동 ${document.getElementById('ho').value}호`;
-            document.getElementById('finalPhone').textContent = `010 - ${document.getElementById('phone1').value} - ${document.getElementById('phone2').value}`;
-            document.getElementById('finalAmount').textContent = `${formattedAmount}원`;
-            document.getElementById('finalProgram').textContent = document.querySelector('input[name="program"]:checked').value;
-            document.getElementById('finalSchedule').textContent = `매주 ${weekdayStr}요일 ${document.getElementById('hour').value}:${document.getElementById('minute').value}`;
+            const nameValue = document.getElementById('name').value;
+            const dateValue = `20${year.toString().slice(2)}.${month}.${day}`;
+            const addressValue = `${document.getElementById('dong').value}동 ${document.getElementById('ho').value}호`;
+            const phoneValue = `010 - ${document.getElementById('phone1').value} - ${document.getElementById('phone2').value}`;
+            const amountText = `${formattedAmount}원`;
+            const programValue = document.querySelector('input[name="program"]:checked').value;
+            const scheduleValue = `매주 ${weekdayStr}요일 ${document.getElementById('hour').value}:${document.getElementById('minute').value}`;
             
             const signatureDataUrl = canvas.toDataURL('image/png');
+            
+            // 반응형 미리보기 업데이트
+            document.getElementById('previewName').textContent = nameValue;
+            document.getElementById('previewDate').textContent = dateValue;
+            document.getElementById('previewAddress').textContent = addressValue;
+            document.getElementById('previewPhone').textContent = phoneValue;
+            document.getElementById('previewAmount').textContent = amountText;
+            document.getElementById('previewProgram').textContent = programValue;
+            document.getElementById('previewSchedule').textContent = scheduleValue;
+            document.getElementById('previewSignature').src = signatureDataUrl;
+            
+            const previewNoteSignature = document.getElementById('previewNoteSignature');
+            const previewSignImg = document.createElement('img');
+            previewSignImg.src = signatureDataUrl;
+            previewNoteSignature.innerHTML = '';
+            previewNoteSignature.appendChild(previewSignImg);
+            
+            // A4 캡처용 업데이트
+            document.getElementById('finalName').textContent = nameValue;
+            document.getElementById('finalDate').textContent = dateValue;
+            document.getElementById('finalAddress').textContent = addressValue;
+            document.getElementById('finalPhone').textContent = phoneValue;
+            document.getElementById('finalAmount').textContent = amountText;
+            document.getElementById('finalProgram').textContent = programValue;
+            document.getElementById('finalSchedule').textContent = scheduleValue;
             document.getElementById('finalSignature').src = signatureDataUrl;
             
             const noteSignature = document.getElementById('noteSignature');
@@ -1512,15 +1930,18 @@
         }
         
         function downloadApplication() {
+            // 브라우저의 다운로드 기능 사용 (모바일에서는 사진첩/갤러리로 저장됨)
             const url = URL.createObjectURL(capturedBlob);
             const link = document.createElement('a');
-            const name = document.getElementById('name').value;
+            const name = document.getElementById('name').value || '신청자';
             const today = new Date();
             const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
             
             link.download = `커뮤니티센터_회원신청서_${name}_${dateStr}.png`;
             link.href = url;
+            document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
             
             URL.revokeObjectURL(url);
             
@@ -1536,16 +1957,23 @@
             let count = 5;
             const countdownElement = document.getElementById('countdownNumber');
             
-            const timer = setInterval(() => {
+            countdownTimer = setInterval(() => {
                 count--;
                 countdownElement.textContent = count;
                 
                 if (count <= 0) {
-                    clearInterval(timer);
-                    document.getElementById('instructionModal').classList.remove('active');
-                    window.open('http://pf.kakao.com/_nVSxdn/chat', '_blank');
+                    clearInterval(countdownTimer);
+                    openKakaoNow();
                 }
             }, 1000);
+        }
+        
+        function openKakaoNow() {
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+            }
+            document.getElementById('instructionModal').classList.remove('active');
+            window.open('http://pf.kakao.com/_nVSxdn/chat', '_blank');
         }
     </script>
 </body>
