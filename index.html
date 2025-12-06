@@ -115,12 +115,12 @@
         
         .select-group select {
             flex: 1;
-            padding: 30px 15px;
+            padding: 60px 15px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 20px;
             background: white;
-            font-weight: 500;
+            font-weight: 600;
         }
         
         .program-option {
@@ -608,6 +608,128 @@
             width: 30px;
             border-radius: 10px;
         }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+        }
+
+        .modal-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .modal-message {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .countdown-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .countdown-number {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .countdown-text {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .instruction-list {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: start;
+            margin-bottom: 15px;
+            gap: 12px;
+        }
+
+        .instruction-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .instruction-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .instruction-text {
+            flex: 1;
+            font-size: 15px;
+            color: #333;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -615,6 +737,47 @@
         <div class="loading-content">
             <div class="spinner"></div>
             <p id="loadingText">신청서를 생성하는 중...</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="downloadModal">
+        <div class="modal-content">
+            <div class="modal-icon">📥</div>
+            <h2 class="modal-title">신청서를 저장하세요</h2>
+            <p class="modal-message">
+                아래 버튼을 눌러 신청서를<br>
+                사진첩/갤러리에 저장해주세요
+            </p>
+            <button class="modal-btn" onclick="downloadApplication()">
+                신청서 저장하기
+            </button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="instructionModal">
+        <div class="modal-content">
+            <div class="modal-icon">💬</div>
+            <h2 class="modal-title">카카오톡으로 전송하기</h2>
+            
+            <div class="instruction-list">
+                <div class="instruction-item">
+                    <div class="instruction-number">1</div>
+                    <div class="instruction-text">카카오톡 채널 하단의 <strong>+ 버튼</strong>을 누르세요</div>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-number">2</div>
+                    <div class="instruction-text">갤러리/사진첩에서 <strong>저장한 신청서</strong>를 선택하세요</div>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-number">3</div>
+                    <div class="instruction-text">신청서 이미지를 <strong>전송</strong>해주세요</div>
+                </div>
+            </div>
+
+            <div class="countdown-box">
+                <div class="countdown-number" id="countdownNumber">5</div>
+                <div class="countdown-text">초 후 카카오톡 채널로 이동합니다</div>
+            </div>
         </div>
     </div>
 
@@ -641,7 +804,7 @@
             <div class="form-group">
                 <label class="form-label">동 / 호수 *</label>
                 <div class="select-group">
-                    <input type="number" inputmode="numeric" class="form-input" id="dong" placeholder="동" style="flex: 1;">
+                    <input type="number" inputmode="numeric" class="form-input" id="dong" placeholder="동" maxlength="3" style="flex: 1;">
                     <input type="number" inputmode="numeric" class="form-input" id="ho" placeholder="호수" style="flex: 1;">
                 </div>
             </div>
@@ -963,13 +1126,37 @@
         let isDrawing = false;
         let capturedBlob = null;
         
-        // 연락처 자동 이동
+        // 동 입력 - 3자리 입력 시 호수로 이동
+        document.getElementById('dong').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            if (value.length >= 3) {
+                value = value.slice(0, 3);
+                e.target.value = value;
+                document.getElementById('ho').focus();
+            } else {
+                e.target.value = value;
+            }
+        });
+        
+        // 연락처 중간 4자리 자동 이동
         document.getElementById('phone1').addEventListener('input', function(e) {
             let value = e.target.value.replace(/[^0-9]/g, '');
             if (value.length >= 4) {
                 value = value.slice(0, 4);
                 e.target.value = value;
                 document.getElementById('phone2').focus();
+            } else {
+                e.target.value = value;
+            }
+        });
+        
+        // 연락처 끝 4자리 입력 후 결제금액으로 이동
+        document.getElementById('phone2').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            if (value.length >= 4) {
+                value = value.slice(0, 4);
+                e.target.value = value;
+                document.getElementById('amount').focus();
             } else {
                 e.target.value = value;
             }
@@ -984,7 +1171,7 @@
             e.target.value = value;
         });
         
-        // 약관 동의 1 처리
+        // 약관 동의 1 처리 - 화면 하단 스크롤
         function handleAgree1Change() {
             const agree1 = document.getElementById('agree1').checked;
             const termsBox = document.getElementById('termsBox');
@@ -997,6 +1184,14 @@
                 privacyBox.classList.add('expanded');
                 agree2Group.style.display = 'block';
                 agreeOption1.classList.add('checked');
+                
+                // 화면 하단으로 스크롤
+                setTimeout(() => {
+                    window.scrollTo({
+                        top: document.body.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 100);
             } else {
                 termsBox.classList.remove('collapsed');
                 privacyBox.classList.remove('expanded');
@@ -1021,6 +1216,14 @@
                 signatureGroup.style.display = 'block';
                 agreeOption2.classList.add('checked');
                 setTimeout(initCanvas, 100);
+                
+                // 화면 하단으로 스크롤
+                setTimeout(() => {
+                    window.scrollTo({
+                        top: document.body.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 100);
             } else {
                 privacyBox.classList.add('expanded');
                 privacyBox.classList.remove('collapsed');
@@ -1174,12 +1377,18 @@
             document.getElementById(`page${page}`).classList.remove('active');
             document.getElementById(`page${page + 1}`).classList.add('active');
             currentPage = page + 1;
+            
+            // 페이지 전환 시 최상단으로 스크롤
+            window.scrollTo(0, 0);
         }
         
         function prevPage(page) {
             document.getElementById(`page${page}`).classList.remove('active');
             document.getElementById(`page${page - 1}`).classList.add('active');
             currentPage = page - 1;
+            
+            // 페이지 전환 시 최상단으로 스크롤
+            window.scrollTo(0, 0);
         }
         
         function submitForm() {
@@ -1226,7 +1435,6 @@
                 .map(checkbox => checkbox.value);
             const weekdayStr = weekdays.join(', ');
             
-            // 쉼표 제거하고 숫자만 추출
             const amountValue = document.getElementById('amount').value.replace(/,/g, '');
             const formattedAmount = parseInt(amountValue).toLocaleString('ko-KR');
             
@@ -1241,7 +1449,6 @@
             const signatureDataUrl = canvas.toDataURL('image/png');
             document.getElementById('finalSignature').src = signatureDataUrl;
             
-            // 중간 서명란에도 추가
             const noteSignature = document.getElementById('noteSignature');
             const signImg = document.createElement('img');
             signImg.src = signatureDataUrl;
@@ -1268,6 +1475,7 @@
                 generatedCanvas.toBlob((blob) => {
                     capturedBlob = blob;
                     document.getElementById('loadingOverlay').classList.remove('active');
+                    window.scrollTo(0, 0);
                 });
                 
             } catch (error) {
@@ -1283,7 +1491,12 @@
                 return;
             }
             
-            // 다운로드
+            // 다운로드 안내 모달 표시
+            document.getElementById('downloadModal').classList.add('active');
+        }
+        
+        function downloadApplication() {
+            // 다운로드 실행
             const url = URL.createObjectURL(capturedBlob);
             const link = document.createElement('a');
             const name = document.getElementById('name').value;
@@ -1296,11 +1509,30 @@
             
             URL.revokeObjectURL(url);
             
-            // 카카오톡 채널 열기
+            // 다운로드 모달 닫기
+            document.getElementById('downloadModal').classList.remove('active');
+            
+            // 안내 모달 표시 및 카운트다운 시작
             setTimeout(() => {
-                window.open('http://pf.kakao.com/_nVSxdn/chat', '_blank');
-                alert('💬 신청서가 다운로드되었습니다!\n\n카카오톡 채널이 열리면\n다운받은 신청서 이미지를 전송해주세요.');
+                document.getElementById('instructionModal').classList.add('active');
+                startCountdown();
             }, 500);
+        }
+        
+        function startCountdown() {
+            let count = 5;
+            const countdownElement = document.getElementById('countdownNumber');
+            
+            const timer = setInterval(() => {
+                count--;
+                countdownElement.textContent = count;
+                
+                if (count <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('instructionModal').classList.remove('active');
+                    window.open('http://pf.kakao.com/_nVSxdn/chat', '_blank');
+                }
+            }, 1000);
         }
     </script>
 </body>
