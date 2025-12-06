@@ -393,12 +393,18 @@
         .a4-document {
             position: absolute;
             left: -9999px;
-            width: 210mm;
-            height: 297mm;
+            width: 794px !important;  /* 고정 픽셀 값 */
+            height: 1123px !important; /* 고정 픽셀 값 */
+            min-width: 794px;
+            min-height: 1123px;
+            max-width: 794px;
+            max-height: 1123px;
             padding: 12mm;
             background: white;
             box-sizing: border-box;
             font-family: 'Malgun Gothic', sans-serif;
+            overflow: hidden;
+            transform-origin: top left;
         }
         
         .document-title {
@@ -1094,8 +1100,8 @@
             </div>
             
             <div class="form-group">
-                <label class="form-label">결제 금액 *</label>
-                <input type="text" inputmode="numeric" class="form-input" id="amount" placeholder="주1회씩 4회: 200,000원 / 주2회씩 8회: 380,000원" required>
+                <label class="form-label">결제 금액 * <span style="font-size: 0.67em;">회당 55,000원 / 주1회씩 4회: 200,000원 / 주2회씩 8회: 380,000원</span></label>
+                <input type="text" inputmode="numeric" class="form-input" id="amount" placeholder="결제하실 금액을 입력해주세요" required>
             </div>
             
             <div class="button-group">
@@ -1323,7 +1329,7 @@
         </button>
         
         <button class="download-btn" onclick="downloadToDevice()">
-            📥 내 기기에 저장하기
+            📥 신청서 저장하기
         </button>
     </div>
 
@@ -1382,12 +1388,12 @@
         
         <div class="detailed-agreement">
             <h3>1. 개인정보동의서</h3>
-            <p>1) 수집, 이용 목적 : 힐스테이트자이계양 야파트 커뮤니티센터 운영에 대한 이용약관 동의 및 회원가입 신청</p>
+            <p>1) 수집, 이용 목적 : 힐스테이트자이계양 아파트 커뮤니티센터 운영에 대한 이용약관 동의 및 회원가입 신청</p>
             <p>2) 수집항목 : 성명, 성별, 생년월일, 주소, 전화번호</p>
             <p>3) 보유·이용기간 : 이용종료 후 2년</p>
                         
             <h3>2. 제3자 제공 동의</h3>
-            <p>1) 제공받는 자 : (주)스포이즘, (주)힐링트리, 관리사무소</p>
+            <p>1) 제공받는 자 : (주)스포이즘, 관리사무소</p>
             <p>2) 제공받는 자의 이용목적 : 커뮤니티시설 이용의 확인 및 입주민 확인</p>
             <p>3) 제공항목 : 성명, 전화번호, 생년월일, 주소</p>
             <p>4) 제공받는 자의 보유 : 커뮤니티 이용 종료 후 2년</p>
@@ -1432,6 +1438,18 @@
             }
         });
         
+        // 호 입력 - 4자리 입력 시 호수로 이동
+        document.getElementById('ho').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            if (value.length >= 4) {
+                value = value.slice(0, 4);
+                e.target.value = value;
+                document.getElementById('phone1').focus();
+            } else {
+                e.target.value = value;
+            }
+        });
+
         // 연락처 중간 4자리 자동 이동
         document.getElementById('phone1').addEventListener('input', function(e) {
             let value = e.target.value.replace(/[^0-9]/g, '');
@@ -1712,6 +1730,11 @@
             document.getElementById('loadingOverlay').classList.add('active');
             document.getElementById('loadingText').textContent = '신청서를 생성하는 중...';
             
+            // 뷰포트 메타태그 임시 저장 및 변경
+            const viewport = document.querySelector('meta[name="viewport"]');
+            const originalContent = viewport.content;
+            viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0';
+            
             const today = new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -1764,6 +1787,8 @@
             
             setTimeout(async () => {
                 await captureApplication();
+                // 뷰포트 복원
+                viewport.content = originalContent;
             }, 500);
         }
         
@@ -1771,15 +1796,25 @@
             try {
                 const captureArea = document.getElementById('captureArea');
                 
-                // A4 크기로 캡처 (210mm x 297mm = 794px x 1123px at 96dpi)
-                // 고해상도를 위해 scale 3 사용
+                // 디바이스 픽셀 비율 감지
+                const dpr = window.devicePixelRatio || 1;
+                
+                // A4 비율 유지 (210mm x 297mm)
+                const a4Width = 794;  // A4 width at 96dpi
+                const a4Height = 1123; // A4 height at 96dpi
+                
+                // 모바일과 데스크탑 모두 동일한 결과를 위한 설정
                 const generatedCanvas = await html2canvas(captureArea, {
-                    scale: 3,
-                    width: 794,
-                    height: 1123,
+                    scale: Math.max(2, dpr), // 최소 2배 스케일 보장
+                    width: a4Width,
+                    height: a4Height,
+                    windowWidth: a4Width,
+                    windowHeight: a4Height,
                     backgroundColor: '#ffffff',
                     logging: false,
-                    useCORS: true
+                    useCORS: true,
+                    scrollY: -window.scrollY,
+                    scrollX: -window.scrollX
                 });
                 
                 generatedCanvas.toBlob((blob) => {
