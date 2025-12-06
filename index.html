@@ -6,7 +6,7 @@
     <title>리:얼 커뮤니티센터 회원 신청</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
     <style>
         * {
             margin: 0;
@@ -1505,8 +1505,8 @@
         // ========================================
         // Google Drive API 설정
         // ========================================
-        const CLIENT_ID = '여기에-클라이언트-ID-입력.apps.googleusercontent.com';
-        const API_KEY = '여기에-API-키-입력';
+        const CLIENT_ID = '553256435396-555q606mvk14frd3bdrar3apm4pkfvae.apps.googleusercontent.com';
+        const API_KEY = 'AIzaSyDLhORH091WA2WoyN9VKavATGdn4iubv7w';
         const SCOPES = 'https://www.googleapis.com/auth/drive.file';
         
         let tokenClient;
@@ -1514,32 +1514,53 @@
         let gapiInited = false;
         let gisInited = false;
         
-        // Google API 초기화
-        function gapiLoaded() {
-            gapi.load('client', initializeGapiClient);
-        }
-        
-        async function initializeGapiClient() {
-            await gapi.client.init({
-                apiKey: API_KEY,
-                discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+        // Google API 초기화 - 개선된 버전
+        function initializeGapiClient() {
+            gapi.load('client', async () => {
+                try {
+                    await gapi.client.init({
+                        apiKey: API_KEY,
+                        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+                    });
+                    gapiInited = true;
+                    console.log('GAPI initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing GAPI:', error);
+                }
             });
-            gapiInited = true;
         }
         
-        function gisLoaded() {
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPES,
-                callback: '', // 동적으로 설정
-            });
-            gisInited = true;
+        function initializeGisClient() {
+            try {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: CLIENT_ID,
+                    scope: SCOPES,
+                    callback: '', // 동적으로 설정
+                });
+                gisInited = true;
+                console.log('GIS initialized successfully');
+            } catch (error) {
+                console.error('Error initializing GIS:', error);
+            }
         }
         
-        // 페이지 로드 시 초기화
+        // 페이지 로드 완료 후 초기화
         window.addEventListener('load', () => {
-            gapiLoaded();
-            gisLoaded();
+            // gapi가 로드될 때까지 대기
+            const checkGapi = setInterval(() => {
+                if (typeof gapi !== 'undefined') {
+                    clearInterval(checkGapi);
+                    initializeGapiClient();
+                }
+            }, 100);
+            
+            // google.accounts가 로드될 때까지 대기
+            const checkGis = setInterval(() => {
+                if (typeof google !== 'undefined' && google.accounts) {
+                    clearInterval(checkGis);
+                    initializeGisClient();
+                }
+            }, 100);
         });
         
         // ========================================
