@@ -1505,8 +1505,8 @@
         // ========================================
         // Google Drive API 설정
         // ========================================
-        const CLIENT_ID = '553256435396-555q606mvk14frd3bdrar3apm4pkfvae.apps.googleusercontent.com';
-        const API_KEY = 'AIzaSyDLhORH091WA2WoyN9VKavATGdn4iubv7w';
+        const CLIENT_ID = '여기에-클라이언트-ID-입력.apps.googleusercontent.com';
+        const API_KEY = '여기에-API-키-입력';
         const SCOPES = 'https://www.googleapis.com/auth/drive.file';
         
         let tokenClient;
@@ -1971,10 +1971,24 @@
         }
         
         async function uploadToDrive() {
-            // API 초기화 확인
+            // API 초기화 확인 - 최대 5초 대기
             if (!gapiInited || !gisInited) {
-                alert('Google API가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
-                return;
+                document.getElementById('loadingOverlay').classList.add('active');
+                document.getElementById('loadingText').textContent = 'Google API 로딩 중...';
+                
+                // 최대 5초 동안 API 로드 대기
+                let waitTime = 0;
+                while ((!gapiInited || !gisInited) && waitTime < 5000) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    waitTime += 100;
+                }
+                
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
+                if (!gapiInited || !gisInited) {
+                    alert('Google API 로딩에 실패했습니다.\n페이지를 새로고침한 후 다시 시도해주세요.');
+                    return;
+                }
             }
             
             // 캡처된 이미지 확인
