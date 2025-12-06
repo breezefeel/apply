@@ -364,75 +364,87 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         
+        /* A4 크기 문서 스타일 */
+        .a4-document {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            background: white;
+            box-sizing: border-box;
+            font-family: 'Malgun Gothic', sans-serif;
+        }
+        
         .document-title {
             text-align: center;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         
         .info-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         
         .info-table td {
             border: 2px solid #000;
-            padding: 10px;
+            padding: 8px;
+            font-size: 13px;
         }
         
         .info-table .label {
             background-color: #e8e8e8;
-            width: 120px;
+            width: 100px;
             text-align: center;
             font-weight: bold;
         }
         
         .application-section {
             border: 2px solid #000;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 15px;
+            margin-bottom: 18px;
         }
         
         .section-title {
             text-align: center;
             font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 15px;
+            font-size: 16px;
+            margin-bottom: 12px;
         }
         
         .agreement-title {
             text-align: center;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
-            margin: 30px 0 20px 0;
+            margin: 20px 0 15px 0;
         }
         
         .agreement-list {
-            line-height: 1.8;
-            margin-bottom: 20px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 12px;
         }
         
         .agreement-list li {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .note-box {
             text-align: center;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
-            margin: 30px 0;
-            padding: 15px;
+            margin: 20px 0;
+            padding: 12px;
             border: 1px solid #333;
         }
         
         .signature-in-note {
             display: inline-block;
-            width: 150px;
+            width: 120px;
             border-bottom: 1px solid #333;
             vertical-align: middle;
-            height: 40px;
+            height: 35px;
             position: relative;
         }
         
@@ -441,57 +453,59 @@
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            height: 35px;
+            height: 30px;
         }
         
         .detailed-agreement {
-            margin-top: 20px;
-            font-size: 14px;
-            line-height: 1.6;
+            margin-top: 15px;
+            font-size: 11px;
+            line-height: 1.5;
         }
         
         .detailed-agreement h3 {
-            font-size: 15px;
+            font-size: 13px;
             font-weight: bold;
-            margin: 15px 0 10px 0;
+            margin: 12px 0 8px 0;
         }
         
         .detailed-agreement p,
         .detailed-agreement li {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .consent-box {
             border: 2px solid #000;
-            padding: 20px;
-            margin-top: 30px;
+            padding: 15px;
+            margin-top: 20px;
         }
         
         .consent-box h3 {
             text-align: center;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         
         .consent-box p {
-            line-height: 1.8;
+            line-height: 1.6;
             text-align: center;
+            font-size: 12px;
         }
         
         .signature-section {
-            margin-top: 40px;
+            margin-top: 30px;
             text-align: center;
         }
         
         .signature-line {
             display: inline-block;
-            margin: 20px 40px;
+            margin: 15px 30px;
         }
         
         .signature-line label {
             font-weight: bold;
-            margin-right: 10px;
+            margin-right: 8px;
+            font-size: 13px;
         }
         
         .signature-display {
@@ -502,7 +516,7 @@
         }
         
         .signature-display img {
-            height: 60px;
+            height: 50px;
             vertical-align: middle;
         }
         
@@ -1014,7 +1028,8 @@
             <p>아래 버튼을 눌러 카카오톡으로 신청서를 전송해주세요</p>
         </div>
 
-        <div id="captureArea" style="background: white; padding: 40px; border-radius: 10px; margin-bottom: 30px;">
+        <!-- A4 크기 문서 -->
+        <div id="captureArea" class="a4-document">
             <h1 class="document-title">G·X) 커뮤니티센터 회원 신청서</h1>
             
             <table class="info-table">
@@ -1043,9 +1058,9 @@
             
             <div class="application-section">
                 <div class="section-title">등록 종목</div>
-                <div style="padding: 20px;">
-                    <div id="finalProgram" style="font-weight: bold; margin-bottom: 10px;"></div>
-                    <div id="finalSchedule"></div>
+                <div style="padding: 15px;">
+                    <div id="finalProgram" style="font-weight: bold; margin-bottom: 8px; font-size: 14px;"></div>
+                    <div id="finalSchedule" style="font-size: 13px;"></div>
                 </div>
             </div>
             
@@ -1109,13 +1124,13 @@
                 </div>
                 <div class="signature-line">
                     <label>담당자</label>
-                    <span style="display: inline-block; width: 150px; border-bottom: 2px solid #000; padding: 5px;"></span>
+                    <span style="display: inline-block; width: 120px; border-bottom: 2px solid #000; padding: 5px;"></span>
                     (인)
                 </div>
             </div>
         </div>
         
-        <button class="kakao-btn" onclick="sendToKakao()">
+        <button class="kakao-btn" onclick="sendToKakao()" style="margin-top: 30px;">
             💬 카카오채널로 신청서 보내기
         </button>
     </div>
@@ -1185,7 +1200,6 @@
                 agree2Group.style.display = 'block';
                 agreeOption1.classList.add('checked');
                 
-                // 화면 하단으로 스크롤
                 setTimeout(() => {
                     window.scrollTo({
                         top: document.body.scrollHeight,
@@ -1217,7 +1231,6 @@
                 agreeOption2.classList.add('checked');
                 setTimeout(initCanvas, 100);
                 
-                // 화면 하단으로 스크롤
                 setTimeout(() => {
                     window.scrollTo({
                         top: document.body.scrollHeight,
@@ -1378,7 +1391,6 @@
             document.getElementById(`page${page + 1}`).classList.add('active');
             currentPage = page + 1;
             
-            // 페이지 전환 시 최상단으로 스크롤
             window.scrollTo(0, 0);
         }
         
@@ -1387,7 +1399,6 @@
             document.getElementById(`page${page - 1}`).classList.add('active');
             currentPage = page - 1;
             
-            // 페이지 전환 시 최상단으로 스크롤
             window.scrollTo(0, 0);
         }
         
@@ -1466,17 +1477,23 @@
         async function captureApplication() {
             try {
                 const captureArea = document.getElementById('captureArea');
+                
+                // A4 크기로 캡처 (210mm x 297mm = 794px x 1123px at 96dpi)
+                // 고해상도를 위해 scale 3 사용
                 const generatedCanvas = await html2canvas(captureArea, {
-                    scale: 2,
+                    scale: 3,
+                    width: 794,
+                    height: 1123,
                     backgroundColor: '#ffffff',
-                    logging: false
+                    logging: false,
+                    useCORS: true
                 });
                 
                 generatedCanvas.toBlob((blob) => {
                     capturedBlob = blob;
                     document.getElementById('loadingOverlay').classList.remove('active');
                     window.scrollTo(0, 0);
-                });
+                }, 'image/png', 1.0);
                 
             } catch (error) {
                 console.error('Error:', error);
@@ -1491,12 +1508,10 @@
                 return;
             }
             
-            // 다운로드 안내 모달 표시
             document.getElementById('downloadModal').classList.add('active');
         }
         
         function downloadApplication() {
-            // 다운로드 실행
             const url = URL.createObjectURL(capturedBlob);
             const link = document.createElement('a');
             const name = document.getElementById('name').value;
@@ -1509,10 +1524,8 @@
             
             URL.revokeObjectURL(url);
             
-            // 다운로드 모달 닫기
             document.getElementById('downloadModal').classList.remove('active');
             
-            // 안내 모달 표시 및 카운트다운 시작
             setTimeout(() => {
                 document.getElementById('instructionModal').classList.add('active');
                 startCountdown();
