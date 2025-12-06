@@ -157,6 +157,53 @@
             opacity: 0.8;
         }
         
+        /* 결제 금액 선택 스타일 */
+        .amount-option {
+            margin-bottom: 15px;
+        }
+        
+        .amount-option input[type="radio"] {
+            display: none;
+        }
+        
+        .amount-option label {
+            display: block;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .amount-option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border-color: #4CAF50;
+        }
+        
+        .amount-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .amount-price {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #667eea;
+        }
+        
+        .amount-option input[type="radio"]:checked + label .amount-price {
+            color: white;
+        }
+        
+        .amount-desc {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+        
         .weekday-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -393,17 +440,17 @@
         .a4-document {
             position: absolute;
             left: -9999px;
-            width: 794px !important;  /* 고정 픽셀 값 */
-            height: 1123px !important; /* 고정 픽셀 값 */
+            width: 794px !important;
+            height: auto !important;  /* auto로 변경 */
             min-width: 794px;
             min-height: 1123px;
             max-width: 794px;
-            max-height: 1123px;
             padding: 12mm;
+            padding-bottom: 20mm;  /* 하단 여백 증가 */
             background: white;
             box-sizing: border-box;
             font-family: 'Malgun Gothic', sans-serif;
-            overflow: hidden;
+            overflow: visible;  /* hidden에서 visible로 변경 */
             transform-origin: top left;
         }
         
@@ -541,12 +588,13 @@
             }
         }
         
+        /* 서명 관련 스타일 조정 */
         .signature-in-note {
             display: inline-block;
-            width: 70px;
+            width: 100px;  /* 70px에서 증가 */
             border-bottom: 1px solid #333;
             vertical-align: middle;
-            height: 18px;
+            height: 25px;  /* 18px에서 증가 */
             position: relative;
         }
 
@@ -562,7 +610,9 @@
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            height: 16px;
+            height: 22px;  /* 16px에서 증가 */
+            max-width: 95px;
+            object-fit: contain;
         }
 
         @media (min-width: 768px) {
@@ -612,8 +662,9 @@
         
         .consent-box {
             border: 2px solid #000;
-            padding: 6px;
-            margin-top: 8px;
+            padding: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
         }
 
         @media (min-width: 768px) {
@@ -651,8 +702,10 @@
         }
         
         .signature-section {
-            margin-top: 12px;
+            margin-top: 20px;
+            margin-bottom: 20px;
             text-align: center;
+            page-break-inside: avoid;
         }
 
         @media (min-width: 768px) {
@@ -690,16 +743,20 @@
             border: none;
             border-bottom: 2px solid #000;
             padding: 2px;
+            min-width: 120px;
         }
         
         .signature-display img {
-            height: 25px;
+            height: 40px;
+            max-width: 150px;
             vertical-align: middle;
+            object-fit: contain;
         }
 
         @media (min-width: 768px) {
             .signature-display img {
                 height: 50px;
+                max-width: 180px;
             }
         }
         
@@ -1099,9 +1156,32 @@
                 </div>
             </div>
             
-            <div class="form-group">
-                <label class="form-label">결제 금액 * <span style="font-size: 0.67em;">회당 55,000원 / 주1회씩 4회: 200,000원 / 주2회씩 8회: 380,000원</span></label>
-                <input type="text" inputmode="numeric" class="form-input" id="amount" placeholder="결제하실 금액을 입력해주세요" required>
+            <div class="form-group" id="amountGroup" style="display: none;">
+                <label class="form-label">결제 금액 선택 *</label>
+                <div class="amount-option">
+                    <input type="radio" name="amount" id="amount1" value="55000">
+                    <label for="amount1">
+                        <div class="amount-name">회당 결제</div>
+                        <div class="amount-price">55,000원</div>
+                        <div class="amount-desc">1회 이용권</div>
+                    </label>
+                </div>
+                <div class="amount-option">
+                    <input type="radio" name="amount" id="amount2" value="200000">
+                    <label for="amount2">
+                        <div class="amount-name">주 1회 패키지</div>
+                        <div class="amount-price">200,000원</div>
+                        <div class="amount-desc">4회 이용권 (회당 50,000원)</div>
+                    </label>
+                </div>
+                <div class="amount-option">
+                    <input type="radio" name="amount" id="amount3" value="380000">
+                    <label for="amount3">
+                        <div class="amount-name">주 2회 패키지 ⭐ 추천</div>
+                        <div class="amount-price">380,000원</div>
+                        <div class="amount-desc">8회 이용권 (회당 47,500원)</div>
+                    </label>
+                </div>
             </div>
             
             <div class="button-group">
@@ -1462,26 +1542,26 @@
             }
         });
         
-        // 연락처 끝 4자리 입력 후 결제금액으로 이동
+        // 연락처 끝 4자리 입력 후 결제 금액 선택 보이기
         document.getElementById('phone2').addEventListener('input', function(e) {
             let value = e.target.value.replace(/[^0-9]/g, '');
             if (value.length >= 4) {
                 value = value.slice(0, 4);
                 e.target.value = value;
-                document.getElementById('amount').focus();
+                
+                // 결제 금액 선택 섹션 표시
+                const amountGroup = document.getElementById('amountGroup');
+                amountGroup.style.display = 'block';
+                
+                // 부드러운 스크롤로 결제 금액 섹션으로 이동
+                setTimeout(() => {
+                    amountGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
             } else {
                 e.target.value = value;
             }
         });
-        
-        // 결제금액 쉼표 자동 입력
-        document.getElementById('amount').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/[^0-9]/g, '');
-            if (value) {
-                value = parseInt(value).toLocaleString('ko-KR');
-            }
-            e.target.value = value;
-        });
+
         
         // 약관 동의 1 처리 - 제출하기 버튼이 보이도록 스크롤
         function handleAgree1Change() {
@@ -1645,15 +1725,20 @@
                 const ho = document.getElementById('ho').value;
                 const phone1 = document.getElementById('phone1').value;
                 const phone2 = document.getElementById('phone2').value;
-                const amount = document.getElementById('amount').value;
+                const amount = document.querySelector('input[name="amount"]:checked');
                 
-                if (!name || !dong || !ho || !phone1 || !phone2 || !amount) {
+                if (!name || !dong || !ho || !phone1 || !phone2) {
                     alert('모든 항목을 입력해주세요.');
                     return;
                 }
                 
                 if (phone1.length !== 4 || phone2.length !== 4) {
                     alert('연락처를 정확히 입력해주세요.');
+                    return;
+                }
+                
+                if (!amount) {
+                    alert('결제 금액을 선택해주세요.');
                     return;
                 }
             }
@@ -1744,7 +1829,7 @@
                 .map(checkbox => checkbox.value);
             const weekdayStr = weekdays.join(', ');
             
-            const amountValue = document.getElementById('amount').value.replace(/,/g, '');
+            const amountValue = document.querySelector('input[name="amount"]:checked').value;
             const formattedAmount = parseInt(amountValue).toLocaleString('ko-KR');
             
             const nameValue = document.getElementById('name').value;
@@ -1796,25 +1881,35 @@
             try {
                 const captureArea = document.getElementById('captureArea');
                 
+                // 캡처 전 임시로 보이게 해서 실제 높이 측정
+                captureArea.style.left = '0';
+                captureArea.style.position = 'relative';
+                
+                // 실제 컨텐츠 높이 측정
+                const actualHeight = captureArea.scrollHeight;
+                const actualWidth = 794;
+                
+                // 다시 숨김
+                captureArea.style.left = '-9999px';
+                captureArea.style.position = 'absolute';
+                
                 // 디바이스 픽셀 비율 감지
                 const dpr = window.devicePixelRatio || 1;
                 
-                // A4 비율 유지 (210mm x 297mm)
-                const a4Width = 794;  // A4 width at 96dpi
-                const a4Height = 1123; // A4 height at 96dpi
-                
                 // 모바일과 데스크탑 모두 동일한 결과를 위한 설정
                 const generatedCanvas = await html2canvas(captureArea, {
-                    scale: Math.max(2, dpr), // 최소 2배 스케일 보장
-                    width: a4Width,
-                    height: a4Height,
-                    windowWidth: a4Width,
-                    windowHeight: a4Height,
+                    scale: Math.max(2, dpr),
+                    width: actualWidth,
+                    height: actualHeight,
+                    windowWidth: actualWidth,
+                    windowHeight: actualHeight,
                     backgroundColor: '#ffffff',
                     logging: false,
                     useCORS: true,
-                    scrollY: -window.scrollY,
-                    scrollX: -window.scrollX
+                    scrollY: 0,
+                    scrollX: 0,
+                    y: 0,
+                    x: 0
                 });
                 
                 generatedCanvas.toBlob((blob) => {
