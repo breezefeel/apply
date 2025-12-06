@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>리:얼 커뮤니티센터 회원 신청</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://apis.google.com/js/api.js"></script>
-    <script src="https://accounts.google.com/gsi/client"></script>
     <style>
         * {
             margin: 0;
@@ -1409,10 +1407,6 @@
         <button class="drive-btn" onclick="uploadToDrive()">
             📤 신청서 제출하기
         </button>
-        
-        <button class="download-btn" onclick="downloadToDevice()">
-            📥 신청서 저장하기
-        </button>
     </div>
 
     <!-- A4 캡처용 숨김 문서 -->
@@ -1503,65 +1497,9 @@
 
     <script>
         // ========================================
-        // Google Drive API 설정
+        // Google Apps Script 설정
         // ========================================
-        const CLIENT_ID = '553256435396-555q606mvk14frd3bdrar3apm4pkfvae.apps.googleusercontent.com';
-        const API_KEY = 'AIzaSyDLhORH091WA2WoyN9VKavATGdn4iubv7w';
-        const SCOPES = 'https://www.googleapis.com/auth/drive.file';
-        
-        let tokenClient;
-        let accessToken = null;
-        let gapiInited = false;
-        let gisInited = false;
-        
-        // Google API 초기화 - 개선된 버전
-        function initializeGapiClient() {
-            gapi.load('client', async () => {
-                try {
-                    await gapi.client.init({
-                        apiKey: API_KEY,
-                        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-                    });
-                    gapiInited = true;
-                    console.log('GAPI initialized successfully');
-                } catch (error) {
-                    console.error('Error initializing GAPI:', error);
-                }
-            });
-        }
-        
-        function initializeGisClient() {
-            try {
-                tokenClient = google.accounts.oauth2.initTokenClient({
-                    client_id: CLIENT_ID,
-                    scope: SCOPES,
-                    callback: '', // 동적으로 설정
-                });
-                gisInited = true;
-                console.log('GIS initialized successfully');
-            } catch (error) {
-                console.error('Error initializing GIS:', error);
-            }
-        }
-        
-        // 페이지 로드 완료 후 초기화
-        window.addEventListener('load', () => {
-            // gapi가 로드될 때까지 대기
-            const checkGapi = setInterval(() => {
-                if (typeof gapi !== 'undefined') {
-                    clearInterval(checkGapi);
-                    initializeGapiClient();
-                }
-            }, 100);
-            
-            // google.accounts가 로드될 때까지 대기
-            const checkGis = setInterval(() => {
-                if (typeof google !== 'undefined' && google.accounts) {
-                    clearInterval(checkGis);
-                    initializeGisClient();
-                }
-            }, 100);
-        });
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzs2yxbiilKz8KQ0E9uXsU0_RR1iasipKX8ZOD8t13k7kFP6Vpp4QWpPk2sgQusY7oMwg/exec';
         
         // ========================================
         // 기존 변수
@@ -1992,59 +1930,14 @@
         }
         
         async function uploadToDrive() {
-            // API 초기화 확인 - 최대 5초 대기
-            if (!gapiInited || !gisInited) {
-                document.getElementById('loadingOverlay').classList.add('active');
-                document.getElementById('loadingText').textContent = 'Google API 로딩 중...';
-                
-                // 최대 5초 동안 API 로드 대기
-                let waitTime = 0;
-                while ((!gapiInited || !gisInited) && waitTime < 5000) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    waitTime += 100;
-                }
-                
-                document.getElementById('loadingOverlay').classList.remove('active');
-                
-                if (!gapiInited || !gisInited) {
-                    alert('Google API 로딩에 실패했습니다.\n페이지를 새로고침한 후 다시 시도해주세요.');
-                    return;
-                }
-            }
-            
             // 캡처된 이미지 확인
             if (!capturedBlob) {
                 alert('신청서가 생성되지 않았습니다.');
                 return;
             }
             
-            // 먼저 인증 확인
-            if (!accessToken) {
-                // 사용자에게 권한 요청
-                tokenClient.callback = async (response) => {
-                    if (response.error !== undefined) {
-                        console.error('OAuth Error:', response);
-                        alert('로그인에 실패했습니다: ' + response.error);
-                        return;
-                    }
-                    accessToken = response.access_token;
-                    await performUpload();
-                };
-                
-                // 기존 토큰이 있다면 재사용 시도, 없으면 새로 요청
-                if (gapi.client.getToken() === null) {
-                    tokenClient.requestAccessToken({ prompt: 'consent' });
-                } else {
-                    tokenClient.requestAccessToken({ prompt: '' });
-                }
-            } else {
-                await performUpload();
-            }
-        }
-        
-        async function performUpload() {
             document.getElementById('loadingOverlay').classList.add('active');
-            document.getElementById('loadingText').textContent = '구글 드라이브에 업로드 중...';
+            document.getElementById('loadingText').textContent = '신청서를 제출하는 중...';
 
             try {
                 const name = document.getElementById('name').value || '신청자';
@@ -2052,62 +1945,70 @@
                 const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
                 const fileName = `커뮤니티센터_회원신청서_${name}_${dateStr}.png`;
 
-                // 메타데이터 설정
-                const metadata = {
-                    name: fileName,
-                    mimeType: 'image/png',
+                // Blob을 Base64로 변환
+                const reader = new FileReader();
+                reader.readAsDataURL(capturedBlob);
+                
+                reader.onloadend = async function() {
+                    const base64data = reader.result.split(',')[1];
+                    
+                    // Apps Script로 전송 (타임아웃 설정)
+                    const uploadPromise = fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            fileName: fileName,
+                            fileData: base64data
+                        })
+                    });
+
+                    // 3초 타임아웃 또는 응답 대기
+                    await Promise.race([
+                        uploadPromise,
+                        new Promise(resolve => setTimeout(resolve, 3000))
+                    ]);
+
+                    document.getElementById('loadingOverlay').classList.remove('active');
+                    
+                    // 자동으로 다운로드 시작
+                    downloadToDevice();
+                    
+                    // 성공 모달 표시
+                    setTimeout(() => {
+                        showSuccessModal(fileName);
+                    }, 500);
                 };
 
-                // FormData 생성
-                const form = new FormData();
-                form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-                form.append('file', capturedBlob);
-
-                // Google Drive에 업로드
-                const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                    method: 'POST',
-                    headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
-                    body: form,
-                });
-
-                const result = await response.json();
-
-                document.getElementById('loadingOverlay').classList.remove('active');
-
-                if (response.ok) {
-                    // 성공 모달 표시
-                    showSuccessModal(fileName, result.id);
-                } else {
-                    throw new Error(result.error?.message || '업로드 실패');
-                }
+                reader.onerror = function() {
+                    document.getElementById('loadingOverlay').classList.remove('active');
+                    alert('파일 변환 중 오류가 발생했습니다.');
+                };
 
             } catch (error) {
                 console.error('Upload error:', error);
                 document.getElementById('loadingOverlay').classList.remove('active');
-                
-                // 토큰 만료 시 재시도
-                if (error.message.includes('401') || error.message.includes('Invalid Credentials')) {
-                    accessToken = null;
-                    alert('세션이 만료되었습니다. 다시 시도해주세요.');
-                } else {
-                    alert('업로드 중 오류가 발생했습니다.\n\n' + error.message);
-                }
+                alert('업로드 중 오류가 발생했습니다.\n\n' + error.message);
             }
         }
         
-        function showSuccessModal(fileName, fileId) {
+        function showSuccessModal(fileName) {
             const modal = document.createElement('div');
             modal.className = 'modal-overlay active';
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-icon">✅</div>
-                    <h2 class="modal-title">업로드 완료!</h2>
+                    <h2 class="modal-title">제출 완료!</h2>
                     <p class="modal-message">
-                        신청서가 구글 드라이브에 저장되었습니다.<br><br>
-                        <strong>${fileName}</strong>
+                        신청서가 성공적으로 제출되었습니다.<br><br>
+                        <strong>${fileName}</strong><br><br>
+                        파일이 자동으로 다운로드되었습니다.<br>
+                        담당자가 확인 후 연락드리겠습니다.
                     </p>
-                    <button class="modal-btn" onclick="window.open('https://drive.google.com/file/d/${fileId}/view', '_blank')">
-                        📂 드라이브에서 보기
+                    <button class="modal-btn" onclick="location.reload()">
+                        새로운 신청서 작성
                     </button>
                     <button class="modal-btn secondary" onclick="this.closest('.modal-overlay').remove()">
                         확인
