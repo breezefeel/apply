@@ -1037,7 +1037,7 @@
                 <div class="help-note-title">💡 갤러리/사진첩 저장 방법</div>
                 <div class="help-note-text">
                     <strong>1단계:</strong> 다운로드한 파일 열기<br>
-                    <strong>2단계:</strong> 공유 버튼 (⋮ 또는 ⎙) 클릭<br>
+                    <strong>2단계:</strong> 저장 or 공유 버튼 클릭<br>
                     <strong>3단계:</strong> "이미지 저장" 또는 "갤러리에 저장" 선택
                 </div>
             </div>
@@ -1088,14 +1088,14 @@
                 <label class="form-label">연락처 *</label>
                 <div class="select-group">
                     <input type="text" class="form-input" value="010" readonly style="flex: 0.8;">
-                    <input type="number" inputmode="numeric" class="form-input" id="phone1" placeholder="0000" maxlength="4" style="flex: 1;">
-                    <input type="number" inputmode="numeric" class="form-input" id="phone2" placeholder="0000" maxlength="4" style="flex: 1;">
+                    <input type="number" inputmode="numeric" class="form-input" id="phone1" placeholder="1234" maxlength="4" style="flex: 1;">
+                    <input type="number" inputmode="numeric" class="form-input" id="phone2" placeholder="1234" maxlength="4" style="flex: 1;">
                 </div>
             </div>
             
             <div class="form-group">
                 <label class="form-label">결제 금액 *</label>
-                <input type="text" inputmode="numeric" class="form-input" id="amount" placeholder="금액을 입력하세요 (예: 50,000)" required>
+                <input type="text" inputmode="numeric" class="form-input" id="amount" placeholder="주1회씩 4회: 200,000원 / 주2회씩 8회: 380,000원" required>
             </div>
             
             <div class="button-group">
@@ -1127,9 +1127,9 @@
                     </label>
                 </div>
                 <div class="program-option">
-                    <input type="radio" name="program" id="stretching" value="리:얼 p-스트레칭">
+                    <input type="radio" name="program" id="stretching" value="리:얼 P-스트레칭">
                     <label for="stretching">
-                        <div class="program-name">리:얼 p-스트레칭</div>
+                        <div class="program-name">리:얼 P-스트레칭</div>
                         <div class="program-desc">전문가와 함께하는 맞춤형 스트레칭 프로그램</div>
                     </label>
                 </div>
@@ -1220,11 +1220,9 @@
                 <h4>[ 이용약관 ]</h4>
                 <ol>
                     <li>본인 부주의로 발생되는 사고에 대해서는 책임을 지지 않습니다.</li>
-                    <li>커뮤니티 시설 이용 신청은 수시접수이며 수업인원에 따라 일할 계산됩니다.</li>
-                    <li>해지를 원하시는 일주일은 반드시 안내데스크에 방문하셔서 해지신청서 작성</li>
-                    <li>등록 후 미 이용 시 연기 및 환불이 불가하며 반드시 해지신청하셔야 합니다.</li>
-                    <li>안전을 위해 영유아, 초등학생, 애완동물의 동반출입을 금지입니다.</li>
-                    <li>운동시설 이용 시 운동복과 실내화를 착용해야 합니다.</li>
+                    <li>해지를 원하시는 입주민은 <strong>반드시 안내데스크에 방문하셔서 <span style="color: red;">해지신청서</span> 작성</strong></li>                    
+                    <li>등록 후 <strong>미 이용 시 연기 및 환불이 불가하며 반드시 해지신청</strong>하셔야 합니다.</li>
+                    <li>안전을 위해 영유아, 초등학생, 애완동물의 동반출입을 금지입니다.</li>                    
                     <li>음주 후 출입불가 하며, 모든 음식물 반입을 금지합니다.</li>
                     <li>모든 비품과 시설물 등을 보호에 힘쓰고, 고의나 과실로 파손하거나 훼손한 경우 배상 책임이 있습니다.</li>
                 </ol>
@@ -1285,7 +1283,7 @@
     <div class="final-page" id="finalPage" style="display: none;">
         <div class="success-box">
             <h2>✅ 신청서 작성 완료!</h2>
-            <p>아래 내용을 확인하시고 구글 드라이브로 전송해주세요</p>
+            <p>아래 내용을 확인하시고 제출해주세요</p>
         </div>
 
         <!-- 반응형 미리보기 -->
@@ -1300,13 +1298,8 @@
                     <td id="previewDate"></td>
                 </tr>
                 <tr>
-                    <td class="label">성별</td>
-                    <td class="label">남 / 여</td>
                     <td class="label">동 / 호수</td>
-                    <td colspan="2" id="previewAddress"></td>
-                    <td></td>
-                </tr>
-                <tr>
+                    <td colspan="2" id="previewAddress"></td>                    
                     <td class="label">연락처</td>
                     <td colspan="5" id="previewPhone"></td>
                 </tr>
@@ -1326,11 +1319,11 @@
         </div>
         
         <button class="drive-btn" onclick="uploadToDrive()">
-            📤 구글 드라이브로 전송하기
+            📤 신청서 제출하기
         </button>
         
         <button class="download-btn" onclick="downloadToDevice()">
-            📥 기기에 저장하기
+            📥 내 기기에 저장하기
         </button>
     </div>
 
@@ -1345,16 +1338,11 @@
                 <td class="label">신청일자</td>
                 <td id="finalDate"></td>
             </tr>
-            <tr>
-                <td class="label">성별</td>
-                <td class="label">남 / 여</td>
+            <tr>                
                 <td class="label">동 / 호수</td>
-                <td colspan="2" id="finalAddress"></td>
-                <td></td>
-            </tr>
-            <tr>
+                <td colspan="2" id="finalAddress"></td>                                
                 <td class="label">연락처</td>
-                <td colspan="5" id="finalPhone"></td>
+                <td colspan="5" id="finalPhone"></td>                
             </tr>
             <tr>
                 <td class="label">결제금액</td>
@@ -1375,43 +1363,35 @@
         <ol class="agreement-list">
             <li>본인 부주의로 발생되는 사고에 대해서는 책임을 지지 않습니다.</li>
             <li>커뮤니티 시설 이용 신청은 수시접수이며 수업인원에 따라 일할 계산됩니다.</li>
-            <li>해지를 원하시는 일주일은 반드시 안내데스크에 방문하셔서 해지신청서 작성<br>
+            <li>해지를 원하시는 입주민은 <strong>반드시 안내데스크에 방문하셔서 <span style="color: red;">해지신청서</span> 작성</strong><br>
             ※ 해지 신청을 하지 않아 발생된 요금의 책임은 본인에게 있습니다.</li>
-            <li>등록 후 미 이용 시 연기 및 환불이 불가하며 반드시 해지신청하셔야 합니다. (질병,복상시에도 불가)<br>
-            ※ 환불규정(전여일수 환불) : 계산 수강료 ÷ 수업일수 = 환불액</li>
+            <li>등록 후 <strong>미 이용 시 연기 및 환불이 불가하며 반드시 해지신청</strong>하셔야 합니다. (양도는 가능)<br>            
         </ol>
         
         <div class="note-box">
             3장 및 4장 내용 확인 [서명 : <span class="signature-in-note" id="noteSignature"></span>]
         </div>
         
-        <ol class="agreement-list" start="5">
-            <li>안전을 위해 영유아, 조등학생, 애완동물의 동반출입을 금지입니다.</li>
-            <li>운동시설 이용 시 운동복과 실내화를 착용해야 합니다.</li>
-            <li>음주 후 출입불가 하며, 모든 음식물 반입을 금지합니다.</li>
+        <ol class="agreement-list" start="5">                        
             <li>모든 비품과 시설물 등을 보호에 힘쓰고, 고의나 과실로 파손하거나 훼손한 경우 배상 책임이 있습니다.</li>
-            <li>이용 시 안전사고에 유의하고 관리자의 지시에 따라야 합니다.</li>
-            <li>소지품은 보관해 드리지 않습니다.</li>
-            <li>전술(이사)시에는 반드시 커뮤니티센터 이용요금 정산을 하고 퇴실 하셔야 합니다.</li>
-            <li>이외의 모든 운영규칙을 읽어보고 확인하였습니다.</li>
-            <li>개인 락커 사용시 발생된 분실물은 개인이 책임입니다.</li>
+            <li>이용 시 안전사고에 유의하고 관리자의 지시에 따라야 합니다.</li>            
+            <li>이외의 모든 운영규칙을 읽어보고 확인하였습니다.</li>            
         </ol>
         
         <div class="detailed-agreement">
             <h3>1. 개인정보동의서</h3>
-            <p>1) 수집, 이용 목적 : 회스테이트지오계약 야파트 커뮤니티센터 운영에 대한 이용약관 동의 및 회원가입 신청</p>
+            <p>1) 수집, 이용 목적 : 힐스테이트자이계양 야파트 커뮤니티센터 운영에 대한 이용약관 동의 및 회원가입 신청</p>
             <p>2) 수집항목 : 성명, 성별, 생년월일, 주소, 전화번호</p>
             <p>3) 보유·이용기간 : 이용종료 후 2년</p>
-            <p>4) 동의 거부 고지 : 개인정보 수집, 이용을 거부하실 수 있습니다. 거부할 경우 커뮤니티시설 이용이 제한될 수 있습니다.</p>
-            
+                        
             <h3>2. 제3자 제공 동의</h3>
-            <p>1) 제공받는 자 : (주)스포이즘, 관리사무소</p>
+            <p>1) 제공받는 자 : (주)스포이즘, (주)힐링트리, 관리사무소</p>
             <p>2) 제공받는 자의 이용목적 : 커뮤니티시설 이용의 확인 및 입주민 확인</p>
             <p>3) 제공항목 : 성명, 전화번호, 생년월일, 주소</p>
             <p>4) 제공받는 자의 보유 : 커뮤니티 이용 종료 후 2년</p>
             
-            <h3>5) 동의 거부 고지</h3>
-            <p>개인정보 제3자 제공을 거부하실 수 있습니다. 거부할 경우 주민공동시설, 커뮤니티 시설의 이용이 제한될 수 있습니다.</p>
+            <h3>* 동의 거부 고지</h3>
+            <p>개인정보 수집,이용 및 제3자 제공을 거부하실 수 있습니다. 거부할 경우 주민공동시설, 커뮤니티 시설의 이용이 제한될 수 있습니다.</p>
         </div>
         
         <div class="consent-box">
@@ -1427,12 +1407,7 @@
                     <img id="finalSignature" src="" alt="서명">
                 </div>
                 (인)
-            </div>
-            <div class="signature-line">
-                <label>담당자</label>
-                <span style="display: inline-block; width: 80px; border-bottom: 2px solid #000; padding: 2px;"></span>
-                (인)
-            </div>
+            </div>            
         </div>
     </div>
 
@@ -1503,8 +1478,13 @@
                 agreeOption1.classList.add('checked');
                 
                 setTimeout(() => {
-                    const buttonGroup = document.getElementById('buttonGroup');
-                    buttonGroup.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    // window.scrollTo(x, y)를 사용하여 스크롤 위치를 설정합니다.
+                    // x: 가로 스크롤 (0으로 설정)
+                    // y: 문서의 전체 높이 (document.body.scrollHeight)
+                    window.scrollTo({
+                        top: document.body.scrollHeight, // 문서의 전체 높이
+                        behavior: 'smooth'            // 부드러운 스크롤 유지
+                    });
                 }, 600);
             } else {
                 termsBox.classList.remove('collapsed');
@@ -1815,14 +1795,14 @@
         
         async function uploadToDrive() {
             document.getElementById('loadingOverlay').classList.add('active');
-            document.getElementById('loadingText').textContent = '구글 드라이브에 업로드 중...';
+            document.getElementById('loadingText').textContent = '신청서 업로드 중...';
             
             // 실제 구글 드라이브 업로드는 서버 측 구현이 필요합니다
             // 여기서는 시뮬레이션만 수행
             await new Promise(resolve => setTimeout(resolve, 2000));
             
             document.getElementById('loadingOverlay').classList.remove('active');
-            alert('구글 드라이브에 업로드되었습니다!');
+            alert('신청서가 제출되었습니다!');
         }
         
         function downloadToDevice() {
