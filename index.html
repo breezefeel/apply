@@ -1751,7 +1751,7 @@
             
             // 날짜 정보 포함한 설명 (줄바꿈 후 표시)
             const dateInfo = firstSessionDates.length > 0 ? 
-                `<br><strong style="color: #079992; font-weight: 700;">첫 시작: ${firstSessionDates.join(', ')}</strong>` : '';
+                `<br><strong style="color: #079992; font-weight: 700; font-size: 1.5em;">첫 시작: ${firstSessionDates.join(', ')}</strong>` : '';
             
             document.getElementById('single1Desc').innerHTML = 
                 `${single1Amount.toLocaleString()}원 (1회)${dateInfo}`;
