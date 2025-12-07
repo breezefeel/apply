@@ -1499,7 +1499,7 @@
             <li>커뮤니티 시설 이용 신청은 수시접수이며 수업인원에 따라 일할 계산됩니다.</li>
             <li>해지를 원하시는 입주민은 <strong>반드시 안내데스크에 방문하셔서 <span style="color: red;">해지신청서</span> 작성</strong><br>
             ※ 해지 신청을 하지 않아 발생된 요금의 책임은 본인에게 있습니다.</li>
-            <li>등록 후 <strong>미 이용 시 연기 및 환불이 불가하며 반드시 해지신청</strong>하셔야 합니다. (양도는 가능)</li>            
+            <li>등록 후 <strong>미 이용 시 연기 및 환불이 불가하며 반드시 해지신청</strong>하셔야 합니다. (양도 가능)</li>            
         </ol>
         
         <div class="note-box">
@@ -1520,12 +1520,11 @@
                         
             <h3>2. 제3자 제공 동의</h3>
             <p>1) 제공받는 자 : (주)스포이즘, 관리사무소</p>
-            <p>2) 제공받는 자의 이용목적 : 커뮤니티시설 이용의 확인 및 입주민 확인</p>
-            <p>3) 제공항목 : 성명, 전화번호, 생년월일, 주소</p>
-            <p>4) 제공받는 자의 보유 : 커뮤니티 이용 종료 후 2년</p>
+            <p>2) 제공항목과 이용목적 : 성명, 전화번호, 동/호수, 커뮤니티시설 이용의 확인 및 입주민 확인</p>            
+            <p>3) 제공받는 자의 보유 : 커뮤니티 이용 종료 후 2년</p>
             
             <h3>* 동의 거부 고지</h3>
-            <p>개인정보 수집,이용 및 제3자 제공을 거부하실 수 있습니다. 거부할 경우 주민공동시설, 커뮤니티 시설의 이용이 제한될 수 있습니다.</p>
+            <p>개인정보 수집,이용 및 제3자 제공을 거부하실 수 있습니다. 거부할 경우 시설 이용이 제한될 수 있습니다.</p>
         </div>
         
         <div class="consent-box">
@@ -1751,7 +1750,7 @@
             
             // 날짜 정보 포함한 설명 (줄바꿈 후 표시)
             const dateInfo = firstSessionDates.length > 0 ? 
-                `<br><strong style="color: #079992; font-weight: 700; font-size: 1.5em;">첫 시작: ${firstSessionDates.join(', ')}</strong>` : '';
+                `<br><strong style="color: #079992; font-weight: 700; font-size: 1.3em;">첫 시작: ${firstSessionDates.join(', ')}</strong>` : '';
             
             document.getElementById('single1Desc').innerHTML = 
                 `${single1Amount.toLocaleString()}원 (1회)${dateInfo}`;
