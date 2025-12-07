@@ -468,20 +468,21 @@
         /* A4 크기 문서 스타일 (캡처용, 화면에는 숨김) */
         .a4-document {
             position: absolute;
-            left: 50%;
-            transform: translateX(-50%) scale(0.88); /* 중앙 정렬 + 88% 축소 */
+            left: -9999px;  /* 화면 밖으로 숨김 */
+            top: 0;
             width: 794px !important;
             height: auto !important;
             min-width: 794px;
             min-height: 1123px;
             max-width: 794px;
-            padding: 6mm 8mm;  /* 패딩 더 축소 */
+            padding: 6mm 8mm;
             padding-bottom: 8mm;
             background: white;
             box-sizing: border-box;
             font-family: 'Malgun Gothic', sans-serif;
             overflow: visible;
-            transform-origin: top center; /* 중앙 기준 */
+            transform: scale(0.88); /* 88% 축소 */
+            transform-origin: top left;
         }
         
         .document-title {
