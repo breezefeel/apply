@@ -1229,29 +1229,18 @@
             
             <div class="form-group">
                 <label class="form-label">수업 시간 *</label>
-                <div class="select-group">
-                    <select class="form-input" id="hour">
-                        <option value="">시</option>
-                        <option value="09">09</option>
-                        <option value="10">10</option>
-                        <option value="11">11</option>
-                        <option value="12">12</option>
-                        <option value="13">13</option>
-                        <option value="14">14</option>
-                        <option value="15">15</option>
-                        <option value="16">16</option>
-                        <option value="17">17</option>
-                        <option value="18">18</option>
-                        <option value="19">19</option>
-                        <option value="20">20</option>
-                    </select>
-                    <select class="form-input" id="minute">
-                        <option value="00" selected>00</option>
-                        <option value="15">15</option>
-                        <option value="30">30</option>
-                        <option value="45">45</option>
-                    </select>
-                </div>
+                <select class="form-input" id="classTime">
+                    <option value="">시간을 선택하세요</option>
+                    <option value="09:00">09:00</option>
+                    <option value="10:15">10:15</option>
+                    <option value="11:30">11:30</option>
+                    <option value="13:30">13:30</option>
+                    <option value="14:45">14:45</option>
+                    <option value="16:00">16:00</option>
+                    <option value="17:15">17:15</option>
+                    <option value="19:00">19:00</option>
+                    <option value="20:15">20:15</option>
+                </select>
             </div>
             
             <div class="form-group">
@@ -1711,14 +1700,24 @@
                 const sessionDate = new Date(startDate);
                 sessionDate.setDate(startDate.getDate() + daysToAdd);
                 
-                const month = sessionDate.getMonth() + 1;
-                const day = sessionDate.getDate();
-                const dayName = weekdayNames[sessionDate.getDay()];
-                
-                dates.push(`${month}/${day}(${dayName})`);
+                dates.push({
+                    date: sessionDate,
+                    month: sessionDate.getMonth() + 1,
+                    day: sessionDate.getDate(),
+                    dayName: weekdayNames[sessionDate.getDay()]
+                });
             });
             
-            return dates.sort();
+            // 날짜순 정렬
+            dates.sort((a, b) => a.date - b.date);
+            
+            // 가장 빠른 날짜만 반환
+            if (dates.length > 0) {
+                const firstDate = dates[0];
+                return [`${firstDate.month}/${firstDate.day}(${firstDate.dayName})`];
+            }
+            
+            return [];
         }
         
         function updateAmountDisplay() {
@@ -1969,8 +1968,7 @@
             if (page === 2) {
                 const program = document.querySelector('input[name="program"]:checked');
                 const weekdays = document.querySelectorAll('input[name="weekday"]:checked');
-                const hour = document.getElementById('hour').value;
-                const minute = document.getElementById('minute').value;
+                const classTime = document.getElementById('classTime').value;
                 const startWeek = document.getElementById('startWeek').value;
                 const packageType = document.querySelector('input[name="packageType"]:checked');
                 
@@ -1984,7 +1982,7 @@
                     return;
                 }
                 
-                if (!hour || !minute) {
+                if (!classTime) {
                     alert('수업 시간을 선택해주세요.');
                     return;
                 }
@@ -2108,7 +2106,7 @@
             const phoneValue = `010 - ${document.getElementById('phone1').value} - ${document.getElementById('phone2').value}`;
             const amountText = `${formattedAmount}원`;
             const programValue = document.querySelector('input[name="program"]:checked').value;
-            const scheduleValue = `매주 ${weekdayStr}요일 ${document.getElementById('hour').value}:${document.getElementById('minute').value}`;
+            const scheduleValue = `매주 ${weekdayStr}요일 ${document.getElementById('classTime').value}`;
             
             const signatureDataUrl = canvas.toDataURL('image/png');
             
@@ -2203,7 +2201,21 @@
             }
             
             document.getElementById('loadingOverlay').classList.add('active');
-            document.getElementById('loadingText').textContent = '신청서를 제출하는 중...';
+            
+            // 5초 카운트다운
+            let countdown = 5;
+            const loadingText = document.getElementById('loadingText');
+            loadingText.textContent = `신청서를 제출하는 중... ${countdown}초`;
+            
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    loadingText.textContent = `신청서를 제출하는 중... ${countdown}초`;
+                } else {
+                    loadingText.textContent = '신청서를 제출하는 중...';
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
 
             try {
                 const name = document.getElementById('name').value || '신청자';
@@ -2240,6 +2252,7 @@
                         const result = await response.json();
                         console.log('서버 응답:', result);
 
+                        clearInterval(countdownInterval);
                         document.getElementById('loadingOverlay').classList.remove('active');
                         
                         if (result.success) {
@@ -2255,6 +2268,7 @@
                         }
                     } catch (fetchError) {
                         console.error('Fetch error:', fetchError);
+                        clearInterval(countdownInterval);
                         document.getElementById('loadingOverlay').classList.remove('active');
                         
                         // no-cors fallback - 파일은 업로드되었을 가능성이 높음
@@ -2266,12 +2280,14 @@
                 };
 
                 reader.onerror = function() {
+                    clearInterval(countdownInterval);
                     document.getElementById('loadingOverlay').classList.remove('active');
                     alert('파일 변환 중 오류가 발생했습니다.');
                 };
 
             } catch (error) {
                 console.error('Upload error:', error);
+                clearInterval(countdownInterval);
                 document.getElementById('loadingOverlay').classList.remove('active');
                 alert('업로드 중 오류가 발생했습니다.\n\n' + error.message);
             }
@@ -2297,9 +2313,7 @@
             const dayOfWeek = weekdays[0] || ''; // 첫 번째 선택 요일
             
             // 시간 정보
-            const hour = document.getElementById('hour').value;
-            const minute = document.getElementById('minute').value;
-            const time = `${hour}:${minute}`;
+            const time = document.getElementById('classTime').value;
             
             // 시작 주차
             const startWeekSelect = document.getElementById('startWeek');
@@ -2361,6 +2375,7 @@
             
             const modal = document.createElement('div');
             modal.className = 'modal-overlay active';
+            modal.id = 'successModal';
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-icon">✅</div>
@@ -2382,12 +2397,19 @@
                     <button class="modal-btn" onclick="window.open('${fileUrl}', '_blank')">
                         📄 신청서 보기 / 저장하기
                     </button>
-                    <button class="modal-btn secondary" onclick="this.closest('.modal-overlay').remove()">
+                    <button class="modal-btn secondary" onclick="closeSuccessModal()">
                         확인
                     </button>
                 </div>
             `;
             document.body.appendChild(modal);
+        }
+        
+        function closeSuccessModal() {
+            const modal = document.getElementById('successModal');
+            if (modal) {
+                modal.remove();
+            }
         }
         
         function downloadToDevice() {
@@ -2404,13 +2426,6 @@
             document.body.removeChild(link);
             
             downloadedFileUrl = url;
-            
-            // 미리보기 이미지 설정
-            document.getElementById('previewImage').src = url;
-            
-            setTimeout(() => {
-                document.getElementById('downloadModal').classList.add('active');
-            }, 500);
         }
         
         function viewDownloadedFile() {
