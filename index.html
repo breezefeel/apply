@@ -25,7 +25,8 @@
         }
         
         .container {
-            max-width: 500px;
+            max-width: 700px;
+            margin: 0 auto;
             width: 100%;
         }
         
@@ -481,7 +482,7 @@
             box-sizing: border-box;
             font-family: 'Malgun Gothic', sans-serif;
             overflow: visible;
-            transform: scale(0.88); /* 88% 축소 */
+            transform: scale(1); 
             transform-origin: top left;
         }
         
@@ -1359,7 +1360,7 @@
                     <li>등록 후 <strong>미 이용 시 연기 및 환불이 불가하며 반드시 해지신청</strong>하셔야 합니다.</li>
                     <li>안전을 위해 영유아, 초등학생, 애완동물의 동반출입을 금지합니다.</li>                    
                     <li>음주 후 출입불가 하며, 모든 음식물 반입을 금지합니다.</li>
-                    <li>모든 비품과 시설물 등을 보호에 힘쓰고, 고의나 과실로 파손하거나 훼손한 경우 배상 책임이 있습니다.</li>
+                    <li>모든 비품과 시설물의 보호에 힘쓰고, 고의/과실로 파손하거나 훼손한 경우 배상 책임이 있습니다.</li>
                 </ol>
             </div>
             
@@ -1498,9 +1499,7 @@
             <li>커뮤니티 시설 이용 신청은 수시접수이며 수업인원에 따라 일할 계산됩니다.</li>
             <li>해지를 원하시는 입주민은 <strong>반드시 안내데스크에 방문하셔서 <span style="color: red;">해지신청서</span> 작성</strong><br>
             ※ 해지 신청을 하지 않아 발생된 요금의 책임은 본인에게 있습니다.</li>
-            <li>등록 후 <strong>미 이용 시 연기 및 환불이 불가하며 반드시 해지신청</strong>하셔야 합니다. (양도는 가능)</li>
-            <li>안전을 위해 영유아, 초등학생, 애완동물의 동반출입을 금지합니다.</li>
-            <li>음주 후 출입불가 하며, 모든 음식물 반입을 금지합니다.</li>
+            <li>등록 후 <strong>미 이용 시 연기 및 환불이 불가하며 반드시 해지신청</strong>하셔야 합니다. (양도는 가능)</li>            
         </ol>
         
         <div class="note-box">
@@ -1508,7 +1507,7 @@
         </div>
         
         <ol class="agreement-list" start="7">                        
-            <li>모든 비품과 시설물 등을 보호에 힘쓰고, 고의나 과실로 파손하거나 훼손한 경우 배상 책임이 있습니다.</li>
+            <li>모든 비품과 시설물의 보호에 힘쓰고, 고의/과실로 파손하거나 훼손한 경우 배상 책임이 있습니다.</li>
             <li>이용 시 안전사고에 유의하고 관리자의 지시에 따라야 합니다.</li>            
             <li>이외의 모든 운영규칙을 읽어보고 확인하였습니다.</li>            
         </ol>
@@ -1690,7 +1689,7 @@
             select.appendChild(option);
             
             // 첫 번째 옵션을 기본 선택
-            if (select.options.length === 1) {
+            if (select.options.length === 2) {
                 option.selected = true;
             }
         }
