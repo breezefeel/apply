@@ -1419,7 +1419,7 @@
     <div class="final-page" id="finalPage" style="display: none;">
         <div class="success-box">
             <h2>✅ 신청서 작성 완료!</h2>
-            <p>아래 내용을 확인하시고 결제를해주세요</p>
+            <p>아래 내용을 확인하시고 결제를 완료해주세요</p>
         </div>
 
         <!-- 반응형 미리보기 -->
@@ -2323,14 +2323,14 @@
             // 7초 카운트다운
             let countdown = 7;
             const loadingText = document.getElementById('loadingText');
-            loadingText.textContent = `신청서를 제출하는 중... ${countdown}초`;
+            loadingText.textContent = `결제를 진행하는 중... ${countdown}초`;
             
             const countdownInterval = setInterval(() => {
                 countdown--;
                 if (countdown > 0) {
-                    loadingText.textContent = `신청서를 제출하는 중... ${countdown}초`;
+                    loadingText.textContent = `결제를 진행하는 중... ${countdown}초`;
                 } else {
-                    loadingText.textContent = '신청서를 제출하는 중...';
+                    loadingText.textContent = '결제를 진행하는 중...';
                     clearInterval(countdownInterval);
                 }
             }, 1000);
