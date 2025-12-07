@@ -1265,7 +1265,15 @@
             <div class="form-group" id="amountGroup" style="display: none;">
                 <label class="form-label">결제 금액 선택 *</label>
                 
-                <div class="program-option" id="weekly1Option">
+                <div class="program-option" id="single1Option" style="display: none;">
+                    <input type="radio" name="packageType" id="single1" value="single1" onchange="updateAmountDisplay()">
+                    <label for="single1">
+                        <div class="program-name">1회 이용권</div>
+                        <div class="program-desc" id="single1Desc">55,000원 (1회)</div>
+                    </label>
+                </div>
+                
+                <div class="program-option" id="weekly1Option" style="display: none;">
                     <input type="radio" name="packageType" id="weekly1" value="weekly1" onchange="updateAmountDisplay()">
                     <label for="weekly1">
                         <div class="program-name">주 1회 패키지</div>
@@ -1273,11 +1281,19 @@
                     </label>
                 </div>
                 
-                <div class="program-option" id="weekly2Option">
+                <div class="program-option" id="weekly2Option" style="display: none;">
                     <input type="radio" name="packageType" id="weekly2" value="weekly2" onchange="updateAmountDisplay()">
                     <label for="weekly2">
                         <div class="program-name">주 2회 패키지 <span style="color: #4CAF50; font-weight: bold;">추천!</span></div>
                         <div class="program-desc" id="weekly2Desc">380,000원 (8회, 회당 47,500원)</div>
+                    </label>
+                </div>
+                
+                <div class="program-option" id="familyOption" style="display: none;">
+                    <input type="radio" name="packageType" id="family" value="family" onchange="updateAmountDisplay()">
+                    <label for="family">
+                        <div class="program-name">가족 공유 패키지 <span style="color: #FF5722; font-weight: bold;">가족 공유 가능!</span></div>
+                        <div class="program-desc" id="familyDesc">540,000원 (12회, 회당 45,000원)</div>
                     </label>
                 </div>
                 
@@ -1539,29 +1555,33 @@
             const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
             const weekdayCount = selectedWeekdays.length;
             
+            const single1Option = document.getElementById('single1Option');
             const weekly1Option = document.getElementById('weekly1Option');
             const weekly2Option = document.getElementById('weekly2Option');
+            const familyOption = document.getElementById('familyOption');
+            
+            // 모든 옵션 초기화
+            single1Option.style.display = 'none';
+            weekly1Option.style.display = 'none';
+            weekly2Option.style.display = 'none';
+            familyOption.style.display = 'none';
+            
+            // 선택 해제
+            document.getElementById('single1').checked = false;
+            document.getElementById('weekly1').checked = false;
+            document.getElementById('weekly2').checked = false;
+            document.getElementById('family').checked = false;
             
             if (weekdayCount === 1) {
-                // 1개 선택: 주 1회만 표시
+                // 1개 선택: 1회권 + 주 1회
+                single1Option.style.display = 'block';
                 weekly1Option.style.display = 'block';
-                weekly2Option.style.display = 'none';
-                
-                // 주 2회가 선택되어 있으면 해제
-                document.getElementById('weekly2').checked = false;
             } else if (weekdayCount === 2) {
-                // 2개 선택: 주 2회만 표시
-                weekly1Option.style.display = 'none';
+                // 2개 선택: 주 2회만
                 weekly2Option.style.display = 'block';
-                
-                // 주 1회가 선택되어 있으면 해제
-                document.getElementById('weekly1').checked = false;
-            } else {
-                // 0개 또는 3개 이상: 모두 숨김
-                weekly1Option.style.display = 'none';
-                weekly2Option.style.display = 'none';
-                document.getElementById('weekly1').checked = false;
-                document.getElementById('weekly2').checked = false;
+            } else if (weekdayCount >= 3) {
+                // 3개 이상 선택: 가족 공유
+                familyOption.style.display = 'block';
             }
             
             // 금액 재계산
@@ -1638,14 +1658,23 @@
             const weekInfo = document.getElementById('weekInfo');
             weekInfo.textContent = `${weeks}주 패키지 (${weeks === 4 ? '한 달 전체' : `이번 달 남은 ${weeks}주`})`;
             
+            const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
+            const weekdayCount = selectedWeekdays.length;
+            
             // 금액 계산
+            const single1Amount = 55000;
             const weekly1Amount = weeks * 50000;
             const weekly2Amount = weeks * 47500 * 2;
+            const familyAmount = weeks * 45000 * weekdayCount;
             
+            document.getElementById('single1Desc').textContent = 
+                `${single1Amount.toLocaleString()}원 (1회)`;
             document.getElementById('weekly1Desc').textContent = 
                 `${weekly1Amount.toLocaleString()}원 (${weeks}회, 회당 50,000원)`;
             document.getElementById('weekly2Desc').textContent = 
                 `${weekly2Amount.toLocaleString()}원 (${weeks * 2}회, 회당 47,500원)`;
+            document.getElementById('familyDesc').textContent = 
+                `${familyAmount.toLocaleString()}원 (${weeks * weekdayCount}회, 회당 45,000원)`;
             
             // 금액 선택 영역 표시
             document.getElementById('amountGroup').style.display = 'block';
@@ -2005,10 +2034,14 @@
             
             // 결제 금액 가져오기 (새로운 방식)
             const packageTypeRadio = document.querySelector('input[name="packageType"]:checked');
+            const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
+            const weekdayCount = selectedWeekdays.length;
             let amountValue = 0;
             
             if (packageTypeRadio) {
-                if (packageTypeRadio.value === 'custom') {
+                if (packageTypeRadio.value === 'single1') {
+                    amountValue = 55000;
+                } else if (packageTypeRadio.value === 'custom') {
                     // 쉼표 제거 후 숫자로 변환
                     const customValue = document.getElementById('customAmountValue').value.replace(/,/g, '');
                     amountValue = parseInt(customValue) || 0;
@@ -2020,6 +2053,8 @@
                         amountValue = weeks * 50000;
                     } else if (packageTypeRadio.value === 'weekly2') {
                         amountValue = weeks * 47500 * 2;
+                    } else if (packageTypeRadio.value === 'family') {
+                        amountValue = weeks * 45000 * weekdayCount;
                     }
                 }
             }
@@ -2138,6 +2173,8 @@
                 // 신청자 데이터 수집
                 const applicantData = collectApplicantData();
                 
+                console.log('신청자 데이터:', applicantData);
+                
                 // Blob을 Base64로 변환
                 const reader = new FileReader();
                 reader.readAsDataURL(capturedBlob);
@@ -2145,35 +2182,46 @@
                 reader.onloadend = async function() {
                     const base64data = reader.result.split(',')[1];
                     
-                    // Apps Script로 전송 (타임아웃 설정)
-                    const uploadPromise = fetch(APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            fileName: fileName,
-                            fileData: base64data,
-                            applicantData: applicantData
-                        })
-                    });
+                    try {
+                        // Apps Script로 전송
+                        const response = await fetch(APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'text/plain',
+                            },
+                            body: JSON.stringify({
+                                fileName: fileName,
+                                fileData: base64data,
+                                applicantData: applicantData
+                            })
+                        });
 
-                    // 3초 타임아웃 또는 응답 대기
-                    await Promise.race([
-                        uploadPromise,
-                        new Promise(resolve => setTimeout(resolve, 3000))
-                    ]);
+                        const result = await response.json();
+                        console.log('서버 응답:', result);
 
-                    document.getElementById('loadingOverlay').classList.remove('active');
-                    
-                    // 자동으로 다운로드 시작
-                    downloadToDevice();
-                    
-                    // 성공 모달 표시
-                    setTimeout(() => {
-                        showSuccessModal(fileName);
-                    }, 500);
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        if (result.success) {
+                            // 자동으로 다운로드 시작
+                            downloadToDevice();
+                            
+                            // 성공 모달 표시
+                            setTimeout(() => {
+                                showSuccessModal(fileName);
+                            }, 500);
+                        } else {
+                            alert('제출 중 오류가 발생했습니다.\n\n' + (result.error || '알 수 없는 오류'));
+                        }
+                    } catch (fetchError) {
+                        console.error('Fetch error:', fetchError);
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        
+                        // no-cors fallback - 파일은 업로드되었을 가능성이 높음
+                        downloadToDevice();
+                        setTimeout(() => {
+                            showSuccessModal(fileName);
+                        }, 500);
+                    }
                 };
 
                 reader.onerror = function() {
@@ -2219,17 +2267,27 @@
             
             // 결제 금액 및 주당 횟수
             const packageTypeRadio = document.querySelector('input[name="packageType"]:checked');
+            const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
+            const weekdayCount = selectedWeekdays.length;
+            
             let amount = 0;
             let weeklyFrequency = 1;
             let duration = `${weeks}주`;
             
             if (packageTypeRadio) {
-                if (packageTypeRadio.value === 'weekly1') {
+                if (packageTypeRadio.value === 'single1') {
+                    weeklyFrequency = 1;
+                    amount = 55000;
+                    duration = '1회';
+                } else if (packageTypeRadio.value === 'weekly1') {
                     weeklyFrequency = 1;
                     amount = weeks * 50000;
                 } else if (packageTypeRadio.value === 'weekly2') {
                     weeklyFrequency = 2;
                     amount = weeks * 47500 * 2;
+                } else if (packageTypeRadio.value === 'family') {
+                    weeklyFrequency = weekdayCount;
+                    amount = weeks * 45000 * weekdayCount;
                 } else if (packageTypeRadio.value === 'custom') {
                     weeklyFrequency = 1; // 기본값
                     // 쉼표 제거 후 숫자로 변환
@@ -2238,7 +2296,7 @@
                 }
             }
             
-            const totalSessions = weeks * weeklyFrequency;
+            const totalSessions = packageTypeRadio && packageTypeRadio.value === 'single1' ? 1 : weeks * weeklyFrequency;
             
             return {
                 name: name,
