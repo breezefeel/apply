@@ -549,8 +549,8 @@
         }
         
         .agreement-list {
-            line-height: 1.3;
-            margin-bottom: 6px;
+            line-height: 1.5;
+            margin-bottom: 8px;
             font-size: 7.5px;
         }
 
@@ -563,7 +563,7 @@
         }
         
         .agreement-list li {
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
 
         @media (min-width: 768px) {
@@ -1584,27 +1584,72 @@
             const select = document.getElementById('startWeek');
             const today = new Date();
             
-            // 향후 8주간의 월요일 날짜 생성
-            for (let i = 0; i < 8; i++) {
-                const monday = getNextMonday(today, i);
-                const dateStr = formatDate(monday);
-                const displayStr = `${monday.getMonth() + 1}월 ${getWeekOfMonth(monday)}주차 (${dateStr} 시작)`;
-                
-                const option = document.createElement('option');
-                option.value = formatDateForDB(monday); // 2025-12-09
-                option.textContent = displayStr;
-                option.dataset.weeks = calculateRemainingWeeks(monday);
-                
-                select.appendChild(option);
-            }
+            // 오늘이 속한 주의 월요일 찾기
+            const currentMonday = getCurrentWeekMonday(today);
+            
+            // 이번 달의 남은 주차들 추가
+            const thisMonthWeeks = getRemainingWeeksInMonth(currentMonday);
+            thisMonthWeeks.forEach(monday => {
+                addWeekOption(select, monday);
+            });
+            
+            // 다음 달 첫 주차 추가
+            const nextMonthFirstWeek = getNextMonthFirstMonday(currentMonday);
+            addWeekOption(select, nextMonthFirstWeek);
         }
         
-        function getNextMonday(baseDate, weeksAhead) {
-            const date = new Date(baseDate);
-            const day = date.getDay();
-            const diff = (day === 0 ? 1 : 8 - day); // 다음 월요일까지 일수
-            date.setDate(date.getDate() + diff + (weeksAhead * 7));
-            return date;
+        // 현재 주의 월요일 구하기
+        function getCurrentWeekMonday(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = day === 0 ? -6 : 1 - day; // 일요일이면 -6, 아니면 월요일까지
+            d.setDate(d.getDate() + diff);
+            d.setHours(0, 0, 0, 0);
+            return d;
+        }
+        
+        // 이번 달 남은 주차들 구하기
+        function getRemainingWeeksInMonth(startMonday) {
+            const weeks = [];
+            const currentMonth = startMonday.getMonth();
+            let monday = new Date(startMonday);
+            
+            // 같은 달 안의 모든 월요일 찾기
+            while (monday.getMonth() === currentMonth) {
+                weeks.push(new Date(monday));
+                monday.setDate(monday.getDate() + 7);
+            }
+            
+            return weeks;
+        }
+        
+        // 다음 달 첫 월요일 구하기
+        function getNextMonthFirstMonday(currentMonday) {
+            const nextMonth = new Date(currentMonday);
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            nextMonth.setDate(1);
+            
+            // 1일이 속한 주의 월요일 찾기
+            const day = nextMonth.getDay();
+            const diff = day === 0 ? 1 : (day === 1 ? 0 : 8 - day + 1);
+            nextMonth.setDate(1 + diff);
+            
+            return nextMonth;
+        }
+        
+        // 옵션 추가
+        function addWeekOption(select, monday) {
+            const month = monday.getMonth() + 1;
+            const weekOfMonth = getWeekOfMonth(monday);
+            const dateStr = formatDate(monday);
+            const displayStr = `${month}월 ${weekOfMonth}주차 (${dateStr} 시작)`;
+            
+            const option = document.createElement('option');
+            option.value = formatDateForDB(monday);
+            option.textContent = displayStr;
+            option.dataset.weeks = calculateRemainingWeeks(monday);
+            
+            select.appendChild(option);
         }
         
         function getWeekOfMonth(date) {
@@ -1664,15 +1709,15 @@
             
             // 날짜 정보 포함한 설명
             const dateInfo = firstSessionDates.length > 0 ? 
-                `\n첫 시작: ${firstSessionDates.join(', ')}` : '';
+                `\n<strong style="color: #667eea;">첫 시작: ${firstSessionDates.join(', ')}</strong>` : '';
             
-            document.getElementById('single1Desc').textContent = 
+            document.getElementById('single1Desc').innerHTML = 
                 `${single1Amount.toLocaleString()}원 (1회)${dateInfo}`;
-            document.getElementById('weekly1Desc').textContent = 
+            document.getElementById('weekly1Desc').innerHTML = 
                 `${weekly1Amount.toLocaleString()}원 (${weeks}회, 회당 50,000원)${dateInfo}`;
-            document.getElementById('weekly2Desc').textContent = 
+            document.getElementById('weekly2Desc').innerHTML = 
                 `${weekly2Amount.toLocaleString()}원 (${weeks * 2}회, 회당 47,500원)${dateInfo}`;
-            document.getElementById('familyDesc').textContent = 
+            document.getElementById('familyDesc').innerHTML = 
                 `${familyAmount.toLocaleString()}원 (${weeks * weekdayCount}회, 회당 45,000원)${dateInfo}`;
             
             // 금액 선택 영역 표시
@@ -2215,8 +2260,8 @@
             
             document.getElementById('loadingOverlay').classList.add('active');
             
-            // 5초 카운트다운
-            let countdown = 5;
+            // 7초 카운트다운
+            let countdown = 7;
             const loadingText = document.getElementById('loadingText');
             loadingText.textContent = `신청서를 제출하는 중... ${countdown}초`;
             
@@ -2320,10 +2365,10 @@
             const programRadio = document.querySelector('input[name="program"]:checked');
             const program = programRadio ? programRadio.value : '';
             
-            // 요일 정보
+            // 요일 정보 (다중 선택 지원)
             const weekdayCheckboxes = document.querySelectorAll('input[name="weekday"]:checked');
             const weekdays = Array.from(weekdayCheckboxes).map(cb => cb.value);
-            const dayOfWeek = weekdays[0] || ''; // 첫 번째 선택 요일
+            const dayOfWeek = weekdays.join(','); // 쉼표로 구분
             
             // 시간 정보
             const time = document.getElementById('classTime').value;
@@ -2332,6 +2377,11 @@
             const startWeekSelect = document.getElementById('startWeek');
             const startDate = startWeekSelect.value;
             const weeks = parseInt(startWeekSelect.options[startWeekSelect.selectedIndex].dataset.weeks);
+            
+            // 종료일 계산
+            const endDateObj = new Date(startDate);
+            endDateObj.setDate(endDateObj.getDate() + ((weeks - 1) * 7));
+            const endDate = endDateObj.toISOString().split('T')[0];
             
             // 결제 금액 및 주당 횟수
             const packageTypeRadio = document.querySelector('input[name="packageType"]:checked');
@@ -2374,6 +2424,7 @@
                 dayOfWeek: dayOfWeek,
                 time: time,
                 startDate: startDate,
+                endDate: endDate,
                 duration: duration,
                 weeks: weeks,
                 weeklyFrequency: weeklyFrequency,
