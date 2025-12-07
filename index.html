@@ -1679,7 +1679,7 @@
             const month = monday.getMonth() + 1;
             const weekOfMonth = getWeekOfMonth(monday);
             const dateStr = formatDate(monday);
-            const displayStr = `${month}월 ${weekOfMonth}주차 (${dateStr}일 부터)`;
+            const displayStr = `${month}월 ${weekOfMonth}주차 (${dateStr}일 이후)`;
             
             const option = document.createElement('option');
             option.value = formatDateForDB(monday);
