@@ -100,7 +100,7 @@
             border-radius: 10px;
             font-size: 16px;
             transition: all 0.3s;
-            min-height: 54px; /* 모바일 터치 영역 확보 */
+            min-height: 58px; /* 모바일 터치 영역 더 확보 */
         }
         
         .form-input:focus {
@@ -446,8 +446,8 @@
             min-width: 794px;
             min-height: 1123px;
             max-width: 794px;
-            padding: 12mm;
-            padding-bottom: 20mm;  /* 하단 여백 증가 */
+            padding: 10mm;
+            padding-bottom: 15mm;  /* 하단 여백 */
             background: white;
             box-sizing: border-box;
             font-family: 'Malgun Gothic', sans-serif;
@@ -457,35 +457,36 @@
         
         .document-title {
             text-align: center;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         @media (min-width: 768px) {
             .document-title {
-                font-size: 24px;
-                margin-bottom: 25px;
+                font-size: 22px;
+                margin-bottom: 20px;
             }
         }
         
         .info-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 8px;
-            font-size: 9px;
+            margin-bottom: 6px;
+            font-size: 8.5px;
+            line-height: 1.4;
         }
 
         @media (min-width: 768px) {
             .info-table {
-                margin-bottom: 18px;
-                font-size: 13px;
+                margin-bottom: 15px;
+                font-size: 12px;
             }
         }
         
         .info-table td {
             border: 2px solid #000;
-            padding: 3px;
+            padding: 4px;
         }
 
         @media (min-width: 768px) {
@@ -509,74 +510,74 @@
         
         .application-section {
             border: 2px solid #000;
-            padding: 6px;
-            margin-bottom: 8px;
+            padding: 5px;
+            margin-bottom: 6px;
         }
 
         @media (min-width: 768px) {
             .application-section {
-                padding: 15px;
-                margin-bottom: 18px;
+                padding: 12px;
+                margin-bottom: 15px;
             }
         }
         
         .section-title {
             text-align: center;
             font-weight: bold;
-            font-size: 11px;
-            margin-bottom: 4px;
+            font-size: 10px;
+            margin-bottom: 3px;
         }
 
         @media (min-width: 768px) {
             .section-title {
-                font-size: 16px;
-                margin-bottom: 12px;
+                font-size: 15px;
+                margin-bottom: 10px;
             }
         }
         
         .agreement-title {
             text-align: center;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
-            margin: 8px 0 6px 0;
+            margin: 6px 0 4px 0;
         }
 
         @media (min-width: 768px) {
             .agreement-title {
-                font-size: 15px;
-                margin: 20px 0 15px 0;
+                font-size: 14px;
+                margin: 15px 0 12px 0;
             }
         }
         
         .agreement-list {
-            line-height: 1.5;
-            margin-bottom: 8px;
-            font-size: 7.5px;
+            line-height: 1.6;
+            margin-bottom: 5px;
+            font-size: 7px;
         }
 
         @media (min-width: 768px) {
             .agreement-list {
-                line-height: 1.6;
-                margin-bottom: 15px;
-                font-size: 12px;
+                line-height: 1.7;
+                margin-bottom: 12px;
+                font-size: 11px;
             }
         }
         
         .agreement-list li {
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         @media (min-width: 768px) {
             .agreement-list li {
-                margin-bottom: 6px;
+                margin-bottom: 5px;
             }
         }
         
         .note-box {
             text-align: center;
-            font-size: 9px;
+            font-size: 8px;
             font-weight: bold;
-            margin: 8px 0;
+            margin: 6px 0;
             padding: 4px;
             border: 1px solid #333;
         }
@@ -623,29 +624,29 @@
         }
         
         .detailed-agreement {
-            margin-top: 6px;
-            font-size: 6.5px;
-            line-height: 1.2;
+            margin-top: 5px;
+            font-size: 6px;
+            line-height: 1.5;
         }
 
         @media (min-width: 768px) {
             .detailed-agreement {
-                margin-top: 15px;
-                font-size: 11px;
-                line-height: 1.5;
+                margin-top: 12px;
+                font-size: 10px;
+                line-height: 1.6;
             }
         }
         
         .detailed-agreement h3 {
-            font-size: 8px;
+            font-size: 7.5px;
             font-weight: bold;
-            margin: 5px 0 3px 0;
+            margin: 4px 0 2px 0;
         }
 
         @media (min-width: 768px) {
             .detailed-agreement h3 {
-                font-size: 13px;
-                margin: 12px 0 8px 0;
+                font-size: 12px;
+                margin: 10px 0 6px 0;
             }
         }
         
@@ -1608,19 +1609,31 @@
             return d;
         }
         
-        // 이번 달 남은 주차들 구하기
+        // 이번 달 남은 주차들 구하기 (현재 주 포함, 지난 주 제외)
         function getRemainingWeeksInMonth(startMonday) {
             const weeks = [];
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
             const currentMonth = startMonday.getMonth();
             let monday = new Date(startMonday);
             
             // 같은 달 안의 모든 월요일 찾기
             while (monday.getMonth() === currentMonth) {
-                weeks.push(new Date(monday));
+                // 현재 주 또는 미래 주만 추가
+                if (monday >= today || isSameWeek(monday, today)) {
+                    weeks.push(new Date(monday));
+                }
                 monday.setDate(monday.getDate() + 7);
             }
             
             return weeks;
+        }
+        
+        // 같은 주인지 확인
+        function isSameWeek(date1, date2) {
+            const monday1 = getCurrentWeekMonday(date1);
+            const monday2 = getCurrentWeekMonday(date2);
+            return monday1.getTime() === monday2.getTime();
         }
         
         // 다음 달 첫 월요일 구하기
@@ -1709,7 +1722,7 @@
             
             // 날짜 정보 포함한 설명
             const dateInfo = firstSessionDates.length > 0 ? 
-                `\n<strong style="color: #667eea;">첫 시작: ${firstSessionDates.join(', ')}</strong>` : '';
+                `\n<strong style="color: #4834d4; font-weight: 700;">첫 시작: ${firstSessionDates.join(', ')}</strong>` : '';
             
             document.getElementById('single1Desc').innerHTML = 
                 `${single1Amount.toLocaleString()}원 (1회)${dateInfo}`;
