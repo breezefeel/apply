@@ -505,19 +505,20 @@
             border-collapse: collapse;
             margin-bottom: 3px;
             font-size: 7px;
-            line-height: 1.25;
+            line-height: 1.5; /* 1.25 → 1.5 */
         }
 
         @media (min-width: 768px) {
             .info-table {
                 margin-bottom: 15px;
                 font-size: 12px;
+                line-height: 1.6;
             }
         }
         
         .info-table td {
             border: 2px solid #000;
-            padding: 2px;
+            padding: 3px; /* 2px → 3px */
         }
 
         @media (min-width: 768px) {
@@ -581,7 +582,7 @@
         }
         
         .agreement-list {
-            line-height: 1.35;
+            line-height: 1.5; /* 1.35 → 1.5 */
             margin-bottom: 2.5px;
             font-size: 6px;
         }
@@ -657,7 +658,7 @@
         .detailed-agreement {
             margin-top: 2.5px;
             font-size: 5.2px;
-            line-height: 1.35;
+            line-height: 1.5; /* 1.35 → 1.5 */
         }
 
         @media (min-width: 768px) {
@@ -1446,17 +1447,21 @@
             </table>
             
             <div class="application-section">
-                <div class="section-title">등록 종목</div>
-                <div style="padding: 12px;">
-                    <div id="previewProgram" style="color: red; font-weight: bold; margin-bottom: 8px; font-size: 13px;"></div>
-                    <div id="previewSchedule" style="color: red; font-weight: bold; margin-bottom: 8px; font-size: 13px;""></div>
+                <div class="section-title" style="font-size: 16px; font-weight: bold;">등록 종목</div>
+                <div style="padding: 15px; line-height: 1.8;">
+                    <div id="previewProgram" style="color: red; font-weight: bold; margin-bottom: 8px; font-size: 15px;"></div>
+                    <div id="previewSchedule" style="color: red; font-weight: bold; margin-bottom: 8px; font-size: 15px;"></div>
+                    <div id="previewStartDate" style="color: #079992; font-weight: bold; font-size: 15px;"></div>
                 </div>
             </div>
         </div>
         
         <button class="drive-btn" onclick="uploadToDrive()">
-            📤 신청서 제출하기
+            💳 결제 완료하기
         </button>
+        <p style="text-align: center; font-size: 12px; color: #666; margin-top: 10px;">
+            해당 결제는 아파트 관리비로 청구됩니다.
+        </p>
     </div>
 
     <!-- A4 캡처용 숨김 문서 -->
@@ -1484,14 +1489,14 @@
         
         <table class="info-table" style="margin-bottom: 8px;">
             <tr>
-                <td class="label" rowspan="2" style="vertical-align: middle; width: 80px;">등록 종목</td>                
-                <td id="finalProgram" style="color: red; font-size: 10px;"></td>
+                <td class="label" rowspan="3" style="vertical-align: middle; width: 80px; font-size: 9px; font-weight: bold;">등록 종목</td>                
+                <td id="finalProgram" style="color: red; font-size: 10px; font-weight: bold;"></td>
             </tr>
             <tr>                                
-                <td style="color: red; font-size: 10px;">
-                    <span id="finalSchedule"></span>
-                    <span id="finalStartDate" style="color: red; font-weight: bold; margin-left: 10px;"></span>
-                </td>
+                <td id="finalSchedule" style="color: red; font-size: 10px; font-weight: bold;"></td>
+            </tr>
+            <tr>
+                <td id="finalStartDate" style="color: #079992; font-weight: bold; font-size: 10px;"></td>
             </tr>
         </table>
         
@@ -2227,6 +2232,19 @@
             document.getElementById('finalAmount').textContent = amountText;
             document.getElementById('finalProgram').textContent = programValue;
             document.getElementById('finalSchedule').textContent = scheduleValue;
+            
+            // 첫 시작 날짜 계산 및 표시
+            const startWeekSelect = document.getElementById('startWeek');
+            const startDate = new Date(startWeekSelect.value);
+            const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
+            const firstSessionDates = getFirstSessionDates(startDate, selectedWeekdays);
+            
+            if (firstSessionDates.length > 0) {
+                const dateText = `첫 시작: ${firstSessionDates.join(', ')}`;
+                document.getElementById('previewStartDate').textContent = dateText;
+                document.getElementById('finalStartDate').textContent = dateText;
+            }
+            
             document.getElementById('finalSignature').src = signatureDataUrl;
             
             const noteSignature = document.getElementById('noteSignature');
