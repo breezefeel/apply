@@ -1661,23 +1661,64 @@
             const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
             const weekdayCount = selectedWeekdays.length;
             
+            // 시작 날짜 계산
+            const startDateStr = selectedOption.value; // "2025-12-09"
+            const startDate = new Date(startDateStr);
+            const firstSessionDates = getFirstSessionDates(startDate, selectedWeekdays);
+            
             // 금액 계산
             const single1Amount = 55000;
             const weekly1Amount = weeks * 50000;
             const weekly2Amount = weeks * 47500 * 2;
             const familyAmount = weeks * 45000 * weekdayCount;
             
+            // 날짜 정보 포함한 설명
+            const dateInfo = firstSessionDates.length > 0 ? 
+                `\n첫 시작: ${firstSessionDates.join(', ')}` : '';
+            
             document.getElementById('single1Desc').textContent = 
-                `${single1Amount.toLocaleString()}원 (1회)`;
+                `${single1Amount.toLocaleString()}원 (1회)${dateInfo}`;
             document.getElementById('weekly1Desc').textContent = 
-                `${weekly1Amount.toLocaleString()}원 (${weeks}회, 회당 50,000원)`;
+                `${weekly1Amount.toLocaleString()}원 (${weeks}회, 회당 50,000원)${dateInfo}`;
             document.getElementById('weekly2Desc').textContent = 
-                `${weekly2Amount.toLocaleString()}원 (${weeks * 2}회, 회당 47,500원)`;
+                `${weekly2Amount.toLocaleString()}원 (${weeks * 2}회, 회당 47,500원)${dateInfo}`;
             document.getElementById('familyDesc').textContent = 
-                `${familyAmount.toLocaleString()}원 (${weeks * weekdayCount}회, 회당 45,000원)`;
+                `${familyAmount.toLocaleString()}원 (${weeks * weekdayCount}회, 회당 45,000원)${dateInfo}`;
             
             // 금액 선택 영역 표시
             document.getElementById('amountGroup').style.display = 'block';
+        }
+        
+        function getFirstSessionDates(startDate, selectedWeekdays) {
+            if (selectedWeekdays.length === 0) return [];
+            
+            const dayMap = {
+                '월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 0
+            };
+            
+            const weekdayNames = ['일', '월', '화', '수', '목', '금', '토'];
+            const dates = [];
+            
+            Array.from(selectedWeekdays).forEach(checkbox => {
+                const weekdayKor = checkbox.value;
+                const targetDay = dayMap[weekdayKor];
+                const currentDay = startDate.getDay();
+                
+                // 시작 날짜부터 해당 요일까지의 차이 계산
+                let daysToAdd = targetDay - currentDay;
+                if (daysToAdd < 0) daysToAdd += 7;
+                
+                const sessionDate = new Date(startDate);
+                sessionDate.setDate(startDate.getDate() + daysToAdd);
+                
+                const month = sessionDate.getMonth() + 1;
+                const day = sessionDate.getDate();
+                const dayName = weekdayNames[sessionDate.getDay()];
+                
+                dates.push(`${month}/${day}(${dayName})`);
+            });
+            
+            return dates.sort();
         }
         
         function updateAmountDisplay() {
