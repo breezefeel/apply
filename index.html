@@ -100,6 +100,7 @@
             border-radius: 10px;
             font-size: 16px;
             transition: all 0.3s;
+            min-height: 54px; /* 모바일 터치 영역 확보 */
         }
         
         .form-input:focus {
@@ -1853,11 +1854,18 @@
             ctx = canvas.getContext('2d');
             
             const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
+            const dpr = window.devicePixelRatio || 1;
+            
+            // 고해상도 디스플레이 대응
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+            
+            ctx.scale(dpr, dpr);
             
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, rect.width, rect.height);
             
             ctx.strokeStyle = '#000000';
             ctx.lineWidth = 2;
@@ -1869,10 +1877,14 @@
             canvas = newCanvas;
             ctx = canvas.getContext('2d');
             
-            canvas.width = rect.width;
-            canvas.height = rect.height;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+            
+            ctx.scale(dpr, dpr);
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, rect.width, rect.height);
             ctx.strokeStyle = '#000000';
             ctx.lineWidth = 2;
             ctx.lineCap = 'round';
@@ -1941,8 +1953,9 @@
         }
         
         function clearSignature() {
+            const rect = canvas.getBoundingClientRect();
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, rect.width, rect.height);
             ctx.fillStyle = '#000000';
         }
         
