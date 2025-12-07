@@ -505,20 +505,19 @@
             border-collapse: collapse;
             margin-bottom: 3px;
             font-size: 7px;
-            line-height: 1.5; /* 1.25 → 1.5 */
+            line-height: 1.5;
         }
 
         @media (min-width: 768px) {
             .info-table {
                 margin-bottom: 15px;
                 font-size: 12px;
-                line-height: 1.6;
             }
         }
         
         .info-table td {
             border: 2px solid #000;
-            padding: 3px; /* 2px → 3px */
+            padding: 2px;
         }
 
         @media (min-width: 768px) {
@@ -582,7 +581,7 @@
         }
         
         .agreement-list {
-            line-height: 1.5; /* 1.35 → 1.5 */
+            line-height: 1.5;
             margin-bottom: 2.5px;
             font-size: 6px;
         }
@@ -658,7 +657,7 @@
         .detailed-agreement {
             margin-top: 2.5px;
             font-size: 5.2px;
-            line-height: 1.5; /* 1.35 → 1.5 */
+            line-height: 1.5;
         }
 
         @media (min-width: 768px) {
@@ -1420,7 +1419,7 @@
     <div class="final-page" id="finalPage" style="display: none;">
         <div class="success-box">
             <h2>✅ 신청서 작성 완료!</h2>
-            <p>아래 내용을 확인하시고 제출해주세요</p>
+            <p>아래 내용을 확인하시고 결제를해주세요</p>
         </div>
 
         <!-- 반응형 미리보기 -->
@@ -1447,11 +1446,11 @@
             </table>
             
             <div class="application-section">
-                <div class="section-title" style="font-size: 16px; font-weight: bold;">등록 종목</div>
-                <div style="padding: 15px; line-height: 1.8;">
-                    <div id="previewProgram" style="color: red; font-weight: bold; margin-bottom: 8px; font-size: 15px;"></div>
-                    <div id="previewSchedule" style="color: red; font-weight: bold; margin-bottom: 8px; font-size: 15px;"></div>
-                    <div id="previewStartDate" style="color: #079992; font-weight: bold; font-size: 15px;"></div>
+                <div class="section-title">등록 종목</div>
+                <div style="padding: 15px;">
+                    <div id="previewProgram" style="color: red; font-weight: bold; margin-bottom: 8px; font-size: 13px;"></div>
+                    <div id="previewSchedule" style="color: red; font-weight: bold; margin-bottom: 8px; font-size: 14px;"></div>
+                    <div id="previewStartDate" style="color: red; font-weight: bold; font-size: 15px;"></div>
                 </div>
             </div>
         </div>
@@ -1489,14 +1488,15 @@
         
         <table class="info-table" style="margin-bottom: 8px;">
             <tr>
-                <td class="label" rowspan="3" style="vertical-align: middle; width: 80px; font-size: 9px; font-weight: bold;">등록 종목</td>                
-                <td id="finalProgram" style="color: red; font-size: 10px; font-weight: bold;"></td>
+                <td class="label" rowspan="2" style="vertical-align: middle; width: 80px;">등록 종목</td>                
+                <td id="finalProgram" style="color: red; font-size: 10px;"></td>
             </tr>
             <tr>                                
-                <td id="finalSchedule" style="color: red; font-size: 10px; font-weight: bold;"></td>
-            </tr>
-            <tr>
-                <td id="finalStartDate" style="color: #079992; font-weight: bold; font-size: 10px;"></td>
+                <td style="color: red; font-size: 10px;">
+                    <span id="finalSchedule"></span>
+                    <span id="finalStartDate" style="color: red; font-weight: bold; margin-left: 10px;"></span>
+                    <span id="previewStartDate" style="color: red; font-weight: bold; font-size: 15px;"></span>
+                </td>
             </tr>
         </table>
         
@@ -2232,11 +2232,11 @@
             document.getElementById('finalAmount').textContent = amountText;
             document.getElementById('finalProgram').textContent = programValue;
             document.getElementById('finalSchedule').textContent = scheduleValue;
+            document.getElementById('finalSignature').src = signatureDataUrl;
             
             // 첫 시작 날짜 계산 및 표시
             const startWeekSelect = document.getElementById('startWeek');
-            const startDate = new Date(startWeekSelect.value);
-            const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
+            const startDate = new Date(startWeekSelect.value);            
             const firstSessionDates = getFirstSessionDates(startDate, selectedWeekdays);
             
             if (firstSessionDates.length > 0) {
@@ -2246,7 +2246,7 @@
             }
             
             document.getElementById('finalSignature').src = signatureDataUrl;
-            
+
             const noteSignature = document.getElementById('noteSignature');
             const signImg = document.createElement('img');
             signImg.src = signatureDataUrl;
@@ -2503,19 +2503,18 @@
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-icon">✅</div>
-                    <h2 class="modal-title">신청서 작성 완료!</h2>
+                    <h2 class="modal-title">결제 완료!</h2>
                     <p class="modal-message">
-                        신청서가 성공적으로 제출되었습니다.<br><br>
+                        결제가 성공적으로 이루어졌습니다.<br><br>
                         <strong>${fileName}</strong><br><br>
-                        아래 내용을 확인하시고 제출해주세요.
+                        아래 내용을 확인하시고 기기에 저장해주세요.
                     </p>
                     <div class="help-note">
                         <div class="help-note-title">📱 파일 저장 방법</div>
                         <div class="help-note-text">
                             1. 아래 버튼을 클릭하여 신청서를 확인하세요<br>
                             2. <strong>공유 버튼(</strong> ⋮ 또는 <strong>↑)</strong>을 눌러 저장하세요<br>
-                            3. <strong>"파일에 저장"</strong> 또는 <strong>"다운로드"</strong> 선택<br>
-                            4. 카카오톡으로 담당자에게 전송해주세요
+                            3. <strong>"파일에 저장"</strong> 또는 <strong>"다운로드"</strong> 선택<br>                            
                         </div>
                     </div>
                     <button class="modal-btn" onclick="window.open('${fileUrl}', '_blank')">
