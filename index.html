@@ -1440,8 +1440,8 @@
                     <td colspan="5" id="previewPhone"></td>
                 </tr>
                 <tr>
-                    <td class="label">결제금액</td>                    
-                    <td colspan="5" id="previewAmount" style="color: red;"></td>
+                    <td class="label">결제금액</td>
+                    <td colspan="5" id="previewAmount"></td>
                 </tr>
             </table>
             
@@ -1576,6 +1576,32 @@
             weekdayCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', updatePaymentOptions);
             });
+            
+            // 프로그램 선택 시 스크롤
+            const programRadios = document.querySelectorAll('input[name="program"]');
+            programRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: document.body.scrollHeight,
+                            behavior: 'smooth'
+                        });
+                    }, 100);
+                });
+            });
+            
+            // 수업 시간 선택 시 스크롤
+            const classTimeSelect = document.getElementById('classTime');
+            if (classTimeSelect) {
+                classTimeSelect.addEventListener('change', function() {
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: document.body.scrollHeight,
+                            behavior: 'smooth'
+                        });
+                    }, 100);
+                });
+            }
         });
         
         function updatePaymentOptions() {
