@@ -1693,16 +1693,59 @@
         
         // 다음 달 첫 월요일 구하기
         function getNextMonthFirstMonday(currentMonday) {
-            const nextMonth = new Date(currentMonday);
-            nextMonth.setMonth(nextMonth.getMonth() + 1);
-            nextMonth.setDate(1);
+            const today = new Date();
+            console.log('=== getNextMonthFirstMonday DEBUG ===');
+            console.log('오늘:', today.toISOString());
+            console.log('오늘 연도:', today.getFullYear());
+            console.log('오늘 월:', today.getMonth() + 1);
+            
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            
+            // 다음 달 1일 구하기
+            let nextMonth, nextYear;
+            if (currentMonth === 11) {  // 12월이면
+                nextMonth = 0;  // 1월
+                nextYear = currentYear + 1;
+            } else {
+                nextMonth = currentMonth + 1;
+                nextYear = currentYear;
+            }
+            
+            console.log('다음 달:', nextYear + '년', (nextMonth + 1) + '월');
+            
+            const firstDay = new Date(nextYear, nextMonth, 1);
+            console.log('다음 달 1일:', firstDay.toISOString());
+            
+            // 1일이 무슨 요일인지 확인
+            const day = firstDay.getDay();
             
             // 1일이 속한 주의 월요일 찾기
-            const day = nextMonth.getDay();
-            const diff = day === 0 ? 1 : (day === 1 ? 0 : 8 - day + 1);
-            nextMonth.setDate(1 + diff);
+            let diff;
+            if (day === 0) {  // 일요일 - 전날(토요일) 포함한 주의 월요일은 이전 달
+                diff = -6;  // 6일 전 월요일
+            } else if (day === 1) {  // 월요일
+                diff = 0;
+            } else {  // 화~토 - 이전 월요일
+                diff = -(day - 1);
+            }
             
-            return nextMonth;
+            const monday = new Date(firstDay);
+            monday.setDate(1 + diff);
+            
+            console.log('1일이 속한 주 월요일:', monday.toISOString());
+            
+            // 월요일이 다음 달에 속하면 그대로, 이전 달이면 다음 월요일(다음 달 내)
+            if (monday.getMonth() !== nextMonth) {
+                console.log('→ 이전 달이므로 +7일');
+                monday.setDate(monday.getDate() + 7);
+            }
+            
+            console.log('최종 월요일:', monday.toISOString());
+            console.log('formatDateForDB:', formatDateForDB(monday));
+            console.log('=== DEBUG 끝 ===');
+            
+            return monday;
         }
         
         // 옵션 추가
@@ -2461,17 +2504,83 @@
             
             // 시작 주차
             const startWeekSelect = document.getElementById('startWeek');
-            const startDate = startWeekSelect.value;
+            const startWeekMonday = startWeekSelect.value; // 월요일 날짜
             const weeks = parseInt(startWeekSelect.options[startWeekSelect.selectedIndex].dataset.weeks);
             
-            // 종료일 계산
-            const endDateObj = new Date(startDate);
-            endDateObj.setDate(endDateObj.getDate() + ((weeks - 1) * 7));
-            const endDate = endDateObj.toISOString().split('T')[0];
+            console.log('=== uploadToDrive 시작일/종료일 계산 ===');
+            console.log('startWeekMonday (value):', startWeekMonday);
+            console.log('weeks:', weeks);
+            
+            // 선택된 요일들
+            const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
+            
+            // 실제 시작일 계산 (선택한 요일 중 가장 빠른 날)
+            const dayMap = {'월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 0};
+            const mondayDate = new Date(startWeekMonday);
+            console.log('mondayDate:', mondayDate.toISOString());
+            console.log('mondayDate 연도:', mondayDate.getFullYear());
+            console.log('mondayDate 월:', mondayDate.getMonth() + 1);
+            
+            const selectedDays = Array.from(selectedWeekdays).map(cb => dayMap[cb.value]);
+            console.log('선택된 요일들 (숫자):', selectedDays);
+            
+            // 월요일을 기준으로 각 요일까지의 차이 계산 (getFirstSessionDates와 동일한 로직)
+            const mondayDay = mondayDate.getDay(); // 월요일 = 1
+            const sessionDates = selectedDays.map(targetDay => {
+                let daysToAdd = targetDay - mondayDay;
+                if (daysToAdd < 0) daysToAdd += 7;
+                
+                const sessionDate = new Date(mondayDate);
+                sessionDate.setDate(mondayDate.getDate() + daysToAdd);
+                return {
+                    date: sessionDate,
+                    daysFromMonday: daysToAdd,
+                    targetDay: targetDay
+                };
+            });
+            
+            // 날짜순 정렬
+            sessionDates.sort((a, b) => a.date - b.date);
+            
+            console.log('계산된 세션 날짜들:', sessionDates.map(s => ({
+                date: s.date.toISOString().split('T')[0],
+                daysFromMonday: s.daysFromMonday
+            })));
+            
+            // 시작일 = 가장 빠른 날짜
+            const firstSession = sessionDates[0];
+            const actualStartDate = firstSession.date;
+            
+            // 한국식 날짜 포맷 (YYYY.MM.DD)
+            const startYear = actualStartDate.getFullYear();
+            const startMonth = String(actualStartDate.getMonth() + 1).padStart(2, '0');
+            const startDay = String(actualStartDate.getDate()).padStart(2, '0');
+            const startDate = `${startYear}.${startMonth}.${startDay}`;
+            
+            console.log('actualStartDate:', actualStartDate.toISOString());
+            console.log('startDate (최종):', startDate);
+            
+            // 종료일 = 마지막 주의 가장 늦은 날짜
+            const lastSession = sessionDates[sessionDates.length - 1];
+            const daysToLastSession = lastSession.daysFromMonday + ((weeks - 1) * 7);
+            
+            console.log('마지막 세션까지 일수:', daysToLastSession);
+            
+            const actualEndDate = new Date(mondayDate);
+            actualEndDate.setDate(mondayDate.getDate() + daysToLastSession);
+            
+            // 한국식 날짜 포맷 (YYYY.MM.DD)
+            const endYear = actualEndDate.getFullYear();
+            const endMonth = String(actualEndDate.getMonth() + 1).padStart(2, '0');
+            const endDay = String(actualEndDate.getDate()).padStart(2, '0');
+            const endDate = `${endYear}.${endMonth}.${endDay}`;
+            
+            console.log('actualEndDate:', actualEndDate.toISOString());
+            console.log('endDate (최종):', endDate);
+            console.log('=== 계산 완료 ===');
             
             // 결제 금액 및 주당 횟수
             const packageTypeRadio = document.querySelector('input[name="packageType"]:checked');
-            const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
             const weekdayCount = selectedWeekdays.length;
             
             let amount = 0;
