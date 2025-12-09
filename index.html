@@ -1243,7 +1243,7 @@
                         <input type="radio" name="program" id="stretching" value="리:얼 P-스트레칭">
                         <label for="stretching">
                             <div class="program-name">P-스트레칭</div>
-                            <div class="program-desc">전문가와 함께, 맞춤형 스트레칭</div>
+                            <div class="program-desc">전문가와 함께, 맞춤 스트레칭</div>
                         </label>
                     </div>
                 </div>
@@ -1480,7 +1480,10 @@
         
         <button class="drive-btn" onclick="uploadToDrive()">
             💳 결제 완료하기
-        </button>        
+        </button>
+        <p style="text-align: center; font-size: 12px; color: #666; margin-top: 10px;">
+            해당 결제는 아파트 관리비로 청구됩니다.
+        </p>
     </div>
 
     <!-- A4 캡처용 숨김 문서 -->
@@ -2649,9 +2652,6 @@
         }
         
         function showSuccessModal(fileName) {
-            // 다운로드된 파일 URL이 있다면 사용
-            const fileUrl = downloadedFileUrl || URL.createObjectURL(capturedBlob);
-            
             const modal = document.createElement('div');
             modal.className = 'modal-overlay active';
             modal.id = 'successModal';
@@ -2660,9 +2660,9 @@
                     <div class="modal-icon">✅</div>
                     <h2 class="modal-title">신청 완료!</h2>
                     <p class="modal-message">
-                        해당 결제는 다음 달 아파트 관리비로 청구됩니다.
+                        다음 달 아파트 관리비로 청구됩니다.
                     </p>
-                    <button class="modal-btn" onclick="window.open('${fileUrl}', '_blank')">
+                    <button class="modal-btn" onclick="viewApplication()">
                         📄 신청서 보기
                     </button>
                     <button class="modal-btn secondary" onclick="openKakaoChannel()">
@@ -2671,6 +2671,77 @@
                 </div>
             `;
             document.body.appendChild(modal);
+        }
+        
+        // 안드로이드에서도 작동하는 신청서 보기
+        function viewApplication() {
+            console.log('📄 신청서 보기 클릭');
+            
+            // 모바일 감지
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            
+            console.log('📱 모바일:', isMobile, '/ 안드로이드:', isAndroid);
+            
+            if (isAndroid) {
+                // 안드로이드: Base64 Data URL로 변환하여 열기
+                console.log('📱 안드로이드: Base64로 변환 중...');
+                
+                const reader = new FileReader();
+                reader.onloadend = function() {
+                    const base64data = reader.result;
+                    console.log('✅ Base64 변환 완료');
+                    
+                    // Data URL을 새 탭에서 열기
+                    const newWindow = window.open('', '_blank');
+                    if (newWindow) {
+                        newWindow.document.write(`
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>신청서</title>
+                                <style>
+                                    body { 
+                                        margin: 0; 
+                                        padding: 0; 
+                                        display: flex; 
+                                        justify-content: center; 
+                                        align-items: center;
+                                        min-height: 100vh;
+                                        background: #f5f5f5;
+                                    }
+                                    img { 
+                                        max-width: 100%; 
+                                        height: auto;
+                                        display: block;
+                                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <img src="${base64data}" alt="신청서">
+                            </body>
+                            </html>
+                        `);
+                        newWindow.document.close();
+                    } else {
+                        alert('팝업이 차단되었습니다.\n브라우저 설정에서 팝업을 허용해주세요.');
+                    }
+                };
+                reader.readAsDataURL(capturedBlob);
+                
+            } else {
+                // iOS 및 데스크탑: Blob URL 사용
+                console.log('💻 iOS/데스크탑: Blob URL 사용');
+                const url = URL.createObjectURL(capturedBlob);
+                const newWindow = window.open(url, '_blank');
+                
+                if (!newWindow) {
+                    alert('팝업이 차단되었습니다.\n브라우저 설정에서 팝업을 허용해주세요.');
+                }
+            }
         }
         
         function openKakaoChannel() {
