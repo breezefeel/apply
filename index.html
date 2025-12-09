@@ -148,6 +148,17 @@
             margin-bottom: 15px;
         }
         
+        /* 프로그램 선택을 한 줄에 배치 */
+        .program-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .program-grid .program-option {
+            margin-bottom: 0;
+        }
+        
         .program-option input[type="radio"] {
             display: none;
         }
@@ -188,6 +199,16 @@
         }
         
         /* 결제 금액 선택 스타일 */
+        #amountGroup {
+            border-top: 2px solid #e0e0e0;
+            padding-top: 25px;
+            margin-top: 25px;
+        }
+        
+        /* 직접 입력 메뉴만 높이 줄이기 */
+        #customAmount + label {
+            padding: 15px 20px !important;
+        }
         .amount-option {
             margin-bottom: 15px;
         }
@@ -1210,19 +1231,21 @@
             
             <div class="form-group">
                 <label class="form-label">프로그램 *</label>
-                <div class="program-option">
-                    <input type="radio" name="program" id="facecare" value="리:얼 작은얼굴">
-                    <label for="facecare">
-                        <div class="program-name">리:얼 작은얼굴</div>
-                        <div class="program-desc">얼굴 라인 관리 및 페이셜 케어 프로그램</div>
-                    </label>
-                </div>
-                <div class="program-option">
-                    <input type="radio" name="program" id="stretching" value="리:얼 P-스트레칭">
-                    <label for="stretching">
-                        <div class="program-name">리:얼 P-스트레칭</div>
-                        <div class="program-desc">전문가와 함께하는 맞춤형 스트레칭 프로그램</div>
-                    </label>
+                <div class="program-grid">
+                    <div class="program-option">
+                        <input type="radio" name="program" id="facecare" value="리:얼 작은얼굴">
+                        <label for="facecare">
+                            <div class="program-name">리:얼 작은얼굴</div>
+                            <div class="program-desc">얼굴 라인 관리 및 페이셜 케어 프로그램</div>
+                        </label>
+                    </div>
+                    <div class="program-option">
+                        <input type="radio" name="program" id="stretching" value="리:얼 P-스트레칭">
+                        <label for="stretching">
+                            <div class="program-name">리:얼 P-스트레칭</div>
+                            <div class="program-desc">전문가와 함께하는 맞춤형 스트레칭 프로그램</div>
+                        </label>
+                    </div>
                 </div>
             </div>
             
@@ -1410,7 +1433,7 @@
             
             <div class="button-group" id="buttonGroup">
                 <button class="btn btn-prev" onclick="prevPage(3)">이전</button>
-                <button class="btn btn-next" onclick="submitForm()">제출하기</button>
+                <button class="btn btn-next" onclick="submitForm()">다음</button>
             </div>
         </div>
     </div>
@@ -2638,22 +2661,12 @@
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-icon">✅</div>
-                    <h2 class="modal-title">결제 완료!</h2>
+                    <h2 class="modal-title">신청 완료!</h2>
                     <p class="modal-message">
-                        결제가 성공적으로 이루어졌습니다.<br><br>
-                        <strong>${fileName}</strong><br><br>
-                        아래 내용을 확인하시고 기기에 저장해주세요.
+                        다음 달 아파트 관리비로 청구됩니다.
                     </p>
-                    <div class="help-note">
-                        <div class="help-note-title">📱 파일 저장 방법</div>
-                        <div class="help-note-text">
-                            1. 아래 버튼을 클릭하여 신청서를 확인하세요<br>
-                            2. <strong>공유 버튼(</strong> ⋮ 또는 <strong>↑)</strong>을 눌러 저장하세요<br>
-                            3. <strong>"파일에 저장"</strong> 또는 <strong>"다운로드"</strong> 선택<br>                            
-                        </div>
-                    </div>
                     <button class="modal-btn" onclick="window.open('${fileUrl}', '_blank')">
-                        📄 신청서 보기 / 저장하기
+                        📄 신청서 보기
                     </button>
                     <button class="modal-btn secondary" onclick="openKakaoChannel()">
                         💬 문의 사항 있으신가요?
