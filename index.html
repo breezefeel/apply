@@ -1285,18 +1285,26 @@
             
             <div class="form-group">
                 <label class="form-label">수업 시간 *</label>
-                <select class="form-input" id="classTime">
-                    <option value="">시간을 선택하세요</option>
-                    <option value="09:00">09:00</option>
-                    <option value="10:15">10:15</option>
-                    <option value="11:30">11:30</option>
-                    <option value="13:30">13:30</option>
-                    <option value="14:45">14:45</option>
-                    <option value="16:00">16:00</option>
-                    <option value="17:15">17:15</option>
-                    <option value="19:00">19:00</option>
-                    <option value="20:15">20:15</option>
-                </select>
+                <div class="select-group">
+                    <select class="form-input" id="timeHour">
+                        <option value="">시간</option>
+                        <option value="09">오전 9시</option>
+                        <option value="10">오전 10시</option>
+                        <option value="11">오전 11시</option>
+                        <option value="12">오후 12시</option>
+                        <option value="14">오후 2시</option>
+                        <option value="15">오후 3시</option>
+                        <option value="16">오후 4시</option>
+                        <option value="17">오후 5시</option>
+                        <option value="19">오후 7시</option>
+                        <option value="20">오후 8시</option>
+                    </select>
+                    <select class="form-input" id="timeMinute">
+                        <option value="">분</option>
+                        <option value="00">00분</option>
+                        <option value="30">30분</option>
+                    </select>
+                </div>
             </div>
             
             <div class="form-group">
@@ -1314,7 +1322,7 @@
                     <input type="radio" name="packageType" id="single1" value="single1" onchange="updateAmountDisplay()">
                     <label for="single1">
                         <div class="program-name">1회 이용권</div>
-                        <div class="program-desc" id="single1Desc">55,000원 (1회)</div>
+                        <div class="program-desc" id="single1Desc">45,000원 (1회)</div>
                     </label>
                 </div>
                 
@@ -1322,7 +1330,7 @@
                     <input type="radio" name="packageType" id="weekly1" value="weekly1" onchange="updateAmountDisplay()">
                     <label for="weekly1">
                         <div class="program-name">주 1회 패키지</div>
-                        <div class="program-desc" id="weekly1Desc">200,000원 (4회, 회당 50,000원)</div>
+                        <div class="program-desc" id="weekly1Desc">170,000원 (4회, 회당 42,500원)</div>
                     </label>
                 </div>
                 
@@ -1330,7 +1338,7 @@
                     <input type="radio" name="packageType" id="weekly2" value="weekly2" onchange="updateAmountDisplay()">
                     <label for="weekly2">
                         <div class="program-name">주 2회 패키지 <span style="color: #4CAF50; font-weight: bold;">추천!</span></div>
-                        <div class="program-desc" id="weekly2Desc">380,000원 (8회, 회당 47,500원)</div>
+                        <div class="program-desc" id="weekly2Desc">320,000원 (8회, 회당 40,000원)</div>
                     </label>
                 </div>
                 
@@ -1338,7 +1346,7 @@
                     <input type="radio" name="packageType" id="family" value="family" onchange="updateAmountDisplay()">
                     <label for="family">
                         <div class="program-name">패밀리 패키지 <span style="color: #FF5722; font-weight: bold;">가족 공유 가능!</span></div>
-                        <div class="program-desc" id="familyDesc">540,000원 (12회, 회당 45,000원)</div>
+                        <div class="program-desc" id="familyDesc">450,000원 (12회, 회당 37,500원)</div>
                     </label>
                 </div>
                 
@@ -1613,10 +1621,10 @@
                 });
             });
             
-            // 수업 시간 선택 시 스크롤
-            const classTimeSelect = document.getElementById('classTime');
-            if (classTimeSelect) {
-                classTimeSelect.addEventListener('change', function() {
+            // 수업 시간(분) 선택 시 스크롤
+            const timeMinuteSelect = document.getElementById('timeMinute');
+            if (timeMinuteSelect) {
+                timeMinuteSelect.addEventListener('change', function() {
                     setTimeout(() => {
                         window.scrollTo({
                             top: document.body.scrollHeight,
@@ -1841,10 +1849,10 @@
             const firstSessionDates = getFirstSessionDates(startDate, selectedWeekdays);
             
             // 금액 계산
-            const single1Amount = 55000;
-            const weekly1Amount = weeks * 50000;
-            const weekly2Amount = weeks * 47500 * 2;
-            const familyAmount = weeks * 45000 * weekdayCount;
+            const single1Amount = 45000;
+            const weekly1Amount = weeks * 42500;
+            const weekly2Amount = weeks * 40000 * 2;
+            const familyAmount = weeks * 37500 * weekdayCount;
             
             // 날짜 정보 포함한 설명 (줄바꿈 후 표시)
             const dateInfo = firstSessionDates.length > 0 ? 
@@ -1853,11 +1861,11 @@
             document.getElementById('single1Desc').innerHTML = 
                 `${single1Amount.toLocaleString()}원 (1회)${dateInfo}`;
             document.getElementById('weekly1Desc').innerHTML = 
-                `${weekly1Amount.toLocaleString()}원 (${weeks}회, 회당 50,000원)${dateInfo}`;
+                `${weekly1Amount.toLocaleString()}원 (${weeks}회, 회당 42,500원)${dateInfo}`;
             document.getElementById('weekly2Desc').innerHTML = 
-                `${weekly2Amount.toLocaleString()}원 (${weeks * 2}회, 회당 47,500원)${dateInfo}`;
+                `${weekly2Amount.toLocaleString()}원 (${weeks * 2}회, 회당 40,000원)${dateInfo}`;
             document.getElementById('familyDesc').innerHTML = 
-                `${familyAmount.toLocaleString()}원 (${weeks * weekdayCount}회, 회당 45,000원)${dateInfo}`;
+                `${familyAmount.toLocaleString()}원 (${weeks * weekdayCount}회, 회당 37,500원)${dateInfo}`;
             
             // 금액 선택 영역 표시
             document.getElementById('amountGroup').style.display = 'block';
@@ -2165,7 +2173,8 @@
             if (page === 2) {
                 const program = document.querySelector('input[name="program"]:checked');
                 const weekdays = document.querySelectorAll('input[name="weekday"]:checked');
-                const classTime = document.getElementById('classTime').value;
+                const timeHour = document.getElementById('timeHour').value;
+                const timeMinute = document.getElementById('timeMinute').value;
                 const startWeek = document.getElementById('startWeek').value;
                 const packageType = document.querySelector('input[name="packageType"]:checked');
                 
@@ -2179,7 +2188,7 @@
                     return;
                 }
                 
-                if (!classTime) {
+                if (!timeHour || !timeMinute) {
                     alert('수업 시간을 선택해주세요.');
                     return;
                 }
@@ -2276,7 +2285,7 @@
             
             if (packageTypeRadio) {
                 if (packageTypeRadio.value === 'single1') {
-                    amountValue = 55000;
+                    amountValue = 45000;
                 } else if (packageTypeRadio.value === 'custom') {
                     // 쉼표 제거 후 숫자로 변환
                     const customValue = document.getElementById('customAmountValue').value.replace(/,/g, '');
@@ -2286,11 +2295,11 @@
                     const weeks = parseInt(startWeekSelect.options[startWeekSelect.selectedIndex].dataset.weeks);
                     
                     if (packageTypeRadio.value === 'weekly1') {
-                        amountValue = weeks * 50000;
+                        amountValue = weeks * 42500;
                     } else if (packageTypeRadio.value === 'weekly2') {
-                        amountValue = weeks * 47500 * 2;
+                        amountValue = weeks * 40000 * 2;
                     } else if (packageTypeRadio.value === 'family') {
-                        amountValue = weeks * 45000 * weekdayCount;
+                        amountValue = weeks * 37500 * weekdayCount;
                     }
                 }
             }
@@ -2303,7 +2312,10 @@
             const phoneValue = `010 - ${document.getElementById('phone1').value} - ${document.getElementById('phone2').value}`;
             const amountText = `${formattedAmount}원`;
             const programValue = document.querySelector('input[name="program"]:checked').value;
-            const scheduleValue = `매주 ${weekdayStr}요일 ${document.getElementById('classTime').value}`;
+            const timeHour = document.getElementById('timeHour').value;
+            const timeMinute = document.getElementById('timeMinute').value;
+            const combinedTime = `${timeHour}:${timeMinute}`;
+            const scheduleValue = `매주 ${weekdayStr}요일 ${combinedTime}`;
             
             const signatureDataUrl = canvas.toDataURL('image/png');
             
@@ -2523,7 +2535,9 @@
             const dayOfWeek = weekdays.join(','); // 쉼표로 구분
             
             // 시간 정보
-            const time = document.getElementById('classTime').value;
+            const timeHour = document.getElementById('timeHour').value;
+            const timeMinute = document.getElementById('timeMinute').value;
+            const time = `${timeHour}:${timeMinute}`;
             
             // 시작 주차
             const startWeekSelect = document.getElementById('startWeek');
@@ -2613,17 +2627,17 @@
             if (packageTypeRadio) {
                 if (packageTypeRadio.value === 'single1') {
                     weeklyFrequency = 1;
-                    amount = 55000;
+                    amount = 45000;
                     duration = '1회';
                 } else if (packageTypeRadio.value === 'weekly1') {
                     weeklyFrequency = 1;
-                    amount = weeks * 50000;
+                    amount = weeks * 42500;
                 } else if (packageTypeRadio.value === 'weekly2') {
                     weeklyFrequency = 2;
-                    amount = weeks * 47500 * 2;
+                    amount = weeks * 40000 * 2;
                 } else if (packageTypeRadio.value === 'family') {
                     weeklyFrequency = weekdayCount;
-                    amount = weeks * 45000 * weekdayCount;
+                    amount = weeks * 37500 * weekdayCount;
                 } else if (packageTypeRadio.value === 'custom') {
                     weeklyFrequency = 1; // 기본값
                     // 쉼표 제거 후 숫자로 변환
