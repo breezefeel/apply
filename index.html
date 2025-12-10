@@ -1301,7 +1301,7 @@
                     </select>
                     <select class="form-input" id="timeMinute">
                         <option value="">분</option>
-                        <option value="00">00분</option>
+                        <option value="00" selected>00분</option>
                         <option value="30">30분</option>
                     </select>
                 </div>
@@ -1823,7 +1823,7 @@
             const endOfMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
             const diffTime = endOfMonth - startDate;
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            const weeks = Math.min(4, Math.ceil(diffDays / 7));
+            const weeks = Math.min(5, Math.ceil(diffDays / 7));
             return weeks;
         }
         
