@@ -2693,20 +2693,40 @@
                     <p class="modal-message">
                         다음 달 아파트 관리비로 청구됩니다.
                     </p>
-                    <button class="modal-btn" onclick="event.stopPropagation(); viewApplication();">
+                    <button class="modal-btn" id="viewAppBtn">
                         📄 신청서 보기
                     </button>
-                    <button class="modal-btn secondary" onclick="event.stopPropagation(); openKakaoChannel();">
+                    <button class="modal-btn secondary" id="kakaoBtn">
                         💬 문의 사항 있으신가요?
                     </button>
                 </div>
             `;
             document.body.appendChild(modal);
+            
+            // 이벤트 리스너를 JavaScript로 직접 연결
+            document.getElementById('viewAppBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                viewApplication();
+            });
+            
+            document.getElementById('kakaoBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openKakaoChannel();
+            });
         }
         
         // 안드로이드에서도 작동하는 신청서 보기
         function viewApplication() {
             console.log('📄 신청서 보기 클릭');
+            
+            // capturedBlob 존재 확인
+            if (!capturedBlob) {
+                console.error('❌ 캡처된 이미지가 없습니다');
+                alert('신청서를 찾을 수 없습니다. 다시 시도해주세요.');
+                return;
+            }
             
             // 모달 먼저 닫기
             closeSuccessModal();
