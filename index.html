@@ -986,12 +986,14 @@
             align-items: center;
             z-index: 10000;
             padding: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
-
+        
         .modal-overlay.active {
             display: flex;
         }
-
+        
         .modal-content {
             background: white;
             padding: 30px;
@@ -999,7 +1001,8 @@
             text-align: center;
             max-width: 450px;
             width: 100%;
-        }
+            position: relative;
+            pointer-events: auto;
 
         @media (min-width: 768px) {
             .modal-content {
@@ -2689,6 +2692,11 @@
                 existingModal.remove();
             }
             
+            // body 스크롤 막기 (모바일에서 중요!)
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+            
             // 모달 오버레이 생성
             const modal = document.createElement('div');
             modal.className = 'modal-overlay';
@@ -2717,6 +2725,7 @@
             const viewBtn = document.createElement('button');
             viewBtn.className = 'modal-btn';
             viewBtn.textContent = '📄 신청서 보기';
+            viewBtn.style.touchAction = 'manipulation'; // 터치 최적화
             viewBtn.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -2728,6 +2737,7 @@
             const kakaoBtn = document.createElement('button');
             kakaoBtn.className = 'modal-btn secondary';
             kakaoBtn.textContent = '💬 문의 사항 있으신가요?';
+            kakaoBtn.style.touchAction = 'manipulation'; // 터치 최적화
             kakaoBtn.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -2839,8 +2849,13 @@
         function closeSuccessModal() {
             const modal = document.getElementById('successModal');
             if (modal) {
-                modal.remove();
+                modal.classList.remove('active');
             }
+            
+            // body 스크롤 복원
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
         }
         
         function downloadToDevice() {
