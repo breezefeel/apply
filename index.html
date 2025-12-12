@@ -2707,11 +2707,14 @@
         // 안드로이드에서도 작동하는 신청서 보기
         function viewApplication() {
             console.log('📄 신청서 보기 클릭');
-            
+    
+            // 모달 먼저 닫기
+            closeSuccessModal();
+    
             // 모바일 감지
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             const isAndroid = /Android/i.test(navigator.userAgent);
-            
+    
             console.log('📱 모바일:', isMobile, '/ 안드로이드:', isAndroid);
             
             if (isAndroid) {
