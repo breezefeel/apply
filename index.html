@@ -2728,8 +2728,11 @@
                 return;
             }
             
-            // 모달 먼저 닫기
-            closeSuccessModal();
+            // 모달 숨기기 (제거하지 않음)
+            const modal = document.getElementById('successModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
             
             // 모바일 감지
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -2806,7 +2809,7 @@
         function closeSuccessModal() {
             const modal = document.getElementById('successModal');
             if (modal) {
-                modal.remove();
+                modal.classList.remove('active'); // 제거 대신 숨기기
             }
         }
         
@@ -2838,6 +2841,15 @@
                 URL.revokeObjectURL(downloadedFileUrl);
             }
         }
+
+        // 페이지로 돌아왔을 때 모달 다시 표시
+        window.addEventListener('focus', function() {
+            const modal = document.getElementById('successModal');
+            if (modal && !modal.classList.contains('active')) {
+                // 신청서 보기 후 페이지로 돌아온 경우
+                modal.classList.add('active');
+            }
+        });
     </script>
 </body>
 </html>
