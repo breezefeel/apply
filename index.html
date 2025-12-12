@@ -2692,46 +2692,48 @@
             const modal = document.createElement('div');
             modal.className = 'modal-overlay active';
             modal.id = 'successModal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-icon">✅</div>
-                    <h2 class="modal-title">신청 완료!</h2>
-                    <p class="modal-message">
-                        다음 달 아파트 관리비로 청구됩니다.
-                    </p>
-                    <button class="modal-btn" id="viewAppBtn">
-                        📄 신청서 보기
-                    </button>
-                    <button class="modal-btn secondary" id="kakaoBtn">
-                        💬 문의 사항 있으신가요?
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(modal);
             
-            // 약간의 딜레이 후 이벤트 리스너 연결 (DOM 완전히 추가된 후)
-            setTimeout(() => {
-                const viewBtn = document.getElementById('viewAppBtn');
-                const kakaoBtn = document.getElementById('kakaoBtn');
-                
-                if (viewBtn) {
-                    viewBtn.onclick = function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('✅ 신청서 보기 버튼 클릭됨');
-                        viewApplication();
-                    };
-                }
-                
-                if (kakaoBtn) {
-                    kakaoBtn.onclick = function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('✅ 카카오 버튼 클릭됨');
-                        openKakaoChannel();
-                    };
-                }
-            }, 100);
+            // 모달 콘텐츠 생성
+            const modalContent = document.createElement('div');
+            modalContent.className = 'modal-content';
+            
+            modalContent.innerHTML = `
+                <div class="modal-icon">✅</div>
+                <h2 class="modal-title">신청 완료!</h2>
+                <p class="modal-message">
+                    다음 달 아파트 관리비로 청구됩니다.
+                </p>
+            `;
+            
+            // 신청서 보기 버튼
+            const viewBtn = document.createElement('button');
+            viewBtn.className = 'modal-btn';
+            viewBtn.id = 'viewAppBtn';
+            viewBtn.innerHTML = '📄 신청서 보기';
+            viewBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('✅ 신청서 보기 버튼 클릭됨');
+                viewApplication();
+            };
+            
+            // 카카오 버튼
+            const kakaoBtn = document.createElement('button');
+            kakaoBtn.className = 'modal-btn secondary';
+            kakaoBtn.id = 'kakaoBtn';
+            kakaoBtn.innerHTML = '💬 문의 사항 있으신가요?';
+            kakaoBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('✅ 카카오 버튼 클릭됨');
+                openKakaoChannel();
+            };
+            
+            // 요소 조립
+            modalContent.appendChild(viewBtn);
+            modalContent.appendChild(kakaoBtn);
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
         }
         
         // 안드로이드에서도 작동하는 신청서 보기
