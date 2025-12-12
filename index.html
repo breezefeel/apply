@@ -2689,27 +2689,34 @@
                 existingModal.remove();
             }
             
+            // 모달 오버레이 생성
             const modal = document.createElement('div');
-            modal.className = 'modal-overlay active';
+            modal.className = 'modal-overlay';
             modal.id = 'successModal';
             
             // 모달 콘텐츠 생성
             const modalContent = document.createElement('div');
             modalContent.className = 'modal-content';
             
-            modalContent.innerHTML = `
-                <div class="modal-icon">✅</div>
-                <h2 class="modal-title">신청 완료!</h2>
-                <p class="modal-message">
-                    다음 달 아파트 관리비로 청구됩니다.
-                </p>
-            `;
+            // 아이콘
+            const icon = document.createElement('div');
+            icon.className = 'modal-icon';
+            icon.textContent = '✅';
+            
+            // 타이틀
+            const title = document.createElement('h2');
+            title.className = 'modal-title';
+            title.textContent = '신청 완료!';
+            
+            // 메시지
+            const message = document.createElement('p');
+            message.className = 'modal-message';
+            message.textContent = '다음 달 아파트 관리비로 청구됩니다.';
             
             // 신청서 보기 버튼
             const viewBtn = document.createElement('button');
             viewBtn.className = 'modal-btn';
-            viewBtn.id = 'viewAppBtn';
-            viewBtn.innerHTML = '📄 신청서 보기';
+            viewBtn.textContent = '📄 신청서 보기';
             viewBtn.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -2720,8 +2727,7 @@
             // 카카오 버튼
             const kakaoBtn = document.createElement('button');
             kakaoBtn.className = 'modal-btn secondary';
-            kakaoBtn.id = 'kakaoBtn';
-            kakaoBtn.innerHTML = '💬 문의 사항 있으신가요?';
+            kakaoBtn.textContent = '💬 문의 사항 있으신가요?';
             kakaoBtn.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -2729,11 +2735,22 @@
                 openKakaoChannel();
             };
             
-            // 요소 조립
+            // DOM 조립 (순서대로)
+            modalContent.appendChild(icon);
+            modalContent.appendChild(title);
+            modalContent.appendChild(message);
             modalContent.appendChild(viewBtn);
             modalContent.appendChild(kakaoBtn);
             modal.appendChild(modalContent);
+            
+            // body에 추가
             document.body.appendChild(modal);
+            
+            // 강제 리플로우 (레이아웃 재계산)
+            modal.offsetHeight;
+            
+            // active 클래스 추가 (애니메이션)
+            modal.classList.add('active');
         }
         
         // 안드로이드에서도 작동하는 신청서 보기
