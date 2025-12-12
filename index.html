@@ -2683,6 +2683,12 @@
         }
         
         function showSuccessModal(fileName) {
+            // 기존 모달이 있으면 제거
+            const existingModal = document.getElementById('successModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
             const modal = document.createElement('div');
             modal.className = 'modal-overlay active';
             modal.id = 'successModal';
@@ -2703,18 +2709,29 @@
             `;
             document.body.appendChild(modal);
             
-            // 이벤트 리스너를 JavaScript로 직접 연결
-            document.getElementById('viewAppBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                viewApplication();
-            });
-            
-            document.getElementById('kakaoBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                openKakaoChannel();
-            });
+            // 약간의 딜레이 후 이벤트 리스너 연결 (DOM 완전히 추가된 후)
+            setTimeout(() => {
+                const viewBtn = document.getElementById('viewAppBtn');
+                const kakaoBtn = document.getElementById('kakaoBtn');
+                
+                if (viewBtn) {
+                    viewBtn.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('✅ 신청서 보기 버튼 클릭됨');
+                        viewApplication();
+                    };
+                }
+                
+                if (kakaoBtn) {
+                    kakaoBtn.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('✅ 카카오 버튼 클릭됨');
+                        openKakaoChannel();
+                    };
+                }
+            }, 100);
         }
         
         // 안드로이드에서도 작동하는 신청서 보기
