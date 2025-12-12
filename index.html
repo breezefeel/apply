@@ -1690,6 +1690,27 @@
             // 다음 달 첫 주차 추가
             const nextMonthFirstWeek = getNextMonthFirstMonday(currentMonday);
             addWeekOption(select, nextMonthFirstWeek);
+            
+            // 기본 선택 로직
+            if (select.options.length > 1) {
+                const firstOption = select.options[1]; // 첫 번째 실제 옵션
+                const firstMonday = new Date(firstOption.value);
+                const firstWeekNum = getWeekOfMonth(firstMonday); // 이 달의 몇 주차인지
+                const firstMonth = firstMonday.getMonth(); // 월 (0-11)
+                
+                // 그 달의 1일이 속한 주차 계산
+                const firstDayOfMonth = new Date(firstMonday.getFullYear(), firstMonth, 1);
+                const firstWeekOfMonth = getWeekOfMonth(firstDayOfMonth);
+                
+                if (firstWeekNum === firstWeekOfMonth) {
+                    // 첫 번째 옵션이 그 달의 첫 주차면 선택
+                    firstOption.selected = true;
+                } else {
+                    // 아니면 마지막 옵션(다음 달 첫 주차) 선택
+                    const lastOption = select.options[select.options.length - 1];
+                    lastOption.selected = true;
+                }
+            }
         }
         
         // 현재 주의 월요일 구하기
@@ -1791,12 +1812,8 @@
             option.textContent = displayStr;
             option.dataset.weeks = calculateRemainingWeeks(monday);
             
-            select.appendChild(option);
+            select.appendChild(option);           
             
-            // 첫 번째 옵션을 기본 선택
-            if (select.options.length === 2) {
-                option.selected = true;
-            }
         }
         
         function getWeekOfMonth(date) {
