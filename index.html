@@ -2711,14 +2711,12 @@
             // 모달 먼저 닫기
             closeSuccessModal();
             
-            // 약간의 딜레이 후 실행 (모달 닫힘 확인)
-            setTimeout(() => {
-                // 모바일 감지
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                const isAndroid = /Android/i.test(navigator.userAgent);
-                
-                console.log('📱 모바일:', isMobile, '/ 안드로이드:', isAndroid);
-
+            // 모바일 감지
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            
+            console.log('📱 모바일:', isMobile, '/ 안드로이드:', isAndroid);
+            
             if (isAndroid) {
                 // 안드로이드: Base64 Data URL로 변환하여 열기
                 console.log('📱 안드로이드: Base64로 변환 중...');
