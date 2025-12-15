@@ -192,6 +192,21 @@
             font-weight: bold;
             margin-bottom: 5px;
         }
+
+        /* 1. 왼쪽 메뉴 (P-스트레칭) - 파란색 강제 적용 */
+        #programSelectionGroup .program-option:nth-child(1) .program-name {
+            color: #5185D4 !important; 
+        }
+
+        /* 2. 오른쪽 메뉴 (작은얼굴) - 주황색 강제 적용 */
+        #programSelectionGroup .program-option:nth-child(2) .program-name {
+            color: #EA580C !important; 
+        }
+
+        /* 3. 선택되었을 때 흰색을 유지하는 규칙 (범위 좁히기) */
+        #programSelectionGroup .program-option input[type="radio"]:checked + label .program-name {
+            color: white !important;
+        }
         
         .program-desc {
             font-size: 13px;
@@ -1234,19 +1249,19 @@
             
             <div class="form-group">
                 <label class="form-label">리:얼 프로그램 *</label>
-                <div class="program-grid">
-                    <div class="program-option">
-                        <input type="radio" name="program" id="facecare" value="리:얼 작은얼굴">
-                        <label for="facecare">
-                            <div class="program-name text-[#EA580C]">작은얼굴</div>
-                            <div class="program-desc">얼굴 라인 관리 및 페이셜 케어</div>
-                        </label>
-                    </div>
+                <div class="program-grid">                    
                     <div class="program-option">
                         <input type="radio" name="program" id="stretching" value="리:얼 P-스트레칭">
                         <label for="stretching">
                             <div class="program-name text-[#5185D4]">P-스트레칭</div>
                             <div class="program-desc">전문가와 함께, 맞춤 스트레칭</div>
+                        </label>
+                    </div>
+                    <div class="program-option">
+                        <input type="radio" name="program" id="facecare" value="리:얼 작은얼굴">
+                        <label for="facecare">
+                            <div class="program-name text-[#EA580C]">작은얼굴</div>
+                            <div class="program-desc">얼굴 라인 관리 및 페이셜 케어</div>
                         </label>
                     </div>
                 </div>
