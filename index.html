@@ -6,1154 +6,1196 @@
     <title>리:얼 커뮤니티센터 회원 신청</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        body {
-            font-family: 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            touch-action: pan-y;
-        }
-        
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            display: none;
-            animation: slideIn 0.5s ease;
-        }
-        
-        .card.active {
-            display: block;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .card-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .card-number {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        
-        .card-title {
-            font-size: 28px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .card-subtitle {
-            color: #888;
-            font-size: 14px;
-        }
-        
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        .form-label {
-            display: block;
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 10px;
-            font-size: 15px;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 22px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
-            min-height: 75px; /* 페이지2 select 기본 높이 */
-        }
-        
-        /* 페이지1 입력 필드는 작게 */
-        #page1 .form-input {
-            padding: 12px;
-            min-height: 50px;
-        }
-        
-        /* 페이지2 select는 모바일에서 더 크게 */
-        #page2 select.form-input {
-            padding: 24px;
-            min-height: 80px;
-        }
-        
-        @media (min-width: 768px) {
-            #page2 select.form-input {
-                padding: 15px;
-                min-height: 54px;
-            }
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .select-group {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .select-group select {
-            flex: 1;
-            padding: 25px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 18px;
-            background: white;
-            font-weight: 600;
-        }
-        
-        .program-option {
-            margin-bottom: 15px;
-        }
-        
-        /* 프로그램 선택을 한 줄에 배치 */
-        .program-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        
-        .program-grid .program-option {
-            margin-bottom: 0;
-        }
-        
-        .program-option input[type="radio"] {
-            display: none;
-        }
-        
-        .program-option label {
-            display: block;
-            padding: 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .program-option input[type="radio"]:checked + label {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-color: #667eea;
-        }
-        
-        .program-option input[type="radio"]:checked + label .program-desc {
-            color: white;
-            opacity: 1;
-        }
-        
-        .program-option input[type="radio"]:checked + label strong {
-            color: white !important;
-        }
-        
-        .program-name {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        /* 1. 왼쪽 메뉴 (P-스트레칭) - 파란색 강제 적용 */
-        #programSelectionGroup .program-option:nth-child(1) .program-name {
-            color: #5185D4 !important; 
-        }
-
-        /* 2. 오른쪽 메뉴 (작은얼굴) - 주황색 강제 적용 */
-        #programSelectionGroup .program-option:nth-child(2) .program-name {
-            color: #EA580C !important; 
-        }
-
-        /* 3. 선택되었을 때 흰색을 유지하는 규칙 (범위 좁히기) */
-        #programSelectionGroup .program-option input[type="radio"]:checked + label .program-name {
-            color: white !important;
-        }
-        
-        .program-desc {
-            font-size: 13px;
-            opacity: 0.8;
-        }
-        
-        /* 결제 금액 선택 스타일 */
-        #amountGroup {
-            border-top: 2px solid #e0e0e0;
-            padding-top: 25px;
-            margin-top: 25px;
-        }
-        
-        /* 직접 입력 메뉴만 높이 줄이기 */
-        #customAmount + label {
-            padding: 15px 20px !important;
-        }
-        .amount-option {
-            margin-bottom: 15px;
-        }
-        
-        .amount-option input[type="radio"] {
-            display: none;
-        }
-        
-        .amount-option label {
-            display: block;
-            padding: 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-        }
-        
-        .amount-option input[type="radio"]:checked + label {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-            color: white;
-            border-color: #4CAF50;
-        }
-        
-        .amount-name {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        
-        .amount-price {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #667eea;
-        }
-        
-        .amount-option input[type="radio"]:checked + label .amount-price {
-            color: white;
-        }
-        
-        .amount-desc {
-            font-size: 13px;
-            opacity: 0.7;
-        }
-        
-        .weekday-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-        
-        .weekday-option {
-            position: relative;
-        }
-        
-        .weekday-option input[type="checkbox"] {
-            display: none;
-        }
-        
-        .weekday-option label {
-            display: block;
-            padding: 15px 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .weekday-option input[type="checkbox"]:checked + label {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-color: #667eea;
-        }
-        
-        .terms-box {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            max-height: 300px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            font-size: 13px;
-            line-height: 1.8;
-            transition: all 0.5s ease;
-        }
-        
-        .terms-box.collapsed {
-            max-height: 100px;
-            overflow: hidden;
-        }
-        
-        .terms-box h4 {
-            color: #333;
-            margin: 15px 0 10px 0;
-            font-size: 14px;
-        }
-        
-        .terms-box ol {
-            padding-left: 20px;
-        }
-        
-        .terms-box li {
-            margin-bottom: 10px;
-        }
-        
-        .privacy-box {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            max-height: 0;
-            overflow: hidden;
-            margin-bottom: 20px;
-            font-size: 13px;
-            line-height: 1.8;
-            transition: all 0.5s ease;
-            opacity: 0;
-        }
-        
-        .privacy-box.expanded {
-            max-height: 500px;
-            opacity: 1;
-            overflow-y: auto;
-        }
-        
-        .privacy-box.collapsed {
-            max-height: 100px;
-            opacity: 1;
-            overflow: hidden;
-        }
-        
-        .checkbox-group {
-            margin-bottom: 20px;
-        }
-        
-        .checkbox-option {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .checkbox-option.checked {
-            background: #f0f7ff;
-            border-color: #667eea;
-        }
-        
-        .checkbox-option input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        
-        .checkbox-option label {
-            cursor: pointer;
-            font-weight: 500;
-            flex: 1;
-        }
-        
-        .signature-pad {
-            border: 2px dashed #667eea;
-            border-radius: 10px;
-            background: #f8f9ff;
-            margin-bottom: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .signature-canvas {
-            display: block;
-            width: 100%;
-            height: 200px;
-            touch-action: none;
-            cursor: crosshair;
-        }
-        
-        .signature-clear {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-        
-        .signature-help {
-            text-align: center;
-            color: #667eea;
-            font-size: 13px;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-        }
-        
-        .btn {
-            flex: 1;
-            padding: 18px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-prev {
-            background: #e0e0e0;
-            color: #666;
-        }
-        
-        .btn-prev:hover {
-            background: #d0d0d0;
-        }
-        
-        .btn-next {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .btn-next:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn-next:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        /* 반응형 최종 페이지 */
-        .final-page {
-            background: white;
-            max-width: 900px;
-            width: 100%;
-            padding: 20px;
-            padding-bottom: 80px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-
-        @media (min-width: 768px) {
-            .final-page {
-                padding: 40px;
-                padding-bottom: 100px;
-            }
-        }
-        
-        /* 반응형 문서 미리보기 */
-        .document-preview {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-        }
-
-        @media (min-width: 768px) {
-            .document-preview {
-                padding: 30px;
-            }
-        }
-        
-        /* A4 크기 문서 스타일 (캡처용, 화면에는 숨김) */
-        .a4-document {
-            position: absolute;
-            left: -9999px;  /* 화면 밖으로 숨김 */
-            top: 0;
-            width: 794px !important;
-            height: auto !important;
-            min-width: 794px;
-            min-height: 1123px;
-            max-width: 794px;
-            padding: 6mm 8mm;
-            padding-bottom: 8mm;
-            background: white;
-            box-sizing: border-box;
-            font-family: 'Malgun Gothic', sans-serif;
-            overflow: visible;
-            transform: scale(0.95); 
-            transform-origin: top left;
-        }
-        
-        .document-title {
-            text-align: center;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 3px;
-        }
-
-        @media (min-width: 768px) {
-            .document-title {
-                font-size: 22px;
-                margin-bottom: 20px;
-            }
-        }
-        
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 3px;
-            font-size: 7px;
-            line-height: 1.5;
-        }
-
-        @media (min-width: 768px) {
-            .info-table {
-                margin-bottom: 15px;
-                font-size: 12px;
-            }
-        }
-        
-        .info-table td {
-            border: 2px solid #000;
-            padding: 2px;
-        }
-
-        @media (min-width: 768px) {
-            .info-table td {
-                padding: 8px;
-            }
-        }
-        
-        .info-table .label {
-            background-color: #e8e8e8;
-            width: 60px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        @media (min-width: 768px) {
-            .info-table .label {
-                width: 100px;
-            }
-        }
-        
-        .application-section {
-            border: 2px solid #000;
-            padding: 2.5px;
-            margin-bottom: 3px;
-        }
-
-        @media (min-width: 768px) {
-            .application-section {
-                padding: 12px;
-                margin-bottom: 15px;
-            }
-        }
-        
-        .section-title {
-            text-align: center;
-            font-weight: bold;
-            font-size: 8.5px;
-            margin-bottom: 2px;
-        }
-
-        @media (min-width: 768px) {
-            .section-title {
-                font-size: 15px;
-                margin-bottom: 10px;
-            }
-        }
-        
-        .agreement-title {
-            text-align: center;
-            font-size: 7.5px;
-            font-weight: bold;
-            margin: 3px 0 2px 0;
-        }
-
-        @media (min-width: 768px) {
-            .agreement-title {
-                font-size: 14px;
-                margin: 15px 0 12px 0;
-            }
-        }
-        
-        .agreement-list {
-            line-height: 1.5;
-            margin-bottom: 2.5px;
-            font-size: 6px;
-        }
-
-        @media (min-width: 768px) {
-            .agreement-list {
-                line-height: 1.7;
-                margin-bottom: 12px;
-                font-size: 11px;
-            }
-        }
-        
-        .agreement-list li {
-            margin-bottom: 1px;
-        }
-
-        @media (min-width: 768px) {
-            .agreement-list li {
-                margin-bottom: 5px;
-            }
-        }
-        
-        .note-box {
-            text-align: center;
-            font-size: 6.5px;
-            font-weight: bold;
-            margin: 3px 0;
-            padding: 2.5px;
-            border: 1px solid #333;
-        }
-
-        @media (min-width: 768px) {
-            .note-box {
-                font-size: 14px;
-                margin: 20px 0;
-                padding: 12px;
-            }
-        }
-        
-        /* 서명 관련 스타일 조정 */
-        .signature-in-note {
-            display: inline-block;
-            width: 100px;  /* 70px에서 증가 */
-            border-bottom: 1px solid #333;
-            vertical-align: middle;
-            height: 25px;  /* 18px에서 증가 */
-            position: relative;
-        }
-
-        @media (min-width: 768px) {
-            .signature-in-note {
-                width: 120px;
-                height: 35px;
-            }
-        }
-        
-        .signature-in-note img {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            height: 22px;  /* 16px에서 증가 */
-            max-width: 95px;
-            object-fit: contain;
-        }
-
-        @media (min-width: 768px) {
-            .signature-in-note img {
-                height: 30px;
-            }
-        }
-        
-        .detailed-agreement {
-            margin-top: 2.5px;
-            font-size: 5.2px;
-            line-height: 1.5;
-        }
-
-        @media (min-width: 768px) {
-            .detailed-agreement {
-                margin-top: 12px;
-                font-size: 10px;
-                line-height: 1.6;
-            }
-        }
-        
-        .detailed-agreement h3 {
-            font-size: 6px;
-            font-weight: bold;
-            margin: 2px 0 1px 0;
-        }
-
-        @media (min-width: 768px) {
-            .detailed-agreement h3 {
-                font-size: 12px;
-                margin: 10px 0 6px 0;
-            }
-        }
-        
-        .detailed-agreement p,
-        .detailed-agreement li {
-            margin-bottom: 2px;
-        }
-
-        @media (min-width: 768px) {
-            .detailed-agreement p,
-            .detailed-agreement li {
-                margin-bottom: 6px;
-            }
-        }
-        
-        .consent-box {
-            border: 2px solid #000;
-            padding: 10px;
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-
-        @media (min-width: 768px) {
-            .consent-box {
-                padding: 15px;
-                margin-top: 20px;
-            }
-        }
-        
-        .consent-box h3 {
-            text-align: center;
-            font-size: 9px;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        @media (min-width: 768px) {
-            .consent-box h3 {
-                font-size: 14px;
-                margin-bottom: 12px;
-            }
-        }
-        
-        .consent-box p {
-            line-height: 1.3;
-            text-align: center;
-            font-size: 7.5px;
-        }
-
-        @media (min-width: 768px) {
-            .consent-box p {
-                line-height: 1.6;
-                font-size: 12px;
-            }
-        }
-        
-        .signature-section {
-            margin-top: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-            page-break-inside: avoid;
-        }
-
-        @media (min-width: 768px) {
-            .signature-section {
-                margin-top: 30px;
-            }
-        }
-        
-        .signature-line {
-            display: inline-block;
-            margin: 6px 12px;
-        }
-
-        @media (min-width: 768px) {
-            .signature-line {
-                margin: 15px 30px;
-            }
-        }
-        
-        .signature-line label {
-            font-weight: bold;
-            margin-right: 3px;
-            font-size: 8px;
-        }
-
-        @media (min-width: 768px) {
-            .signature-line label {
-                margin-right: 8px;
-                font-size: 13px;
-            }
-        }
-        
-        .signature-display {
-            display: inline-block;
-            border: none;
-            border-bottom: 2px solid #000;
-            padding: 2px;
-            min-width: 120px;
-        }
-        
-        .signature-display img {
-            height: 40px;
-            max-width: 150px;
-            vertical-align: middle;
-            object-fit: contain;
-        }
-
-        @media (min-width: 768px) {
-            .signature-display img {
-                height: 50px;
-                max-width: 180px;
-            }
-        }
-        
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .loading-content {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 400px;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .success-box {
-            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        @media (min-width: 768px) {
-            .success-box {
-                padding: 30px;
-                margin-bottom: 30px;
-            }
-        }
-
-        .success-box h2 {
-            font-size: 20px;
-            margin-bottom: 12px;
-        }
-
-        @media (min-width: 768px) {
-            .success-box h2 {
-                font-size: 24px;
-                margin-bottom: 15px;
-            }
-        }
-
-        .success-box p {
-            font-size: 14px;
-            opacity: 0.95;
-            line-height: 1.6;
-        }
-
-        @media (min-width: 768px) {
-            .success-box p {
-                font-size: 16px;
-            }
-        }
-
-        .drive-btn {
-            background: #4285F4;
-            color: white;
-            padding: 18px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-            margin-bottom: 15px;
-        }
-
-        @media (min-width: 768px) {
-            .drive-btn {
-                padding: 20px;
-                font-size: 18px;
-            }
-        }
-
-        .drive-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(66, 133, 244, 0.4);
-        }
-
-        .download-btn {
-            background: #34A853;
-            color: white;
-            padding: 18px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-        }
-
-        @media (min-width: 768px) {
-            .download-btn {
-                padding: 20px;
-                font-size: 18px;
-            }
-        }
-
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(52, 168, 83, 0.4);
-        }
-
-        .progress-bar {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-        
-        .progress-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #e0e0e0;
-            transition: all 0.3s;
-        }
-        
-        .progress-dot.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            width: 30px;
-            border-radius: 10px;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            padding: 20px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .modal-overlay.active {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 450px;
-            width: 100%;
-            position: relative;
-            pointer-events: auto;
-
-        @media (min-width: 768px) {
-            .modal-content {
-                padding: 40px;
-            }
-        }
-
-        .modal-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        @media (min-width: 768px) {
-            .modal-icon {
-                font-size: 64px;
-                margin-bottom: 20px;
-            }
-        }
-
-        .modal-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 12px;
-        }
-
-        @media (min-width: 768px) {
-            .modal-title {
-                font-size: 24px;
-                margin-bottom: 15px;
-            }
-        }
-
-        .modal-message {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .modal-message {
-                font-size: 16px;
-                margin-bottom: 25px;
-            }
-        }
-
-        .modal-btn {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            transition: all 0.3s;
-            margin-bottom: 10px;
-        }
-
-        @media (min-width: 768px) {
-            .modal-btn {
-                padding: 18px;
-                font-size: 18px;
-            }
-        }
-
-        .modal-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .modal-btn.secondary {
-            background: #e0e0e0;
-            color: #666;
-        }
-
-        .modal-btn.secondary:hover {
-            background: #d0d0d0;
-            box-shadow: none;
-        }
-
-        .help-note {
-            background: #e3f2fd;
-            border: 2px solid #2196F3;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .help-note-title {
-            font-weight: bold;
-            color: #1565C0;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .help-note-text {
-            color: #1565C0;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .file-preview {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        .file-preview img {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        .view-file-btn {
-            background: #667eea;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .view-file-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 15px rgba(102, 126, 234, 0.3);
-        }
-    </style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+			-webkit-tap-highlight-color: transparent;
+		}
+		
+		body {
+			font-family: 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+			/* 배경을 그린/틸 계열로 변경 */
+			background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+			min-height: 100vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			padding: 20px;
+			touch-action: pan-y;
+		}
+		
+		.container {
+			max-width: 700px;
+			margin: 0 auto;
+			width: 100%;
+		}
+		
+		.card {
+			background: white;
+			border-radius: 20px;
+			padding: 40px;
+			box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+			display: none;
+			animation: slideIn 0.5s ease;
+		}
+		
+		.card.active {
+			display: block;
+		}
+		
+		@keyframes slideIn {
+			from {
+				opacity: 0;
+				transform: translateY(20px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+		
+		.card-header {
+			text-align: center;
+			margin-bottom: 30px;
+		}
+		
+		.card-number {
+			display: inline-block;
+			/* 색상 변경 */
+			background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+			color: white;
+			padding: 8px 20px;
+			border-radius: 20px;
+			font-size: 14px;
+			font-weight: bold;
+			margin-bottom: 15px;
+		}
+		
+		.card-title {
+			font-size: 28px;
+			font-weight: bold;
+			color: #333;
+			margin-bottom: 10px;
+		}
+		
+		.card-subtitle {
+			color: #888;
+			font-size: 14px;
+		}
+						
+		/* index (7).html의 <style> 블록에 추가 */
+		.main-title {
+			text-align: center;
+			/* 색상 변경 */
+			color: #00b09b;
+			margin-bottom: 30px;
+			font-size: 32px;
+		}
+		
+		.form-group {
+			margin-bottom: 25px;
+		}
+		
+		.form-label {
+			display: block;
+			font-weight: bold;
+			color: #555;
+			margin-bottom: 10px;
+			font-size: 15px;
+		}
+		
+		.form-input {
+			width: 100%;
+			padding: 22px;
+			border: 2px solid #e0e0e0;
+			border-radius: 10px;
+			font-size: 16px;
+			transition: all 0.3s;
+			min-height: 75px; /* 페이지2 select 기본 높이 */
+		}
+		
+		/* 페이지1 입력 필드는 작게 */
+		#page1 .form-input {
+			padding: 12px;
+			min-height: 50px;
+		}
+		
+		/* 페이지2 select는 모바일에서 더 크게 */
+		#page2 select.form-input {
+			padding: 24px;
+			min-height: 80px;
+		}
+		
+		@media (min-width: 768px) {
+			#page2 select.form-input {
+				padding: 15px;
+				min-height: 54px;
+			}
+		}
+		
+		.form-input:focus {
+			outline: none;
+			/* 색상 변경 */
+			border-color: #00b09b;
+			/* 색상 변경 (RGB: 0, 176, 155) */
+			box-shadow: 0 0 0 3px rgba(0, 176, 155, 0.1);
+		}
+		
+		.select-group {
+			display: flex;
+			gap: 10px;
+		}
+		
+		.select-group select {
+			flex: 1;
+			padding: 25px 15px;
+			border: 2px solid #e0e0e0;
+			border-radius: 10px;
+			font-size: 18px;
+			background: white;
+			font-weight: 600;
+		}
+		
+		.program-option {
+			margin-bottom: 15px;
+		}
+		
+		/* 프로그램 선택을 한 줄에 배치 */
+		.program-grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 15px;
+		}
+		
+		.program-grid .program-option {
+			margin-bottom: 0;
+		}
+		
+		.program-option input[type="radio"] {
+			display: none;
+		}
+		
+		.program-option label {
+			display: block;
+			padding: 20px;
+			border: 2px solid #e0e0e0;
+			border-radius: 10px;
+			cursor: pointer;
+			transition: all 0.3s;
+		}
+		
+		.program-option input[type="radio"]:checked + label {
+			/* 색상 변경 */
+			background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+			color: white;
+			/* 색상 변경 */
+			border-color: #00b09b;
+		}
+		
+		.program-option input[type="radio"]:checked + label .program-desc {
+			color: white;
+			opacity: 1;
+		}
+		
+		.program-option input[type="radio"]:checked + label strong {
+			color: white !important;
+		}
+		
+		.program-name {
+			font-size: 18px;
+			font-weight: bold;
+			margin-bottom: 5px;
+		}
+
+		/* 1. 왼쪽 메뉴 (P-스트레칭) - 색상 변경 */
+		#programSelectionGroup .program-option:nth-child(1) .program-name {
+			color: #5185D4 !important; 
+		}
+
+		/* 2. 오른쪽 메뉴 (작은얼굴) - 색상 변경 */
+		#programSelectionGroup .program-option:nth-child(2) .program-name {
+			color: #EA580C !important; 
+		}
+
+		/* 3. 선택되었을 때 흰색을 유지하는 규칙 (범위 좁히기) */
+		#programSelectionGroup .program-option input[type="radio"]:checked + label .program-name {
+			color: white !important;
+		}
+		
+		.program-desc {
+			font-size: 13px;
+			opacity: 0.8;
+		}
+		
+		/* 결제 금액 선택 스타일 */
+		#amountGroup {
+			border-top: 2px solid #e0e0e0;
+			padding-top: 25px;
+			margin-top: 25px;
+		}
+		
+		/* 직접 입력 메뉴만 높이 줄이기 */
+		#customAmount + label {
+			padding: 15px 20px !important;
+		}
+		.amount-option {
+			margin-bottom: 15px;
+		}
+		
+		.amount-option input[type="radio"] {
+			display: none;
+		}
+		
+		.amount-option label {
+			display: block;
+			padding: 20px;
+			border: 2px solid #e0e0e0;
+			border-radius: 10px;
+			cursor: pointer;
+			transition: all 0.3s;
+			position: relative;
+		}
+		
+		.amount-option input[type="radio"]:checked + label {
+			/* 색상 변경 */
+			background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+			color: white;
+			/* 색상 변경 */
+			border-color: #00b09b;
+		}
+		
+		.amount-name {
+			font-size: 16px;
+			font-weight: bold;
+			margin-bottom: 8px;
+		}
+		
+		.amount-price {
+			font-size: 24px;
+			font-weight: bold;
+			margin-bottom: 5px;
+			/* 색상 변경 */
+			color: #00b09b;
+		}
+		
+		.amount-option input[type="radio"]:checked + label .amount-price {
+			color: white;
+		}
+		
+		.amount-desc {
+			font-size: 13px;
+			opacity: 0.7;
+		}
+		
+		.weekday-grid {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 10px;
+		}
+		
+		.weekday-option {
+			position: relative;
+		}
+		
+		.weekday-option input[type="checkbox"] {
+			display: none;
+		}
+		
+		.weekday-option label {
+			display: block;
+			padding: 15px 10px;
+			border: 2px solid #e0e0e0;
+			border-radius: 10px;
+			text-align: center;
+			cursor: pointer;
+			transition: all 0.3s;
+			font-weight: 500;
+			font-size: 14px;
+		}
+		
+		.weekday-option input[type="checkbox"]:checked + label {
+			/* 색상 변경 */
+			background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+			color: white;
+			/* 색상 변경 */
+			border-color: #00b09b;
+		}
+		
+		.terms-box {
+			background: #f8f9fa;
+			border-radius: 10px;
+			padding: 20px;
+			max-height: 300px;
+			overflow-y: auto;
+			margin-bottom: 20px;
+			font-size: 13px;
+			line-height: 1.8;
+			transition: all 0.5s ease;
+		}
+		
+		.terms-box.collapsed {
+			max-height: 100px;
+			overflow: hidden;
+		}
+		
+		.terms-box h4 {
+			color: #333;
+			margin: 15px 0 10px 0;
+			font-size: 14px;
+		}
+		
+		.terms-box ol {
+			padding-left: 20px;
+		}
+		
+		.terms-box li {
+			margin-bottom: 10px;
+		}
+		
+		.privacy-box {
+			background: #f8f9fa;
+			border-radius: 10px;
+			padding: 20px;
+			max-height: 0;
+			overflow: hidden;
+			margin-bottom: 20px;
+			font-size: 13px;
+			line-height: 1.8;
+			transition: all 0.5s ease;
+			opacity: 0;
+		}
+		
+		.privacy-box.expanded {
+			max-height: 500px;
+			opacity: 1;
+			overflow-y: auto;
+		}
+		
+		.privacy-box.collapsed {
+			max-height: 100px;
+			opacity: 1;
+			overflow: hidden;
+		}
+		
+		.checkbox-group {
+			margin-bottom: 20px;
+		}
+		
+		.checkbox-option {
+			display: flex;
+			align-items: center;
+			padding: 15px;
+			border: 2px solid #e0e0e0;
+			border-radius: 10px;
+			margin-bottom: 10px;
+			cursor: pointer;
+			transition: all 0.3s;
+		}
+		
+		.checkbox-option.checked {
+			/* 색상 변경 (라이트 블루 -> 라이트 틸) */
+			background: #e0f7fa; 
+			/* 색상 변경 */
+			border-color: #00b09b;
+		}
+		
+		.checkbox-option input[type="checkbox"] {
+			width: 20px;
+			height: 20px;
+			margin-right: 10px;
+			cursor: pointer;
+		}
+		
+		.checkbox-option label {
+			cursor: pointer;
+			font-weight: 500;
+			flex: 1;
+		}
+		
+		.signature-pad {
+			/* 색상 변경 */
+			border: 2px dashed #00b09b;
+			/* 색상 변경 (라이트 퍼플 -> 라이트 블루/틸) */
+			background: #f0f7ff; 
+			border-radius: 10px;
+			margin-bottom: 10px;
+			position: relative;
+			overflow: hidden;
+		}
+		
+		.signature-canvas {
+			display: block;
+			width: 100%;
+			height: 200px;
+			touch-action: none;
+			cursor: crosshair;
+		}
+		
+		.signature-clear {
+			display: block;
+			width: 100%;
+			padding: 10px;
+			background: #f0f0f0;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			font-size: 14px;
+			margin-bottom: 20px;
+		}
+		
+		.signature-help {
+			text-align: center;
+			/* 색상 변경 */
+			color: #00b09b;
+			font-size: 13px;
+			margin-bottom: 10px;
+			font-weight: 500;
+		}
+		
+		.button-group {
+			display: flex;
+			gap: 10px;
+			margin-top: 30px;
+		}
+		
+		.btn {
+			flex: 1;
+			padding: 18px;
+			border: none;
+			border-radius: 10px;
+			font-size: 16px;
+			font-weight: bold;
+			cursor: pointer;
+			transition: all 0.3s;
+		}
+		
+		.btn-prev {
+			background: #e0e0e0;
+			color: #666;
+		}
+		
+		.btn-prev:hover {
+			background: #d0d0d0;
+		}
+		
+		.btn-next {
+			/* 색상 변경 */
+			background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+			color: white;
+		}
+		
+		.btn-next:hover {
+			transform: translateY(-2px);
+			/* 색상 변경 (RGB: 0, 176, 155) */
+			box-shadow: 0 5px 20px rgba(0, 176, 155, 0.4);
+		}
+		
+		.btn-next:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+		
+		/* 반응형 최종 페이지 */
+		.final-page {
+			background: white;
+			max-width: 900px;
+			width: 100%;
+			padding: 20px;
+			padding-bottom: 80px;
+			border-radius: 20px;
+			box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+		}
+
+		@media (min-width: 768px) {
+			.final-page {
+				padding: 40px;
+				padding-bottom: 100px;
+			}
+		}
+		
+		/* 반응형 문서 미리보기 */
+		.document-preview {
+			background: white;
+			padding: 15px;
+			border-radius: 10px;
+			margin-bottom: 20px;
+			overflow-x: auto;
+		}
+
+		@media (min-width: 768px) {
+			.document-preview {
+				padding: 30px;
+			}
+		}
+		
+		/* A4 크기 문서 스타일 (캡처용, 화면에는 숨김) */
+		.a4-document {
+			position: absolute;
+			left: -9999px; 	/* 화면 밖으로 숨김 */
+			top: 0;
+			width: 794px !important;
+			height: auto !important;
+			min-width: 794px;
+			min-height: 1123px;
+			max-width: 794px;
+			padding: 6mm 8mm;
+			padding-bottom: 8mm;
+			background: white;
+			box-sizing: border-box;
+			font-family: 'Malgun Gothic', sans-serif;
+			overflow: visible;
+			transform: scale(0.95); 
+			transform-origin: top left;
+		}
+		
+		.document-title {
+			text-align: center;
+			font-size: 12px;
+			font-weight: bold;
+			margin-bottom: 3px;
+		}
+
+		@media (min-width: 768px) {
+			.document-title {
+				font-size: 22px;
+				margin-bottom: 20px;
+			}
+		}
+		
+		.info-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-bottom: 3px;
+			font-size: 7px;
+			line-height: 1.5;
+		}
+
+		@media (min-width: 768px) {
+			.info-table {
+				margin-bottom: 15px;
+				font-size: 12px;
+			}
+		}
+		
+		.info-table td {
+			border: 2px solid #000;
+			padding: 2px;
+		}
+
+		@media (min-width: 768px) {
+			.info-table td {
+				padding: 8px;
+			}
+		}
+		
+		.info-table .label {
+			background-color: #e8e8e8;
+			width: 60px;
+			text-align: center;
+			font-weight: bold;
+		}
+
+		@media (min-width: 768px) {
+			.info-table .label {
+				width: 100px;
+			}
+		}
+		
+		.application-section {
+			border: 2px solid #000;
+			padding: 2.5px;
+			margin-bottom: 3px;
+		}
+
+		@media (min-width: 768px) {
+			.application-section {
+				padding: 12px;
+				margin-bottom: 15px;
+			}
+		}
+		
+		.section-title {
+			text-align: center;
+			font-weight: bold;
+			font-size: 8.5px;
+			margin-bottom: 2px;
+		}
+
+		@media (min-width: 768px) {
+			.section-title {
+				font-size: 15px;
+				margin-bottom: 10px;
+			}
+		}
+		
+		.agreement-title {
+			text-align: center;
+			font-size: 7.5px;
+			font-weight: bold;
+			margin: 3px 0 2px 0;
+		}
+
+		@media (min-width: 768px) {
+			.agreement-title {
+				font-size: 14px;
+				margin: 15px 0 12px 0;
+			}
+		}
+		
+		.agreement-list {
+			line-height: 1.5;
+			margin-bottom: 2.5px;
+			font-size: 6px;
+		}
+
+		@media (min-width: 768px) {
+			.agreement-list {
+				line-height: 1.7;
+				margin-bottom: 12px;
+				font-size: 11px;
+			}
+		}
+		
+		.agreement-list li {
+			margin-bottom: 1px;
+		}
+
+		@media (min-width: 768px) {
+			.agreement-list li {
+				margin-bottom: 5px;
+			}
+		}
+		
+		.note-box {
+			text-align: center;
+			font-size: 6.5px;
+			font-weight: bold;
+			margin: 3px 0;
+			padding: 2.5px;
+			border: 1px solid #333;
+		}
+
+		@media (min-width: 768px) {
+			.note-box {
+				font-size: 14px;
+				margin: 20px 0;
+				padding: 12px;
+			}
+		}
+		
+		/* 서명 관련 스타일 조정 */
+		.signature-in-note {
+			display: inline-block;
+			width: 100px; 	/* 70px에서 증가 */
+			border-bottom: 1px solid #333;
+			vertical-align: middle;
+			height: 25px; 	/* 18px에서 증가 */
+			position: relative;
+		}
+
+		@media (min-width: 768px) {
+			.signature-in-note {
+				width: 120px;
+				height: 35px;
+			}
+		}
+		
+		.signature-in-note img {
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			height: 22px; 	/* 16px에서 증가 */
+			max-width: 95px;
+			object-fit: contain;
+		}
+
+		@media (min-width: 768px) {
+			.signature-in-note img {
+				height: 30px;
+			}
+		}
+		
+		.detailed-agreement {
+			margin-top: 2.5px;
+			font-size: 5.2px;
+			line-height: 1.5;
+		}
+
+		@media (min-width: 768px) {
+			.detailed-agreement {
+				margin-top: 12px;
+				font-size: 10px;
+				line-height: 1.6;
+			}
+		}
+		
+		.detailed-agreement h3 {
+			font-size: 6px;
+			font-weight: bold;
+			margin: 2px 0 1px 0;
+		}
+
+		@media (min-width: 768px) {
+			.detailed-agreement h3 {
+				font-size: 12px;
+				margin: 10px 0 6px 0;
+			}
+		}
+		
+		.detailed-agreement p,
+		.detailed-agreement li {
+			margin-bottom: 2px;
+		}
+
+		@media (min-width: 768px) {
+			.detailed-agreement p,
+			.detailed-agreement li {
+				margin-bottom: 6px;
+			}
+		}
+		
+		.consent-box {
+			border: 2px solid #000;
+			padding: 10px;
+			margin-top: 15px;
+			margin-bottom: 15px;
+		}
+
+		@media (min-width: 768px) {
+			.consent-box {
+				padding: 15px;
+				margin-top: 20px;
+			}
+		}
+		
+		.consent-box h3 {
+			text-align: center;
+			font-size: 9px;
+			font-weight: bold;
+			margin-bottom: 4px;
+		}
+
+		@media (min-width: 768px) {
+			.consent-box h3 {
+				font-size: 14px;
+				margin-bottom: 12px;
+			}
+		}
+		
+		.consent-box p {
+			line-height: 1.3;
+			text-align: center;
+			font-size: 7.5px;
+		}
+
+		@media (min-width: 768px) {
+			.consent-box p {
+				line-height: 1.6;
+				font-size: 12px;
+			}
+		}
+		
+		.signature-section {
+			margin-top: 20px;
+			margin-bottom: 20px;
+			text-align: center;
+			page-break-inside: avoid;
+		}
+
+		@media (min-width: 768px) {
+			.signature-section {
+				margin-top: 30px;
+			}
+		}
+		
+		.signature-line {
+			display: inline-block;
+			margin: 6px 12px;
+		}
+
+		@media (min-width: 768px) {
+			.signature-line {
+				margin: 15px 30px;
+			}
+		}
+		
+		.signature-line label {
+			font-weight: bold;
+			margin-right: 3px;
+			font-size: 8px;
+		}
+
+		@media (min-width: 768px) {
+			.signature-line label {
+				margin-right: 8px;
+				font-size: 13px;
+			}
+		}
+		
+		.signature-display {
+			display: inline-block;
+			border: none;
+			border-bottom: 2px solid #000;
+			padding: 2px;
+			min-width: 120px;
+		}
+		
+		.signature-display img {
+			height: 40px;
+			max-width: 150px;
+			vertical-align: middle;
+			object-fit: contain;
+		}
+
+		@media (min-width: 768px) {
+			.signature-display img {
+				height: 50px;
+				max-width: 180px;
+			}
+		}
+		
+		.loading-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0, 0, 0, 0.8);
+			display: none;
+			justify-content: center;
+			align-items: center;
+			z-index: 9999;
+		}
+
+		.loading-overlay.active {
+			display: flex;
+		}
+
+		.loading-content {
+			background: white;
+			padding: 40px;
+			border-radius: 20px;
+			text-align: center;
+			max-width: 400px;
+		}
+
+		.spinner {
+			border: 4px solid #f3f3f3;
+			/* 색상 변경 */
+			border-top: 4px solid #00b09b;
+			border-radius: 50%;
+			width: 50px;
+			height: 50px;
+			animation: spin 1s linear infinite;
+			margin: 0 auto 20px;
+		}
+
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
+
+		.success-box {
+			background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+			color: white;
+			padding: 25px;
+			border-radius: 15px;
+			margin-bottom: 25px;
+			text-align: center;
+		}
+
+		@media (min-width: 768px) {
+			.success-box {
+				padding: 30px;
+				margin-bottom: 30px;
+			}
+		}
+
+		.success-box h2 {
+			font-size: 20px;
+			margin-bottom: 12px;
+		}
+
+		@media (min-width: 768px) {
+			.success-box h2 {
+				font-size: 24px;
+				margin-bottom: 15px;
+			}
+		}
+
+		.success-box p {
+			font-size: 14px;
+			opacity: 0.95;
+			line-height: 1.6;
+		}
+
+		@media (min-width: 768px) {
+			.success-box p {
+				font-size: 16px;
+			}
+		}
+
+		.drive-btn {
+			/* 색상 변경 */
+			background: #00b09b;
+			color: white;
+			padding: 18px;
+			border: none;
+			border-radius: 10px;
+			font-size: 16px;
+			font-weight: bold;
+			cursor: pointer;
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
+			transition: all 0.3s;
+			margin-bottom: 15px;
+		}
+
+		@media (min-width: 768px) {
+			.drive-btn {
+				padding: 20px;
+				font-size: 18px;
+			}
+		}
+
+		.drive-btn:hover {
+			transform: translateY(-2px);
+			/* 색상 변경 (RGB: 0, 176, 155) */
+			box-shadow: 0 5px 20px rgba(0, 176, 155, 0.4);
+		}
+
+		.download-btn {
+			/* 색상 변경 */
+			background: #009684;
+			color: white;
+			padding: 18px;
+			border: none;
+			border-radius: 10px;
+			font-size: 16px;
+			font-weight: bold;
+			cursor: pointer;
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
+			transition: all 0.3s;
+		}
+
+		@media (min-width: 768px) {
+			.download-btn {
+				padding: 20px;
+				font-size: 18px;
+			}
+		}
+
+		.download-btn:hover {
+			transform: translateY(-2px);
+			/* 색상 변경 (RGB: 0, 150, 132) */
+			box-shadow: 0 5px 20px rgba(0, 150, 132, 0.4);
+		}
+
+		.progress-bar {
+			display: flex;
+			justify-content: center;
+			gap: 10px;
+			margin-bottom: 30px;
+		}
+		
+		.progress-dot {
+			width: 12px;
+			height: 12px;
+			border-radius: 50%;
+			background: #e0e0e0;
+			transition: all 0.3s;
+		}
+		
+		.progress-dot.active {
+			/* 색상 변경 */
+			background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+			width: 30px;
+			border-radius: 10px;
+		}
+
+		.modal-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0, 0, 0, 0.9);
+			display: none;
+			justify-content: center;
+			align-items: center;
+			z-index: 10000;
+			padding: 20px;
+			overflow-y: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+		
+		.modal-overlay.active {
+			display: flex;
+		}
+		
+		.modal-content {
+			background: white;
+			padding: 30px;
+			border-radius: 20px;
+			text-align: center;
+			max-width: 450px;
+			width: 100%;
+			position: relative;
+			pointer-events: auto;
+		}
+
+		@media (min-width: 768px) {
+			.modal-content {
+				padding: 40px;
+			}
+		}
+
+		.modal-icon {
+			font-size: 48px;
+			margin-bottom: 15px;
+		}
+
+		@media (min-width: 768px) {
+			.modal-icon {
+				font-size: 64px;
+				margin-bottom: 20px;
+			}
+		}
+
+		.modal-title {
+			font-size: 20px;
+			font-weight: bold;
+			color: #333;
+			margin-bottom: 12px;
+		}
+
+		@media (min-width: 768px) {
+			.modal-title {
+				font-size: 24px;
+				margin-bottom: 15px;
+			}
+		}
+
+		.modal-message {
+			font-size: 14px;
+			color: #666;
+			line-height: 1.6;
+			margin-bottom: 20px;
+		}
+
+		@media (min-width: 768px) {
+			.modal-message {
+				font-size: 16px;
+				margin-bottom: 25px;
+			}
+		}
+
+		.modal-btn {
+			width: 100%;
+			padding: 16px;
+			border: none;
+			border-radius: 10px;
+			font-size: 16px;
+			font-weight: bold;
+			cursor: pointer;
+			/* 색상 변경 */
+			background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+			color: white;
+			transition: all 0.3s;
+			margin-bottom: 10px;
+		}
+
+		@media (min-width: 768px) {
+			.modal-btn {
+				padding: 18px;
+				font-size: 18px;
+			}
+		}
+
+		.modal-btn:hover {
+			transform: translateY(-2px);
+			/* 색상 변경 (RGB: 0, 176, 155) */
+			box-shadow: 0 5px 20px rgba(0, 176, 155, 0.4);
+		}
+
+		.modal-btn.secondary {
+			background: #e0e0e0;
+			color: #666;
+		}
+
+		.modal-btn.secondary:hover {
+			background: #d0d0d0;
+			box-shadow: none;
+		}
+
+		.help-note {
+			/* 색상 변경 (라이트 블루 -> 라이트 틸) */
+			background: #e0f7fa;
+			/* 색상 변경 (블루 -> 시안/틸) */
+			border: 2px solid #00bcd4;
+			border-radius: 10px;
+			padding: 15px;
+			margin-bottom: 20px;
+			text-align: left;
+		}
+
+		.help-note-title {
+			font-weight: bold;
+			/* 색상 변경 (다크 블루 -> 다크 시안/틸) */
+			color: #00838f;
+			margin-bottom: 8px;
+			font-size: 14px;
+		}
+
+		.help-note-text {
+			/* 색상 변경 (다크 블루 -> 다크 시안/틸) */
+			color: #00838f;
+			font-size: 13px;
+			line-height: 1.6;
+		}
+
+		.file-preview {
+			border: 2px solid #e0e0e0;
+			border-radius: 10px;
+			padding: 15px;
+			margin-top: 15px;
+			text-align: center;
+		}
+
+		.file-preview img {
+			max-width: 100%;
+			border-radius: 8px;
+			margin-bottom: 10px;
+		}
+
+		.view-file-btn {
+			/* 색상 변경 */
+			background: #00b09b;
+			color: white;
+			padding: 12px 20px;
+			border: none;
+			border-radius: 8px;
+			font-size: 14px;
+			font-weight: bold;
+			cursor: pointer;
+			transition: all 0.3s;
+		}
+
+		.view-file-btn:hover {
+			transform: translateY(-2px);
+			/* 색상 변경 (RGB: 0, 176, 155) */
+			box-shadow: 0 3px 15px rgba(0, 176, 155, 0.3);
+		}
+	</style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay">
@@ -1202,7 +1244,7 @@
             
             <div class="card-header">
                 <div class="card-number">1 / 3</div>
-                <h2 class="card-title">기본 정보</h2>
+                <h1 class="main-title">✨신청서 작성</h1>
                 <p class="card-subtitle">회원님의 정보를 입력해주세요</p>
             </div>
             
@@ -1268,6 +1310,14 @@
             </div>
             
             <div class="form-group">
+                <label class="form-label">시작 주차 선택 *</label>
+                <select class="form-input" id="startWeek" onchange="calculateAmount()">
+                    <option value="">시작 주차를 선택하세요</option>
+                </select>
+                <div id="weekInfo" style="margin-top: 8px; font-size: 13px; color: #666;"></div>
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">수업 요일 * (복수 선택 가능)</label>
                 <div class="weekday-grid">
                     <div class="weekday-option">
@@ -1323,14 +1373,6 @@
                         <option value="30">30분</option>
                     </select>
                 </div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">시작 주차 선택 *</label>
-                <select class="form-input" id="startWeek" onchange="calculateAmount()">
-                    <option value="">시작 주차를 선택하세요</option>
-                </select>
-                <div id="weekInfo" style="margin-top: 8px; font-size: 13px; color: #666;"></div>
             </div>
             
             <div class="form-group" id="amountGroup" style="display: none;">
