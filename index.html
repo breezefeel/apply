@@ -1746,41 +1746,57 @@
         
         function generateStartWeekOptions() {
             const select = document.getElementById('startWeek');
-            const today = new Date();
+            if (!select) return;
             
-            // 오늘이 속한 주의 월요일 찾기
+            select.innerHTML = '<option value="">선택하세요</option>';
+            
+            const today = new Date();
             const currentMonday = getCurrentWeekMonday(today);
             
-            // 이번 달의 남은 주차들 추가
-            const thisMonthWeeks = getRemainingWeeksInMonth(currentMonday);
-            thisMonthWeeks.forEach(monday => {
-                addWeekOption(select, monday);
-            });
-            
-            // 다음 달 첫 주차 추가
-            const nextMonthFirstWeek = getNextMonthFirstMonday(currentMonday);
-            addWeekOption(select, nextMonthFirstWeek);
-            
-            // 기본 선택 로직
-            if (select.options.length > 1) {
-                const firstOption = select.options[1]; // 첫 번째 실제 옵션
-                const firstMonday = new Date(firstOption.value);
-                const firstWeekNum = getWeekOfMonth(firstMonday); // 이 달의 몇 주차인지
-                const firstMonth = firstMonday.getMonth(); // 월 (0-11)
-                
-                // 그 달의 1일이 속한 주차 계산
-                const firstDayOfMonth = new Date(firstMonday.getFullYear(), firstMonth, 1);
-                const firstWeekOfMonth = getWeekOfMonth(firstDayOfMonth);
-                
-                if (firstWeekNum === firstWeekOfMonth) {
-                    // 첫 번째 옵션이 그 달의 첫 주차면 선택
-                    firstOption.selected = true;
-                } else {
-                    // 아니면 마지막 옵션(다음 달 첫 주차) 선택
-                    const lastOption = select.options[select.options.length - 1];
-                    lastOption.selected = true;
+            // 핵심 날짜 설정 (2026년 기준)
+            const jan1stMon = new Date(2026, 0, 5);  // 1월 1주차 월요일
+            const jan1stSun = new Date(2026, 0, 11, 23, 59, 59); // 1월 1주차 일요일 종료
+            const feb1stMon = new Date(2026, 1, 2);  // 2월 1주차 월요일
+            const mar1stMon = new Date(2026, 2, 2);  // 3월 1주차 월요일
+
+            let startDate, endDate, defaultDate;
+
+            // 1) 1월 1주차가 지나지 않은 경우 (오늘 <= 1월 11일)
+            if (today <= jan1stSun) {
+                startDate = jan1stMon;      // 1월 1주차부터 표시
+                endDate = feb1stMon;        // 다음 달(2월) 1주차까지 표시
+                defaultDate = jan1stMon;    // 기본 선택: 1월 1주차
+            } 
+            // 2) 1월 1주차가 지난 경우
+            else {
+                startDate = currentMonday;  // 현재 주차부터 표시 (이미 지난 주는 자동 제외)
+                endDate = mar1stMon;        // 3월 1주차까지 표시 범위 확장
+                defaultDate = feb1stMon;    // 기본 선택: 2월 1주차
+            }
+
+            // 옵션 생성 루프
+            let tempDate = new Date(startDate);
+            while (tempDate <= endDate) {
+                addWeekOption(select, tempDate);
+                tempDate.setDate(tempDate.getDate() + 7);
+            }
+
+            // 기본값 설정
+            const defaultValue = formatDateForDB(defaultDate);
+            // 생성된 옵션 중에 defaultDate가 있는지 확인 후 선택
+            for (let i = 0; i < select.options.length; i++) {
+                if (select.options[i].value === defaultValue) {
+                    select.selectedIndex = i;
+                    break;
                 }
             }
+            
+            // 만약 해당 날짜가 목록에 없다면(예: 2월 1주차도 지남) 마지막 옵션 선택
+            if (select.selectedIndex <= 0 && select.options.length > 1) {
+                select.selectedIndex = select.options.length - 1;
+            }
+
+            if (typeof calculateAmount === 'function') calculateAmount();
         }
         
         // 현재 주의 월요일 구하기
