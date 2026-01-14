@@ -222,12 +222,22 @@
 			color: #5185D4 !important; 
 		}
 
-		/* 2. 오른쪽 메뉴 (작은얼굴) - 색상 변경 */
+		/* 2. 오른쪽 메뉴 (재활운동) - 색상 변경 */
 		#programSelectionGroup .program-option:nth-child(2) .program-name {
+			color: #10B981 !important; 
+		}
+        
+        /* 3. 오른쪽 메뉴 (작은얼굴) - 색상 변경 */
+		#programSelectionGroup .program-option:nth-child(3) .program-name {
 			color: #EA580C !important; 
 		}
 
-		/* 3. 선택되었을 때 흰색을 유지하는 규칙 (범위 좁히기) */
+        /* 4. 오른쪽 메뉴 (복부관리) - 색상 변경 */
+		#programSelectionGroup .program-option:nth-child(4) .program-name {
+			color: #9333EA !important; 
+		}
+
+		/* 5. 선택되었을 때 흰색을 유지하는 규칙 (범위 좁히기) */
 		#programSelectionGroup .program-option input[type="radio"]:checked + label .program-name {
 			color: white !important;
 		}
@@ -1310,10 +1320,24 @@
                         </label>
                     </div>
                     <div class="program-option">
+                        <input type="radio" name="program" id="rehab" value="리:얼 재활운동">
+                        <label for="rehab">
+                            <div class="program-name text-[#10B981]">재활운동</div>
+                            <div class="program-desc">셀프 통증관리 & 기능 운동</div>
+                        </label>
+                    </div>
+                    <div class="program-option">
                         <input type="radio" name="program" id="facecare" value="리:얼 작은얼굴">
                         <label for="facecare">
                             <div class="program-name text-[#EA580C]">작은얼굴</div>
                             <div class="program-desc">얼굴 라인 관리 및 페이셜 케어</div>
+                        </label>
+                    </div>
+                    <div class="program-option">
+                        <input type="radio" name="program" id="abdominalcare" value="리:얼 복부관리">
+                        <label for="abdominalcare">
+                            <div class="program-name text-[#9333EA]">복부관리</div>
+                            <div class="program-desc">복부 관리 및 아로마 케어</div>
                         </label>
                     </div>
                 </div>
