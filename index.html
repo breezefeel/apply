@@ -169,6 +169,25 @@
 		.program-option {
 			margin-bottom: 15px;
 		}
+
+        /* [추가] 결제 금액 선택(라디오 버튼) 활성화 스타일 */
+        .program-option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+            color: white;
+            border-color: #00b09b;
+        }
+
+        /* 선택 시 내부 텍스트 및 설명 하얀색으로 변경 */
+        .program-option input[type="radio"]:checked + label .program-name,
+        .program-option input[type="radio"]:checked + label .program-desc {
+            color: white !important;
+            opacity: 1;
+        }
+
+        /* 선택 시 '추천!', '장기 할인' 같은 강조 문구도 하얀색으로 변경 */
+        .program-option input[type="radio"]:checked + label span {
+            color: white !important;
+        }
 		
 		/* 프로그램 선택을 한 줄에 배치 */
 		.program-grid {
@@ -181,7 +200,7 @@
 			margin-bottom: 0;
 		}
 		
-		.program-option input[type="radio"] {
+		.program-option input[type="checkbox"] {
 			display: none;
 		}
 		
@@ -194,7 +213,7 @@
 			transition: all 0.3s;
 		}
 		
-		.program-option input[type="radio"]:checked + label {
+		.program-option input[type="checkbox"]:checked + label {
 			/* 색상 변경 */
 			background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
 			color: white;
@@ -202,12 +221,12 @@
 			border-color: #00b09b;
 		}
 		
-		.program-option input[type="radio"]:checked + label .program-desc {
+		.program-option input[type="checkbox"]:checked + label .program-desc {
 			color: white;
 			opacity: 1;
 		}
 		
-		.program-option input[type="radio"]:checked + label strong {
+		.program-option input[type="checkbox"]:checked + label strong {
 			color: white !important;
 		}
 		
@@ -216,31 +235,41 @@
 			font-weight: bold;
 			margin-bottom: 5px;
 		}
-
-		/* 1. 왼쪽 메뉴 (P-스트레칭) - 색상 변경 */
+		
+		/* 1. 왼쪽 메뉴 (작은얼굴) - 색상 변경 */
 		#programSelectionGroup .program-option:nth-child(1) .program-name {
-			color: #4FC3F7 !important; 
-		}
-
-		/* 2. 오른쪽 메뉴 (재활운동) - 색상 변경 */
-		#programSelectionGroup .program-option:nth-child(2) .program-name {
-			color: #81C784 !important; 
-		}
-        
-        /* 3. 오른쪽 메뉴 (작은얼굴) - 색상 변경 */
-		#programSelectionGroup .program-option:nth-child(3) .program-name {
 			color: #F06292 !important; 
 		}
 
-        /* 4. 오른쪽 메뉴 (복부관리) - 색상 변경 */
-		#programSelectionGroup .program-option:nth-child(4) .program-name {
+        /* 2. 오른쪽 메뉴 (P-스트레칭) - 색상 변경 */
+		#programSelectionGroup .program-option:nth-child(2) .program-name {
+			color: #4FC3F7 !important; 
+		}
+
+        /* 3. 왼쪽 메뉴 (두피관리) - 색상 변경 */
+		#programSelectionGroup .program-option:nth-child(3) .program-name {
 			color: #FFB74D !important; 
 		}
 
-		/* 5. 선택되었을 때 흰색을 유지하는 규칙 (범위 좁히기) */
-		#programSelectionGroup .program-option input[type="radio"]:checked + label .program-name {
-			color: white !important;
+        /* 4. 오른쪽 메뉴 (재활운동) - 색상 변경 */
+		#programSelectionGroup .program-option:nth-child(4) .program-name {
+			color: #4f7cf7 !important; 
 		}
+                
+        /* 5. 왼쪽 메뉴 (복부관리) - 색상 변경 */
+		#programSelectionGroup .program-option:nth-child(5) .program-name {
+			color: #81C784 !important; 
+		}
+
+        /* 6. 오른쪽 메뉴 (인사이드) - 색상 변경 */
+		#programSelectionGroup .program-option:nth-child(6) .program-name {
+			color: #BA68C8 !important; 
+		}
+
+		/* 7. 선택되었을 때 흰색을 유지하는 규칙 (범위 좁히기) */
+		#programSelectionGroup .program-option input[type="checkbox"]:checked + label .program-name {
+            color: white !important;
+        }
 		
 		.program-desc {
 			font-size: 13px;
@@ -1214,6 +1243,26 @@
 			/* 색상 변경 (RGB: 0, 176, 155) */
 			box-shadow: 0 3px 15px rgba(0, 176, 155, 0.3);
 		}
+
+        /* 1. 결제 금액 메뉴의 라디오 버튼(동그라미) 숨김 강제 적용 */
+        #amountGroup .program-option input[type="radio"] {
+            display: none !important;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        /* 2. 시작 날짜 기본 색상 (선택 전: 청록색) */
+        .start-date-text {
+            color: #079992;
+            font-weight: 700;
+            font-size: 1.3em;
+        }
+
+        /* 3. 선택되었을 때 시작 날짜를 하얀색으로 변경 */
+        #amountGroup .program-option input[type="radio"]:checked + label .start-date-text {
+            color: white !important;
+        }
+
 	</style>
 </head>
 <body>
@@ -1310,36 +1359,56 @@
             </div>
             
             <div class="form-group" id="programSelectionGroup">
-                <label class="form-label">리:얼 프로그램 *</label>
-                <div class="program-grid">                    
+                <label class="form-label"></strong>리:얼 프로그램</strong> *(복수 선택 가능)</label>
+                <div class="program-grid">     
                     <div class="program-option">
-                        <input type="radio" name="program" id="stretching" value="리:얼 P-스트레칭">
+                        <input type="checkbox" name="program" id="facecare" value="리:얼 작은얼굴" onchange="calculateAmount()">
+                        <label for="facecare">
+                            <div class="program-name text-[#F06292]">작은얼굴</div>
+                            <div class="program-desc">얼굴 라인 관리 및 페이셜 케어</div>
+                        </label>
+                    </div>  
+
+                    <div class="program-option">
+                        <input type="checkbox" name="program" id="stretching" value="리:얼 P-스트레칭" onchange="calculateAmount()">
                         <label for="stretching">
                             <div class="program-name text-[#4FC3F7]">P-스트레칭</div>
                             <div class="program-desc">전문가와 함께, 맞춤 스트레칭</div>
                         </label>
                     </div>
+
                     <div class="program-option">
-                        <input type="radio" name="program" id="rehab" value="리:얼 재활운동">
+                        <input type="checkbox" name="program" id="scalpcare" value="리:얼 복부관리" onchange="calculateAmount()">
+                        <label for="scalpcare">
+                            <div class="program-name text-[#FFB74D]">두피관리</div>
+                            <div class="program-desc">두피 관리 및 기기 관리</div>
+                        </label>
+                    </div>
+
+                    <div class="program-option">
+                        <input type="checkbox" name="program" id="rehab" value="리:얼 재활운동" onchange="calculateAmount()">
                         <label for="rehab">
-                            <div class="program-name text-[#81C784]">재활운동</div>
+                            <div class="program-name text-[#4f7cf7]">재활운동</div>
                             <div class="program-desc">셀프 통증관리 & 기능 운동</div>
                         </label>
                     </div>
+
                     <div class="program-option">
-                        <input type="radio" name="program" id="facecare" value="리:얼 작은얼굴">
-                        <label for="facecare">
-                            <div class="program-name text-[#F06292]">작은얼굴</div>
-                            <div class="program-desc">얼굴 라인 관리 및 페이셜 케어</div>
-                        </label>
-                    </div>
-                    <div class="program-option">
-                        <input type="radio" name="program" id="abdominalcare" value="리:얼 복부관리">
+                        <input type="checkbox" name="program" id="abdominalcare" value="리:얼 복부관리" onchange="calculateAmount()">
                         <label for="abdominalcare">
-                            <div class="program-name text-[#FFB74D]">복부관리</div>
-                            <div class="program-desc">복부 관리 및 아로마 케어</div>
+                            <div class="program-name text-[#81C784]">복부관리(3월 예정)</div>
+                            <div class="program-desc">복부 관리 및 기기 관리</div>
                         </label>
                     </div>
+
+                    <div class="program-option">
+                        <input type="checkbox" name="program" id="inside" value="리:얼 인사이드" onchange="calculateAmount()">
+                        <label for="inside">
+                            <div class="program-name text-[#BA68C8]">인사이드</div>
+                            <div class="program-desc">선천적 성향 & 재능 상담</div>
+                        </label>
+                    </div>
+                    
                 </div>
             </div>
             
@@ -1352,7 +1421,7 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">수업 요일 * (복수 선택 가능)</label>
+                <label class="form-label">관리 요일 * (복수 선택 가능)</label>
                 <div class="weekday-grid">
                     <div class="weekday-option">
                         <input type="checkbox" name="weekday" id="mon" value="월">
@@ -1386,7 +1455,7 @@
             </div>
             
             <div class="form-group">
-                <label class="form-label">수업 시간 *</label>
+                <label class="form-label">관리 시간 *</label>
                 <div class="select-group">
                     <select class="form-input" id="timeHour">
                         <option value="">시간</option>
@@ -1413,7 +1482,7 @@
                 <label class="form-label">결제 금액 선택 *</label>
                 
                 <div class="program-option" id="single1Option" style="display: none;">
-                    <input type="radio" name="packageType" id="single1" value="single1" onchange="updateAmountDisplay()">
+                    <input type="radio" name="packageType" id="single1" value="single1" onchange="updateAmountDisplay(); calculateAmount();">
                     <label for="single1">
                         <div class="program-name">1회 이용권</div>
                         <div class="program-desc" id="single1Desc">45,000원 (1회)</div>
@@ -1421,26 +1490,26 @@
                 </div>
                 
                 <div class="program-option" id="weekly1Option" style="display: none;">
-                    <input type="radio" name="packageType" id="weekly1" value="weekly1" onchange="updateAmountDisplay()">
+                    <input type="radio" name="packageType" id="weekly1" value="weekly1" onchange="updateAmountDisplay(); calculateAmount();">
                     <label for="weekly1">
                         <div class="program-name">주 1회 패키지</div>
-                        <div class="program-desc" id="weekly1Desc">170,000원 (4회, 회당 42,500원)</div>
+                        <div class="program-desc" id="weekly1Desc"></div>
                     </label>
                 </div>
                 
                 <div class="program-option" id="weekly2Option" style="display: none;">
-                    <input type="radio" name="packageType" id="weekly2" value="weekly2" onchange="updateAmountDisplay()">
+                    <input type="radio" name="packageType" id="weekly2" value="weekly2" onchange="updateAmountDisplay(); calculateAmount();">
                     <label for="weekly2">
-                        <div class="program-name">주 2회 패키지 <span style="color: #4CAF50; font-weight: bold;">추천!</span></div>
-                        <div class="program-desc" id="weekly2Desc">320,000원 (8회, 회당 40,000원)</div>
+                        <div class="program-name">주 2회 이상 패키지 <span style="color: #4CAF50; font-weight: bold;">추천!</span></div>
+                        <div class="program-desc" id="weekly2Desc"></div>
                     </label>
                 </div>
-                
-                <div class="program-option" id="familyOption" style="display: none;">
-                    <input type="radio" name="packageType" id="family" value="family" onchange="updateAmountDisplay()">
-                    <label for="family">
-                        <div class="program-name">패밀리 패키지 <span style="color: #FF5722; font-weight: bold;">가족 공유 가능!</span></div>
-                        <div class="program-desc" id="familyDesc">450,000원 (12회, 회당 37,500원)</div>
+
+                <div class="program-option" id="month3Option" style="display: none;">
+                    <input type="radio" name="packageType" id="month3" value="month3" onchange="updateAmountDisplay(); calculateAmount();">
+                    <label for="month3">
+                        <div class="program-name">3개월 패키지 <span style="color: #FF5722; font-weight: bold;">장기 할인</span></div>
+                        <div class="program-desc" id="month3Desc"></div>
                     </label>
                 </div>
                 
@@ -1629,7 +1698,7 @@
         
         <ol class="agreement-list">
             <li>본인 부주의로 발생되는 사고에 대해서는 책임을 지지 않습니다.</li>
-            <li>커뮤니티 시설 이용 신청은 수시접수이며 수업인원에 따라 일할 계산됩니다.</li>
+            <li>커뮤니티 시설 이용 신청은 수시접수이며 수업/관리일에 따라 일할 계산됩니다.</li>
             <li>해지를 원하시는 입주민은 <strong>반드시 안내 데스크에 방문하셔서 <span style="color: red;">해지신청서</span> 작성.</strong><br>
             ※ 해지 신청을 하지 않아 발생된 요금의 책임은 본인에게 있습니다.</li>
             <li>등록 후 <strong>미 이용 시 연기 및 환불이 불가하며 반드시 해지신청</strong>하셔야 합니다. (양도 가능)</li>            
@@ -1702,20 +1771,7 @@
                 checkbox.addEventListener('change', updatePaymentOptions);
             });
             
-            // 프로그램 선택 시 스크롤
-            const programRadios = document.querySelectorAll('input[name="program"]');
-            programRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    setTimeout(() => {
-                        window.scrollTo({
-                            top: document.body.scrollHeight,
-                            behavior: 'smooth'
-                        });
-                    }, 100);
-                });
-            });
-            
-            // 수업 시간(분) 선택 시 스크롤
+            // 관리 시간(분) 선택 시 스크롤
             const timeMinuteSelect = document.getElementById('timeMinute');
             if (timeMinuteSelect) {
                 timeMinuteSelect.addEventListener('change', function() {
@@ -1736,30 +1792,28 @@
             const single1Option = document.getElementById('single1Option');
             const weekly1Option = document.getElementById('weekly1Option');
             const weekly2Option = document.getElementById('weekly2Option');
-            const familyOption = document.getElementById('familyOption');
+            const month3Option = document.getElementById('month3Option'); // 신규
             
-            // 모든 옵션 초기화
+            // 모든 옵션 초기화 (숨김 및 체크 해제)
             single1Option.style.display = 'none';
             weekly1Option.style.display = 'none';
             weekly2Option.style.display = 'none';
-            familyOption.style.display = 'none';
+            month3Option.style.display = 'none';
             
-            // 선택 해제
-            document.getElementById('single1').checked = false;
-            document.getElementById('weekly1').checked = false;
-            document.getElementById('weekly2').checked = false;
-            document.getElementById('family').checked = false;
+            const radios = document.getElementsByName('packageType');
+            for(let i=0; i<radios.length; i++) {
+                if(radios[i].value !== 'custom') radios[i].checked = false;
+            }
             
             if (weekdayCount === 1) {
-                // 1개 선택: 1회권 + 주 1회
+                // 1일 선택: 1회권, 주1회, 3개월 표시
                 single1Option.style.display = 'block';
                 weekly1Option.style.display = 'block';
-            } else if (weekdayCount === 2) {
-                // 2개 선택: 주 2회만
+                month3Option.style.display = 'block';
+            } else if (weekdayCount >= 2) {
+                // 2일 이상 선택: 주2회이상(통합됨), 3개월 표시
                 weekly2Option.style.display = 'block';
-            } else if (weekdayCount >= 3) {
-                // 3개 이상 선택: 가족 공유
-                familyOption.style.display = 'block';
+                month3Option.style.display = 'block';
             }
             
             // 금액 재계산
@@ -1958,43 +2012,87 @@
             const select = document.getElementById('startWeek');
             const selectedOption = select.options[select.selectedIndex];
             
+            // 프로그램 선택 개수 확인
+            const selectedPrograms = document.querySelectorAll('input[name="program"]:checked');
+            const programCount = selectedPrograms.length;
+
             if (!selectedOption || !selectedOption.value) {
                 document.getElementById('amountGroup').style.display = 'none';
                 return;
             }
             
-            const weeks = parseInt(selectedOption.dataset.weeks);
+            // 기본 주차 (드롭다운에서 선택된 주)
+            const selectedWeeks = parseInt(selectedOption.dataset.weeks);
+            
             const weekInfo = document.getElementById('weekInfo');
-            weekInfo.textContent = `${weeks}주 패키지 (${weeks === 4 ? '한 달 전체' : `이번 달 남은 ${weeks}주`})`;
+            const programInfoText = programCount > 0 ? ` (선택 프로그램: ${programCount}개)` : '';
+            weekInfo.textContent = `${selectedWeeks}주 패키지 (${selectedWeeks === 4 ? '한 달 전체' : `이번 달 남은 ${selectedWeeks}주`})${programInfoText}`;
             
             const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
             const weekdayCount = selectedWeekdays.length;
             
-            // 시작 날짜 계산
-            const startDateStr = selectedOption.value; // "2025-12-09"
+            // [수정] 시작 날짜 표시용 HTML 생성 (인라인 스타일 제거 -> 클래스 적용)
+            const startDateStr = selectedOption.value;
             const startDate = new Date(startDateStr);
             const firstSessionDates = getFirstSessionDates(startDate, selectedWeekdays);
             
-            // 금액 계산
-            const single1Amount = 45000;
-            const weekly1Amount = weeks * 42500;
-            const weekly2Amount = weeks * 40000 * 2;
-            const familyAmount = weeks * 37500 * weekdayCount;
-            
-            // 날짜 정보 포함한 설명 (줄바꿈 후 표시)
+            // 기존: style="color: #079992; ..." -> 변경: class="start-date-text"
             const dateInfo = firstSessionDates.length > 0 ? 
-                `<br><strong style="color: #079992; font-weight: 700; font-size: 1.3em;">첫 시작: ${firstSessionDates.join(', ')}</strong>` : '';
+                `<br><strong class="start-date-text">첫 시작: ${firstSessionDates.join(', ')}</strong>` : '';
+
+            // ==========================================
+            // [가격 정책 로직]
+            // ==========================================
+            
+            // 1. 단가 결정 (기본 단가 설정)
+            let pricePerSession = 0;
+
+            // 조건 A: 프로그램 2개 이상 선택 시 -> 무조건 회당 40,000원 (3개월 패키지 제외)
+            if (programCount >= 2) {
+                pricePerSession = 40000; 
+            } else {
+                // 프로그램 1개일 때
+                // 주 1회: 42,500원
+                // 주 2회 이상: 40,000원
+                pricePerSession = (weekdayCount >= 2) ? 40000 : 42500;
+            }
+
+            // 2. 패키지별 총액 계산
+            
+            // (1) 1회 이용권 (단가는 고정 45,000 * 프로그램 수)
+            const single1Amount = 45000 * programCount;
+            
+            // (2) 주 1회 패키지
+            // 주 1회는 위에서 계산된 pricePerSession(42500 or 40000)을 사용
+            const weekly1Amount = pricePerSession * selectedWeeks * 1 * programCount;
+            
+            // (3) 주 2회 이상 패키지
+            // 주 2회 이상이면 위에서 계산된 pricePerSession(40000)을 사용
+            // 총 횟수 = 주차 * 주당횟수 * 프로그램수
+            const weekly2Amount = 40000 * selectedWeeks * weekdayCount * programCount;
+            
+            // (4) [신규] 3개월 패키지 (12주 기준)
+            // 조건: 3개월 패키지는 회당 37,500원 고정
+            const month3Weeks = 12; 
+            const month3Price = 37500;
+            const month3Amount = month3Price * month3Weeks * weekdayCount * programCount;
+
+            // ==========================================
+            // HTML 업데이트
+            // ==========================================
             
             document.getElementById('single1Desc').innerHTML = 
                 `${single1Amount.toLocaleString()}원 (1회)${dateInfo}`;
+                
             document.getElementById('weekly1Desc').innerHTML = 
-                `${weekly1Amount.toLocaleString()}원 (${weeks}회, 회당 42,500원)${dateInfo}`;
+                `${weekly1Amount.toLocaleString()}원 (${selectedWeeks}주, 회당 ${pricePerSession.toLocaleString()}원)${dateInfo}`;
+                
             document.getElementById('weekly2Desc').innerHTML = 
-                `${weekly2Amount.toLocaleString()}원 (${weeks * 2}회, 회당 40,000원)${dateInfo}`;
-            document.getElementById('familyDesc').innerHTML = 
-                `${familyAmount.toLocaleString()}원 (${weeks * weekdayCount}회, 회당 37,500원)${dateInfo}`;
+                `${weekly2Amount.toLocaleString()}원 (${selectedWeeks}주, 회당 40,000원)${dateInfo}`;
+                
+            document.getElementById('month3Desc').innerHTML = 
+                `${month3Amount.toLocaleString()}원 (12주, 회당 37,500원)${dateInfo}`;
             
-            // 금액 선택 영역 표시
             document.getElementById('amountGroup').style.display = 'block';
         }
         
@@ -2298,25 +2396,25 @@
             }
             
             if (page === 2) {
-                const program = document.querySelector('input[name="program"]:checked');
+                const programs = document.querySelectorAll('input[name="program"]:checked');
                 const weekdays = document.querySelectorAll('input[name="weekday"]:checked');
                 const timeHour = document.getElementById('timeHour').value;
                 const timeMinute = document.getElementById('timeMinute').value;
                 const startWeek = document.getElementById('startWeek').value;
                 const packageType = document.querySelector('input[name="packageType"]:checked');
                 
-                if (!program) {
-                    alert('프로그램을 선택해주세요.');
+                if (programs.length === 0) {
+                    alert('프로그램을 최소 하나 이상 선택해주세요.');
                     return;
                 }
                 
                 if (weekdays.length === 0) {
-                    alert('수업 요일을 선택해주세요.');
+                    alert('관리 요일을 선택해주세요.');
                     return;
                 }
                 
                 if (!timeHour || !timeMinute) {
-                    alert('수업 시간을 선택해주세요.');
+                    alert('관리 시간을 선택해주세요.');
                     return;
                 }
                 
@@ -2404,30 +2502,40 @@
                 .map(checkbox => checkbox.value);
             const weekdayStr = weekdays.join(', ');
             
-            // 결제 금액 가져오기 (새로운 방식)
+            // [수정] 결제 금액 및 프로그램 정보 가져오기 (복수 선택 지원)
             const packageTypeRadio = document.querySelector('input[name="packageType"]:checked');
             const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
             const weekdayCount = selectedWeekdays.length;
+            
+            // 프로그램 복수 선택 처리
+            const selectedProgramsCheckbox = document.querySelectorAll('input[name="program"]:checked');
+            const programCount = selectedProgramsCheckbox.length;
+            const programValue = Array.from(selectedProgramsCheckbox).map(cb => cb.value).join(', ');
+
             let amountValue = 0;
             
             if (packageTypeRadio) {
                 if (packageTypeRadio.value === 'single1') {
-                    amountValue = 45000;
+                    amountValue = 45000 * programCount;
                 } else if (packageTypeRadio.value === 'custom') {
-                    // 쉼표 제거 후 숫자로 변환
                     const customValue = document.getElementById('customAmountValue').value.replace(/,/g, '');
                     amountValue = parseInt(customValue) || 0;
+                } else if (packageTypeRadio.value === 'month3') {
+                    // 3개월 패키지: 37,500원 * 12주 * 주당횟수 * 프로그램수
+                    amountValue = 37500 * 12 * weekdayCount * programCount;
                 } else {
+                    // 주 1회 / 주 2회 이상
                     const startWeekSelect = document.getElementById('startWeek');
                     const weeks = parseInt(startWeekSelect.options[startWeekSelect.selectedIndex].dataset.weeks);
                     
-                    if (packageTypeRadio.value === 'weekly1') {
-                        amountValue = weeks * 42500;
-                    } else if (packageTypeRadio.value === 'weekly2') {
-                        amountValue = weeks * 40000 * 2;
-                    } else if (packageTypeRadio.value === 'family') {
-                        amountValue = weeks * 37500 * weekdayCount;
+                    let unitPrice = 0;
+                    if (programCount >= 2) {
+                        unitPrice = 40000;
+                    } else {
+                        unitPrice = (packageTypeRadio.value === 'weekly2' || weekdayCount >= 2) ? 40000 : 42500;
                     }
+                    
+                    amountValue = unitPrice * weeks * weekdayCount * programCount;
                 }
             }
             
@@ -2438,7 +2546,7 @@
             const addressValue = `${document.getElementById('dong').value}동 ${document.getElementById('ho').value}호`;
             const phoneValue = `010 - ${document.getElementById('phone1').value} - ${document.getElementById('phone2').value}`;
             const amountText = `${formattedAmount}원`;
-            const programValue = document.querySelector('input[name="program"]:checked').value;
+            
             const timeHour = document.getElementById('timeHour').value;
             const timeMinute = document.getElementById('timeMinute').value;
             const combinedTime = `${timeHour}:${timeMinute}`;
@@ -2465,17 +2573,53 @@
             document.getElementById('finalSchedule').textContent = scheduleValue;
             document.getElementById('finalSignature').src = signatureDataUrl;
             
-            // 첫 시작 날짜 계산 및 표시
+            // 첫 시작 날짜 및 종료 날짜 계산/표시
             const startWeekSelect = document.getElementById('startWeek');
-            const startDate = new Date(startWeekSelect.value);            
+            const startWeekMonday = new Date(startWeekSelect.value);
+            const startDate = new Date(startWeekMonday);            
+            
+            // 1. 첫 시작 날짜 구하기
             const firstSessionDates = getFirstSessionDates(startDate, selectedWeekdays);
             
+            // 2. 종료 날짜 구하기
+            let durationWeeks = parseInt(startWeekSelect.options[startWeekSelect.selectedIndex].dataset.weeks);
+            
+            if (packageTypeRadio) {
+                if (packageTypeRadio.value === 'month3') {
+                    durationWeeks = 12; // 3개월 = 12주
+                } else if (packageTypeRadio.value === 'single1') {
+                    durationWeeks = 1;  // 1회권 = 1주
+                }
+            }
+            
+            // 선택된 요일 중, 월요일(1) 기준으로 가장 늦은 요일(gap) 찾기
+            const dayMap = {'월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 0};
+            let maxDiff = -1;
+            
+            selectedWeekdays.forEach(cb => {
+                let dayIndex = dayMap[cb.value]; 
+                let diff = dayIndex - 1;
+                if (diff < 0) diff += 7; // 일요일(0) 처리
+                if (diff > maxDiff) maxDiff = diff;
+            });
+            
+            // 종료일 계산
+            const endCalcDate = new Date(startWeekMonday);
+            endCalcDate.setDate(endCalcDate.getDate() + ((durationWeeks - 1) * 7) + maxDiff);
+            
+            const endMonth = endCalcDate.getMonth() + 1;
+            const endDay = endCalcDate.getDate();
+            const endDayName = ['일','월','화','수','목','금','토'][endCalcDate.getDay()];
+            const endDateStr = `${endMonth}/${endDay}(${endDayName})`;
+            
+            // 3. 화면 및 캡처용 텍스트 업데이트
             if (firstSessionDates.length > 0) {
-                const dateText = `첫 시작: ${firstSessionDates.join(', ')}`;
+                const dateText = `첫 시작: ${firstSessionDates.join(', ')} / 종료: ${endDateStr}`;
                 document.getElementById('previewStartDate').textContent = dateText;
                 document.getElementById('finalStartDate').textContent = dateText;
             }
             
+            // 서명 이미지 처리 및 화면 전환
             document.getElementById('finalSignature').src = signatureDataUrl;
 
             const noteSignature = document.getElementById('noteSignature');
@@ -2652,9 +2796,9 @@
             const phone2 = document.getElementById('phone2').value;
             const phone = `010-${phone1}-${phone2}`;
             
-            // 프로그램 정보
-            const programRadio = document.querySelector('input[name="program"]:checked');
-            const program = programRadio ? programRadio.value : '';
+            // [수정됨] 프로그램 정보 (복수 선택)
+            const programCheckboxes = document.querySelectorAll('input[name="program"]:checked');
+            const program = Array.from(programCheckboxes).map(cb => cb.value).join(',');
             
             // 요일 정보 (다중 선택 지원)
             const weekdayCheckboxes = document.querySelectorAll('input[name="weekday"]:checked');
@@ -2751,25 +2895,36 @@
             let weeklyFrequency = 1;
             let duration = `${weeks}주`;
             
+            // [수정된 부분]
             if (packageTypeRadio) {
+                const programCount = document.querySelectorAll('input[name="program"]:checked').length;
+                
                 if (packageTypeRadio.value === 'single1') {
                     weeklyFrequency = 1;
-                    amount = 45000;
+                    amount = 45000 * programCount;
                     duration = '1회';
-                } else if (packageTypeRadio.value === 'weekly1') {
-                    weeklyFrequency = 1;
-                    amount = weeks * 42500;
-                } else if (packageTypeRadio.value === 'weekly2') {
-                    weeklyFrequency = weekdayCount;
-                    amount = weeks * 40000 * 2;
-                } else if (packageTypeRadio.value === 'family') {
-                    weeklyFrequency = weekdayCount;
-                    amount = weeks * 37500 * weekdayCount;
                 } else if (packageTypeRadio.value === 'custom') {
-                    weeklyFrequency = 1; // 기본값
-                    // 쉼표 제거 후 숫자로 변환
+                    weeklyFrequency = 1; 
                     const customValue = document.getElementById('customAmountValue').value.replace(/,/g, '');
                     amount = parseInt(customValue) || 0;
+                } else if (packageTypeRadio.value === 'month3') {
+                    // [신규] 3개월 패키지 처리
+                    weeklyFrequency = weekdayCount;
+                    amount = 37500 * 12 * weekdayCount * programCount;
+                    duration = '12주 (3개월)';
+                    weeks = 12; // DB 기록용 주차도 12주로 변경
+                } else {
+                    // 주 1회, 주 2회 이상
+                    weeklyFrequency = weekdayCount;
+                    
+                    let unitPrice = 0;
+                    if (programCount >= 2) {
+                        unitPrice = 40000;
+                    } else {
+                        unitPrice = (weekdayCount >= 2) ? 40000 : 42500;
+                    }
+                    
+                    amount = unitPrice * weeks * weekdayCount * programCount;
                 }
             }
             
