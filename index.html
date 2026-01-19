@@ -1792,31 +1792,35 @@
             const single1Option = document.getElementById('single1Option');
             const weekly1Option = document.getElementById('weekly1Option');
             const weekly2Option = document.getElementById('weekly2Option');
-            const month3Option = document.getElementById('month3Option'); // 신규
+            const month3Option = document.getElementById('month3Option');
             
-            // 모든 옵션 초기화 (숨김 및 체크 해제)
+            // 1. 모든 옵션 일단 숨김 및 선택 초기화
             single1Option.style.display = 'none';
             weekly1Option.style.display = 'none';
             weekly2Option.style.display = 'none';
             month3Option.style.display = 'none';
             
             const radios = document.getElementsByName('packageType');
+            // '직접 입력(custom)'이 아닌 것은 체크 해제 (옵션이 바뀔 수 있으므로)
             for(let i=0; i<radios.length; i++) {
                 if(radios[i].value !== 'custom') radios[i].checked = false;
             }
             
-            if (weekdayCount === 1) {
-                // 1일 선택: 1회권, 주1회, 3개월 표시
+            // 2. 요일 선택 개수에 따른 옵션 표시 로직 수정
+            if (weekdayCount >= 1) {
+                // [변경] 요일이 1개 이상이면 '1회권', '주 1회', '3개월'은 무조건 보여줌
+                // (복수 요일을 선택했더라도, 각 프로그램별로 주 1회씩 하고 싶을 수 있으므로)
                 single1Option.style.display = 'block';
                 weekly1Option.style.display = 'block';
                 month3Option.style.display = 'block';
-            } else if (weekdayCount >= 2) {
-                // 2일 이상 선택: 주2회이상(통합됨), 3개월 표시
-                weekly2Option.style.display = 'block';
-                month3Option.style.display = 'block';
             }
             
-            // 금액 재계산
+            if (weekdayCount >= 2) {
+                // [변경] 요일이 2개 이상일 때만 '주 2회 이상' 옵션을 추가로 보여줌
+                weekly2Option.style.display = 'block';
+            }
+            
+            // 3. 금액 재계산 (옵션 노출 상태가 바뀌었으므로)
             if (document.getElementById('startWeek').value) {
                 calculateAmount();
             }
