@@ -2003,6 +2003,23 @@
         }
         
         function calculateRemainingWeeks(startDate) {
+            // [수정됨] 2026년 2월 설날 연휴 특별 로직
+            if (startDate.getFullYear() === 2026 && startDate.getMonth() === 1) { 
+                const startDay = startDate.getDate();
+                
+                // 1. 첫째 주(1일~7일) 시작 -> 3주 (3주차 휴강 제외)
+                if (startDay <= 7) return 3;
+                
+                // 2. 둘째 주(8일~14일) 시작 -> 2주 (3주차 휴강 제외)
+                if (startDay <= 14) return 2;
+                
+                // 3. 셋째 주(15일~21일) 시작 -> 1주 (3주차는 수업 없음, 4주차 1회만 남음)
+                if (startDay <= 21) return 1;
+                
+                // 4. 넷째 주 이후 시작 -> 원래 로직대로 1주
+            }
+
+            // --- 기존 로직 (다른 달은 정상 계산) ---
             const endOfMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
             const diffTime = endOfMonth - startDate;
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
