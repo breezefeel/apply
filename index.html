@@ -1414,10 +1414,30 @@
             
             <div class="form-group">
                 <label class="form-label">시작 주차 선택 *</label>
-                <select class="form-input" id="startWeek" onchange="calculateAmount()">
+                <select class="form-input" id="startWeek" onchange="resetExtensionOption(); calculateAmount()">
                     <option value="">시작 주차를 선택하세요</option>
                 </select>
                 <div id="weekInfo" style="margin-top: 8px; font-size: 13px; color: #666;"></div>
+            </div>
+
+            <div class="form-group" id="extensionGroup" style="display: none; background: #f0f7ff; padding: 15px; border-radius: 10px; border: 1px solid #00b09b;">
+                <label class="form-label" style="color: #00b09b;">📅 종료 기간 설정</label>
+                <div class="program-grid">
+                    <div class="program-option" style="margin-bottom: 0;">
+                        <input type="radio" name="extensionType" id="endCurrent" value="current" checked onchange="calculateAmount()">
+                        <label for="endCurrent" style="padding: 15px;">
+                            <div class="program-name" style="font-size: 16px;">이번 달 말까지</div>
+                            <div class="program-desc">기본 설정</div>
+                        </label>
+                    </div>
+                    <div class="program-option" style="margin-bottom: 0;">
+                        <input type="radio" name="extensionType" id="endNext" value="next" onchange="calculateAmount()">
+                        <label for="endNext" style="padding: 15px;">
+                            <div class="program-name" style="font-size: 16px;">다음 달 말까지</div>
+                            <div class="program-desc">기간 연장</div>
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
@@ -2030,63 +2050,85 @@
             return weeks;
         }
         
+        // [추가] 시작 주차가 바뀌면 연장 옵션을 기본값(이번 달)으로 초기화
+        function resetExtensionOption() {
+            const endCurrent = document.getElementById('endCurrent');
+            if (endCurrent) endCurrent.checked = true;
+        }
+
         function calculateAmount() {
             const select = document.getElementById('startWeek');
             const selectedOption = select.options[select.selectedIndex];
-            const customRadio = document.getElementById('customAmount'); // 상태 저장용
-
-            // 프로그램 선택 개수 확인
+            const customRadio = document.getElementById('customAmount');
+            
+            // 프로그램 및 요일 선택 확인
             const selectedPrograms = document.querySelectorAll('input[name="program"]:checked');
             const programCount = selectedPrograms.length;
+            const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
+            const weekdayCount = selectedWeekdays.length;
 
             if (!selectedOption || !selectedOption.value) {
                 document.getElementById('amountGroup').style.display = 'none';
+                document.getElementById('extensionGroup').style.display = 'none';
                 return;
             }
+
+            // 1. 시작 날짜 파악
+            const startDate = new Date(selectedOption.value);
+            const startWeekNum = getWeekOfMonth(startDate);
             
-            // 기본 주차 (드롭다운 값)
-            const selectedWeeks = parseInt(selectedOption.dataset.weeks);
-            
+            // 2. 기간 연장 모드(3주차 이상 & 다음 달 말까지 선택) 확인
+            const extensionGroup = document.getElementById('extensionGroup');
+            let isExtensionMode = false;
+
+            if (startWeekNum >= 3) {
+                extensionGroup.style.display = 'block';
+                if (document.getElementById('endNext').checked) {
+                    isExtensionMode = true;
+                }
+            } else {
+                extensionGroup.style.display = 'none';
+            }
+
+            // 3. 결제용 주차(Weeks) 계산
+            let selectedWeeks = parseInt(selectedOption.dataset.weeks); // 기본 남은 주차
+
+            if (isExtensionMode) {
+                // [수정] 다음 달 말까지 선택 시
+                const nextMonthEnd = new Date(startDate.getFullYear(), startDate.getMonth() + 2, 0);
+                const diffTime = nextMonthEnd.getTime() - startDate.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                // 물리적인 주차 계산
+                selectedWeeks = Math.ceil(diffDays / 7);
+
+                // [핵심] 2026년 2월 3주차(휴강)가 포함되면 결제 주차에서 -1주 차감
+                if (startDate.getFullYear() === 2026) {
+                    const holidayStart = new Date(2026, 1, 15); // 2월 15일
+                    const holidayEnd = new Date(2026, 1, 22);   // 2월 21일 경
+                    // 기간이 연휴를 완전히 포함하면 1주 차감
+                    if (startDate < holidayStart && nextMonthEnd > holidayEnd) {
+                        selectedWeeks -= 1;
+                    }
+                }
+            }
+
+            // 4. 안내 멘트 업데이트
             const weekInfo = document.getElementById('weekInfo');
             const programInfoText = programCount > 0 ? ` (선택 프로그램: ${programCount}개)` : '';
-            weekInfo.textContent = `${selectedWeeks}주 패키지 (${selectedWeeks === 4 ? '한 달 전체' : `이번 달 남은 ${selectedWeeks}주`})${programInfoText}`;
             
-            const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
-            const weekdayCount = selectedWeekdays.length;
-            
-            // ==========================================
-            // [기간 메모리 로직] - 여기가 핵심!
-            // ==========================================
-            const packageTypeInfo = document.querySelector('input[name="packageType"]:checked');
-            
-            // 현재 활성화된 패키지가 있다면, 그 기간을 '직접 입력' 버튼에 저장해둠
-            if (packageTypeInfo && packageTypeInfo.value !== 'custom') {
-                let currentWeeks = selectedWeeks; // 기본: 드롭다운 주차
-                if (packageTypeInfo.value === 'single1') currentWeeks = 1;
-                else if (packageTypeInfo.value === 'month3') currentWeeks = 12;
-                
-                // 상태 저장 (다음번 '직접 입력' 클릭 시 사용됨)
-                customRadio.dataset.savedWeeks = currentWeeks;
-            }
-            
-            // '직접 입력' 계산을 위한 주차 결정 (저장된 값 있으면 사용, 없으면 기본값)
-            let customTargetWeeks = selectedWeeks;
-            if (customRadio.dataset.savedWeeks) {
-                customTargetWeeks = parseInt(customRadio.dataset.savedWeeks);
-            }
+            let durationText = '';
+            if (selectedWeeks === 4 && !isExtensionMode) durationText = '한 달 전체';
+            else if (isExtensionMode) durationText = `이번 달 잔여 + 다음 달 전체`;
+            else durationText = `이번 달 남은 ${selectedWeeks}주`;
 
-            // ==========================================
-            // [날짜 계산 로직]
-            // ==========================================
-            const startDateStr = selectedOption.value;
-            const startDate = new Date(startDateStr); 
-            
-            const firstSessionDates = getFirstSessionDates(startDate, selectedWeekdays);
-            const startStr = firstSessionDates.length > 0 ? firstSessionDates.join(', ') : '';
+            weekInfo.textContent = `${selectedWeeks}주 패키지 (${durationText})${programInfoText}`;
 
+            // --- 날짜 표시를 위한 계산 ---
+
+            // 선택된 요일 중 가장 늦은 요일(gap) 찾기
             const dayMap = {'월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 0};
             let maxDiff = 0;
-            
             if (selectedWeekdays.length > 0) {
                 const startDayIndex = startDate.getDay() === 0 ? 6 : startDate.getDay() - 1; 
                 let tempMaxDiff = -1;
@@ -2099,33 +2141,89 @@
                 maxDiff = tempMaxDiff;
             }
 
-            // 기간별 종료일 계산 함수
-            function getEndDateString(durationWeeks) {
+            // 첫 수업 시작일 문자열
+            const firstSessionDates = getFirstSessionDates(startDate, selectedWeekdays);
+            const startStr = firstSessionDates.length > 0 ? firstSessionDates.join(', ') : '';
+
+            // [중요] 종료일 문자열 계산 함수 (각 패키지별 로직 분리)
+            function getEndDateString(type) {
                 if (weekdayCount === 0) return '';
                 
-                // 2026년 2월 연휴 보정 로직
-                let calendarWeeks = durationWeeks;
-                if (startDate.getFullYear() === 2026 && startDate.getMonth() === 1) {
-                    if (durationWeeks === 3 && startDate.getDate() <= 7) calendarWeeks = 4;
-                    else if (durationWeeks === 2 && startDate.getDate() <= 14) calendarWeeks = 3;
+                const tempEndDate = new Date(startDate);
+                let weeksToAdd = 0;
+
+                // A. 3개월 패키지 (2월 휴강 보정 로직)
+                if (type === 'month3') {
+                    weeksToAdd = 12; // 기본 12주
+                    // 기간 내에 2026년 2월 3주차가 끼어있으면 1주 더 연장 (수업 보장)
+                    if (startDate.getFullYear() === 2026) {
+                        const holidayStart = new Date(2026, 1, 15);
+                        // 12주 후의 날짜 대략 계산
+                        const roughEndDate = new Date(startDate);
+                        roughEndDate.setDate(roughEndDate.getDate() + (12 * 7));
+                        
+                        if (startDate < holidayStart && roughEndDate > holidayStart) {
+                            weeksToAdd = 13; // 1주 추가 연장 (종료일 4/25로 밀림)
+                        }
+                    }
+                    // 종료일 계산
+                    tempEndDate.setDate(tempEndDate.getDate() + ((weeksToAdd - 1) * 7) + maxDiff);
+                } 
+                // B. "다음 달 말까지" 선택 시 (날짜를 월말로 강제 고정)
+                else if (type === 'standard' && isExtensionMode) {
+                    // 다음 달의 마지막 날 구하기
+                    const nextMonthLastDay = new Date(startDate.getFullYear(), startDate.getMonth() + 2, 0);
+                    
+                    // 마지막 날부터 역순으로 선택한 요일 중 가장 늦은 요일(maxDiff) 찾기
+                    // 예: 토요일 선택 시, 2월 28일(토)이 딱 걸리도록
+                    const targetDayNum = (maxDiff + 1) % 7; // maxDiff는 월(0)~일(6) 기준 조정 필요
+                    
+                    // 단순하게: 해당 월의 마지막 날짜 근처의 해당 요일 찾기
+                    // 여기서는 UI상 '2월 28일'을 보여주기 위해 월말 날짜를 그대로 쓰거나, 
+                    // 정확히 수업 있는 마지막 날을 계산.
+                    
+                    // 사용자 요청: "2월 28일 토요일이 종료일이 되어야"
+                    // -> 선택된 요일 중 토요일이 있다면 2/28, 없다면 그 전 수업일
+                    
+                    // 마지막 날(2/28)이 선택한 요일에 포함되는지 확인하는 로직보다는
+                    // 단순히 "다음 달 말일" 근처의 수업 마지막 날을 계산
+                    
+                    let searchDate = new Date(nextMonthLastDay);
+                    // 뒤에서부터 하루씩 빼면서 선택된 요일인지 확인
+                    while (true) {
+                        const currentDayName = ['일','월','화','수','목','금','토'][searchDate.getDay()];
+                        let isSelected = false;
+                        selectedWeekdays.forEach(cb => {
+                            if (cb.value === currentDayName) isSelected = true;
+                        });
+                        
+                        if (isSelected) {
+                            tempEndDate.setTime(searchDate.getTime());
+                            break;
+                        }
+                        searchDate.setDate(searchDate.getDate() - 1);
+                        // 무한루프 방지 (한달 이상 차이날 리 없으므로)
+                        if (searchDate < startDate) break; 
+                    }
+                }
+                // C. 일반 주차 계산 (기존 로직)
+                else {
+                    weeksToAdd = (type === 'single') ? 1 : selectedWeeks;
+                    tempEndDate.setDate(tempEndDate.getDate() + ((weeksToAdd - 1) * 7) + maxDiff);
                 }
 
-                const endDate = new Date(startDate);
-                endDate.setDate(endDate.getDate() + ((calendarWeeks - 1) * 7) + maxDiff);
-                
-                const mm = endDate.getMonth() + 1;
-                const dd = endDate.getDate();
-                const dy = ['일','월','화','수','목','금','토'][endDate.getDay()];
+                const mm = tempEndDate.getMonth() + 1;
+                const dd = tempEndDate.getDate();
+                const dy = ['일','월','화','수','목','금','토'][tempEndDate.getDay()];
                 return `${mm}/${dd}(${dy})`;
             }
 
-            // 각 옵션별 종료일 문자열
-            const endStr_Standard = getEndDateString(selectedWeeks); 
-            const endStr_Single   = getEndDateString(1);             
-            const endStr_Month3   = getEndDateString(12);
-            // [수정] 직접 입력용 종료일 (기억해둔 주차 사용)
-            const endStr_Custom   = getEndDateString(customTargetWeeks);
+            // 각 옵션별 종료일 텍스트 생성
+            const endStr_Standard = getEndDateString('standard'); 
+            const endStr_Single   = getEndDateString('single');             
+            const endStr_Month3   = getEndDateString('month3'); // 3개월 전용 로직 적용
 
+            // 날짜 범위 표시 HTML 생성
             function createDateInfo(sStr, eStr) {
                 if (!sStr || !eStr) return '';
                 return `<br><span class="start-date-text" style="font-size: 0.9em;">기간: ${sStr} ~ ${eStr}</span>`;
@@ -2135,10 +2233,11 @@
             const dateInfo_Single   = createDateInfo(startStr, endStr_Single);
             const dateInfo_Month3   = createDateInfo(startStr, endStr_Month3);
 
-            // ==========================================
-            // [가격 및 HTML 업데이트]
-            // ==========================================
+            // [가격 업데이트]
             let pricePerSession = 0;
+            
+            // 프로그램이 2개 이상이거나, 주 2회 이상(Weekly 1 패키지에서 요일 2개 선택 시 등)이면 40,000원 적용
+            // (기존 로직 유지)
             if (programCount >= 2) pricePerSession = 40000; 
             else pricePerSession = (weekdayCount >= 2) ? 40000 : 42500;
 
@@ -2147,20 +2246,46 @@
             const weekly2Amount = 40000 * selectedWeeks * weekdayCount * programCount;
             const month3Amount  = 37500 * 12 * weekdayCount * programCount;
 
+            // [수정] 회당 가격 정보 추가
+            
+            // 1회 이용권 (회당 45,000원 고정)
             document.getElementById('single1Desc').innerHTML = 
-                `${single1Amount.toLocaleString()}원 (1회)${dateInfo_Single}`;
+                `${single1Amount.toLocaleString()}원 (1회, 회당 45,000원)${dateInfo_Single}`;
+            
+            // 주 1회 패키지 (조건에 따라 42,500원 또는 40,000원 변동)
             document.getElementById('weekly1Desc').innerHTML = 
                 `${weekly1Amount.toLocaleString()}원 (${selectedWeeks}주, 회당 ${pricePerSession.toLocaleString()}원)${dateInfo_Standard}`;
+                
+            // 주 2회 패키지 (회당 40,000원 고정)
             document.getElementById('weekly2Desc').innerHTML = 
                 `${weekly2Amount.toLocaleString()}원 (${selectedWeeks}주, 회당 40,000원)${dateInfo_Standard}`;
+                
+            // 3개월 패키지 (회당 37,500원 고정)
             document.getElementById('month3Desc').innerHTML = 
                 `${month3Amount.toLocaleString()}원 (12주, 회당 37,500원)${dateInfo_Month3}`;
             
-            // [수정] 직접 입력 날짜 표시 (기억해둔 주차에 따른 종료일 표시)
+            // 직접 입력
+            // [기간 메모리 로직]
+            const packageTypeInfo = document.querySelector('input[name="packageType"]:checked');
+            if (packageTypeInfo && packageTypeInfo.value !== 'custom') {
+                let currentWeeks = selectedWeeks;
+                if (packageTypeInfo.value === 'single1') currentWeeks = 1;
+                else if (packageTypeInfo.value === 'month3') currentWeeks = 12;
+                customRadio.dataset.savedWeeks = currentWeeks;
+            }
+            
+            // 직접 입력 날짜 표시 (선택된 패키지 기간 따라가기)
             const customDateRange = document.getElementById('customDateRange');
             if (customDateRange) {
-                if (startStr && endStr_Custom) {
-                    customDateRange.textContent = `(${startStr} ~ ${endStr_Custom})`;
+                // 현재 선택된 라디오 버튼에 맞는 종료일을 보여줌
+                let targetEndStr = endStr_Standard;
+                if (packageTypeInfo) {
+                    if (packageTypeInfo.value === 'single1') targetEndStr = endStr_Single;
+                    else if (packageTypeInfo.value === 'month3') targetEndStr = endStr_Month3;
+                }
+                
+                if (startStr && targetEndStr) {
+                    customDateRange.textContent = `(${startStr} ~ ${targetEndStr})`;
                 } else {
                     customDateRange.textContent = '';
                 }
