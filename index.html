@@ -1516,7 +1516,15 @@
                         <div class="program-desc" id="weekly1Desc"></div>
                     </label>
                 </div>
-                
+				
+                <div class="program-option" id="weekly1_50minOption" style="display: none;">
+				    <input type="radio" name="packageType" id="weekly1_50min" value="weekly1_50min" onchange="updateAmountDisplay(); calculateAmount();">
+				    <label for="weekly1_50min">
+				        <div class="program-name">주 1회 50분 패키지 <span style="color: #4CAF50; font-weight: bold;">(집중 관리)</span></div>
+				        <div class="program-desc" id="weekly1_50minDesc"></div>
+				    </label>
+				</div>
+				
                 <div class="program-option" id="weekly2Option" style="display: none;">
                     <input type="radio" name="packageType" id="weekly2" value="weekly2" onchange="updateAmountDisplay(); calculateAmount();">
                     <label for="weekly2">
@@ -1809,19 +1817,21 @@
         });
         
         function updatePaymentOptions() {
-            const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
-            const weekdayCount = selectedWeekdays.length;
-            
-            const single1Option = document.getElementById('single1Option');
-            const weekly1Option = document.getElementById('weekly1Option');
-            const weekly2Option = document.getElementById('weekly2Option');
-            const month3Option = document.getElementById('month3Option');
+			const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
+			const weekdayCount = selectedWeekdays.length;
+			
+			const single1Option = document.getElementById('single1Option');
+			const weekly1Option = document.getElementById('weekly1Option');
+			const weekly1_50minOption = document.getElementById('weekly1_50minOption'); // 추가
+			const weekly2Option = document.getElementById('weekly2Option');
+			const month3Option = document.getElementById('month3Option');
             
             // 1. 초기화: 모든 옵션 숨김 및 선택 해제
             single1Option.style.display = 'none';
-            weekly1Option.style.display = 'none';
-            weekly2Option.style.display = 'none';
-            month3Option.style.display = 'none';
+		    weekly1Option.style.display = 'none';
+		    weekly1_50minOption.style.display = 'none'; // 추가
+		    weekly2Option.style.display = 'none';
+		    month3Option.style.display = 'none';
             
             const radios = document.getElementsByName('packageType');
             // '직접 입력'이 아닌 옵션들은 선택 해제 (조건이 바뀌어 사라질 수 있으므로)
@@ -1833,7 +1843,8 @@
             if (weekdayCount === 1) {
                 // [요일 1개]: 1회권, 주1회, 3개월 (주2회 이상은 숨김)
                 single1Option.style.display = 'block';
-                weekly1Option.style.display = 'block';                
+		        weekly1Option.style.display = 'block';
+		        weekly1_50minOption.style.display = 'block';               
             } else if (weekdayCount >= 2) {
                 // [요일 2개 이상]: 주1회, 주2회 이상, 3개월 (1회권은 숨김)
                 weekly1Option.style.display = 'block';
@@ -3025,49 +3036,49 @@
             let duration = `${weeks}주`;
 
             if (packageTypeRadio) {
-                const programCount = programCheckboxes.length;
-                const weekdayCount = weekdayCheckboxes.length;
-                
-                if (packageTypeRadio.value === 'single1') {
-                    weeklyFrequency = 1;
-                    amount = 45000 * programCount;
-                    duration = '1회';
-                    weeks = 1; 
-                } else if (packageTypeRadio.value === 'month3') {
-                    weeklyFrequency = weekdayCount;
-                    amount = 37500 * 12 * weekdayCount * programCount;
-                    duration = '12주 (3개월)';
-                    weeks = 12; 
-                } else if (packageTypeRadio.value === 'custom') {
-                    weeklyFrequency = 1; 
-                    const customValue = document.getElementById('customAmountValue').value.replace(/,/g, '');
-                    amount = parseInt(customValue) || 0;
-                    
-                    // [수정] 직접 입력 시, 기억해둔 기간이 있다면 그 값을 적용
-                    if (customRadio.dataset.savedWeeks) {
-                        weeks = parseInt(customRadio.dataset.savedWeeks);
-                        if (weeks === 1) duration = '1회 (직접입력)';
-                        else if (weeks === 12) duration = '12주 (직접입력)';
-                        else duration = `${weeks}주 (직접입력)`;
-                    }
-                } else {
-                    // 주1회, 주2회
-                    weeklyFrequency = weekdayCount;
-                    let unitPrice = (programCount >= 2 || weekdayCount >= 2) ? 40000 : 42500;
-                    amount = unitPrice * weeks * weekdayCount * programCount;
-                }
-                
-                // 총 횟수 계산
-                if (packageTypeRadio.value === 'single1' || (packageTypeRadio.value === 'custom' && weeks === 1)) {
-                     totalSessions = 1 * programCount;
-                } else {
-                     // 주 1회/2회/3개월 등은 (주차 * 주당횟수 * 프로그램수)
-                     // 단, 직접입력의 경우 정확한 주당횟수를 알 수 없으므로 
-                     // 보통 '요일 개수'를 주당 횟수로 가정하거나 1로 가정함. 
-                     // 여기서는 요일 개수를 따름.
-                     totalSessions = weeks * weekdayCount * programCount;
-                }
-            }
+			    const programCount = programCheckboxes.length;
+			    const weekdayCount = weekdayCheckboxes.length;
+			    
+			    if (packageTypeRadio.value === 'single1') {
+			        weeklyFrequency = 1;
+			        amount = 45000 * programCount;
+			        duration = '1회';
+			        weeks = 1; 
+			    } else if (packageTypeRadio.value === 'weekly1_50min') {
+			        // [추가] 50분 집중관리 패키지 로직
+			        weeklyFrequency = 1;
+			        amount = 80000 * weeks * 1 * programCount; // 회당 80,000원 적용
+			        duration = `${weeks}주 (50분 집중관리)`;
+			    } else if (packageTypeRadio.value === 'month3') {
+			        weeklyFrequency = weekdayCount;
+			        amount = 37500 * 12 * weekdayCount * programCount;
+			        duration = '12주 (3개월)';
+			        weeks = 12; 
+			    } else if (packageTypeRadio.value === 'custom') {
+			        weeklyFrequency = 1; 
+			        const customValue = document.getElementById('customAmountValue').value.replace(/,/g, '');
+			        amount = parseInt(customValue) || 0;
+			        
+			        if (customRadio.dataset.savedWeeks) {
+			            weeks = parseInt(customRadio.dataset.savedWeeks);
+			            if (weeks === 1) duration = '1회 (직접입력)';
+			            else if (weeks === 12) duration = '12주 (직접입력)';
+			            else duration = `${weeks}주 (직접입력)`;
+			        }
+			    } else {
+			        // 주1회(25분), 주2회(25분)
+			        weeklyFrequency = weekdayCount;
+			        let unitPrice = (programCount >= 2 || weekdayCount >= 2) ? 40000 : 42500;
+			        amount = unitPrice * weeks * weekdayCount * programCount;
+			    }
+			    
+			    // 총 횟수 계산
+			    if (packageTypeRadio.value === 'single1' || (packageTypeRadio.value === 'custom' && weeks === 1)) {
+			         totalSessions = 1 * programCount;
+			    } else {
+			         totalSessions = weeks * (packageTypeRadio.value === 'weekly1_50min' ? 1 : weekdayCount) * programCount;
+			    }
+			}
             
             // 실제 시작일 계산
             const dayMap = {'월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 0};
