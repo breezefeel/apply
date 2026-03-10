@@ -1413,31 +1413,10 @@
             </div>
             
             <div class="form-group">
-                <label class="form-label">시작 주차 선택 *</label>
-                <select class="form-input" id="startWeek" onchange="resetExtensionOption(); calculateAmount()">
+                <label class="form-label">첫 시작 주간 선택 *</label>
+                <select class="form-input" id="startWeek" onchange="calculateAmount()">
                     <option value="">시작 주차를 선택하세요</option>
                 </select>
-                <div id="weekInfo" style="margin-top: 8px; font-size: 13px; color: #666;"></div>
-            </div>
-
-            <div class="form-group" id="extensionGroup" style="display: none; background: #f0f7ff; padding: 15px; border-radius: 10px; border: 1px solid #00b09b;">
-                <label class="form-label" style="color: #00b09b;">📅 종료 기간 설정</label>
-                <div class="program-grid">
-                    <div class="program-option" style="margin-bottom: 0;">
-                        <input type="radio" name="extensionType" id="endCurrent" value="current" checked onchange="calculateAmount()">
-                        <label for="endCurrent" style="padding: 15px;">
-                            <div class="program-name" style="font-size: 16px;">이번 달 말까지</div>
-                            <div class="program-desc">기본 설정</div>
-                        </label>
-                    </div>
-                    <div class="program-option" style="margin-bottom: 0;">
-                        <input type="radio" name="extensionType" id="endNext" value="next" onchange="calculateAmount()">
-                        <label for="endNext" style="padding: 15px;">
-                            <div class="program-name" style="font-size: 16px;">다음 달 말까지</div>
-                            <div class="program-desc">기간 연장</div>
-                        </label>
-                    </div>
-                </div>
             </div>
 
             <div class="form-group">
@@ -1474,61 +1453,71 @@
                 </div>
             </div>
             
-            <div class="form-group">
-                <label class="form-label">관리 시간 *</label>
-                <div class="select-group">
-                    <select class="form-input" id="timeHour">
-                        <option value="">시간</option>
-                        <option value="09">오전 9시</option>
-                        <option value="10">오전 10시</option>
-                        <option value="11">오전 11시</option>
-                        <option value="12">오후 12시</option>
-                        <option value="14">오후 2시</option>
-                        <option value="15">오후 3시</option>
-                        <option value="16">오후 4시</option>
-                        <option value="17">오후 5시</option>
-                        <option value="19">오후 7시</option>
-                        <option value="20">오후 8시</option>
-                    </select>
-                    <select class="form-input" id="timeMinute">
-                        <option value="">분</option>
-                        <option value="00" selected>00분</option>
-                        <option value="30">30분</option>
-                    </select>
+            <div class="form-group" id="dynamicTimeGroup" style="display: none; background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #e0e0e0;">
+                <label class="form-label" style="color: #333; margin-bottom: 15px;">⏰ 요일별 관리 시간 *</label>
+                <div id="timeSelectorsContainer">
+                    </div>
+            </div>
+            
+            <div class="form-group" id="durationSelectionGroup">
+                <label class="form-label">관리 유형 (시간) 선택 *</label>
+                <style>
+                    /* 관리 유형 선택 버튼 스타일 */
+                    .duration-label {
+                        display: block;
+                        padding: 16px;
+                        background: white;
+                        border: 2px solid #e0e0e0;
+                        border-radius: 10px;
+                        text-align: center;
+                        font-size: 16px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        color: #333;
+                    }
+                    /* 선택되었을 때의 스타일 */
+                    input[name="careDuration"]:checked + .duration-label {
+                        background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+                        border-color: #00b09b;
+                        color: white !important;
+                    }
+                </style>
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <input type="radio" name="careDuration" id="care50" value="50" checked onchange="calculateAmount()" style="display:none;">
+                        <label for="care50" class="duration-label">50분 관리</label>
+                    </div>
+                    <div style="flex: 1;">
+                        <input type="radio" name="careDuration" id="care80" value="80" onchange="calculateAmount()" style="display:none;">
+                        <label for="care80" class="duration-label">80분 관리</label>
+                    </div>
                 </div>
             </div>
             
             <div class="form-group" id="amountGroup" style="display: none;">
-                <label class="form-label">결제 금액 선택 *</label>
+                <label class="form-label">결제 패키지 선택 *</label>
                 
                 <div class="program-option" id="single1Option" style="display: none;">
                     <input type="radio" name="packageType" id="single1" value="single1" onchange="updateAmountDisplay(); calculateAmount();">
                     <label for="single1">
-                        <div class="program-name">1회 이용권</div>
-                        <div class="program-desc" id="single1Desc">45,000원 (1회)</div>
+                        <div class="program-name">1회 이용권 (총 1회)</div>
+                        <div class="program-desc" id="single1Desc"></div>
                     </label>
                 </div>
                 
                 <div class="program-option" id="weekly1Option" style="display: none;">
                     <input type="radio" name="packageType" id="weekly1" value="weekly1" onchange="updateAmountDisplay(); calculateAmount();">
                     <label for="weekly1">
-                        <div class="program-name">주 1회 패키지</div>
+                        <div class="program-name">주 1회 패키지 (총 4회)</div>
                         <div class="program-desc" id="weekly1Desc"></div>
                     </label>
                 </div>
-
-                <div class="program-option" id="weekly1_50minOption" style="display: none;">
-                    <input type="radio" name="packageType" id="weekly1_50min" value="weekly1_50min" onchange="updateAmountDisplay(); calculateAmount();">
-                    <label for="weekly1_50min">
-                        <div class="program-name">주 1회 50분 패키지 <span style="color: #4CAF50; font-weight: bold;">(집중 관리)</span></div>
-                        <div class="program-desc" id="weekly1_50minDesc"></div>
-                    </label>
-                </div>
-								
+                
                 <div class="program-option" id="weekly2Option" style="display: none;">
                     <input type="radio" name="packageType" id="weekly2" value="weekly2" onchange="updateAmountDisplay(); calculateAmount();">
                     <label for="weekly2">
-                        <div class="program-name">주 2회 패키지 <span style="color: #4CAF50; font-weight: bold;">추천!</span></div>
+                        <div class="program-name">주 2회 패키지 (총 8회) <span style="color: #4CAF50; font-weight: bold;">추천!</span></div>
                         <div class="program-desc" id="weekly2Desc"></div>
                     </label>
                 </div>
@@ -1536,7 +1525,7 @@
                 <div class="program-option" id="month3Option" style="display: none;">
                     <input type="radio" name="packageType" id="month3" value="month3" onchange="updateAmountDisplay(); calculateAmount();">
                     <label for="month3">
-                        <div class="program-name">3개월 패키지 <span style="color: #FF5722; font-weight: bold;">장기 할인</span></div>
+                        <div class="program-name">3개월 패키지 (총 24회) <span style="color: #FF5722; font-weight: bold;">장기 할인</span></div>
                         <div class="program-desc" id="month3Desc"></div>
                     </label>
                 </div>
@@ -1544,10 +1533,7 @@
                 <div class="program-option">
                     <input type="radio" name="packageType" id="customAmount" value="custom" onchange="updateAmountDisplay();">
                     <label for="customAmount">
-                        <div class="program-name">
-                            직접 입력 
-                            <span id="customDateRange" style="font-size: 0.8em; font-weight: normal; margin-left: 5px;"></span>
-                        </div>
+                        <div class="program-name">직접 입력</div>
                         <div class="program-desc">특별한 사유로 금액을 직접 입력합니다</div>
                     </label>
                 </div>
@@ -1796,68 +1782,113 @@
         window.addEventListener('DOMContentLoaded', function() {
             generateStartWeekOptions();
             
-            // 요일 체크박스에 이벤트 리스너 추가
             const weekdayCheckboxes = document.querySelectorAll('input[name="weekday"]');
             weekdayCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', updatePaymentOptions);
+                checkbox.addEventListener('change', function() {
+                    updatePaymentOptions();
+                    renderTimeSelectors(); // 요일별 시간 선택기택 생성 함수 호출
+                });
+            });
+        });
+
+        // [신규] 요일별 시간 선택기 동적 생성 함수
+        function renderTimeSelectors() {
+            const container = document.getElementById('timeSelectorsContainer');
+            const dynamicTimeGroup = document.getElementById('dynamicTimeGroup');
+            const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
+            
+            if (selectedWeekdays.length === 0) {
+                dynamicTimeGroup.style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+            
+            dynamicTimeGroup.style.display = 'block';
+            
+            // 기존에 선택해둔 시간값 보존
+            const existingSelections = {};
+            const oldSelects = container.querySelectorAll('.time-hour');
+            oldSelects.forEach(sel => {
+                const day = sel.dataset.day;
+                const minSel = container.querySelector(`.time-minute[data-day="${day}"]`);
+                if(minSel) existingSelections[day] = { hour: sel.value, minute: minSel.value };
             });
             
-            // 관리 시간(분) 선택 시 스크롤
-            const timeMinuteSelect = document.getElementById('timeMinute');
-            if (timeMinuteSelect) {
-                timeMinuteSelect.addEventListener('change', function() {
-                    setTimeout(() => {
-                        window.scrollTo({
-                            top: document.body.scrollHeight,
-                            behavior: 'smooth'
-                        });
-                    }, 100);
+            container.innerHTML = '';
+            
+            selectedWeekdays.forEach(cb => {
+                const day = cb.value;
+                const prev = existingSelections[day] || { hour: '', minute: '00' };
+                
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.alignItems = 'center';
+                div.style.gap = '10px';
+                div.style.marginBottom = '10px';
+                
+                div.innerHTML = `
+                    <div style="width: 40px; font-weight: bold; color: #00b09b; text-align: center;">${day}</div>
+                    <select class="form-input time-hour" data-day="${day}" style="flex: 1; padding: 12px; min-height: 45px;">
+                        <option value="">시간 선택</option>
+                        <option value="09" ${prev.hour==='09'?'selected':''}>오전 9시</option>
+                        <option value="10" ${prev.hour==='10'?'selected':''}>오전 10시</option>
+                        <option value="11" ${prev.hour==='11'?'selected':''}>오전 11시</option>
+                        <option value="12" ${prev.hour==='12'?'selected':''}>오후 12시</option>
+                        <option value="14" ${prev.hour==='14'?'selected':''}>오후 2시</option>
+                        <option value="15" ${prev.hour==='15'?'selected':''}>오후 3시</option>
+                        <option value="16" ${prev.hour==='16'?'selected':''}>오후 4시</option>
+                        <option value="17" ${prev.hour==='17'?'selected':''}>오후 5시</option>
+                        <option value="19" ${prev.hour==='19'?'selected':''}>오후 7시</option>
+                        <option value="20" ${prev.hour==='20'?'selected':''}>오후 8시</option>
+                    </select>
+                    <select class="form-input time-minute" data-day="${day}" style="flex: 1; padding: 12px; min-height: 45px;">
+                        <option value="00" ${prev.minute==='00'?'selected':''}>00분</option>
+                        <option value="30" ${prev.minute==='30'?'selected':''}>30분</option>
+                    </select>
+                `;
+                container.appendChild(div);
+            });
+
+            // 스크롤 자동 이동 효과 적용
+            container.querySelectorAll('.time-minute').forEach(sel => {
+                sel.addEventListener('change', () => {
+                    setTimeout(() => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}), 100);
                 });
-            }
-        });
+            });
+        }
         
+        // 2. 결제 옵션 업데이트 (단순화)
         function updatePaymentOptions() {
 			const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
 			const weekdayCount = selectedWeekdays.length;
 			
 			const single1Option = document.getElementById('single1Option');
 			const weekly1Option = document.getElementById('weekly1Option');
-			const weekly1_50minOption = document.getElementById('weekly1_50minOption'); // 추가
 			const weekly2Option = document.getElementById('weekly2Option');
 			const month3Option = document.getElementById('month3Option');
             
-            // 1. 초기화: 모든 옵션 숨김 및 선택 해제
             single1Option.style.display = 'none';
 		    weekly1Option.style.display = 'none';
-		    weekly1_50minOption.style.display = 'none'; // 추가
 		    weekly2Option.style.display = 'none';
 		    month3Option.style.display = 'none';
             
             const radios = document.getElementsByName('packageType');
-            // '직접 입력'이 아닌 옵션들은 선택 해제 (조건이 바뀌어 사라질 수 있으므로)
-            for(let i=0; i<radios.length; i++) {
-                if(radios[i].value !== 'custom') radios[i].checked = false;
-            }
+            for(let i=0; i<radios.length; i++) if(radios[i].value !== 'custom') radios[i].checked = false;
             
-            // 2. 요일 개수에 따른 표시 로직
             if (weekdayCount === 1) {
-                // [요일 1개]: 1회권, 주1회, 3개월 (주2회 이상은 숨김)
                 single1Option.style.display = 'block';
 		        weekly1Option.style.display = 'block';
-		        weekly1_50minOption.style.display = 'block';               
+		        month3Option.style.display = 'block';
             } else if (weekdayCount >= 2) {
-                // [요일 2개 이상]: 주1회, 주2회 이상, 3개월 (1회권은 숨김)
                 weekly1Option.style.display = 'block';
                 weekly2Option.style.display = 'block';
                 month3Option.style.display = 'block';
             }
             
-            // 3. 금액 재계산
-            if (document.getElementById('startWeek').value) {
-                calculateAmount();
-            }
+            if (document.getElementById('startWeek').value) calculateAmount();
         }
         
+        // 1. 시작 주차 메뉴 생성 (단순화)
         function generateStartWeekOptions() {
             const select = document.getElementById('startWeek');
             if (!select) return;
@@ -1867,49 +1898,23 @@
             const today = new Date();
             const currentMonday = getCurrentWeekMonday(today);
             
-            // 핵심 날짜 설정 (2026년 기준)
-            const jan1stMon = new Date(2026, 0, 5);  // 1월 1주차 월요일
-            const jan1stSun = new Date(2026, 0, 11, 23, 59, 59); // 1월 1주차 일요일 종료
-            const feb1stMon = new Date(2026, 1, 2);  // 2월 1주차 월요일
-            const mar1stMon = new Date(2026, 2, 2);  // 3월 1주차 월요일
+            let startDate = new Date(currentMonday);
+            let endDate = new Date(currentMonday);
+            endDate.setDate(endDate.getDate() + (7 * 6)); 
 
-            let startDate, endDate, defaultDate;
-
-            // 1) 1월 1주차가 지나지 않은 경우 (오늘 <= 1월 11일)
-            if (today <= jan1stSun) {
-                startDate = jan1stMon;      // 1월 1주차부터 표시
-                endDate = feb1stMon;        // 다음 달(2월) 1주차까지 표시
-                defaultDate = jan1stMon;    // 기본 선택: 1월 1주차
-            } 
-            // 2) 1월 1주차가 지난 경우
-            else {
-                startDate = currentMonday;  // 현재 주차부터 표시 (이미 지난 주는 자동 제외)
-                endDate = mar1stMon;        // 3월 1주차까지 표시 범위 확장
-                defaultDate = feb1stMon;    // 기본 선택: 2월 1주차
-            }
-
-            // 옵션 생성 루프
             let tempDate = new Date(startDate);
             while (tempDate <= endDate) {
-                addWeekOption(select, tempDate);
+                const month = tempDate.getMonth() + 1;
+                const weekOfMonth = getWeekOfMonth(tempDate);
+                const dateStr = `${month}/${tempDate.getDate()}`;
+                const option = document.createElement('option');
+                option.value = formatDateForDB(tempDate);
+                option.textContent = `${month}월 ${weekOfMonth}주차 (${dateStr}일 이후)`;
+                select.appendChild(option);           
                 tempDate.setDate(tempDate.getDate() + 7);
             }
 
-            // 기본값 설정
-            const defaultValue = formatDateForDB(defaultDate);
-            // 생성된 옵션 중에 defaultDate가 있는지 확인 후 선택
-            for (let i = 0; i < select.options.length; i++) {
-                if (select.options[i].value === defaultValue) {
-                    select.selectedIndex = i;
-                    break;
-                }
-            }
-            
-            // 만약 해당 날짜가 목록에 없다면(예: 2월 1주차도 지남) 마지막 옵션 선택
-            if (select.selectedIndex <= 0 && select.options.length > 1) {
-                select.selectedIndex = select.options.length - 1;
-            }
-
+            if (select.options.length > 1) select.selectedIndex = 1;
             if (typeof calculateAmount === 'function') calculateAmount();
         }
         
@@ -1930,7 +1935,7 @@
             today.setHours(0, 0, 0, 0);
             const currentMonth = startMonday.getMonth();
             let monday = new Date(startMonday);
-            
+
             // 같은 달 안의 모든 월요일 찾기
             while (monday.getMonth() === currentMonth) {
                 // 다음 주차부터만 추가 (현재 주 제외)
@@ -2067,246 +2072,76 @@
             if (endCurrent) endCurrent.checked = true;
         }
 
+        // 3. 금액 및 날짜 계산 (핵심 50분/80분 로직)
         function calculateAmount() {
             const select = document.getElementById('startWeek');
             const selectedOption = select.options[select.selectedIndex];
-            const customRadio = document.getElementById('customAmount');
             
-            // 프로그램 및 요일 선택 확인
-            const selectedPrograms = document.querySelectorAll('input[name="program"]:checked');
-            const programCount = selectedPrograms.length;
+            const programCount = document.querySelectorAll('input[name="program"]:checked').length;
             const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
             const weekdayCount = selectedWeekdays.length;
+            const careDuration = document.querySelector('input[name="careDuration"]:checked').value; 
 
             if (!selectedOption || !selectedOption.value) {
                 document.getElementById('amountGroup').style.display = 'none';
-                document.getElementById('extensionGroup').style.display = 'none';
                 return;
             }
 
-            // 1. 시작 날짜 파악
             const startDate = new Date(selectedOption.value);
-            const startWeekNum = getWeekOfMonth(startDate);
-            
-            // 2. 기간 연장 모드(3주차 이상 & 다음 달 말까지 선택) 확인
-            const extensionGroup = document.getElementById('extensionGroup');
-            let isExtensionMode = false;
 
-            if (startWeekNum >= 3) {
-                extensionGroup.style.display = 'block';
-                if (document.getElementById('endNext').checked) {
-                    isExtensionMode = true;
-                }
-            } else {
-                extensionGroup.style.display = 'none';
-            }
+            // [핵심] 고정 가격 및 횟수 정책
+            const prices = {
+                '50': { single1: 45000, weekly1: 42500, weekly2: 40000, month3: 37500 },
+                '80': { single1: 85000, weekly1: 80000, weekly2: 75000, month3: 70000 }
+            };
+            const currentPrices = prices[careDuration];
+            const sessions = { single1: 1, weekly1: 4, weekly2: 8, month3: 24 };
 
-            // 3. 결제용 주차(Weeks) 계산
-            let selectedWeeks = parseInt(selectedOption.dataset.weeks); // 기본 남은 주차
-
-            if (isExtensionMode) {
-                // [수정] 다음 달 말까지 선택 시
-                const nextMonthEnd = new Date(startDate.getFullYear(), startDate.getMonth() + 2, 0);
-                const diffTime = nextMonthEnd.getTime() - startDate.getTime();
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
-                // 물리적인 주차 계산
-                selectedWeeks = Math.ceil(diffDays / 7);
-
-                // [핵심] 2026년 2월 3주차(휴강)가 포함되면 결제 주차에서 -1주 차감
-                if (startDate.getFullYear() === 2026) {
-                    const holidayStart = new Date(2026, 1, 15); // 2월 15일
-                    const holidayEnd = new Date(2026, 1, 22);   // 2월 21일 경
-                    // 기간이 연휴를 완전히 포함하면 1주 차감
-                    if (startDate < holidayStart && nextMonthEnd > holidayEnd) {
-                        selectedWeeks -= 1;
-                    }
-                }
-            }
-
-            // 4. 안내 멘트 업데이트
-            const weekInfo = document.getElementById('weekInfo');
-            const programInfoText = programCount > 0 ? ` (선택 프로그램: ${programCount}개)` : '';
-            
-            let durationText = '';
-            if (selectedWeeks === 4 && !isExtensionMode) durationText = '한 달 전체';
-            else if (isExtensionMode) durationText = `이번 달 잔여 + 다음 달 전체`;
-            else durationText = `이번 달 남은 ${selectedWeeks}주`;
-
-            weekInfo.textContent = `${selectedWeeks}주 패키지 (${durationText})${programInfoText}`;
-
-            // --- 날짜 표시를 위한 계산 ---
-
-            // 선택된 요일 중 가장 늦은 요일(gap) 찾기
+            // 종료일 계산용 요일 차이 찾기
             const dayMap = {'월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 0};
             let maxDiff = 0;
-            if (selectedWeekdays.length > 0) {
-                const startDayIndex = startDate.getDay() === 0 ? 6 : startDate.getDay() - 1; 
+            if (weekdayCount > 0) {
                 let tempMaxDiff = -1;
                 selectedWeekdays.forEach(cb => {
-                    let dayIndex = dayMap[cb.value]; 
-                    let diff = dayIndex - 1; 
+                    let diff = dayMap[cb.value] - 1; 
                     if (diff < 0) diff += 7; 
                     if (diff > tempMaxDiff) tempMaxDiff = diff;
                 });
                 maxDiff = tempMaxDiff;
             }
 
-            // 첫 수업 시작일 문자열
             const firstSessionDates = getFirstSessionDates(startDate, selectedWeekdays);
             const startStr = firstSessionDates.length > 0 ? firstSessionDates.join(', ') : '';
 
-            // [중요] 종료일 문자열 계산 함수 (각 패키지별 로직 분리)
-            function getEndDateString(type) {
+            function getEndDateString(totalSessions) {
                 if (weekdayCount === 0) return '';
-                
+                // 총 횟수를 방문 요일 수로 나누어 몇 주가 걸리는지 계산
+                const durationWeeks = Math.ceil(totalSessions / weekdayCount);
                 const tempEndDate = new Date(startDate);
-                let weeksToAdd = 0;
-
-                // A. 3개월 패키지 (2월 휴강 보정 로직)
-                if (type === 'month3') {
-                    weeksToAdd = 12; // 기본 12주
-                    // 기간 내에 2026년 2월 3주차가 끼어있으면 1주 더 연장 (수업 보장)
-                    if (startDate.getFullYear() === 2026) {
-                        const holidayStart = new Date(2026, 1, 15);
-                        // 12주 후의 날짜 대략 계산
-                        const roughEndDate = new Date(startDate);
-                        roughEndDate.setDate(roughEndDate.getDate() + (12 * 7));
-                        
-                        if (startDate < holidayStart && roughEndDate > holidayStart) {
-                            weeksToAdd = 13; // 1주 추가 연장 (종료일 4/25로 밀림)
-                        }
-                    }
-                    // 종료일 계산
-                    tempEndDate.setDate(tempEndDate.getDate() + ((weeksToAdd - 1) * 7) + maxDiff);
-                } 
-                // B. "다음 달 말까지" 선택 시 (날짜를 월말로 강제 고정)
-                else if (type === 'standard' && isExtensionMode) {
-                    // 다음 달의 마지막 날 구하기
-                    const nextMonthLastDay = new Date(startDate.getFullYear(), startDate.getMonth() + 2, 0);
-                    
-                    // 마지막 날부터 역순으로 선택한 요일 중 가장 늦은 요일(maxDiff) 찾기
-                    // 예: 토요일 선택 시, 2월 28일(토)이 딱 걸리도록
-                    const targetDayNum = (maxDiff + 1) % 7; // maxDiff는 월(0)~일(6) 기준 조정 필요
-                    
-                    // 단순하게: 해당 월의 마지막 날짜 근처의 해당 요일 찾기
-                    // 여기서는 UI상 '2월 28일'을 보여주기 위해 월말 날짜를 그대로 쓰거나, 
-                    // 정확히 수업 있는 마지막 날을 계산.
-                    
-                    // 사용자 요청: "2월 28일 토요일이 종료일이 되어야"
-                    // -> 선택된 요일 중 토요일이 있다면 2/28, 없다면 그 전 수업일
-                    
-                    // 마지막 날(2/28)이 선택한 요일에 포함되는지 확인하는 로직보다는
-                    // 단순히 "다음 달 말일" 근처의 수업 마지막 날을 계산
-                    
-                    let searchDate = new Date(nextMonthLastDay);
-                    // 뒤에서부터 하루씩 빼면서 선택된 요일인지 확인
-                    while (true) {
-                        const currentDayName = ['일','월','화','수','목','금','토'][searchDate.getDay()];
-                        let isSelected = false;
-                        selectedWeekdays.forEach(cb => {
-                            if (cb.value === currentDayName) isSelected = true;
-                        });
-                        
-                        if (isSelected) {
-                            tempEndDate.setTime(searchDate.getTime());
-                            break;
-                        }
-                        searchDate.setDate(searchDate.getDate() - 1);
-                        // 무한루프 방지 (한달 이상 차이날 리 없으므로)
-                        if (searchDate < startDate) break; 
-                    }
-                }
-                // C. 일반 주차 계산 (기존 로직)
-                else {
-                    weeksToAdd = (type === 'single') ? 1 : selectedWeeks;
-                    tempEndDate.setDate(tempEndDate.getDate() + ((weeksToAdd - 1) * 7) + maxDiff);
-                }
-
-                const mm = tempEndDate.getMonth() + 1;
-                const dd = tempEndDate.getDate();
-                const dy = ['일','월','화','수','목','금','토'][tempEndDate.getDay()];
-                return `${mm}/${dd}(${dy})`;
+                tempEndDate.setDate(tempEndDate.getDate() + ((durationWeeks - 1) * 7) + maxDiff);
+                return `${tempEndDate.getMonth() + 1}/${tempEndDate.getDate()}(${['일','월','화','수','목','금','토'][tempEndDate.getDay()]})`;
             }
 
-            // 각 옵션별 종료일 텍스트 생성
-            const endStr_Standard = getEndDateString('standard'); 
-            const endStr_Single   = getEndDateString('single');             
-            const endStr_Month3   = getEndDateString('month3'); // 3개월 전용 로직 적용
-
-            // 날짜 범위 표시 HTML 생성
             function createDateInfo(sStr, eStr) {
                 if (!sStr || !eStr) return '';
                 return `<br><span class="start-date-text" style="font-size: 0.9em;">기간: ${sStr} ~ ${eStr}</span>`;
             }
 
-            const dateInfo_Standard = createDateInfo(startStr, endStr_Standard);
-            const dateInfo_Single   = createDateInfo(startStr, endStr_Single);
-            const dateInfo_Month3   = createDateInfo(startStr, endStr_Month3);
+            // 총 결제 금액 계산
+            const single1Amount = currentPrices.single1 * programCount;
+            const weekly1Amount = currentPrices.weekly1 * sessions.weekly1 * programCount;
+            const weekly2Amount = currentPrices.weekly2 * sessions.weekly2 * programCount;
+            const month3Amount  = currentPrices.month3 * sessions.month3 * programCount;
 
-            // [가격 업데이트]
-            let pricePerSession = 0;
-            
-            // 프로그램이 2개 이상이거나, 주 2회 이상(Weekly 1 패키지에서 요일 2개 선택 시 등)이면 40,000원 적용
-            // (기존 로직 유지)
-            if (programCount >= 2) pricePerSession = 40000; 
-            else pricePerSession = (weekdayCount >= 2) ? 40000 : 42500;
-
-            const single1Amount = 45000 * programCount;
-            const weekly1Amount = pricePerSession * selectedWeeks * 1 * programCount;
-            const weekly1_50minAmount = 80000 * selectedWeeks * 1 * programCount;
-            const weekly2Amount = 40000 * selectedWeeks * weekdayCount * programCount;
-            const month3Amount  = 37500 * 12 * weekdayCount * programCount;
-
-            // [수정] 회당 가격 정보 추가
-            
-            // 1회 이용권 (회당 45,000원 고정)
             document.getElementById('single1Desc').innerHTML = 
-                `${single1Amount.toLocaleString()}원 (1회, 회당 45,000원)${dateInfo_Single}`;
-
-            // 주 1회 패키지 (조건에 따라 42,500원 또는 40,000원 변동)
+                `${single1Amount.toLocaleString()}원 (1회, 회당 ${currentPrices.single1.toLocaleString()}원)${createDateInfo(startStr, getEndDateString(sessions.single1))}`;
             document.getElementById('weekly1Desc').innerHTML = 
-                `${weekly1Amount.toLocaleString()}원 (${selectedWeeks}주, 회당 ${pricePerSession.toLocaleString()}원)${dateInfo_Standard}`;
-
-            // 주 1회 50분 패키지 (추가된 부분 - 기존 양식과 통일)
-            document.getElementById('weekly1_50minDesc').innerHTML = 
-                `${weekly1_50minAmount.toLocaleString()}원 (${selectedWeeks}주, 회당 80,000원)${dateInfo_Standard}`;
-
-            // 주 2회 패키지 (회당 40,000원 고정)
+                `${weekly1Amount.toLocaleString()}원 (총 4회, 회당 ${currentPrices.weekly1.toLocaleString()}원)${createDateInfo(startStr, getEndDateString(sessions.weekly1))}`;
             document.getElementById('weekly2Desc').innerHTML = 
-                `${weekly2Amount.toLocaleString()}원 (${selectedWeeks}주, 회당 40,000원)${dateInfo_Standard}`;
-
-            // 3개월 패키지 (회당 37,500원 고정)
+                `${weekly2Amount.toLocaleString()}원 (총 8회, 회당 ${currentPrices.weekly2.toLocaleString()}원)${createDateInfo(startStr, getEndDateString(sessions.weekly2))}`;
             document.getElementById('month3Desc').innerHTML = 
-                `${month3Amount.toLocaleString()}원 (12주, 회당 37,500원)${dateInfo_Month3}`;
-            
-            // 직접 입력
-            // [기간 메모리 로직]
-            const packageTypeInfo = document.querySelector('input[name="packageType"]:checked');
-            if (packageTypeInfo && packageTypeInfo.value !== 'custom') {
-                let currentWeeks = selectedWeeks;
-                if (packageTypeInfo.value === 'single1') currentWeeks = 1;
-                else if (packageTypeInfo.value === 'month3') currentWeeks = 12;
-                customRadio.dataset.savedWeeks = currentWeeks;
-            }
-            
-            // 직접 입력 날짜 표시 (선택된 패키지 기간 따라가기)
-            const customDateRange = document.getElementById('customDateRange');
-            if (customDateRange) {
-                // 현재 선택된 라디오 버튼에 맞는 종료일을 보여줌
-                let targetEndStr = endStr_Standard;
-                if (packageTypeInfo) {
-                    if (packageTypeInfo.value === 'single1') targetEndStr = endStr_Single;
-                    else if (packageTypeInfo.value === 'month3') targetEndStr = endStr_Month3;
-                }
-                
-                if (startStr && targetEndStr) {
-                    customDateRange.textContent = `(${startStr} ~ ${targetEndStr})`;
-                } else {
-                    customDateRange.textContent = '';
-                }
-            }
-            
+                `${month3Amount.toLocaleString()}원 (총 24회, 회당 ${currentPrices.month3.toLocaleString()}원)${createDateInfo(startStr, getEndDateString(sessions.month3))}`;
+
             document.getElementById('amountGroup').style.display = 'block';
         }
         
@@ -2612,8 +2447,6 @@
             if (page === 2) {
                 const programs = document.querySelectorAll('input[name="program"]:checked');
                 const weekdays = document.querySelectorAll('input[name="weekday"]:checked');
-                const timeHour = document.getElementById('timeHour').value;
-                const timeMinute = document.getElementById('timeMinute').value;
                 const startWeek = document.getElementById('startWeek').value;
                 const packageType = document.querySelector('input[name="packageType"]:checked');
                 
@@ -2627,8 +2460,15 @@
                     return;
                 }
                 
-                if (!timeHour || !timeMinute) {
-                    alert('관리 시간을 선택해주세요.');
+                // [수정됨] 동적 생성된 요일별 시간 선택 누락 검증
+                const timeHours = document.querySelectorAll('.time-hour');
+                let isTimeMissing = false;
+                timeHours.forEach(select => {
+                    if (!select.value) isTimeMissing = true;
+                });
+                
+                if (isTimeMissing || timeHours.length === 0) {
+                    alert('모든 요일의 관리 시간을 선택해주세요.');
                     return;
                 }
                 
@@ -2698,156 +2538,108 @@
             generateFinalPage();
         }
         
+        // 4. 신청서 이미지 생성 데이터 처리
         async function generateFinalPage() {
             document.getElementById('loadingOverlay').classList.add('active');
             document.getElementById('loadingText').textContent = '신청서를 생성하는 중...';
             
-            // 뷰포트 메타태그 임시 저장 및 변경
             const viewport = document.querySelector('meta[name="viewport"]');
             const originalContent = viewport.content;
             viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0';
             
             const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
+            const dateValue = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
             
-            const weekdays = Array.from(document.querySelectorAll('input[name="weekday"]:checked'))
-                .map(checkbox => checkbox.value);
-            const weekdayStr = weekdays.join(', ');
-            
-            // [수정] 결제 금액 및 프로그램 정보 가져오기 (복수 선택 지원)
-            const packageTypeRadio = document.querySelector('input[name="packageType"]:checked');
             const selectedWeekdays = document.querySelectorAll('input[name="weekday"]:checked');
             const weekdayCount = selectedWeekdays.length;
+            const weekdayStr = Array.from(selectedWeekdays).map(checkbox => checkbox.value).join(', ');
             
-            // 프로그램 복수 선택 처리
-            const selectedProgramsCheckbox = document.querySelectorAll('input[name="program"]:checked');
-            const programCount = selectedProgramsCheckbox.length;
-            const programValue = Array.from(selectedProgramsCheckbox).map(cb => cb.value).join(', ');
+            const selectedPrograms = document.querySelectorAll('input[name="program"]:checked');
+            const programCount = selectedPrograms.length;
+            const programValue = Array.from(selectedPrograms).map(cb => cb.value).join(', ');
+            
+            const careDuration = document.querySelector('input[name="careDuration"]:checked').value;
+            const packageTypeRadio = document.querySelector('input[name="packageType"]:checked');
+
+            const prices = {
+                '50': { single1: 45000, weekly1: 42500, weekly2: 40000, month3: 37500 },
+                '80': { single1: 85000, weekly1: 80000, weekly2: 75000, month3: 70000 }
+            };
+            const sessions = { single1: 1, weekly1: 4, weekly2: 8, month3: 24 };
 
             let amountValue = 0;
-            
+            let durationWeeks = 1;
+
             if (packageTypeRadio) {
-                if (packageTypeRadio.value === 'single1') {
-                    amountValue = 45000 * programCount;
-                } else if (packageTypeRadio.value === 'custom') {
+                if (packageTypeRadio.value === 'custom') {
                     const customValue = document.getElementById('customAmountValue').value.replace(/,/g, '');
                     amountValue = parseInt(customValue) || 0;
-                } else if (packageTypeRadio.value === 'month3') {
-                    // 3개월 패키지: 37,500원 * 12주 * 주당횟수 * 프로그램수
-                    amountValue = 37500 * 12 * weekdayCount * programCount;
+                    durationWeeks = 1;
                 } else {
-                    // 주 1회 / 주 2회 이상
-                    const startWeekSelect = document.getElementById('startWeek');
-                    const weeks = parseInt(startWeekSelect.options[startWeekSelect.selectedIndex].dataset.weeks);
-                    
-                    let unitPrice = 0;
-                    if (programCount >= 2) {
-                        unitPrice = 40000;
-                    } else {
-                        unitPrice = (packageTypeRadio.value === 'weekly2' || weekdayCount >= 2) ? 40000 : 42500;
-                    }
-                    
-                    amountValue = unitPrice * weeks * weekdayCount * programCount;
+                    const pt = packageTypeRadio.value;
+                    amountValue = prices[careDuration][pt] * sessions[pt] * programCount;
+                    durationWeeks = Math.ceil(sessions[pt] / (weekdayCount || 1));
                 }
             }
-            
-            const formattedAmount = parseInt(amountValue).toLocaleString('ko-KR');
-            
+
+            const formattedAmount = parseInt(amountValue).toLocaleString('ko-KR') + '원';
             const nameValue = document.getElementById('name').value;
-            const dateValue = `${year}.${month}.${day}`;
             const addressValue = `${document.getElementById('dong').value}동 ${document.getElementById('ho').value}호`;
             const phoneValue = `010 - ${document.getElementById('phone1').value} - ${document.getElementById('phone2').value}`;
-            const amountText = `${formattedAmount}원`;
-            
-            const timeHour = document.getElementById('timeHour').value;
-            const timeMinute = document.getElementById('timeMinute').value;
-            const combinedTime = `${timeHour}:${timeMinute}`;
-            const scheduleValue = `매주 ${weekdayStr}요일 ${combinedTime}`;
+
+            let scheduleParts = [];
+            selectedWeekdays.forEach(cb => {
+                const day = cb.value;
+                const h = document.querySelector(`.time-hour[data-day="${day}"]`).value;
+                const m = document.querySelector(`.time-minute[data-day="${day}"]`).value;
+                scheduleParts.push(`${day} ${h}:${m}`);
+            });
+            const scheduleValue = `매주 ` + scheduleParts.join(', ');
             
             const signatureDataUrl = canvas.toDataURL('image/png');
             
-            // 반응형 미리보기 업데이트
-            document.getElementById('previewName').textContent = nameValue;
-            document.getElementById('previewDate').textContent = dateValue;
-            document.getElementById('previewAddress').textContent = addressValue;
-            document.getElementById('previewPhone').textContent = phoneValue;
-            document.getElementById('previewAmount').textContent = amountText;
-            document.getElementById('previewProgram').textContent = programValue;
-            document.getElementById('previewSchedule').textContent = scheduleValue;
-            
-            // A4 캡처용 업데이트
-            document.getElementById('finalName').textContent = nameValue;
-            document.getElementById('finalDate').textContent = dateValue;
-            document.getElementById('finalAddress').textContent = addressValue;
-            document.getElementById('finalPhone').textContent = phoneValue;
-            document.getElementById('finalAmount').textContent = amountText;
-            document.getElementById('finalProgram').textContent = programValue;
-            document.getElementById('finalSchedule').textContent = scheduleValue;
-            document.getElementById('finalSignature').src = signatureDataUrl;
-            
-            // 첫 시작 날짜 및 종료 날짜 계산/표시
-            const startWeekSelect = document.getElementById('startWeek');
-            const startWeekMonday = new Date(startWeekSelect.value);
-            const startDate = new Date(startWeekMonday);            
-            
-            // 1. 첫 시작 날짜 구하기
-            const firstSessionDates = getFirstSessionDates(startDate, selectedWeekdays);
-            
-            // 2. 종료 날짜 구하기
-            let durationWeeks = parseInt(startWeekSelect.options[startWeekSelect.selectedIndex].dataset.weeks);
-            
-            if (packageTypeRadio) {
-                if (packageTypeRadio.value === 'month3') {
-                    durationWeeks = 12; // 3개월 = 12주
-                } else if (packageTypeRadio.value === 'single1') {
-                    durationWeeks = 1;  // 1회권 = 1주
-                }
-            }
-            
-            // 선택된 요일 중, 월요일(1) 기준으로 가장 늦은 요일(gap) 찾기
+            // 화면 업데이트
+            const updateUI = (prefix) => {
+                document.getElementById(`${prefix}Name`).textContent = nameValue;
+                document.getElementById(`${prefix}Date`).textContent = dateValue;
+                document.getElementById(`${prefix}Address`).textContent = addressValue;
+                document.getElementById(`${prefix}Phone`).textContent = phoneValue;
+                document.getElementById(`${prefix}Amount`).textContent = formattedAmount;
+                document.getElementById(`${prefix}Program`).textContent = `${programValue} (${careDuration}분)`;
+                document.getElementById(`${prefix}Schedule`).textContent = scheduleValue;
+            };
+            updateUI('preview');
+            updateUI('final');
+
+            const startWeekMonday = new Date(document.getElementById('startWeek').value);
+            const firstSessionDates = getFirstSessionDates(startWeekMonday, selectedWeekdays);
+
             const dayMap = {'월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 0};
             let maxDiff = -1;
-            
             selectedWeekdays.forEach(cb => {
-                let dayIndex = dayMap[cb.value]; 
-                let diff = dayIndex - 1;
-                if (diff < 0) diff += 7; // 일요일(0) 처리
+                let diff = dayMap[cb.value] - 1;
+                if (diff < 0) diff += 7; 
                 if (diff > maxDiff) maxDiff = diff;
             });
             
-            // 종료일 계산
             const endCalcDate = new Date(startWeekMonday);
             endCalcDate.setDate(endCalcDate.getDate() + ((durationWeeks - 1) * 7) + maxDiff);
+            const endDateStr = `${endCalcDate.getMonth() + 1}/${endCalcDate.getDate()}(${['일','월','화','수','목','금','토'][endCalcDate.getDay()]})`;
             
-            const endMonth = endCalcDate.getMonth() + 1;
-            const endDay = endCalcDate.getDate();
-            const endDayName = ['일','월','화','수','목','금','토'][endCalcDate.getDay()];
-            const endDateStr = `${endMonth}/${endDay}(${endDayName})`;
-            
-            // 3. 화면 및 캡처용 텍스트 업데이트
             if (firstSessionDates.length > 0) {
                 const dateText = `첫 시작: ${firstSessionDates.join(', ')} / 종료: ${endDateStr}`;
                 document.getElementById('previewStartDate').textContent = dateText;
                 document.getElementById('finalStartDate').textContent = dateText;
             }
             
-            // 서명 이미지 처리 및 화면 전환
             document.getElementById('finalSignature').src = signatureDataUrl;
-
-            const noteSignature = document.getElementById('noteSignature');
-            const signImg = document.createElement('img');
-            signImg.src = signatureDataUrl;
-            noteSignature.innerHTML = '';
-            noteSignature.appendChild(signImg);
+            document.getElementById('noteSignature').innerHTML = `<img src="${signatureDataUrl}">`;
             
             document.getElementById('formContainer').style.display = 'none';
             document.getElementById('finalPage').style.display = 'block';
             
             setTimeout(async () => {
                 await captureApplication();
-                // 뷰포트 복원
                 viewport.content = originalContent;
             }, 500);
         }
@@ -3000,151 +2792,79 @@
             }
         }
         
+        // 5. 서버 전송용 데이터 수집
         function collectApplicantData() {
-            // 기본 정보
-            const name = document.getElementById('name').value;
-            const dong = document.getElementById('dong').value;
-            const ho = document.getElementById('ho').value;
-            const address = `${dong}동 ${ho}호`;
-            const phone1 = document.getElementById('phone1').value;
-            const phone2 = document.getElementById('phone2').value;
-            const phone = `010-${phone1}-${phone2}`;
-            
-            // 프로그램 정보
-            const programCheckboxes = document.querySelectorAll('input[name="program"]:checked');
-            const program = Array.from(programCheckboxes).map(cb => cb.value).join(',');
-            
-            // 요일 정보
-            const weekdayCheckboxes = document.querySelectorAll('input[name="weekday"]:checked');
-            const weekdays = Array.from(weekdayCheckboxes).map(cb => cb.value);
-            const dayOfWeek = weekdays.join(',');
-            
-            // 시간 정보
-            const timeHour = document.getElementById('timeHour').value;
-            const timeMinute = document.getElementById('timeMinute').value;
-            const time = `${timeHour}:${timeMinute}`;
-            
-            // 시작 주차
-            const startWeekSelect = document.getElementById('startWeek');
-            const startWeekMonday = startWeekSelect.value; 
-            
-            // 기본 주차 (드롭다운 값)
-            let weeks = parseInt(startWeekSelect.options[startWeekSelect.selectedIndex].dataset.weeks);
-            
-            // 결제 패키지 확인
             const packageTypeRadio = document.querySelector('input[name="packageType"]:checked');
-            const customRadio = document.getElementById('customAmount'); // 상태 저장용
+            const careDuration = document.querySelector('input[name="careDuration"]:checked').value;
+            const programCheckboxes = document.querySelectorAll('input[name="program"]:checked');
+            const programCount = programCheckboxes.length;
+            const weekdayCheckboxes = document.querySelectorAll('input[name="weekday"]:checked');
+            const weekdayCount = weekdayCheckboxes.length;
+            
+            const prices = {
+                '50': { single1: 45000, weekly1: 42500, weekly2: 40000, month3: 37500 },
+                '80': { single1: 85000, weekly1: 80000, weekly2: 75000, month3: 70000 }
+            };
+            const sessions = { single1: 1, weekly1: 4, weekly2: 8, month3: 24 };
 
             let amount = 0;
-            let weeklyFrequency = 1;
             let totalSessions = 0;
-            let duration = `${weeks}주`;
+            let durationStr = '';
+            let weeks = 1;
 
             if (packageTypeRadio) {
-			    const programCount = programCheckboxes.length;
-			    const weekdayCount = weekdayCheckboxes.length;
-			    
-			    if (packageTypeRadio.value === 'single1') {
-			        weeklyFrequency = 1;
-			        amount = 45000 * programCount;
-			        duration = '1회';
-			        weeks = 1; 
-			    } else if (packageTypeRadio.value === 'weekly1_50min') {
-			        // [추가] 50분 집중관리 패키지 로직
-			        weeklyFrequency = 1;
-			        amount = 80000 * weeks * 1 * programCount; // 회당 80,000원 적용
-			        duration = `${weeks}주 (50분 집중관리)`;
-			    } else if (packageTypeRadio.value === 'month3') {
-			        weeklyFrequency = weekdayCount;
-			        amount = 37500 * 12 * weekdayCount * programCount;
-			        duration = '12주 (3개월)';
-			        weeks = 12; 
-			    } else if (packageTypeRadio.value === 'custom') {
-			        weeklyFrequency = 1; 
-			        const customValue = document.getElementById('customAmountValue').value.replace(/,/g, '');
-			        amount = parseInt(customValue) || 0;
-			        
-			        if (customRadio.dataset.savedWeeks) {
-			            weeks = parseInt(customRadio.dataset.savedWeeks);
-			            if (weeks === 1) duration = '1회 (직접입력)';
-			            else if (weeks === 12) duration = '12주 (직접입력)';
-			            else duration = `${weeks}주 (직접입력)`;
-			        }
-			    } else {
-			        // 주1회(25분), 주2회(25분)
-			        weeklyFrequency = weekdayCount;
-			        let unitPrice = (programCount >= 2 || weekdayCount >= 2) ? 40000 : 42500;
-			        amount = unitPrice * weeks * weekdayCount * programCount;
-			    }
-			    
-			    // 총 횟수 계산
-			    if (packageTypeRadio.value === 'single1' || (packageTypeRadio.value === 'custom' && weeks === 1)) {
-			         totalSessions = 1 * programCount;
-			    } else {
-			         totalSessions = weeks * (packageTypeRadio.value === 'weekly1_50min' ? 1 : weekdayCount) * programCount;
-			    }
-			}
-            
-            // 실제 시작일 계산
-            const dayMap = {'월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 0};
-            const mondayDate = new Date(startWeekMonday);
-            const selectedDays = Array.from(weekdayCheckboxes).map(cb => dayMap[cb.value]);
-            
-            const mondayDay = mondayDate.getDay(); 
-            const sessionDates = selectedDays.map(targetDay => {
-                let daysToAdd = targetDay - mondayDay;
-                if (daysToAdd < 0) daysToAdd += 7;
-                
-                const sessionDate = new Date(mondayDate);
-                sessionDate.setDate(mondayDate.getDate() + daysToAdd);
-                return {
-                    date: sessionDate,
-                    daysFromMonday: daysToAdd
-                };
-            });
-            
-            sessionDates.sort((a, b) => a.date - b.date);
-            
-            const firstSession = sessionDates[0];
-            const actualStartDate = firstSession.date;
-            
-            const startYear = actualStartDate.getFullYear();
-            const startMonth = String(actualStartDate.getMonth() + 1).padStart(2, '0');
-            const startDay = String(actualStartDate.getDate()).padStart(2, '0');
-            const startDate = `${startYear}.${startMonth}.${startDay}`;
-            
-            // 종료일 계산 (2026년 2월 연휴 보정 포함)
-            // weeks 값은 위에서 이미 packageType에 따라 조정되었음
-            let calendarWeeks = weeks;
-            if (actualStartDate.getFullYear() === 2026 && actualStartDate.getMonth() === 1) {
-                if (weeks === 3 && actualStartDate.getDate() <= 7) calendarWeeks = 4;
-                else if (weeks === 2 && actualStartDate.getDate() <= 14) calendarWeeks = 3;
+                if (packageTypeRadio.value === 'custom') {
+                    amount = parseInt(document.getElementById('customAmountValue').value.replace(/,/g, '')) || 0;
+                    totalSessions = 1;
+                    durationStr = `직접입력 (${careDuration}분)`;
+                    weeks = 1;
+                } else {
+                    const pt = packageTypeRadio.value;
+                    amount = prices[careDuration][pt] * sessions[pt] * programCount;
+                    totalSessions = sessions[pt] * programCount; // 프로그램당 횟수 합산
+                    weeks = Math.ceil(sessions[pt] / (weekdayCount || 1));
+                    
+                    if (pt === 'single1') durationStr = `1회 (${careDuration}분)`;
+                    else if (pt === 'weekly1') durationStr = `총 4회 (${careDuration}분)`;
+                    else if (pt === 'weekly2') durationStr = `총 8회 (${careDuration}분)`;
+                    else if (pt === 'month3') durationStr = `총 24회 (${careDuration}분)`;
+                }
             }
 
-            // 마지막 세션의 요일 차이 + (캘린더주차-1)*7
-            const lastSession = sessionDates[sessionDates.length - 1];
-            const daysToLastSession = lastSession.daysFromMonday + ((calendarWeeks - 1) * 7);
+            const timeArr = [];
+            Array.from(weekdayCheckboxes).forEach(cb => {
+                const day = cb.value;
+                const h = document.querySelector(`.time-hour[data-day="${day}"]`).value;
+                const m = document.querySelector(`.time-minute[data-day="${day}"]`).value;
+                timeArr.push(`${h}:${m}`);
+            });
             
-            const actualEndDate = new Date(mondayDate);
-            actualEndDate.setDate(mondayDate.getDate() + daysToLastSession);
+            const startWeekMonday = new Date(document.getElementById('startWeek').value);
+            const dayMap = {'월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 0};
+            let maxDiff = -1;
+            Array.from(weekdayCheckboxes).forEach(cb => {
+                let diff = dayMap[cb.value] - 1;
+                if (diff < 0) diff += 7;
+                if (diff > maxDiff) maxDiff = diff;
+            });
             
-            const endYear = actualEndDate.getFullYear();
-            const endMonth = String(actualEndDate.getMonth() + 1).padStart(2, '0');
-            const endDay = String(actualEndDate.getDate()).padStart(2, '0');
-            const endDate = `${endYear}.${endMonth}.${endDay}`;
-            
+            const endDateObj = new Date(startWeekMonday);
+            endDateObj.setDate(endDateObj.getDate() + ((weeks - 1) * 7) + maxDiff);
+
+            const formatD = (d) => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+
             return {
-                name: name,
-                address: address,
-                phone: phone,
-                program: program,
-                dayOfWeek: dayOfWeek,
-                time: time,
-                startDate: startDate,
-                endDate: endDate,
-                duration: duration,
+                name: document.getElementById('name').value,
+                address: `${document.getElementById('dong').value}동 ${document.getElementById('ho').value}호`,
+                phone: `010-${document.getElementById('phone1').value}-${document.getElementById('phone2').value}`,
+                program: Array.from(programCheckboxes).map(c => c.value).join(','),
+                dayOfWeek: Array.from(weekdayCheckboxes).map(c => c.value).join(','),
+                time: timeArr.join(','),
+                startDate: formatD(startWeekMonday), // 편의상 첫 주의 월요일을 보냄
+                endDate: formatD(endDateObj),
+                duration: durationStr,
                 weeks: weeks,
-                weeklyFrequency: weeklyFrequency,
+                weeklyFrequency: weekdayCount,
                 totalSessions: totalSessions,
                 amount: amount
             };
