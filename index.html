@@ -1830,16 +1830,21 @@
                     <div style="width: 40px; font-weight: bold; color: #00b09b; text-align: center;">${day}</div>
                     <select class="form-input time-hour" data-day="${day}" style="flex: 1; padding: 12px; min-height: 45px;">
                         <option value="">시간 선택</option>
+                        <option value="07" ${prev.hour==='07'?'selected':''}>오전 7시</option>
+                        <option value="08" ${prev.hour==='08'?'selected':''}>오전 8시</option>
                         <option value="09" ${prev.hour==='09'?'selected':''}>오전 9시</option>
                         <option value="10" ${prev.hour==='10'?'selected':''}>오전 10시</option>
                         <option value="11" ${prev.hour==='11'?'selected':''}>오전 11시</option>
                         <option value="12" ${prev.hour==='12'?'selected':''}>오후 12시</option>
+                        <option value="13" ${prev.hour==='13'?'selected':''}>오후 1시</option>
                         <option value="14" ${prev.hour==='14'?'selected':''}>오후 2시</option>
                         <option value="15" ${prev.hour==='15'?'selected':''}>오후 3시</option>
                         <option value="16" ${prev.hour==='16'?'selected':''}>오후 4시</option>
                         <option value="17" ${prev.hour==='17'?'selected':''}>오후 5시</option>
+                        <option value="18" ${prev.hour==='18'?'selected':''}>오후 6시</option>
                         <option value="19" ${prev.hour==='19'?'selected':''}>오후 7시</option>
                         <option value="20" ${prev.hour==='20'?'selected':''}>오후 8시</option>
+                        <option value="21" ${prev.hour==='21'?'selected':''}>오후 9시</option>
                     </select>
                     <select class="form-input time-minute" data-day="${day}" style="flex: 1; padding: 12px; min-height: 45px;">
                         <option value="00" ${prev.minute==='00'?'selected':''}>00분</option>
