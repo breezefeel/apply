@@ -109,6 +109,18 @@
       background:#fff; border:1px solid var(--border);
       border-radius:10px; padding:8px 10px; margin-bottom:8px;
     }
+    .psp-part-card.horizontal {
+      display:flex; flex-wrap:wrap; gap:8px; align-items:stretch;
+    }
+    .psp-part-card.horizontal .method-row {
+      display:inline-flex; flex-direction:row; align-items:center; gap:6px;
+      grid-template-columns:none;
+      padding:7px 12px; margin:0;
+      border:1px solid var(--border); border-radius:999px;
+      background:#fff;
+    }
+    .psp-part-card.horizontal .method-row input { margin-top:0; }
+    .psp-part-card.horizontal .method-row .method-label { white-space:nowrap; }
     .method-row {
       display:grid; grid-template-columns:24px 1fr auto;
       gap:8px; align-items:start;
@@ -116,10 +128,18 @@
     }
     .method-row:hover { background:rgba(255,255,255,.7); }
     .method-row.done {
-      background:#ede9fe; border-left:3px solid #7c3aed;
+      background:var(--green-bg); border-left:3px solid var(--green);
     }
-    .method-row.done .method-label { color:#5b21b6; font-weight:600; }
-    .method-row.today { background:var(--green-bg); border-left:3px solid var(--green); }
+    .method-row.done .method-label { color:#047857; font-weight:600; }
+    .method-row.done input[type="checkbox"] {
+      accent-color: var(--green);
+      width:18px; height:18px;
+    }
+    .method-row.today {
+      background:#d1fae5; border-left:3px solid #10b981;
+      box-shadow: inset 0 0 0 1px rgba(5,150,105,.25);
+    }
+    .method-row.today input[type="checkbox"] { accent-color: #10b981; }
     .method-row input { width:18px; height:18px; margin-top:2px; cursor:pointer; }
     .method-label { font-size:12px; font-weight:500; line-height:1.45; }
     .method-vid { font-size:10px; color:var(--green); margin-top:2px; }
@@ -138,8 +158,8 @@
     .movement-legend { display:flex; flex-wrap:wrap; gap:10px; font-size:10px; color:var(--dim); margin-bottom:10px; }
     .movement-legend span { display:inline-flex; align-items:center; gap:5px; }
     .legend-swatch { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
-    .legend-swatch.done { background:#ede9fe; border:1px solid #7c3aed; }
-    .legend-swatch.today { background:var(--green-bg); border:1px solid var(--green); }
+    .legend-swatch.done { background:var(--green-bg); border:1px solid var(--green); }
+    .legend-swatch.today { background:#d1fae5; border:1px solid #10b981; }
 
     .add-panel { display:none; margin-top:12px; padding-top:12px; border-top:1px dashed var(--border); }
     .add-panel.open { display:block; }
@@ -222,9 +242,9 @@
     <!-- Re:Al Movement -->
     <section class="card">
       <div class="card-title">Re:Al Movement</div>
-      <div class="card-sub">전체 프로그램이 기본 표시됩니다. 회원 선택 시 이전 진도가 보라색으로 표시됩니다.</div>
+      <div class="card-sub">회원 선택 시 이전 진도는 <strong style="color:var(--green);font-weight:700;">초록 체크</strong>로 표시됩니다.</div>
       <div class="movement-legend">
-        <span><i class="legend-swatch done"></i>이전에 진행한 항목</span>
+        <span><i class="legend-swatch done"></i>이전에 진행한 항목 (초록 체크)</span>
         <span><i class="legend-swatch today"></i>오늘 새로 추가</span>
       </div>
       <div id="pspProgramList"><div class="empty-hint">불러오는 중…</div></div>
@@ -675,16 +695,18 @@
           } else {
             html += '<div class="psp-part-hd" style="margin-top:4px;"><span>'+escapeHtml(progName)+'</span></div>';
           }
-          html += '<div class="psp-part-card">';
+          html += '<div class="psp-part-card'+(secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0 ? ' horizontal' : '')+'">';
           items.forEach(function(item){
             const checked = hasMember && isMethodChecked(item.id);
             const rowCls = hasMember ? methodRowClass(item.id) : '';
             const tagLabel = item.hasVideo ? (secKey === 'self_tool' ? '링크' : '영상') : 'URL없음';
-            const vidTag = '<span class="vid-tag'+(item.hasVideo?' ok':'')+'">'+tagLabel+'</span>';
+            const isHoriz = secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0;
+            const vidTag = isHoriz ? '' : '<span class="vid-tag'+(item.hasVideo?' ok':'')+'">'+tagLabel+'</span>';
+            const showVidLine = secKey !== 'self_tool' && item.videoTitle && item.videoTitle !== item.label;
             html += '<label class="method-row'+rowCls+'">'+
               '<input type="checkbox"'+(checked?' checked':'')+' onchange="toggleToday(\''+item.id+'\',this)">'+
               '<div><div class="method-label">'+escapeHtml(item.label)+'</div>'+
-              (item.videoTitle ? '<div class="method-vid">▶ '+escapeHtml(item.videoTitle)+'</div>' : '')+
+              (showVidLine ? '<div class="method-vid">▶ '+escapeHtml(item.videoTitle)+'</div>' : '')+
               '</div>'+vidTag+'</label>';
           });
           html += '</div>';
