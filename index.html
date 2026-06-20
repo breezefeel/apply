@@ -472,7 +472,7 @@
       </div>
       <div class="field">
         <label>오늘 포인트 (회원 알림톡 · 1~2문장)</label>
-        <textarea id="sessionCoachMemo" rows="2" maxlength="80" placeholder="예) 호흡 길게, 어깨 긴장 풀고 진행해 주세요." oninput="updateSessionWrapPreview()"></textarea>
+        <textarea id="sessionCoachMemo" rows="2" maxlength="80" placeholder="직접 작성할 멘트를 입력하세요." onfocus="onSessionCoachMemoFocus()" oninput="updateSessionWrapPreview()"></textarea>
         <div class="memo-counter"><span id="sessionMemoCount">0</span>/80</div>
       </div>
       <div class="alimtalk-preview">
@@ -681,11 +681,11 @@
     var COLLAPSIBLE_SECTIONS = ['self_tool', 'pos1_par', 'pos2', 'pos3', 'func'];
 
     var PROGRAM_STAGES = [
-      { num: 1, key: 'self_tool', title: '셀프 자극', titleEn: 'Self Tool', titleKo: '셀프 자극' },
-      { num: 2, key: 'pos1_par', title: 'Lying Position', titleEn: 'Lying', titleKo: 'Lying Position' },
-      { num: 3, key: 'pos2', title: 'Sitting Position', titleEn: 'Sitting', titleKo: 'Sitting Position' },
-      { num: 4, key: 'pos3', title: 'Standing Position', titleEn: 'Standing', titleKo: 'Standing Position' },
-      { num: 5, key: 'func', title: '기능운동', titleEn: 'Functional', titleKo: '기능운동' },
+      { num: 1, key: 'self_tool', title: '셀프 통증케어', titleEn: 'Self Tool', titleKo: '소도구 자극' },
+      { num: 2, key: 'pos1_par', title: '누운 자세', titleEn: 'Lying', titleKo: 'Lying Position' },
+      { num: 3, key: 'pos2', title: '앉은 자세', titleEn: 'Sitting', titleKo: 'Sitting Position' },
+      { num: 4, key: 'pos3', title: '선 자세', titleEn: 'Standing', titleKo: 'Standing Position' },
+      { num: 5, key: 'func', title: '기능운동', titleEn: 'Functional', titleKo: 'Advanced' },
     ];
 
     function stageForUiSection(uiSection) {
@@ -790,6 +790,21 @@
       return labels;
     }
 
+    const DEFAULT_SESSION_COACH_MEMO = '꾸준함이 가장 큰 변화를 만듭니다. 오늘도 잘 하셨어요! 💪';
+
+    function onSessionCoachMemoFocus() {
+      var el = document.getElementById('sessionCoachMemo');
+      if (!el || el.dataset.usingDefault !== '1') return;
+      el.value = '';
+      el.dataset.usingDefault = '';
+      updateSessionWrapPreview();
+    }
+
+    function effectiveSessionCoachMemo(raw) {
+      var v = String(raw != null ? raw : '').trim();
+      return v || DEFAULT_SESSION_COACH_MEMO;
+    }
+
     function buildAttendAlimtalkPreview(m, summary, memo, linkIds) {
       var stage = PROGRAM_STAGES.find(function(s) { return s.num === summary.currentStageNum; }) || PROGRAM_STAGES[0];
       var stageLine = summary.currentStageNum + '/5단계 · ' + stage.titleEn;
@@ -818,9 +833,7 @@
       document.getElementById('sessionWrapMemberHint').textContent =
         (m.name || '회원') + (m.sessionDisplay ? ' · ' + m.sessionDisplay : '');
       document.getElementById('sessionWrapIntro').innerHTML =
-        '저희 프로그램은 <strong>가장 안전한 방법부터 시작해서 기능까지</strong>를 목표로 <strong>5단계</strong>로 진행하고 있어요.<br><br>' +
-        '현재 몸 상태를 평가해봤을 때 <strong>' + escapeHtml(formatStageRecommendList(summary.recommendedNums)) +
-        '</strong>부터 진행하는 게 좋을 것 같아요.';
+        '<strong>리얼 무브먼트 5단계 프로토콜</strong>';
       var roadmap = document.getElementById('sessionStageRoadmap');
       roadmap.innerHTML = '';
       summary.stages.forEach(function(st) {
@@ -856,17 +869,18 @@
         }).join('');
       }
       var memoEl = document.getElementById('sessionCoachMemo');
-      if (!memoEl.dataset.touched) memoEl.value = '';
+      memoEl.value = DEFAULT_SESSION_COACH_MEMO;
+      memoEl.dataset.usingDefault = '1';
       updateSessionWrapPreview();
     }
 
     function updateSessionWrapPreview() {
       var m = state.selected;
       var memoEl = document.getElementById('sessionCoachMemo');
-      var memo = memoEl ? memoEl.value : '';
+      var raw = memoEl ? memoEl.value : '';
+      var memo = effectiveSessionCoachMemo(raw);
       if (memoEl) {
-        memoEl.dataset.touched = memo ? '1' : '';
-        document.getElementById('sessionMemoCount').textContent = String(memo.length);
+        document.getElementById('sessionMemoCount').textContent = String(raw.length);
       }
       var summary = computeProgramStageSummary();
       document.getElementById('sessionAlimtalkPreview').textContent =
@@ -890,7 +904,7 @@
       var summary = computeProgramStageSummary();
       var stage = PROGRAM_STAGES.find(function(s) { return s.num === summary.currentStageNum; }) || PROGRAM_STAGES[0];
       var memoEl = document.getElementById('sessionCoachMemo');
-      var memo = memoEl ? String(memoEl.value || '').trim().slice(0, 80) : '';
+      var memo = memoEl ? effectiveSessionCoachMemo(memoEl.value).slice(0, 80) : DEFAULT_SESSION_COACH_MEMO;
       var linkIds = getSessionLinkIds();
       var todayIds = todayProgressEntries().map(function(e) { return e.id; });
       return {
@@ -1545,6 +1559,19 @@
       document.getElementById('extraPassModal').classList.add('open');
     }
 
+    function alimtalkHint(alimtalk) {
+      if (!alimtalk) return '';
+      var ev = alimtalk.everyVisit || alimtalk;
+      if (ev && ev.ok) return '';
+      if (ev && ev.skipped) {
+        if (ev.reason === 'no_template') return ' · 알림톡 미발송(템플릿 미설정)';
+        if (ev.reason === 'solapi') return ' · 알림톡 미발송(Solapi 미설정)';
+        if (ev.reason === 'no_phone') return ' · 알림톡 미발송(회원 전화번호 없음)';
+        if (ev.reason === 'no_config') return ' · 알림톡 미발송(설정 없음)';
+      }
+      return ' · 알림톡 미발송';
+    }
+
     async function runCompleteSession(m, progress, opts) {
       opts = opts || {};
       document.getElementById('saveBtn').disabled = true;
@@ -1570,7 +1597,8 @@
       _pendingAttendAlimtalk = null;
       if (data.completed) {
         const sess = data.sessionDisplay ? ' (' + data.sessionDisplay + ')' : '';
-        toast((opts.basicAttendOnly ? '출석 완료' : '저장·출석 완료') + sess);
+        const ataHint = alimtalkHint(data.alimtalk);
+        toast((opts.basicAttendOnly ? '출석 완료' : '저장·출석 완료') + sess + ataHint);
       } else {
         toast(data.attendMessage || '진도 저장됨');
       }
