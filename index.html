@@ -230,6 +230,7 @@
     .toast { position:fixed; top:12px; left:50%; transform:translateX(-50%); background:#1e293b; color:#fff; padding:10px 16px; border-radius:999px; font-size:13px; z-index:300; opacity:0; transition:opacity .2s; pointer-events:none; }
     .toast.show { opacity:1; }
     .empty-hint { text-align:center; color:var(--dim); font-size:13px; padding:16px 8px; }
+    .load-countdown { display:block; font-size:11px; color:#94a3b8; margin-top:4px; font-weight:600; }
 
     .send-link-list { display:flex; flex-direction:column; gap:6px; margin:12px 0 16px; max-height:42vh; overflow:auto; }
     .send-link-item {
@@ -980,12 +981,50 @@
     function escapeHtml(s) {
       return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
-    async function api(payload) {
+    var BOARD_LOAD_ESTIMATE_SEC = 10;
+    var _loadCountdownTimer = null;
+
+    function clearLoadCountdown() {
+      if (_loadCountdownTimer) {
+        clearInterval(_loadCountdownTimer);
+        _loadCountdownTimer = null;
+      }
+    }
+
+    function setMemberChipsMessage(msg, countdownSec) {
+      var extra = '';
+      if (typeof countdownSec === 'number' && countdownSec >= 0) {
+        extra = '<span class="load-countdown">예상 ' + countdownSec + '초 · 서버에서 회원 목록을 가져오는 중</span>';
+      }
+      document.getElementById('memberChips').innerHTML =
+        '<span class="empty-hint">' + escapeHtml(msg) + extra + '</span>';
+    }
+
+    function startMemberLoadCountdown() {
+      clearLoadCountdown();
+      var left = BOARD_LOAD_ESTIMATE_SEC;
+      setMemberChipsMessage('불러오는 중…', left);
+      _loadCountdownTimer = setInterval(function() {
+        left--;
+        if (left < 0) {
+          setMemberChipsMessage('불러오는 중… 시간이 길어지고 있습니다. 잠시만 기다려 주세요', null);
+          return;
+        }
+        setMemberChipsMessage('불러오는 중…', left);
+      }, 1000);
+    }
+
+    async function api(payload, opts) {
+      opts = opts || {};
+      var timeoutMs = opts.timeoutMs != null ? opts.timeoutMs : 55000;
+      var controller = new AbortController();
+      var timer = setTimeout(function() { controller.abort(); }, timeoutMs);
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify(Object.assign({ pin: state.pin }, payload)),
+          signal: controller.signal,
         });
         const text = await res.text();
         try {
@@ -994,11 +1033,13 @@
           return { ok: false, message: '서버 응답 형식 오류' };
         }
       } catch (err) {
+        if (err && err.name === 'AbortError') {
+          return { ok: false, offline: true, message: '서버 응답 시간 초과(약 ' + Math.round(timeoutMs / 1000) + '초) — 새로고침해 주세요' };
+        }
         return { ok: false, offline: true, message: '서버 연결 실패 (로컬 파일이면 웹 호스팅 필요)' };
+      } finally {
+        clearTimeout(timer);
       }
-    }
-    function setMemberChipsMessage(msg) {
-      document.getElementById('memberChips').innerHTML = '<span class="empty-hint">' + escapeHtml(msg) + '</span>';
     }
     function loadCustomMembers() {
       try { state.customMembers = JSON.parse(localStorage.getItem(CUSTOM_KEY) || '[]'); } catch(e) { state.customMembers = []; }
@@ -1066,40 +1107,44 @@
 
     async function loadBoard() {
       loadCustomMembers();
-      setMemberChipsMessage('불러오는 중…');
-      const data = await api({ action: 'instructorDayBoard' });
+      startMemberLoadCountdown();
+      try {
+        const data = await api({ action: 'instructorDayBoard' }, { timeoutMs: 55000 });
 
-      if (data.needPin) {
-        showPin(true);
-        state.boardOnline = false;
-        document.getElementById('dateLine').textContent = '강사 PIN 입력 필요';
-        setMemberChipsMessage('PIN 입력 후 회원 목록을 불러옵니다');
+        if (data.needPin) {
+          showPin(true);
+          state.boardOnline = false;
+          document.getElementById('dateLine').textContent = '강사 PIN 입력 필요';
+          setMemberChipsMessage('PIN 입력 후 회원 목록을 불러옵니다');
+          renderProgramList();
+          return;
+        }
+
+        if (!data.ok) {
+          state.boardOnline = false;
+          document.getElementById('dateLine').textContent = '오프라인 · 프로그램만 표시';
+          setMemberChipsMessage(data.offline
+            ? '서버 연결 실패 — HTTPS로 열거나 새로고침'
+            : (data.message || '회원 목록 불러오기 실패'));
+          if (!state.program.length) state.program = buildLocalProgram();
+          renderProgramList();
+          toast(data.message || '서버 연결 실패');
+          return;
+        }
+
+        state.board = data;
+        state.boardOnline = true;
+        state.program = data.pspProgram || data.pspCatalog || state.program;
+        document.getElementById('dateLine').textContent =
+          (data.date || '') + ' (' + (data.dayKr || '') + ') · 예약 ' + (data.members || []).length + '명';
+        renderMemberChips();
         renderProgramList();
-        return;
-      }
-
-      if (!data.ok) {
-        state.boardOnline = false;
-        document.getElementById('dateLine').textContent = '오프라인 · 프로그램만 표시';
-        setMemberChipsMessage(data.offline
-          ? '서버 연결 실패 — HTTPS로 열거나 새로고침'
-          : (data.message || '회원 목록 불러오기 실패'));
-        if (!state.program.length) state.program = buildLocalProgram();
-        renderProgramList();
-        toast(data.message || '서버 연결 실패');
-        return;
-      }
-
-      state.board = data;
-      state.boardOnline = true;
-      state.program = data.pspProgram || data.pspCatalog || state.program;
-      document.getElementById('dateLine').textContent =
-        (data.date || '') + ' (' + (data.dayKr || '') + ') · 예약 ' + (data.members || []).length + '명';
-      renderMemberChips();
-      renderProgramList();
-      if (state.selectedKey) {
-        const m = todayMembers().find(function(x) { return memberKey(x) === state.selectedKey; });
-        if (m) selectMember(m, false);
+        if (state.selectedKey) {
+          const m = todayMembers().find(function(x) { return memberKey(x) === state.selectedKey; });
+          if (m) selectMember(m, false);
+        }
+      } finally {
+        clearLoadCountdown();
       }
     }
 
