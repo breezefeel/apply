@@ -1022,7 +1022,7 @@
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(Object.assign({ pin: state.pin }, payload)),
           signal: controller.signal,
         });
@@ -1030,13 +1030,16 @@
         try {
           return JSON.parse(text);
         } catch (parseErr) {
-          return { ok: false, message: '서버 응답 형식 오류' };
+          return { ok: false, message: '서버 응답 형식 오류 — Apps Script 배포·URL 확인' };
         }
       } catch (err) {
         if (err && err.name === 'AbortError') {
-          return { ok: false, offline: true, message: '서버 응답 시간 초과(약 ' + Math.round(timeoutMs / 1000) + '초) — 새로고침해 주세요' };
+          return { ok: false, offline: true, message: '서버 응답 시간 초과(약 ' + Math.round(timeoutMs / 1000) + '초) — code.gs 배포 후 새로고침' };
         }
-        return { ok: false, offline: true, message: '서버 연결 실패 (로컬 파일이면 웹 호스팅 필요)' };
+        var hint = (location.protocol === 'file:')
+          ? 'HTML 파일을 직접 열면 안 됩니다 — GitHub Pages 등 HTTPS 주소로 열어 주세요'
+          : '인터넷·Apps Script 배포 상태를 확인하고 새로고침해 주세요';
+        return { ok: false, offline: true, message: hint };
       } finally {
         clearTimeout(timer);
       }
@@ -1109,7 +1112,7 @@
       loadCustomMembers();
       startMemberLoadCountdown();
       try {
-        const data = await api({ action: 'instructorDayBoard' }, { timeoutMs: 55000 });
+        const data = await api({ action: 'instructorDayBoard' }, { timeoutMs: 75000 });
 
         if (data.needPin) {
           showPin(true);
@@ -1123,9 +1126,9 @@
         if (!data.ok) {
           state.boardOnline = false;
           document.getElementById('dateLine').textContent = '오프라인 · 프로그램만 표시';
-          setMemberChipsMessage(data.offline
-            ? '서버 연결 실패 — HTTPS로 열거나 새로고침'
-            : (data.message || '회원 목록 불러오기 실패'));
+          setMemberChipsMessage(data.message || (data.offline
+            ? '서버 연결 실패'
+            : '회원 목록 불러오기 실패'));
           if (!state.program.length) state.program = buildLocalProgram();
           renderProgramList();
           toast(data.message || '서버 연결 실패');
