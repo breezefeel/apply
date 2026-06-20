@@ -37,14 +37,19 @@
     .btn-save { background:var(--blue); color:#fff; }
     .btn:disabled { opacity:.45; cursor:not-allowed; }
 
-    /* 오늘 회원 — 강사별 3줄 */
+    /* 오늘 회원 — 강사명 + 회원 칩 한 줄(넘치면 줄바꿈) */
     .instructor-rows { display:flex; flex-direction:column; gap:10px; }
-    .inst-row { display:flex; flex-direction:column; gap:6px; }
-    .inst-row-hd {
-      font-size:11px; font-weight:800; padding:5px 10px; border-radius:8px;
-      color:var(--text);
+    .inst-row {
+      display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px;
     }
-    .inst-row-chips { display:flex; flex-wrap:wrap; gap:8px; padding-left:2px; }
+    .inst-row-hd {
+      flex:0 0 auto;
+      font-size:11px; font-weight:800; padding:5px 10px; border-radius:8px;
+      color:var(--text); white-space:nowrap;
+    }
+    .inst-row-chips {
+      display:contents;
+    }
     .inst-empty { font-size:12px; color:var(--dim); padding:4px 8px; }
     .member-chip {
       border:2px solid var(--border); border-radius:999px;
@@ -85,6 +90,26 @@
       padding:8px 10px; background:var(--blue-bg);
       border-radius:8px 8px 0 0; border:1px solid #bfdbfe; border-bottom:none;
     }
+    .psp-section.collapsible .psp-section-hd {
+      cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+      gap:8px; user-select:none;
+    }
+    .psp-section-hd .section-meta {
+      font-size:10px; font-weight:700; padding:2px 7px; border-radius:999px; margin-left:auto;
+    }
+    .psp-section-hd .section-meta-done { background:var(--green-bg); color:#047857; }
+    .psp-section-hd .section-meta-partial { background:#fef3c7; color:#b45309; }
+    .psp-section.collapsible .psp-section-hd::after {
+      content:'▾'; font-size:11px; opacity:.55; flex-shrink:0;
+      transition:transform .15s;
+    }
+    .psp-section.collapsible.collapsed .psp-section-hd {
+      border-radius:8px; border-bottom:1px solid #bfdbfe;
+    }
+    .psp-section.collapsible.collapsed .psp-section-hd::after {
+      transform:rotate(-90deg);
+    }
+    .psp-section.collapsible.collapsed .psp-section-body { display:none; }
     .psp-section-body {
       border:1px solid var(--border); border-radius:0 0 10px 10px;
       padding:10px; background:#fafbfd;
@@ -131,7 +156,8 @@
       background:var(--green-bg); border-left:3px solid var(--green);
     }
     .method-row.done .method-label { color:#047857; font-weight:600; }
-    .method-row.done input[type="checkbox"] {
+    .method-row.done input[type="checkbox"],
+    .method-row.done .check-prior-only {
       accent-color: var(--green);
       width:18px; height:18px;
     }
@@ -140,7 +166,11 @@
       box-shadow: inset 0 0 0 1px rgba(5,150,105,.25);
     }
     .method-row.today input[type="checkbox"] { accent-color: #10b981; }
-    .method-row input { width:18px; height:18px; margin-top:2px; cursor:pointer; }
+    .method-row.today .today-badge {
+      font-size:9px; font-weight:800; color:#047857;
+      background:#a7f3d0; padding:1px 5px; border-radius:4px; margin-left:4px;
+    }
+    .method-row input { width:18px; height:18px; margin-top:2px; cursor:pointer; flex-shrink:0; }
     .method-label { font-size:12px; font-weight:500; line-height:1.45; }
     .method-vid { font-size:10px; color:var(--green); margin-top:2px; }
     .vid-tag { font-size:10px; padding:2px 6px; border-radius:5px; background:#f1f5f9; color:#94a3b8; }
@@ -200,6 +230,18 @@
     .toast { position:fixed; top:12px; left:50%; transform:translateX(-50%); background:#1e293b; color:#fff; padding:10px 16px; border-radius:999px; font-size:13px; z-index:300; opacity:0; transition:opacity .2s; pointer-events:none; }
     .toast.show { opacity:1; }
     .empty-hint { text-align:center; color:var(--dim); font-size:13px; padding:16px 8px; }
+
+    .send-link-list { display:flex; flex-direction:column; gap:6px; margin:12px 0 16px; max-height:42vh; overflow:auto; }
+    .send-link-item {
+      display:flex; align-items:flex-start; gap:8px; padding:8px 10px;
+      border:1px solid var(--border); border-radius:8px; background:#f8fafc;
+    }
+    .send-link-item input { margin-top:2px; flex-shrink:0; }
+    .send-link-item .send-link-label { font-size:12px; font-weight:600; line-height:1.45; flex:1; }
+    .send-link-item .send-link-vid { font-size:10px; color:var(--green); margin-top:2px; }
+    .send-link-empty { font-size:12px; color:var(--dim); padding:12px 4px; text-align:center; }
+    .send-link-actions { display:flex; gap:8px; }
+    .send-link-actions .btn { flex:1; }
   </style>
 </head>
 <body>
@@ -220,7 +262,7 @@
     <!-- 1. 오늘 예약 회원 -->
     <section class="card">
       <div class="card-title">오늘 예약 회원</div>
-      <div class="card-sub">강사별 3줄 · 시트와 동일한 색상 · 완료 회원은 취소선</div>
+      <div class="card-sub">강사별 한 줄 · 시트와 동일한 색상 · 완료 회원은 취소선</div>
       <div class="toolbar">
         <button type="button" class="btn btn-ghost" onclick="loadBoard()">새로고침</button>
         <button type="button" class="btn btn-ghost" onclick="toggleAddMember()">+ 회원 추가</button>
@@ -242,10 +284,10 @@
     <!-- Re:Al Movement -->
     <section class="card">
       <div class="card-title">Re:Al Movement</div>
-      <div class="card-sub">회원 선택 시 이전 진도는 <strong style="color:var(--green);font-weight:700;">초록 체크</strong>로 표시됩니다.</div>
+      <div class="card-sub">이전 진도는 <strong style="color:var(--green);font-weight:700;">초록 체크</strong>, 오늘 진행은 <strong style="color:#047857;font-weight:700;">오늘</strong> 표시 · 초록 항목을 다시 누르면 오늘 진행으로 표시됩니다.</div>
       <div class="movement-legend">
-        <span><i class="legend-swatch done"></i>이전에 진행한 항목 (초록 체크)</span>
-        <span><i class="legend-swatch today"></i>오늘 새로 추가</span>
+        <span><i class="legend-swatch done"></i>이전에 진행한 항목</span>
+        <span><i class="legend-swatch today"></i>오늘 진행한 항목</span>
       </div>
       <div id="pspProgramList"><div class="empty-hint">불러오는 중…</div></div>
     </section>
@@ -257,7 +299,7 @@
       <span id="sendCountLabel">오늘 0개 선택</span>
     </div>
     <div class="actions">
-      <button type="button" class="btn btn-green" id="sendBtn" onclick="sendChecked()" disabled>영상 보내기</button>
+      <button type="button" class="btn btn-green" id="sendBtn" onclick="openSendLinkModal()" disabled>링크 전송</button>
       <button type="button" class="btn btn-save" id="saveBtn" onclick="saveSession()" disabled>저장하기</button>
     </div>
   </div>
@@ -293,6 +335,52 @@
             <button type="button" class="btn btn-green" style="width:100%;" onclick="sendEvalSms()">보내기 (SMS)</button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 출석 확인 (출석부와 동일) -->
+  <div class="modal-overlay" id="extraPassModal">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-hd">
+        <h2>출석 확인</h2>
+        <button type="button" class="modal-close" onclick="closeExtraPassModal()">×</button>
+      </div>
+      <p id="extraPassModalText" style="font-size:14px;line-height:1.55;margin-bottom:16px;">이미 오늘 출석이 기록되어 있습니다. 수강권을 하나 더 사용하시겠습니까?</p>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="btn btn-primary" style="flex:1;" onclick="confirmExtraPassSave(true)">네, 사용할게요</button>
+        <button type="button" class="btn btn-ghost" style="flex:1;" onclick="confirmExtraPassSave(false)">아니요</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="phonePickerModal">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-hd">
+        <h2>회원 선택</h2>
+        <button type="button" class="modal-close" onclick="closePhonePickerModal()">×</button>
+      </div>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:12px;">동일한 번호가 여러 건 있습니다. 회원을 선택해 주세요.</p>
+      <div id="phonePickerBtns" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+  </div>
+
+  <!-- 링크 전송 확인 -->
+  <div class="modal-overlay" id="sendLinkModal">
+    <div class="modal" style="max-width:440px;">
+      <div class="modal-hd">
+        <h2>링크 전송</h2>
+        <button type="button" class="modal-close" onclick="closeSendLinkModal()">×</button>
+      </div>
+      <div class="field">
+        <label>연락처</label>
+        <input type="tel" id="sendLinkPhone" placeholder="01012345678">
+      </div>
+      <p style="font-size:11px;color:var(--dim);margin-bottom:6px;">전송할 항목 (체크 해제 가능)</p>
+      <div class="send-link-list" id="sendLinkItems"></div>
+      <div class="send-link-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeSendLinkModal()">취소</button>
+        <button type="button" class="btn btn-green" id="sendLinkConfirmBtn" onclick="confirmSendLinks()">전송</button>
       </div>
     </div>
   </div>
@@ -341,17 +429,20 @@
       { id:'ball_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'복부', linkUrl:'https://www.youtube.com/shorts/zjvXLTL9E5A' },
       { id:'ball_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'엉덩이', linkUrl:'https://m.blog.naver.com/allenjoy/223442108509' },
       { id:'ball_scapula', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'견갑골', linkUrl:'https://m.blog.naver.com/allenjoy/223449532242' },
-      { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'① Supine Lower', label:'Passive Stretching (P-ROM) · 발→발목→무릎→고관절' },
-      { id:'p1_sl_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'① Supine Lower', label:'Assisted Active (CIE · Hold&Relax · Pull&Push)' },
-      { id:'p1_sl_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'① Supine Lower', label:'Resistive(베이직) · 하지 근막경선' },
-      { id:'p1_su_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'② Supine Upper', label:'Passive Stretching (P-ROM) · 손가락→손목→팔꿈치→어깨' },
-      { id:'p1_su_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'② Supine Upper', label:'Assisted Active · 상지' },
-      { id:'p1_su_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'② Supine Upper', label:'Resistive(베이직) · 상지 근막경선' },
-      { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'③ Prone Lower', label:'Passive Stretching · Prone 하지' },
-      { id:'p1_pl_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'③ Prone Lower', label:'Resistive(베이직) · Prone 하지' },
-      { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Passive Stretching · Prone 상지·척추' },
-      { id:'p1_pu_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Resistive(베이직) · Prone 상지' },
-      { id:'post_breath', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬 (엉덩이→발→무릎→척추→어깨→손끝)' },
+      { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'① Supine Lower', label:'Passive Stretching' },
+      { id:'p1_sl_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'① Supine Lower', label:'Assisted Active' },
+      { id:'p1_sl_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'① Supine Lower', label:'Resistive' },
+      { id:'p1_su_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'② Supine Upper', label:'Passive Stretching' },
+      { id:'p1_su_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'② Supine Upper', label:'Assisted Active' },
+      { id:'p1_su_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'② Supine Upper', label:'Resistive' },
+      { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'③ Prone Lower', label:'Passive Stretching' },
+      { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'③ Prone Lower', label:'Assisted Active' },
+      { id:'p1_pl_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'③ Prone Lower', label:'Resistive' },
+      { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Passive Stretching' },
+      { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Assisted Active' },
+      { id:'p1_pu_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Resistive' },
+      { id:'post_breath_relax', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'1 · 누워서 호흡 운동', label:'편안한 호흡' },
+      { id:'post_breath', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬 (엉덩이→발→머리→어깨→손끝)' },
       { id:'post_super_1', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'3 · Prone Superman 6단계', label:'① 척추 — 경추부터 척추분절 순으로 전체 들기' },
       { id:'post_super_2', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'3 · Prone Superman 6단계', label:'② 대각선 — 한 손 + 반대 발 동시 들기' },
       { id:'post_super_3', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'3 · Prone Superman 6단계', label:'③ 양손·양발 — 낮게 동시 들기' },
@@ -364,17 +455,55 @@
       { id:'post_situp_4', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'2 · Supine Sit-up 6단계', label:'④ 하체 — 등 닿은 상태 다리 한쪽씩 → 양쪽 동시' },
       { id:'post_situp_5', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'2 · Supine Sit-up 6단계', label:'⑤ 정식 Sit-up — 통증 없는 범위' },
       { id:'post_situp_6', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'2 · Supine Sit-up 6단계', label:'⑥ 구르기 — 뒤로 굴렀다 복귀, 무릎 펴고 발끝 닿기' },
-      { id:'p2_a_front', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active', label:'전방 경선 — 경추 굴곡·흉추 굴곡·고관절 굴곡·발목 배굴' },
-      { id:'p2_a_back', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active', label:'후방 경선 — 경추 신전·흉추 신전·햄스트링·발목 저굴' },
-      { id:'p2_a_lat', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active', label:'측방 경선 — 경추·흉추 측굴·고관절 외전·발목 내외번' },
-      { id:'p2_a_spiral', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active', label:'나선·회전 경선 — 경추·흉추 회전·견갑·GH 회전' },
-      { id:'p2_p_supp', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'A-ROM 보완', label:'Passive Stretching 보완 (P-ROM)' },
-      { id:'p2_sit_breath', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'생활습관', label:'바르게 앉기 · 호흡 정렬 (골반→척추→어깨)' },
-      { id:'p3_stand', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'기능 패턴', label:'서기 · 보행 · 하체 정렬' },
-      { id:'p3_squat', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'기능 패턴', label:'스쿼트 · 밸런스 자세 교정' },
-      { id:'func_resist', uiSection:'func', sectionTitle:'기능운동', program:'Resistive(어드밴스드)', label:'전신 통합 저항 운동 8종' },
-      { id:'func_daily', uiSection:'func', sectionTitle:'기능운동', program:'일상 동작', label:'기능적 패턴 · 일상·작업 동작 훈련' },
-      { id:'func_walk', uiSection:'func', sectionTitle:'기능운동', program:'보행', label:'보행 · 하체 정렬 홈트' },
+      { id:'p2_a_front', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active Stretching', label:'전방 경선 — 경추 굴곡·흉추 굴곡·고관절 굴곡·발목 배굴' },
+      { id:'p2_a_back', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active Stretching', label:'후방 경선 — 경추 신전·흉추 신전·햄스트링·발목 저굴' },
+      { id:'p2_a_lat', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active Stretching', label:'측방 경선 — 경추·흉추 측굴·고관절 외전·발목 내외번' },
+      { id:'p2_a_spiral', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active Stretching', label:'나선·회전 경선 — 경추·흉추 회전·견갑·GH 회전' },
+      { id:'p2_sit_posture', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'생활습관', label:'바르게 앉는 방법' },
+      { id:'p2_sit_breath', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'생활습관', label:'호흡 운동 + 등척성 정렬 (엉덩이→머리→어깨→손끝)' },
+      { id:'p2_seg_1', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동', label:'① 시작 정렬 — 바르게 앉아 양팔 벌리고 손끝 바깥으로 길게 뻗기' },
+      { id:'p2_seg_2', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동', label:'② 앞으로 모으기(날숨 5초) — 손등부터 Internal rotation' },
+      { id:'p2_seg_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동', label:'③ 근위 분절 연결 — 팔꿈치→어깨 순차 Internal rotation' },
+      { id:'p2_seg_4', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동', label:'④ 척추 굴곡 동반 — 전 구간 Flexion으로 연결' },
+      { id:'p2_seg_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동', label:'⑤ 뒤로 벌리기(들숨 5초) — 손부터 External rotation 순차 진행' },
+      { id:'p2_seg_6', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동', label:'⑥ 마무리 정렬 — Lower thoracic 갈비뼈 살짝 누르기 + 전 구간 Extension' },
+      { id:'p2_pushup_1', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'① 무릎 대고 네발 — 웨이브로 내려갔다 올라오기' },
+      { id:'p2_pushup_2', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'② 무릎 지지 — 몸통+골반 동시 하강 → 웨이브로 상승' },
+      { id:'p2_pushup_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'③ 무릎 지지 — 몸통+골반 동시 하강·상승 (웨이브 없이)' },
+      { id:'p2_pushup_4', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'④ 무릎 뗀 네발 — 웨이브로 내려갔다 올라오기' },
+      { id:'p2_pushup_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'⑤ 무릎 뗀 네발 — 몸통+골반 동시 하강 → 웨이브로 상승' },
+      { id:'p2_pushup_6', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'⑥ 정상 Push-up — 통증 없는 범위에서 완성 동작' },
+      { id:'p3_a_upper_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 상체', label:'① 상지 — 손·손목·팔 연쇄' },
+      { id:'p3_a_upper_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 상체', label:'② 목 — 경추 굴곡·신전·측굴·회전' },
+      { id:'p3_a_upper_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 상체', label:'③ 어깨 — GH·견갑 연쇄' },
+      { id:'p3_a_upper_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 상체', label:'④ 몸통 — 흉·요추 분절 (Roll down/up)' },
+      { id:'p3_a_lower_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 하체', label:'① 허리 — 요추·골반 정렬' },
+      { id:'p3_a_lower_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 하체', label:'② 고관절 — 굴곡·신전·회전' },
+      { id:'p3_a_lower_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 하체', label:'③ 무릎 — 슬관절 가동' },
+      { id:'p3_a_lower_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 하체', label:'④ 발목 — 족부·종아리 연쇄' },
+      { id:'p3_balance_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'① 일어선 상태 한발 살짝 들기 — 30초 유지 (좌·우)' },
+      { id:'p3_balance_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'② 무릎 높이까지 들어 올리기 — 30초 유지 (좌·우)' },
+      { id:'p3_balance_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'③ 한 발 지지 · 반대 다리 뒤로 짧게 뻗기 + 소폭 전굴' },
+      { id:'p3_balance_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'④ 한 발 지지 · 반대 다리 뒤로 뻗기(발 미접지) + 전굴' },
+      { id:'p3_balance_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑤ ④ 자세에서 반대 다리 앞으로 — 대퇴 수평(무릎 약 90°)' },
+      { id:'p3_balance_6', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑥ 최종 — 뒤로 뻗기(전굴)→무릎 들기 한 사이클 연속·리듬 있게' },
+      { id:'p3_squat_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'① 의자에 살짝 걸터 앉은 상태 — 엉덩이 앞으로 떼었다 앉기' },
+      { id:'p3_squat_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'② 엉덩이 앞으로 뗀 뒤 — 일어났다가 다시 앉기' },
+      { id:'p3_squat_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'③ 일어났다가 깊게 앉았다가 — 의자 높이까지 일어난 후 다시 앉기' },
+      { id:'p3_squat_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'④ 한쪽 다리에 중심 — ①번 동작 (좌·우)' },
+      { id:'p3_squat_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'⑤ 한쪽 다리에 중심 — ②번 동작 (좌·우)' },
+      { id:'p3_squat_6', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'⑥ 한쪽 다리에 중심 — ③번 동작 (좌·우)' },
+      { id:'p3_stand_posture', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 서기' },
+      { id:'p3_stand_breath', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'호흡 정렬 운동' },
+      { id:'p3_stand_walk', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 걷기' },
+      { id:'func_adv_a', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'A' },
+      { id:'func_adv_b', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'B' },
+      { id:'func_adv_c', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'C' },
+      { id:'func_adv_d', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'D' },
+      { id:'func_adv_e', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'E' },
+      { id:'func_adv_f', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'F' },
+      { id:'func_adv_g', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'G' },
+      { id:'func_adv_h', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'H' },
     ];
     function buildLocalProgram() {
       return MOVEMENT_CATALOG_RAW.map(function(item) {
@@ -400,7 +529,69 @@
       customMembers: [],
       evalReportText: '',
       completedKeys: {},
+      sectionCollapsed: {},
+      sectionCollapsedTouched: {},
     };
+
+    var COLLAPSIBLE_SECTIONS = ['self_tool', 'pos1_par', 'pos2', 'pos3', 'func'];
+
+    function sectionItems(secKey) {
+      return state.program.filter(function(p) { return (p.uiSection || 'other') === secKey; });
+    }
+
+    function sectionProgressStats(secKey) {
+      const items = sectionItems(secKey);
+      const total = items.length;
+      let checked = 0;
+      items.forEach(function(item) {
+        if (state.savedProgress[item.id] || state.todayProgress[item.id]) checked++;
+      });
+      return {
+        total: total,
+        checked: checked,
+        allComplete: total > 0 && checked === total,
+        partial: checked > 0 && checked < total,
+      };
+    }
+
+    function defaultSectionCollapsed(secKey, hasMember) {
+      if (COLLAPSIBLE_SECTIONS.indexOf(secKey) < 0) return false;
+      if (hasMember) {
+        const stats = sectionProgressStats(secKey);
+        if (stats.allComplete) return true;
+        if (stats.partial) return false;
+      }
+      if (secKey === 'pos1_par') return false;
+      return true;
+    }
+
+    function refreshSectionCollapseDefaults() {
+      const hasMember = !!state.selected;
+      COLLAPSIBLE_SECTIONS.forEach(function(secKey) {
+        if (state.sectionCollapsedTouched[secKey]) return;
+        state.sectionCollapsed[secKey] = defaultSectionCollapsed(secKey, hasMember);
+      });
+    }
+
+    function isSectionCollapsed(secKey) {
+      if (COLLAPSIBLE_SECTIONS.indexOf(secKey) < 0) return false;
+      if (state.sectionCollapsedTouched[secKey]) {
+        return !!state.sectionCollapsed[secKey];
+      }
+      return defaultSectionCollapsed(secKey, !!state.selected);
+    }
+
+    function sectionHeaderMeta(secKey) {
+      const stats = sectionProgressStats(secKey);
+      if (!stats.total || !state.selected) return '';
+      if (stats.allComplete) {
+        return ' <span class="section-meta section-meta-done">완료 '+stats.checked+'/'+stats.total+'</span>';
+      }
+      if (stats.partial) {
+        return ' <span class="section-meta section-meta-partial">진행 '+stats.checked+'/'+stats.total+'</span>';
+      }
+      return '';
+    }
 
     function toast(msg) {
       const el = document.getElementById('toast');
@@ -471,13 +662,15 @@
       Object.keys(state.todayProgress).forEach(function(k){ if(state.todayProgress[k]) out[k]=['done']; });
       return out;
     }
-    function methodRowClass(id) {
-      if (state.todayProgress[id]) return ' today';
-      if (state.savedProgress[id]) return ' done';
-      return '';
+    function todayProgressMap() {
+      const out = {};
+      Object.keys(state.todayProgress).forEach(function(k){ if(state.todayProgress[k]) out[k]=['done']; });
+      return out;
     }
-    function isMethodChecked(id) {
-      return !!(state.savedProgress[id] || state.todayProgress[id]);
+    function sendableMethodIds() {
+      return state.program.filter(function(p) {
+        return (state.savedProgress[p.id] || state.todayProgress[p.id]) && p.hasVideo;
+      }).map(function(p) { return p.id; });
     }
 
     function showPin(show) {
@@ -599,6 +792,8 @@
       state.selectedKey = memberKey(m);
       state.todayProgress = {};
       state.savedProgress = {};
+      state.sectionCollapsedTouched = {};
+      state.sectionCollapsed = {};
       const prog = m.pspProgress || {};
       Object.keys(prog).forEach(function(id){
         if (prog[id] && prog[id].length) state.savedProgress[id] = true;
@@ -628,9 +823,16 @@
       document.getElementById('briefMemo').textContent = memo;
 
       document.getElementById('sendMemberLabel').textContent = (m.name || '회원') + '님';
+      refreshSectionCollapseDefaults();
       renderMemberChips();
       renderProgramList();
       updateSendBar();
+    }
+
+    function toggleSectionCollapse(key) {
+      state.sectionCollapsedTouched[key] = true;
+      state.sectionCollapsed[key] = !isSectionCollapsed(key);
+      renderProgramList();
     }
 
     function renderProgramList() {
@@ -656,7 +858,15 @@
       sections.forEach(function(secKey){
         const g = grouped[secKey];
         if (!g) return;
-        html += '<div class="psp-section"><div class="psp-section-hd">'+escapeHtml(g.title)+'</div><div class="psp-section-body">';
+        const isCollapsible = COLLAPSIBLE_SECTIONS.indexOf(secKey) >= 0;
+        const collapsed = isCollapsible && isSectionCollapsed(secKey);
+        html += '<div class="psp-section'+(isCollapsible?' collapsible':'')+(collapsed?' collapsed':'')+'">';
+        if (isCollapsible) {
+          html += '<div class="psp-section-hd" onclick="toggleSectionCollapse(\''+secKey+'\')">'+escapeHtml(g.title)+sectionHeaderMeta(secKey)+'</div>';
+        } else {
+          html += '<div class="psp-section-hd">'+escapeHtml(g.title)+'</div>';
+        }
+        html += '<div class="psp-section-body">';
         if (secKey === 'posture') {
           html += '<div class="psp-goal-box"><strong>공통 목표</strong> — '+escapeHtml(SECTION_META.posture.goal)+'</div>';
           html += '<div class="psp-trio">';
@@ -697,15 +907,22 @@
           }
           html += '<div class="psp-part-card'+(secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0 ? ' horizontal' : '')+'">';
           items.forEach(function(item){
-            const checked = hasMember && isMethodChecked(item.id);
-            const rowCls = hasMember ? methodRowClass(item.id) : '';
+            const isPrior = hasMember && !!state.savedProgress[item.id];
+            const isToday = hasMember && !!state.todayProgress[item.id];
+            const checked = isPrior || isToday;
+            const rowCls = isToday ? ' today' : (isPrior ? ' done' : '');
+            const priorOnly = isPrior && !isToday;
             const tagLabel = item.hasVideo ? (secKey === 'self_tool' ? '링크' : '영상') : 'URL없음';
             const isHoriz = secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0;
             const vidTag = isHoriz ? '' : '<span class="vid-tag'+(item.hasVideo?' ok':'')+'">'+tagLabel+'</span>';
             const showVidLine = secKey !== 'self_tool' && item.videoTitle && item.videoTitle !== item.label;
+            const todayBadge = isToday ? '<span class="today-badge">오늘</span>' : '';
+            const priorCls = priorOnly ? ' class="check-prior-only"' : '';
+            const priorClick = priorOnly ? ' onclick="repeatPrior(\''+item.id+'\',event)"' : '';
             html += '<label class="method-row'+rowCls+'">'+
-              '<input type="checkbox"'+(checked?' checked':'')+' onchange="toggleToday(\''+item.id+'\',this)">'+
-              '<div><div class="method-label">'+escapeHtml(item.label)+'</div>'+
+              '<input type="checkbox"'+(checked?' checked':'')+priorCls+priorClick+
+              ' onchange="toggleToday(\''+item.id+'\',this)">'+
+              '<div><div class="method-label">'+escapeHtml(item.label)+todayBadge+'</div>'+
               (showVidLine ? '<div class="method-vid">▶ '+escapeHtml(item.videoTitle)+'</div>' : '')+
               '</div>'+vidTag+'</label>';
           });
@@ -716,19 +933,33 @@
       root.innerHTML = html;
     }
 
+    function repeatPrior(id, ev) {
+      if (!state.selected) return;
+      if (state.todayProgress[id]) return;
+      ev.preventDefault();
+      state.todayProgress[id] = true;
+      refreshSectionCollapseDefaults();
+      renderProgramList();
+      updateSendBar();
+      autoSaveProgress();
+    }
+
     async function toggleToday(id, cb) {
       if (!state.selected) {
         toast('회원을 먼저 선택해 주세요'); cb.checked = false; return;
       }
-      if (!state.selected.suffix8) {
-        toast('시트 연동 회원을 선택해 주세요'); cb.checked = false; return;
-      }
+      const wasPrior = !!state.savedProgress[id];
+      const wasToday = !!state.todayProgress[id];
       if (cb.checked) {
-        if (!state.savedProgress[id]) state.todayProgress[id] = true;
+        if (!wasToday) state.todayProgress[id] = true;
       } else {
-        delete state.todayProgress[id];
-        delete state.savedProgress[id];
+        if (wasToday) {
+          delete state.todayProgress[id];
+        } else if (wasPrior) {
+          delete state.savedProgress[id];
+        }
       }
+      refreshSectionCollapseDefaults();
       renderProgramList();
       updateSendBar();
       await autoSaveProgress();
@@ -748,34 +979,31 @@
         sessionNote: todayLabels.length ? '오늘 진도: ' + todayLabels.join(', ') : '',
         pspProgress: mergedProgressMap(),
       });
-      if (data.ok) {
-        Object.keys(state.todayProgress).forEach(function(k){ state.savedProgress[k]=true; });
-        state.todayProgress = {};
-        renderProgramList();
-        updateSendBar();
-      } else {
+      if (!data.ok) {
         toast(data.message || '진도 저장 실패');
       }
     }
 
     function updateSendBar() {
       const todayN = Object.keys(state.todayProgress).length;
-      const doneN = Object.keys(state.savedProgress).length;
-      const withVideo = state.program.filter(function(p){
-        return (state.todayProgress[p.id] || state.savedProgress[p.id]) && p.hasVideo;
-      }).length;
-      let label = '진도 ' + doneN + '개';
-      if (todayN) label += ' · 오늘 +' + todayN;
+      const priorN = Object.keys(state.savedProgress).length;
+      const withVideo = sendableMethodIds().length;
+      let label = '이전 ' + priorN + '개';
+      if (todayN) label += ' · 오늘 ' + todayN;
       if (withVideo) label += ' · 영상 ' + withVideo + '개';
       document.getElementById('sendCountLabel').textContent = label;
-      const hasMember = !!(state.selected && state.selected.suffix8);
-      const hasProgress = Object.keys(state.savedProgress).length + Object.keys(state.todayProgress).length > 0;
-      document.getElementById('sendBtn').disabled = !state.selected || !withVideo;
-      document.getElementById('saveBtn').disabled = !hasMember || !hasProgress;
+      const hasMember = !!state.selected;
+      const hasSheetMember = !!(state.selected && state.selected.suffix8);
+      document.getElementById('sendBtn').disabled = !hasMember || !withVideo;
+      document.getElementById('saveBtn').disabled = !hasSheetMember;
     }
 
     function sessionNoteFromProgress() {
-      const ids = Object.keys(mergedProgressMap());
+      return sessionNoteFromIds(mergedProgressMap());
+    }
+
+    function sessionNoteFromIds(progress) {
+      const ids = Object.keys(progress || {});
       const labels = ids.map(function(id) {
         const p = state.program.find(function(x) { return x.id === id; });
         return p ? p.label : id;
@@ -783,59 +1011,188 @@
       return labels.length ? '오늘 진도: ' + labels.join(', ') : '';
     }
 
-    async function saveSession() {
-      const m = state.selected;
-      if (!m || !m.suffix8) { toast('회원 선택'); return; }
-      const progress = mergedProgressMap();
-      if (!Object.keys(progress).length) { toast('진도를 체크해 주세요'); return; }
-      document.getElementById('saveBtn').disabled = true;
-      const data = await api({
+    function sessionNoteForSave() {
+      return sessionNoteFromIds(todayProgressMap());
+    }
+
+    var _pendingCompleteSession = null;
+
+    function completeSessionPayload(m, progress, opts) {
+      opts = opts || {};
+      return {
         action: 'instructorCompleteSession',
         suffix8: m.suffix8,
-        name: m.name,
+        name: opts.memberName || m.name,
         time: m.time,
         instructorIndex: m.instructorIndex,
-        rowKey: m.rowKey || m.rowIndex,
-        phoneLast4: m.phoneLast4,
+        rowKey: opts.rowKey != null ? opts.rowKey : (m.rowKey || m.rowIndex),
+        phoneLast4: opts.phoneLast4 != null ? opts.phoneLast4 : m.phoneLast4,
         specialNotes: (m.specialNotes || '').trim(),
-        sessionNote: sessionNoteFromProgress(),
+        sessionNote: sessionNoteForSave(),
         pspProgress: progress,
-      });
-      document.getElementById('saveBtn').disabled = false;
-      if (data.ok) {
-        Object.keys(state.todayProgress).forEach(function(k) { state.savedProgress[k] = true; });
-        state.todayProgress = {};
+        confirmExtraPass: !!opts.confirmExtraPass,
+      };
+    }
+
+    function applyCompleteSessionResult(m, data) {
+      Object.keys(state.todayProgress).forEach(function(k) { state.savedProgress[k] = true; });
+      state.todayProgress = {};
+      if (data.completed) {
         state.completedKeys[memberKey(m)] = true;
         m.sessionCompleted = true;
-        m.attendedToday = !!data.completed;
-        if (data.sessionDisplay) m.sessionDisplay = data.sessionDisplay;
-        if (data.completed) toast('저장·완료 처리됨');
-        else toast(data.attendMessage || '진도 저장됨');
-        renderProgramList();
-        renderMemberChips();
-        updateSendBar();
-      } else {
+        m.attendedToday = true;
+      }
+      if (data.sessionDisplay) m.sessionDisplay = data.sessionDisplay;
+      refreshSectionCollapseDefaults();
+      renderProgramList();
+      renderMemberChips();
+      updateSendBar();
+    }
+
+    function closeExtraPassModal() {
+      document.getElementById('extraPassModal').classList.remove('open');
+      _pendingCompleteSession = null;
+    }
+
+    function closePhonePickerModal() {
+      document.getElementById('phonePickerModal').classList.remove('open');
+      _pendingCompleteSession = null;
+    }
+
+    async function confirmExtraPassSave(useExtra) {
+      const pending = _pendingCompleteSession;
+      closeExtraPassModal();
+      if (!pending || !useExtra) {
+        if (pending && pending.data) {
+          applyCompleteSessionResult(pending.member, pending.data);
+          toast(pending.data.attendMessage || '진도 저장됨 (출석 미처리)');
+        }
+        return;
+      }
+      await runCompleteSession(pending.member, pending.progress, {
+        confirmExtraPass: true,
+        rowKey: pending.opts && pending.opts.rowKey,
+        phoneLast4: pending.opts && pending.opts.phoneLast4,
+      });
+    }
+
+    function openPhonePickerModal(candidates, member, progress, data) {
+      const box = document.getElementById('phonePickerBtns');
+      box.innerHTML = '';
+      (candidates || []).forEach(function(c) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-ghost';
+        btn.style.width = '100%';
+        btn.textContent = (c.name ? c.name + ' · ' : '') + '끝자리 ' + c.last4;
+        btn.onclick = function() {
+          closePhonePickerModal();
+          runCompleteSession(member, progress, { rowKey: c.rowKey, phoneLast4: c.last4, memberName: c.name });
+        };
+        box.appendChild(btn);
+      });
+      _pendingCompleteSession = { member: member, progress: progress, data: data };
+      document.getElementById('phonePickerModal').classList.add('open');
+    }
+
+    function openExtraPassModal(message, member, progress, data, opts) {
+      document.getElementById('extraPassModalText').textContent = message || '이미 오늘 출석이 기록되어 있습니다. 수강권을 하나 더 사용하시겠습니까?';
+      _pendingCompleteSession = { member: member, progress: progress, data: data, opts: opts || {} };
+      document.getElementById('extraPassModal').classList.add('open');
+    }
+
+    async function runCompleteSession(m, progress, opts) {
+      document.getElementById('saveBtn').disabled = true;
+      const data = await api(completeSessionPayload(m, progress, opts));
+      document.getElementById('saveBtn').disabled = false;
+      if (!data.ok) {
         toast(data.message || '저장 실패');
+        return;
+      }
+      if (data.needPhoneSelect && (data.candidates || []).length) {
+        applyCompleteSessionResult(m, data);
+        openPhonePickerModal(data.candidates, m, progress, data);
+        toast('진도 저장됨 · 회원을 선택해 출석을 완료해 주세요');
+        return;
+      }
+      if (data.needExtraPassConfirm) {
+        applyCompleteSessionResult(m, data);
+        openExtraPassModal(data.attendMessage, m, progress, data, opts);
+        return;
+      }
+      applyCompleteSessionResult(m, data);
+      if (data.completed) {
+        const sess = data.sessionDisplay ? ' (' + data.sessionDisplay + ')' : '';
+        toast('저장·출석 완료' + sess);
+      } else {
+        toast(data.attendMessage || '진도 저장됨');
       }
     }
 
-    async function sendChecked() {
+    async function saveSession() {
+      const m = state.selected;
+      if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
+      const progress = mergedProgressMap();
+      await runCompleteSession(m, progress, {});
+    }
+
+    function openSendLinkModal() {
       const m = state.selected;
       if (!m) { toast('회원 선택'); return; }
-      const ids = Object.keys(state.todayProgress);
-      const savedIds = Object.keys(state.savedProgress);
-      if (!ids.length && !savedIds.length) { toast('진도를 체크해 주세요'); return; }
-      const methodIds = ids.length ? ids.concat(savedIds.filter(function(s){ return ids.indexOf(s)<0; })) : savedIds;
-      const sendable = state.program.filter(function(p){ return methodIds.indexOf(p.id)>=0 && p.hasVideo; });
-      if (!sendable.length) { toast('영상 URL이 있는 항목이 없습니다'); return; }
+      const ids = sendableMethodIds();
+      if (!ids.length) { toast('영상 URL이 있는 항목이 없습니다'); return; }
+      const phone = String(m.phoneDigits || '').replace(/\D/g, '');
+      document.getElementById('sendLinkPhone').value = phone.length >= 10 ? formatPhone(phone) : phone;
+      const box = document.getElementById('sendLinkItems');
+      box.innerHTML = '';
+      ids.forEach(function(id) {
+        const p = state.program.find(function(x) { return x.id === id; });
+        if (!p) return;
+        const row = document.createElement('label');
+        row.className = 'send-link-item';
+        const isToday = !!state.todayProgress[id];
+        const badge = isToday ? ' <span class="today-badge">오늘</span>' : '';
+        row.innerHTML =
+          '<input type="checkbox" data-id="'+escapeHtml(id)+'" checked>' +
+          '<div><div class="send-link-label">'+escapeHtml(p.label)+badge+'</div>' +
+          (p.videoTitle && p.videoTitle !== p.label
+            ? '<div class="send-link-vid">▶ '+escapeHtml(p.videoTitle)+'</div>' : '') +
+          '</div>';
+        box.appendChild(row);
+      });
+      document.getElementById('sendLinkModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSendLinkModal() {
+      document.getElementById('sendLinkModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    async function confirmSendLinks() {
+      const m = state.selected;
+      if (!m) { toast('회원 선택'); return; }
+      const phone = document.getElementById('sendLinkPhone').value.replace(/\D/g, '');
+      if (phone.length < 10) { toast('연락처를 확인해 주세요'); return; }
+      const checks = document.querySelectorAll('#sendLinkItems input[type="checkbox"]');
+      const methodIds = [];
+      checks.forEach(function(cb) {
+        if (cb.checked && cb.dataset.id) methodIds.push(cb.dataset.id);
+      });
+      if (!methodIds.length) { toast('전송할 항목을 선택해 주세요'); return; }
+      const origPhone = String(m.phoneDigits || '').replace(/\D/g, '');
       const payload = { action:'instructorSendHomework', methodIds:methodIds };
-      if (m.suffix8) payload.suffix8List = [m.suffix8];
-      else if (m.phoneDigits) payload.phones = [m.phoneDigits];
-      document.getElementById('sendBtn').disabled = true;
+      if (phone === origPhone && m.suffix8) payload.suffix8List = [m.suffix8];
+      else payload.phones = [phone];
+      document.getElementById('sendLinkConfirmBtn').disabled = true;
       const data = await api(payload);
-      document.getElementById('sendBtn').disabled = false;
-      if (data.ok) toast('발송 '+(data.sent||0)+'건 완료');
-      else toast(data.message || '발송 실패');
+      document.getElementById('sendLinkConfirmBtn').disabled = false;
+      if (data.ok) {
+        closeSendLinkModal();
+        toast('발송 '+(data.sent||0)+'건 완료');
+      } else {
+        toast(data.message || '발송 실패');
+      }
     }
 
     function toggleAddMember() { document.getElementById('addMemberPanel').classList.toggle('open'); }
@@ -948,8 +1305,10 @@
     }
 
     document.getElementById('evalModal').addEventListener('click', function(e){ if(e.target===this) closeEvalModal(); });
+    document.getElementById('sendLinkModal').addEventListener('click', function(e){ if(e.target===this) closeSendLinkModal(); });
     document.getElementById('pinInput').addEventListener('keydown', function(e){ if(e.key==='Enter') submitPin(); });
     loadCustomMembers();
+    refreshSectionCollapseDefaults();
     renderProgramList();
     loadBoard();
   </script>
