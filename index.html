@@ -1650,7 +1650,9 @@
     }
 
     document.getElementById('evalModal').addEventListener('click', function(e){ if(e.target===this) closeEvalModal(); });
-    document.getElementById('sendLinkModal').addEventListener('click', function(e){ if(e.target===this) closeSendLinkModal(); });
+    document.getElementById('sessionWrapModal').addEventListener('click', function(e){ if(e.target===this) closeSessionWrapModal(); });
+    document.getElementById('extraPassModal').addEventListener('click', function(e){ if(e.target===this) closeExtraPassModal(); });
+    document.getElementById('phonePickerModal').addEventListener('click', function(e){ if(e.target===this) closePhonePickerModal(); });
     document.getElementById('pinInput').addEventListener('keydown', function(e){ if(e.key==='Enter') submitPin(); });
     loadCustomMembers();
     refreshSectionCollapseDefaults();
