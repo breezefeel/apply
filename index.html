@@ -156,20 +156,12 @@
       background:var(--green-bg); border-left:3px solid var(--green);
     }
     .method-row.done .method-label { color:#047857; font-weight:600; }
-    .method-row.done input[type="checkbox"],
     .method-row.done .check-prior-only {
       accent-color: var(--green);
       width:18px; height:18px;
     }
-    .method-row.today {
-      background:#d1fae5; border-left:3px solid #10b981;
-      box-shadow: inset 0 0 0 1px rgba(5,150,105,.25);
-    }
-    .method-row.today input[type="checkbox"] { accent-color: #10b981; }
-    .method-row.today .today-badge {
-      font-size:9px; font-weight:800; color:#047857;
-      background:#a7f3d0; padding:1px 5px; border-radius:4px; margin-left:4px;
-    }
+    .method-row input[type="checkbox"] { accent-color: var(--blue); }
+    .method-row.done input[type="checkbox"]:checked { accent-color: var(--green); }
     .method-row input { width:18px; height:18px; margin-top:2px; cursor:pointer; flex-shrink:0; }
     .method-label { font-size:12px; font-weight:500; line-height:1.45; }
     .method-vid { font-size:10px; color:var(--green); margin-top:2px; }
@@ -189,7 +181,16 @@
     .movement-legend span { display:inline-flex; align-items:center; gap:5px; }
     .legend-swatch { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
     .legend-swatch.done { background:var(--green-bg); border:1px solid var(--green); }
-    .legend-swatch.today { background:#d1fae5; border:1px solid #10b981; }
+    .legend-swatch.today {
+      width:14px; height:14px; border-radius:3px;
+      border:2px solid var(--blue); background:#fff;
+      position:relative; box-sizing:border-box;
+    }
+    .legend-swatch.today::after {
+      content:''; position:absolute; left:2px; top:0px;
+      width:4px; height:7px; border:solid var(--blue);
+      border-width:0 2px 2px 0; transform:rotate(45deg);
+    }
 
     .add-panel { display:none; margin-top:12px; padding-top:12px; border-top:1px dashed var(--border); }
     .add-panel.open { display:block; }
@@ -331,7 +332,8 @@
     }
     .memo-counter { font-size:10px; color:var(--dim); text-align:right; margin-top:4px; }
     .session-wrap-actions { display:flex; gap:8px; margin-top:4px; }
-    .session-wrap-actions .btn { flex:1; padding:12px; font-size:13px; }
+    .session-wrap-actions .btn { flex:1; padding:12px 8px; font-size:12px; }
+    .session-wrap-actions .btn-save-attend { flex:1.15; }
   </style>
 </head>
 <body>
@@ -472,16 +474,17 @@
       </div>
       <div class="field">
         <label>오늘 포인트 (회원 알림톡 · 1~2문장)</label>
-        <textarea id="sessionCoachMemo" rows="2" maxlength="80" placeholder="직접 작성할 멘트를 입력하세요." onfocus="onSessionCoachMemoFocus()" oninput="updateSessionWrapPreview()"></textarea>
+        <textarea id="sessionCoachMemo" rows="2" maxlength="80" placeholder="직접 작성할 멘트를 입력하세요." onfocus="onSessionCoachMemoFocus()" onblur="onSessionCoachMemoBlur()" oninput="updateSessionWrapPreview()"></textarea>
         <div class="memo-counter"><span id="sessionMemoCount">0</span>/80</div>
       </div>
       <div class="alimtalk-preview">
-        <div class="preview-label">회원에게 전송될 알림톡 미리보기</div>
+        <div class="preview-label">저장+출석 시 회원에게 전송될 알림톡 미리보기</div>
         <div id="sessionAlimtalkPreview"></div>
       </div>
       <div class="session-wrap-actions">
         <button type="button" class="btn btn-ghost" onclick="closeSessionWrapModal()">취소</button>
-        <button type="button" class="btn btn-save" id="sessionWrapConfirmBtn" onclick="confirmSessionWrapSave()">저장·출석 완료</button>
+        <button type="button" class="btn btn-ghost" id="sessionWrapSaveBtn" onclick="confirmSessionWrapSaveOnly()">저장</button>
+        <button type="button" class="btn btn-save btn-save-attend" id="sessionWrapSaveAttendBtn" onclick="confirmSessionWrapSaveAndAttend()">저장+출석</button>
       </div>
     </div>
   </div>
@@ -800,6 +803,15 @@
       updateSessionWrapPreview();
     }
 
+    function onSessionCoachMemoBlur() {
+      var el = document.getElementById('sessionCoachMemo');
+      if (!el) return;
+      if (String(el.value || '').trim()) return;
+      el.value = DEFAULT_SESSION_COACH_MEMO;
+      el.dataset.usingDefault = '1';
+      updateSessionWrapPreview();
+    }
+
     function effectiveSessionCoachMemo(raw) {
       var v = String(raw != null ? raw : '').trim();
       return v || DEFAULT_SESSION_COACH_MEMO;
@@ -919,7 +931,45 @@
 
     var _pendingAttendAlimtalk = null;
 
-    async function confirmSessionWrapSave() {
+    function applySaveOnlyResult(m) {
+      Object.keys(state.todayProgress).forEach(function(k) { state.savedProgress[k] = true; });
+      state.todayProgress = {};
+      refreshSectionCollapseDefaults();
+      renderProgramList();
+      updateSendBar();
+    }
+
+    async function runSaveSessionOnly(m, progress) {
+      document.getElementById('saveBtn').disabled = true;
+      document.getElementById('attendBtn').disabled = true;
+      var data = await api({
+        action: 'instructorSaveSession',
+        suffix8: m.suffix8,
+        name: m.name,
+        time: m.time,
+        instructorIndex: m.instructorIndex,
+        specialNotes: (m.specialNotes || '').trim(),
+        sessionNote: sessionNoteForSave(),
+        pspProgress: progress,
+      });
+      updateSendBar();
+      if (!data.ok) {
+        toast(data.message || '저장 실패');
+        return false;
+      }
+      applySaveOnlyResult(m);
+      toast('저장 완료');
+      return true;
+    }
+
+    async function confirmSessionWrapSaveOnly() {
+      var m = state.selected;
+      if (!m || !m.suffix8) return;
+      closeSessionWrapModal();
+      await runSaveSessionOnly(m, mergedProgressMap());
+    }
+
+    async function confirmSessionWrapSaveAndAttend() {
       var m = state.selected;
       if (!m || !m.suffix8) return;
       _pendingAttendAlimtalk = buildAttendAlimtalkPayload();
@@ -995,7 +1045,7 @@
     function escapeHtml(s) {
       return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
-    var BOARD_LOAD_ESTIMATE_SEC = 10;
+    var BOARD_LOAD_ESTIMATE_SEC = 25;
     var _loadCountdownTimer = null;
 
     function clearLoadCountdown() {
@@ -1227,7 +1277,7 @@
       if (m) selectMember(m, true);
     }
 
-    async function selectMember(m, fromUser) {
+    function resetMemberSessionState(m) {
       state.selected = m;
       state.selectedKey = memberKey(m);
       state.todayProgress = {};
@@ -1236,40 +1286,62 @@
       state.sectionCollapsed = {};
       _pendingAttendAlimtalk = null;
       var memoEl = document.getElementById('sessionCoachMemo');
-      if (memoEl) { memoEl.value = ''; delete memoEl.dataset.touched; }
-      const prog = m.pspProgress || {};
-      Object.keys(prog).forEach(function(id){
+      if (memoEl) {
+        memoEl.value = '';
+        delete memoEl.dataset.usingDefault;
+        delete memoEl.dataset.touched;
+      }
+      var prog = m.pspProgress || {};
+      Object.keys(prog).forEach(function(id) {
         if (prog[id] && prog[id].length) state.savedProgress[id] = true;
       });
-      if (m.suffix8) {
-        const detail = await api({ action:'instructorMemberDetail', suffix8:m.suffix8 });
-        if (detail.ok && detail.member) {
-          m.specialNotes = detail.member.specialNotes || (m.memoSummary && m.memoSummary.specialNotes) || '';
-          Object.keys(detail.member.pspProgress || {}).forEach(function(id){
-            if (detail.member.pspProgress[id] && detail.member.pspProgress[id].length) state.savedProgress[id] = true;
-          });
-        } else {
-          Object.keys(m.pspProgress || prog).forEach(function(id){
-            if ((m.pspProgress||prog)[id] && (m.pspProgress||prog)[id].length) state.savedProgress[id]=true;
-          });
-          m.specialNotes = (m.memoSummary && m.memoSummary.specialNotes) || '';
-        }
-        loadFirstEvalView(m.phoneDigits);
-      } else {
-        m.specialNotes = m.memo || '';
-      }
+      m.specialNotes = (m.memoSummary && m.memoSummary.specialNotes) || m.specialNotes || '';
+    }
 
+    function renderSelectedMemberUi() {
+      var m = state.selected;
+      if (!m) return;
       document.getElementById('memberBrief').classList.add('show');
       document.getElementById('briefName').textContent = m.name || '—';
       document.getElementById('briefPhone').textContent = m.phoneDigits ? formatPhone(m.phoneDigits) : '';
-      const memo = (m.specialNotes || '').trim() || '특이사항 없음';
+      var memo = (m.specialNotes || '').trim() || '특이사항 없음';
       document.getElementById('briefMemo').textContent = memo;
-
       document.getElementById('sendMemberLabel').textContent = (m.name || '회원') + '님';
       refreshSectionCollapseDefaults();
       renderMemberChips();
       renderProgramList();
       updateSendBar();
+    }
+
+    var _memberDetailReq = 0;
+
+    async function enrichMemberDetailInBackground(m) {
+      if (!m || !m.suffix8) return;
+      var reqId = ++_memberDetailReq;
+      var selKey = memberKey(m);
+      try {
+        var detail = await api({ action: 'instructorMemberDetail', suffix8: m.suffix8 }, { timeoutMs: 45000 });
+        if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
+        if (!detail.ok || !detail.member) return;
+        m.specialNotes = detail.member.specialNotes || m.specialNotes || '';
+        Object.keys(detail.member.pspProgress || {}).forEach(function(id) {
+          if (detail.member.pspProgress[id] && detail.member.pspProgress[id].length) {
+            state.savedProgress[id] = true;
+          }
+        });
+        renderSelectedMemberUi();
+      } catch (e) { /* 보드 데이터로 이미 표시됨 */ }
+    }
+
+    function selectMember(m, fromUser) {
+      resetMemberSessionState(m);
+      if (!m.suffix8) {
+        m.specialNotes = m.memo || '';
+      }
+      renderSelectedMemberUi();
+      if (m.suffix8) {
+        enrichMemberDetailInBackground(m);
+      }
     }
 
     function toggleSectionCollapse(key) {
@@ -1355,20 +1427,16 @@
           items.forEach(function(item){
             const isPrior = hasMember && !!state.savedProgress[item.id];
             const isToday = hasMember && !!state.todayProgress[item.id];
-            const checked = isPrior || isToday;
-            const rowCls = isToday ? ' today' : (isPrior ? ' done' : '');
-            const priorOnly = isPrior && !isToday;
+            const checked = isToday;
+            const rowCls = isPrior ? ' done' : '';
             const tagLabel = item.hasVideo ? (secKey === 'self_tool' ? '링크' : '영상') : 'URL없음';
             const isHoriz = secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0;
             const vidTag = isHoriz ? '' : '<span class="vid-tag'+(item.hasVideo?' ok':'')+'">'+tagLabel+'</span>';
             const displayLabel = methodDisplayLabel(item);
-            const todayBadge = isToday ? '<span class="today-badge">오늘</span>' : '';
-            const priorCls = priorOnly ? ' class="check-prior-only"' : '';
-            const priorClick = priorOnly ? ' onclick="repeatPrior(\''+item.id+'\',event)"' : '';
             html += '<label class="method-row'+rowCls+'">'+
-              '<input type="checkbox"'+(checked?' checked':'')+priorCls+priorClick+
+              '<input type="checkbox"'+(checked?' checked':'')+
               ' onchange="toggleToday(\''+item.id+'\',this)">'+
-              '<div><div class="method-label">'+escapeHtml(displayLabel)+todayBadge+'</div>'+
+              '<div><div class="method-label">'+escapeHtml(displayLabel)+'</div>'+
               '</div>'+vidTag+'</label>';
           });
           html += '</div>';
@@ -1376,17 +1444,6 @@
         html += '</div></div>';
       });
       root.innerHTML = html;
-    }
-
-    function repeatPrior(id, ev) {
-      if (!state.selected) return;
-      if (state.todayProgress[id]) return;
-      ev.preventDefault();
-      state.todayProgress[id] = true;
-      refreshSectionCollapseDefaults();
-      renderProgramList();
-      updateSendBar();
-      autoSaveProgress();
     }
 
     async function toggleToday(id, cb) {
@@ -1598,7 +1655,7 @@
       if (data.completed) {
         const sess = data.sessionDisplay ? ' (' + data.sessionDisplay + ')' : '';
         const ataHint = alimtalkHint(data.alimtalk);
-        toast((opts.basicAttendOnly ? '출석 완료' : '저장·출석 완료') + sess + ataHint);
+        toast((opts.basicAttendOnly ? '출석 완료' : '저장+출석 완료') + sess + ataHint);
       } else {
         toast(data.attendMessage || '진도 저장됨');
       }
