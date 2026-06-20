@@ -415,10 +415,54 @@
       },
     };
     function programSortKey(name) {
-      const m = String(name||'').match(/^(\d+)/);
-      const n = m ? parseInt(m[1],10) : 99;
-      var postureOrder = { 1:0, 3:1, 2:2 };
-      return postureOrder[n] != null ? postureOrder[n] : n;
+      const s = String(name || '');
+      const postM = s.match(/^(\d+)\s*·/);
+      if (postM && /호흡|Sit-up|Superman/.test(s)) {
+        var postureOrder = { 1: 10, 3: 11, 2: 12 };
+        return postureOrder[postM[1]] != null ? postureOrder[postM[1]] : 20;
+      }
+      var circled = { '①': 1, '②': 2, '③': 3, '④': 4 };
+      if (circled[s.charAt(0)] != null) return circled[s.charAt(0)];
+      const m = s.match(/^(\d+)/);
+      return m ? parseInt(m[1], 10) : 99;
+    }
+    function isPostureProgramBlock(items) {
+      return (items || []).some(function(it) { return /^post_/.test(it.id); });
+    }
+
+    var P1_BODY_MAP = {
+      '① Supine Lower': 'Supine 하지',
+      '② Supine Upper': 'Supine 상지',
+      '③ Prone Lower': 'Prone 하지',
+      '④ Prone Upper': 'Prone 상지',
+    };
+
+    function simplifyExerciseLabel(raw) {
+      var s = String(raw || '').trim();
+      if (/^Passive Stretching/i.test(s)) return 'Passive Stretching';
+      if (/^Assisted Active/i.test(s)) return 'Assisted Active';
+      if (/^Resistive/i.test(s)) return 'Resistive';
+      return s;
+    }
+
+    function methodDisplayLabel(item) {
+      if (!item) return '';
+      var prog = String(item.program || '');
+      var label = String(item.label || '');
+      if (P1_BODY_MAP[prog]) {
+        return P1_BODY_MAP[prog] + ' — ' + simplifyExerciseLabel(label);
+      }
+      if (label.indexOf(' — ') >= 0) return label;
+      if (prog === '생활습관') return label;
+      if (prog === 'Resistive — Advanced') return 'Resistive — Advanced — ' + label;
+      return label;
+    }
+
+    function useFlatCheckboxRows(progName) {
+      if (P1_BODY_MAP[progName]) return true;
+      if (progName === '근막경선별 Active Stretching') return true;
+      if (/근막경선별 Active ·/.test(progName)) return true;
+      return false;
     }
 
     /* 서버 연결 전에도 표시 — code.gs PSP_PROGRAM_CATALOG_ 와 동기화 */
@@ -441,20 +485,20 @@
       { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Passive Stretching' },
       { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Assisted Active' },
       { id:'p1_pu_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Resistive' },
-      { id:'post_breath_relax', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'1 · 누워서 호흡 운동', label:'편안한 호흡' },
-      { id:'post_breath', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬 (엉덩이→발→머리→어깨→손끝)' },
-      { id:'post_super_1', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'3 · Prone Superman 6단계', label:'① 척추 — 경추부터 척추분절 순으로 전체 들기' },
-      { id:'post_super_2', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'3 · Prone Superman 6단계', label:'② 대각선 — 한 손 + 반대 발 동시 들기' },
-      { id:'post_super_3', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'3 · Prone Superman 6단계', label:'③ 양손·양발 — 낮게 동시 들기' },
-      { id:'post_super_4', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'3 · Prone Superman 6단계', label:'④ 접영 — 양손·양발 든 상태 접영 + 발 벌림' },
-      { id:'post_super_5', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'3 · Prone Superman 6단계', label:'⑤ 팔 신전·무릎 굴곡 — 견갑 모으기 → 무릎 높게 밴딩' },
-      { id:'post_super_6', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'3 · Prone Superman 6단계', label:'⑥ 팔꿈치·회전 — 한쪽 팔꿈치부터 번갈아 높이 들며 회전' },
-      { id:'post_situp_1', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'2 · Supine Sit-up 6단계', label:'① 상체 — 누운 상태 상체 약 45° (견갑 이탈)' },
-      { id:'post_situp_2', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'2 · Supine Sit-up 6단계', label:'② 하체 — 견갑 띄운 채 다리 한쪽씩 → 양쪽 동시' },
-      { id:'post_situp_3', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'2 · Supine Sit-up 6단계', label:'③ 상체 — 앉은 90°에서 45°까지 내려갔다 복귀' },
-      { id:'post_situp_4', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'2 · Supine Sit-up 6단계', label:'④ 하체 — 등 닿은 상태 다리 한쪽씩 → 양쪽 동시' },
-      { id:'post_situp_5', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'2 · Supine Sit-up 6단계', label:'⑤ 정식 Sit-up — 통증 없는 범위' },
-      { id:'post_situp_6', uiSection:'posture', sectionTitle:'생활습관 & 자세 교정', program:'2 · Supine Sit-up 6단계', label:'⑥ 구르기 — 뒤로 굴렀다 복귀, 무릎 펴고 발끝 닿기' },
+      { id:'post_breath_relax', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'1 · 누워서 호흡 운동', label:'편안한 호흡' },
+      { id:'post_breath', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬 (엉덩이→발→머리→어깨→손끝)' },
+      { id:'post_super_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'3 · Prone Superman 6단계', label:'① 척추 — 경추부터 척추분절 순으로 전체 들기' },
+      { id:'post_super_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'3 · Prone Superman 6단계', label:'② 대각선 — 한 손 + 반대 발 동시 들기' },
+      { id:'post_super_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'3 · Prone Superman 6단계', label:'③ 양손·양발 — 낮게 동시 들기' },
+      { id:'post_super_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'3 · Prone Superman 6단계', label:'④ 접영 — 양손·양발 든 상태 접영 + 발 벌림' },
+      { id:'post_super_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'3 · Prone Superman 6단계', label:'⑤ 팔 신전·무릎 굴곡 — 견갑 모으기 → 무릎 높게 밴딩' },
+      { id:'post_super_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'3 · Prone Superman 6단계', label:'⑥ 팔꿈치·회전 — 한쪽 팔꿈치부터 번갈아 높이 들며 회전' },
+      { id:'post_situp_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'2 · Supine Sit-up 6단계', label:'① 상체 — 누운 상태 상체 약 45° (견갑 이탈)' },
+      { id:'post_situp_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'2 · Supine Sit-up 6단계', label:'② 하체 — 견갑 띄운 채 다리 한쪽씩 → 양쪽 동시' },
+      { id:'post_situp_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'2 · Supine Sit-up 6단계', label:'③ 상체 — 앉은 90°에서 45°까지 내려갔다 복귀' },
+      { id:'post_situp_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'2 · Supine Sit-up 6단계', label:'④ 하체 — 등 닿은 상태 다리 한쪽씩 → 양쪽 동시' },
+      { id:'post_situp_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'2 · Supine Sit-up 6단계', label:'⑤ 정식 Sit-up — 통증 없는 범위' },
+      { id:'post_situp_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'2 · Supine Sit-up 6단계', label:'⑥ 구르기 — 뒤로 굴렀다 복귀, 무릎 펴고 발끝 닿기' },
       { id:'p2_a_front', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active Stretching', label:'전방 경선 — 경추 굴곡·흉추 굴곡·고관절 굴곡·발목 배굴' },
       { id:'p2_a_back', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active Stretching', label:'후방 경선 — 경추 신전·흉추 신전·햄스트링·발목 저굴' },
       { id:'p2_a_lat', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active Stretching', label:'측방 경선 — 경추·흉추 측굴·고관절 외전·발목 내외번' },
@@ -844,7 +888,7 @@
       }
       const hasMember = !!state.selected;
 
-      const sections = ['self_tool','pos1_par','posture','pos2','pos3','func'];
+      const sections = ['self_tool','pos1_par','pos2','pos3','func'];
       const sectionOrder = {};
       sections.forEach(function(s,i){ sectionOrder[s]=i; });
       const grouped = {};
@@ -867,15 +911,7 @@
           html += '<div class="psp-section-hd">'+escapeHtml(g.title)+'</div>';
         }
         html += '<div class="psp-section-body">';
-        if (secKey === 'posture') {
-          html += '<div class="psp-goal-box"><strong>공통 목표</strong> — '+escapeHtml(SECTION_META.posture.goal)+'</div>';
-          html += '<div class="psp-trio">';
-          SECTION_META.posture.trio.forEach(function(t){
-            html += '<div class="psp-trio-item"><div class="psp-trio-ico">'+t.ico+'</div>'+
-              '<div class="psp-trio-t">'+escapeHtml(t.t)+'</div><div class="psp-trio-s">'+escapeHtml(t.s)+'</div></div>';
-          });
-          html += '</div><p class="psp-coach-foot">'+escapeHtml(SECTION_META.posture.coachFoot)+'</p>';
-        }
+        let postureIntroShown = false;
         let programsInSection = {};
         g.items.forEach(function(item){
           if (!programsInSection[item.program]) programsInSection[item.program] = [];
@@ -887,7 +923,18 @@
           return String(a).localeCompare(String(b),'ko');
         }).forEach(function(progName){
           const items = programsInSection[progName];
-          if (secKey === 'posture') {
+          const isPosture = isPostureProgramBlock(items);
+          if (secKey === 'pos1_par' && isPosture && !postureIntroShown) {
+            postureIntroShown = true;
+            html += '<div class="psp-goal-box" style="margin-top:12px;"><strong>생활습관 & 자세 교정</strong> — '+escapeHtml(SECTION_META.posture.goal)+'</div>';
+            html += '<div class="psp-trio">';
+            SECTION_META.posture.trio.forEach(function(t){
+              html += '<div class="psp-trio-item"><div class="psp-trio-ico">'+t.ico+'</div>'+
+                '<div class="psp-trio-t">'+escapeHtml(t.t)+'</div><div class="psp-trio-s">'+escapeHtml(t.s)+'</div></div>';
+            });
+            html += '</div><p class="psp-coach-foot">'+escapeHtml(SECTION_META.posture.coachFoot)+'</p>';
+          }
+          if (isPosture) {
             const numMatch = progName.match(/^(\d+)/);
             const num = numMatch ? numMatch[1] : '';
             html += '<div class="psp-part-hd">'+(num ? '<span class="psp-part-num">'+num+'</span>' : '')+
@@ -902,7 +949,7 @@
               });
               html += '</div>';
             }
-          } else {
+          } else if (!useFlatCheckboxRows(progName)) {
             html += '<div class="psp-part-hd" style="margin-top:4px;"><span>'+escapeHtml(progName)+'</span></div>';
           }
           html += '<div class="psp-part-card'+(secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0 ? ' horizontal' : '')+'">';
@@ -915,15 +962,14 @@
             const tagLabel = item.hasVideo ? (secKey === 'self_tool' ? '링크' : '영상') : 'URL없음';
             const isHoriz = secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0;
             const vidTag = isHoriz ? '' : '<span class="vid-tag'+(item.hasVideo?' ok':'')+'">'+tagLabel+'</span>';
-            const showVidLine = secKey !== 'self_tool' && item.videoTitle && item.videoTitle !== item.label;
+            const displayLabel = methodDisplayLabel(item);
             const todayBadge = isToday ? '<span class="today-badge">오늘</span>' : '';
             const priorCls = priorOnly ? ' class="check-prior-only"' : '';
             const priorClick = priorOnly ? ' onclick="repeatPrior(\''+item.id+'\',event)"' : '';
             html += '<label class="method-row'+rowCls+'">'+
               '<input type="checkbox"'+(checked?' checked':'')+priorCls+priorClick+
               ' onchange="toggleToday(\''+item.id+'\',this)">'+
-              '<div><div class="method-label">'+escapeHtml(item.label)+todayBadge+'</div>'+
-              (showVidLine ? '<div class="method-vid">▶ '+escapeHtml(item.videoTitle)+'</div>' : '')+
+              '<div><div class="method-label">'+escapeHtml(displayLabel)+todayBadge+'</div>'+
               '</div>'+vidTag+'</label>';
           });
           html += '</div>';
@@ -970,7 +1016,7 @@
       if (!m || !m.suffix8) return;
       const todayLabels = Object.keys(state.todayProgress).map(function(id){
         const p = state.program.find(function(x){ return x.id===id; });
-        return p ? p.label : id;
+        return p ? methodDisplayLabel(p) : id;
       });
       const data = await api({
         action:'instructorSaveSession',
@@ -1006,7 +1052,7 @@
       const ids = Object.keys(progress || {});
       const labels = ids.map(function(id) {
         const p = state.program.find(function(x) { return x.id === id; });
-        return p ? p.label : id;
+        return p ? methodDisplayLabel(p) : id;
       });
       return labels.length ? '오늘 진도: ' + labels.join(', ') : '';
     }
@@ -1154,10 +1200,7 @@
         const badge = isToday ? ' <span class="today-badge">오늘</span>' : '';
         row.innerHTML =
           '<input type="checkbox" data-id="'+escapeHtml(id)+'" checked>' +
-          '<div><div class="send-link-label">'+escapeHtml(p.label)+badge+'</div>' +
-          (p.videoTitle && p.videoTitle !== p.label
-            ? '<div class="send-link-vid">▶ '+escapeHtml(p.videoTitle)+'</div>' : '') +
-          '</div>';
+          '<div><div class="send-link-label">'+escapeHtml(methodDisplayLabel(p))+badge+'</div></div>';
         box.appendChild(row);
       });
       document.getElementById('sendLinkModal').classList.add('open');
