@@ -209,6 +209,30 @@
     .method-row.done input[type="checkbox"]:checked { accent-color: var(--green); }
     .method-row input { width:18px; height:18px; margin-top:2px; cursor:pointer; flex-shrink:0; }
     .method-label { font-size:12px; font-weight:500; line-height:1.45; }
+    /* Position 1 — Passive/AA/Resistive: 4부위 컴팩트 (모바일 2×2, 넓은 화면 1줄) */
+    .psp-part-card.p1-kind-card {
+      display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px;
+      padding:8px;
+    }
+    @media (min-width:520px) {
+      .psp-part-card.p1-kind-card { grid-template-columns:repeat(4, minmax(0, 1fr)); }
+    }
+    .psp-part-card.p1-kind-card .method-row {
+      display:flex; align-items:center; gap:6px;
+      grid-template-columns:none;
+      margin:0; padding:7px 8px;
+      border:1px solid var(--border); border-radius:8px; background:#fafbfc;
+      min-width:0;
+    }
+    .psp-part-card.p1-kind-card .method-row input { margin-top:0; flex-shrink:0; }
+    .psp-part-card.p1-kind-card .method-row > div { flex:1; min-width:0; }
+    .psp-part-card.p1-kind-card .method-label {
+      font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .psp-part-card.p1-kind-card .vid-tag {
+      flex-shrink:0; font-size:9px; padding:2px 4px; white-space:nowrap;
+    }
+    .psp-part-card.p1-kind-card .method-row.done { border-left-width:1px; border-left-color:var(--green); }
     .method-vid { font-size:10px; color:var(--green); margin-top:2px; }
     .vid-tag { font-size:10px; padding:2px 6px; border-radius:5px; background:#f1f5f9; color:#94a3b8; }
     .vid-tag.ok { background:var(--green-bg); color:var(--green); }
@@ -540,8 +564,9 @@
         <p id="dateLine">—</p>
       </div>
       <div class="page-hd-actions">
-        <a class="page-hd-link" href="https://breezefeel.github.io/yaksu/" target="_blank" rel="noopener noreferrer">신청서 작성</a>
         <a class="page-hd-link" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠 올리기</a>
+        <a class="page-hd-link" href="https://breezefeel.github.io/yaksu/" target="_blank" rel="noopener noreferrer">신청서 작성</a>
+        <a class="page-hd-link" href="https://docs.google.com/spreadsheets/d/1I8zIUUaP-eIGpB2y4dMgZbDRiBBzjpAGEWU0RD3yk8g/edit?gid=263546936#gid=263546936" target="_blank" rel="noopener noreferrer">예약 스케줄</a>
       </div>
     </div>
   </header>
@@ -760,6 +785,21 @@
       return s;
     }
 
+    function isP1BodyItem(item) {
+      return !!(item && P1_BODY_MAP[item.program]);
+    }
+
+    function p1BodyPartLabel(item) {
+      return P1_BODY_MAP[item.program] || '';
+    }
+
+    function p1BodyPartOrder(prog) {
+      var order = { '① Supine Lower': 1, '② Supine Upper': 2, '③ Prone Lower': 3, '④ Prone Upper': 4 };
+      return order[prog] != null ? order[prog] : 99;
+    }
+
+    var P1_EXERCISE_KINDS = ['Passive Stretching', 'Assisted Active', 'Resistive'];
+
     function methodDisplayLabel(item) {
       if (!item) return '';
       var prog = String(item.program || '');
@@ -824,10 +864,10 @@
       { id:'p1_su_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'② Supine Upper', label:'Assisted Active' },
       { id:'p1_su_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'② Supine Upper', label:'Resistive' },
       { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'③ Prone Lower', label:'Passive Stretching' },
-      { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'③ Prone Lower', label:'Assisted Active' },
+      { id:'p1_pl_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'③ Prone Lower', label:'Assisted Active' },
       { id:'p1_pl_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'③ Prone Lower', label:'Resistive' },
       { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Passive Stretching' },
-      { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Assisted Active' },
+      { id:'p1_pu_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Assisted Active' },
       { id:'p1_pu_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Resistive' },
       { id:'post_breath_relax', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'1 · 누워서 호흡 운동', label:'편안한 호흡' },
       { id:'post_breath', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬 (엉덩이→발→머리→어깨→손끝)' },
@@ -1953,6 +1993,45 @@
       root.innerHTML = html;
     }
 
+    function renderMethodRowHtml(item, secKey, hasMember, displayLabel) {
+      const isPrior = hasMember && !!state.savedProgress[item.id];
+      const isToday = hasMember && !!state.todayProgress[item.id];
+      const checked = isToday;
+      const rowCls = isPrior ? ' done' : '';
+      const tagLabel = item.hasVideo ? (secKey === 'self_tool' ? '링크' : '영상') : 'URL없음';
+      const isHoriz = secKey === 'self_tool' && String(item.program || '').indexOf('마사지볼') >= 0;
+      const vidTag = isHoriz ? '' : '<span class="vid-tag' + (item.hasVideo ? ' ok' : '') + '">' + tagLabel + '</span>';
+      const label = displayLabel != null ? displayLabel : methodDisplayLabel(item);
+      return '<label class="method-row' + rowCls + '">' +
+        '<input type="checkbox"' + (checked ? ' checked' : '') +
+        ' onchange="toggleToday(\'' + item.id + '\',this)">' +
+        '<div><div class="method-label">' + escapeHtml(label) + '</div></div>' +
+        vidTag + '</label>';
+    }
+
+    function renderP1ParByExerciseType(p1Items, secKey, hasMember) {
+      var byKind = {};
+      p1Items.forEach(function (item) {
+        var kind = simplifyExerciseLabel(item.label);
+        if (!byKind[kind]) byKind[kind] = [];
+        byKind[kind].push(item);
+      });
+      var html = '';
+      P1_EXERCISE_KINDS.forEach(function (kind) {
+        var items = byKind[kind];
+        if (!items || !items.length) return;
+        html += '<div class="psp-part-hd" style="margin-top:4px;"><span>' + escapeHtml(kind) + '</span></div>';
+        html += '<div class="psp-part-card p1-kind-card">';
+        items.sort(function (a, b) {
+          return p1BodyPartOrder(a.program) - p1BodyPartOrder(b.program);
+        }).forEach(function (item) {
+          html += renderMethodRowHtml(item, secKey, hasMember, p1BodyPartLabel(item));
+        });
+        html += '</div>';
+      });
+      return html;
+    }
+
     function renderProgramList() {
       const root = document.getElementById('pspProgramList');
       const list = state.program;
@@ -1991,7 +2070,16 @@
         html += '<div class="psp-section-body">';
         let postureIntroShown = false;
         let programsInSection = {};
-        g.items.forEach(function(item){
+        var sectionItems = g.items.slice();
+        if (secKey === 'pos1_par') {
+          var p1BodyItems = sectionItems.filter(isP1BodyItem);
+          var restItems = sectionItems.filter(function (it) { return !isP1BodyItem(it); });
+          if (p1BodyItems.length) {
+            html += renderP1ParByExerciseType(p1BodyItems, secKey, hasMember);
+          }
+          sectionItems = restItems;
+        }
+        sectionItems.forEach(function(item){
           if (!programsInSection[item.program]) programsInSection[item.program] = [];
           programsInSection[item.program].push(item);
         });
@@ -2032,19 +2120,7 @@
           }
           html += '<div class="psp-part-card'+(secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0 ? ' horizontal' : '')+'">';
           items.forEach(function(item){
-            const isPrior = hasMember && !!state.savedProgress[item.id];
-            const isToday = hasMember && !!state.todayProgress[item.id];
-            const checked = isToday;
-            const rowCls = isPrior ? ' done' : '';
-            const tagLabel = item.hasVideo ? (secKey === 'self_tool' ? '링크' : '영상') : 'URL없음';
-            const isHoriz = secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0;
-            const vidTag = isHoriz ? '' : '<span class="vid-tag'+(item.hasVideo?' ok':'')+'">'+tagLabel+'</span>';
-            const displayLabel = methodDisplayLabel(item);
-            html += '<label class="method-row'+rowCls+'">'+
-              '<input type="checkbox"'+(checked?' checked':'')+
-              ' onchange="toggleToday(\''+item.id+'\',this)">'+
-              '<div><div class="method-label">'+escapeHtml(displayLabel)+'</div>'+
-              '</div>'+vidTag+'</label>';
+            html += renderMethodRowHtml(item, secKey, hasMember);
           });
           html += '</div>';
         });
