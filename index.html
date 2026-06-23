@@ -20,8 +20,26 @@
       min-height: 100dvh; padding-bottom: calc(88px + var(--safe-b));
     }
     .page-hd { background: linear-gradient(135deg,#1e3a6e,#2563eb); color:#fff; padding:14px 16px 12px; }
+    .page-hd-inner {
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      max-width:760px; margin:0 auto;
+    }
+    .page-hd-main { min-width:0; flex:1; }
     .page-hd h1 { font-size:16px; font-weight:800; }
     .page-hd p { font-size:11px; opacity:.85; margin-top:2px; }
+    .page-hd-actions {
+      display:flex; flex-shrink:0; gap:6px; flex-wrap:wrap; justify-content:flex-end;
+    }
+    .page-hd-link {
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:6px 10px; border-radius:8px; font-size:11px; font-weight:800;
+      text-decoration:none; white-space:nowrap; line-height:1.2;
+      background:rgba(255,255,255,.16); color:#fff;
+      border:1px solid rgba(255,255,255,.28);
+      transition: background .15s, border-color .15s;
+    }
+    .page-hd-link:hover { background:rgba(255,255,255,.26); border-color:rgba(255,255,255,.45); }
+    .page-hd-link:active { transform:scale(.98); }
     main { max-width:760px; margin:0 auto; padding:12px 12px 20px; }
 
     .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-bottom:12px; box-shadow:var(--shadow); }
@@ -293,6 +311,11 @@
       font-weight:600; line-height:1.35; text-align:left;
     }
     .eval-hist-chip.on { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
+    .eval-hist-group-tag { font-size:12px; font-weight:800; color:var(--blue); }
+    .eval-hist-sub { font-size:11px; color:var(--dim); font-weight:600; }
+    .eval-hist-subrow + .eval-hist-subrow { margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); }
+    .eval-hist-subtitle { font-size:11px; font-weight:800; color:var(--text); margin-bottom:5px; }
+    .eval-hist-memo-block .eval-hist-note { margin-top:4px; min-height:56px; max-height:120px; }
     .eval-hist-note {
       width:100%; min-height:34px; max-height:88px; font-size:11px;
       padding:6px 8px; border:1px solid var(--border); border-radius:6px; resize:vertical;
@@ -511,8 +534,16 @@
   </div>
 
   <header class="page-hd">
-    <h1>Re:Al 강사 · 회원 관리</h1>
-    <p id="dateLine">—</p>
+    <div class="page-hd-inner">
+      <div class="page-hd-main">
+        <h1>Re:Al 강사 · 회원 관리</h1>
+        <p id="dateLine">—</p>
+      </div>
+      <div class="page-hd-actions">
+        <a class="page-hd-link" href="https://breezefeel.github.io/yaksu/" target="_blank" rel="noopener noreferrer">신청서 작성</a>
+        <a class="page-hd-link" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠 올리기</a>
+      </div>
+    </div>
   </header>
 
   <main>
@@ -585,7 +616,7 @@
         <p class="eval-member-hint" id="evalMemberHint">—</p>
         <div class="field eval-history-field">
           <label>History Taking</label>
-          <p class="eval-hist-lead">프로필 웰니스 문진 순서 · 기본 항목은 탭으로 선택, 회원별 특이사항은 각 칸에 기록</p>
+          <p class="eval-hist-lead">항목은 탭으로 선택 · 보충 사항은 하단 「그 외 사항」에 기록</p>
           <div class="eval-hist-form" id="evalHistoryForm"></div>
         </div>
         <div class="field"><label>Inspection</label><textarea id="evalInspection" rows="2"></textarea></div>
@@ -2298,12 +2329,15 @@
       };
     }
 
-    /** 프로필 웰니스(움직임·자세) 문진 순서 + PSP PART A OPPQRST — 강사용 History Taking */
-    var EVAL_HISTORY_SECTIONS = (function () {
+    /** History Taking — 내원 목적 → 목표별 세부 → OPPQRST → 그 외 메모 */
+    var EVAL_HISTORY_GROUPS = (function () {
       function opts(list) {
         return list.map(function (x) {
           return typeof x === 'string' ? { id: x, label: x } : x;
         });
+      }
+      function item(id, title, hint, options, multi) {
+        return { id: id, title: title, hint: hint || '', multi: multi !== false, options: opts(options) };
       }
       var wellnessGoals = opts([
         { id: 'stretch', label: '유연성 향상' },
@@ -2312,95 +2346,185 @@
         { id: 'face', label: '얼굴 교정·관리' },
         { id: 'prevention', label: '예방·셀프 케어' },
       ]);
-      var comfort = opts([
-        { id: 'none', label: '불편 없음' },
-        { id: 'mild', label: '가벼운 불편' },
-        { id: 'exercise', label: '운동·스트레칭 시 불편' },
-        { id: 'daily', label: '일상생활 어려움' },
-      ]);
-      function follow(id, title, hint, options) {
-        return { id: id, step: '3', title: title, hint: hint, multi: true, options: opts(options) };
-      }
       return [
-        { id: 'goal', step: '1', title: '웰니스 목표', hint: '프로필 1단계 — 주요 관심 분야', multi: true, options: wellnessGoals },
-        { id: 'comfort', step: '2', title: '현재 불편 정도', hint: '프로필 2단계 — 통증·불편 수준', multi: false, options: comfort },
-        follow('stretch_area', '[유연성] 불편 부위', '목·어깨·등 / 허리·골반 / 무릎·하지 / 여러 곳·전신', [
-          '목·어깨·등', '허리·골반', '무릎·하지', '여러 곳·전신',
-        ]),
-        follow('stretch_timing', '[유연성] 불편 시기', '아침 / 오래 앉을 때 / 운동 전후 / 특별히 없음', [
-          '아침에 특히 뻣뻣', '오래 앉아 있을 때', '운동 전·후', '특별히 없음',
-        ]),
-        follow('posture_focus', '[자세] 우선 교정 부위', '거북목 / 굽은 어깨 / 골반·허리 / 전신 균형', [
-          '거북목·목', '굽은 어깨·등', '골반·허리', '전신 균형·체형',
-        ]),
-        follow('posture_life', '[자세] 생활 패턴', '책상 / 스마트폰 / 서서 일함 / 운전·반복 동작', [
-          '장시간 책상·PC', '스마트폰·목 사용', '서서 일함', '운전·반복 동작',
-        ]),
-        follow('fitness_move', '[기능] 목표 동작', '일상 / 걷기·뛰기 / 스포츠 / 업무·오래 서기', [
-          '계단·들기 등 일상', '걷기·뛰기', '스포츠·취미', '업무·오래 서기',
-        ]),
-        follow('fitness_level', '[기능] 활동 수준', '거의 안 움직임 / 가벼운 산책 / 주2~3회 / 꾸준히 운동', [
-          '거의 안 움직임', '가벼운 산책', '주 2~3회 운동', '꾸준히 운동 중',
-        ]),
-        follow('face_focus', '[얼굴] 개선 우선', '비대칭 / 붓기·축소 / 턱·목 / 전체 균형', [
-          '안면 비대칭', '얼굴 축소·붓기', '턱·목 라인', '전체 균형',
-        ]),
-        follow('face_symptom', '[얼굴] 동반 증상', '두통·어깨 / 턱·저작 / 특별히 없음', [
-          '두통·어깨 결림', '턱·저작 불편', '특별히 없음(미용·균형)',
-        ]),
-        follow('prev_reason', '[예방] 관리 이유', '재발 걱정 / 치료 후 유지 / 예방·습관 / 셀프 관리', [
-          '통증 재발 걱정', '치료 후 유지', '예방·습관 교정', '스스로 관리 배우기',
-        ]),
-        follow('prev_area', '[예방] 관리 부위', '목·어깨 / 허리·골반 / 무릎·하지 / 전신', [
-          '목·어깨', '허리·골반', '무릎·하지', '전신·여러 곳',
-        ]),
-        { id: 'cc', step: 'A', stepClass: 'clinical', title: 'C/C — Chief Complaint', hint: '「어제 오늘, 가장 불편한 게 뭔가요?」 · 손으로 짚기', multi: true, options: opts([
-          '정확히 짚음 (국소)', '애매·넓은 범위 (방사·연관 의심)',
-        ]) },
-        { id: 'onset', step: 'O', stepClass: 'clinical', title: 'O — Onset', hint: '시작 시점 · 급성/만성 · 외상 여부', multi: true, options: opts([
-          '급성', '만성', '외상·사건 있음', '외상·사건 없음 → 자세·습관 의심',
-        ]) },
-        { id: 'provocation', step: 'P', stepClass: 'clinical', title: 'P — Provocation', hint: '어떤 동작·자세에서 악화?', multi: true, options: opts([
-          '힘 쓸 때 악화 (근육·힘줄)', '패시브 늘릴 때 악화 (Fascia·인대·관절)',
-        ]) },
-        { id: 'palliation', step: 'P', stepClass: 'clinical', title: 'P — Palliation', hint: '완화 요인', multi: true, options: opts([
-          '쉬면 나아짐', '움직이면 나아짐', '열에 좋아짐', '냉에 좋아짐',
-        ]) },
-        { id: 'quality', step: 'Q', stepClass: 'clinical', title: 'Q — Quality', hint: '통증 종류 — 조직 특이 단서', multi: true, options: opts([
-          '전기 튀는 날카로움 (신경)', '한 점 날카로움 (관절)', '뻐근·쥐어짜는 (근육)',
-          '당기는·뻣뻣 (Fascia)', '찢어지는 (결합조직)', '욱씬거림 (급성 염증)', '저림·타는 (신경 만성)',
-        ]) },
-        { id: 'region', step: 'R', stepClass: 'clinical', title: 'R — Region / Radiation', hint: '위치·범위 · 방사', multi: true, options: opts([
-          '국소·한 부위', '경로를 따라 방사',
-        ]) },
-        { id: 'severity', step: 'S', stepClass: 'clinical', title: 'S — Severity', hint: 'VAS · 일상 영향', multi: true, options: opts([
-          'VAS 0~3 경증', 'VAS 4~6 중등도', 'VAS 7~10 중증',
-          '도움 불필요', '도움 가끔 필요', '도움 항상 필요',
-          '안정 시 통증 없음', '안정 시 약간 불편', '안정 시에도 통증',
-        ]) },
-        { id: 'timing', step: 'T', stepClass: 'clinical', title: 'T — Timing', hint: '지속·간헐 · 시간대·활동', multi: true, options: opts([
-          '쉬면 나아짐', '특정 자세·시간대 악화', '아침에 심함', '안정 시에도 지속',
-        ]) },
+        {
+          step: '1',
+          title: '내원 목적',
+          sub: '웰니스 목표',
+          items: [item('goal', '', '', wellnessGoals, true)],
+        },
+        {
+          step: '2',
+          groupTag: '[유연성]',
+          items: [
+            item('stretch_area', '불편 부위', '목·어깨·등 / 허리·골반 / 무릎·하지 / 여러 곳·전신', [
+              '목·어깨·등', '허리·골반', '무릎·하지', '여러 곳·전신',
+            ]),
+            item('stretch_timing', '불편 시기', '아침 / 오래 앉을 때 / 운동 전후 / 특별히 없음', [
+              '아침에 특히 뻣뻣', '오래 앉아 있을 때', '운동 전·후', '특별히 없음',
+            ]),
+          ],
+        },
+        {
+          step: '3',
+          groupTag: '[자세]',
+          items: [
+            item('posture_focus', '우선 교정 부위', '거북목 / 굽은 어깨 / 골반·허리 / 전신 균형', [
+              '거북목·목', '굽은 어깨·등', '골반·허리', '전신 균형·체형',
+            ]),
+            item('posture_life', '생활 패턴', '책상 / 스마트폰 / 서서 일함 / 운전·반복 동작', [
+              '장시간 책상·PC', '스마트폰·목 사용', '서서 일함', '운전·반복 동작',
+            ]),
+          ],
+        },
+        {
+          step: '4',
+          groupTag: '[기능]',
+          items: [
+            item('fitness_move', '목표 동작', '일상 / 걷기·뛰기 / 스포츠 / 업무·오래 서기', [
+              '계단·들기 등 일상', '걷기·뛰기', '스포츠·취미', '업무·오래 서기',
+            ]),
+            item('fitness_level', '활동 수준', '거의 안 움직임 / 가벼운 산책 / 주2~3회 / 꾸준히 운동', [
+              '거의 안 움직임', '가벼운 산책', '주 2~3회 운동', '꾸준히 운동 중',
+            ]),
+          ],
+        },
+        {
+          step: '5',
+          groupTag: '[예방]',
+          items: [
+            item('prev_reason', '관리 이유', '재발 걱정 / 치료 후 유지 / 예방·습관 / 셀프 관리', [
+              '통증 재발 걱정', '치료 후 유지', '예방·습관 교정', '스스로 관리 배우기',
+            ]),
+            item('prev_area', '관리 부위', '목·어깨 / 허리·골반 / 무릎·하지 / 전신', [
+              '목·어깨', '허리·골반', '무릎·하지', '전신·여러 곳',
+            ]),
+          ],
+        },
+        {
+          step: '6',
+          groupTag: '[얼굴]',
+          items: [
+            item('face_focus', '개선 우선', '비대칭 / 붓기·축소 / 턱·목 / 전체 균형', [
+              '안면 비대칭', '얼굴 축소·붓기', '턱·목 라인', '전체 균형',
+            ]),
+            item('face_symptom', '동반 증상', '두통·어깨 / 턱·저작 / 특별히 없음', [
+              '두통·어깨 결림', '턱·저작 불편', '특별히 없음(미용·균형)',
+            ]),
+          ],
+        },
+        {
+          step: 'A', stepClass: 'clinical',
+          items: [item('cc', 'C/C — Chief Complaint', '「어제 오늘, 가장 불편한 게 뭔가요?」 · 손으로 짚기', [
+            '정확히 짚음 (국소)', '애매·넓은 범위 (방사·연관 의심)',
+          ])],
+        },
+        {
+          step: 'O', stepClass: 'clinical',
+          items: [item('onset', 'O — Onset', '시작 시점 · 급성/만성 · 외상 여부', [
+            '급성', '만성', '외상·사건 있음', '외상·사건 없음 → 자세·습관 의심',
+          ])],
+        },
+        {
+          step: 'P', stepClass: 'clinical',
+          items: [item('provocation', 'P — Provocation', '어떤 동작·자세에서 악화?', [
+            '힘 쓸 때 악화 (근육·힘줄)', '패시브 늘릴 때 악화 (Fascia·인대·관절)',
+          ])],
+        },
+        {
+          step: 'P', stepClass: 'clinical',
+          items: [item('palliation', 'P — Palliation', '완화 요인', [
+            '쉬면 나아짐', '움직이면 나아짐', '열에 좋아짐', '냉에 좋아짐',
+          ])],
+        },
+        {
+          step: 'Q', stepClass: 'clinical',
+          items: [item('quality', 'Q — Quality', '통증 종류 — 조직 특이 단서', [
+            '전기 튀는 날카로움 (신경)', '한 점 날카로움 (관절)', '뻐근·쥐어짜는 (근육)',
+            '당기는·뻣뻣 (Fascia)', '찢어지는 (결합조직)', '욱씬거림 (급성 염증)', '저림·타는 (신경 만성)',
+          ])],
+        },
+        {
+          step: 'R', stepClass: 'clinical',
+          items: [item('region', 'R — Region / Radiation', '위치·범위 · 방사', [
+            '국소·한 부위', '경로를 따라 방사',
+          ])],
+        },
+        {
+          step: 'S', stepClass: 'clinical',
+          items: [item('severity', 'S — Severity', 'VAS · 일상 영향', [
+            'VAS 0~3 경증', 'VAS 4~6 중등도', 'VAS 7~10 중증',
+            '도움 불필요', '도움 가끔 필요', '도움 항상 필요',
+            '안정 시 통증 없음', '안정 시 약간 불편', '안정 시에도 통증',
+          ])],
+        },
+        {
+          step: 'T', stepClass: 'clinical',
+          items: [item('timing', 'T — Timing', '지속·간헐 · 시간대·활동', [
+            '쉬면 나아짐', '특정 자세·시간대 악화', '아침에 심함', '안정 시에도 지속',
+          ])],
+        },
+        { isMemo: true, title: '그 외 사항' },
       ];
     })();
+
+    function getEvalHistoryChipSections() {
+      var flat = [];
+      EVAL_HISTORY_GROUPS.forEach(function (grp) {
+        if (grp.isMemo) return;
+        (grp.items || []).forEach(function (sec) {
+          flat.push({
+            id: sec.id,
+            title: sec.title,
+            multi: sec.multi,
+            groupStep: grp.step,
+            groupTag: grp.groupTag || '',
+            groupTitle: grp.title || '',
+            groupSub: grp.sub || '',
+          });
+        });
+      });
+      return flat;
+    }
+
+    function renderEvalHistoryChipRow(sec) {
+      var chips = (sec.options || []).map(function (opt) {
+        return '<button type="button" class="eval-hist-chip" data-sec="' + escapeHtml(sec.id) + '" data-val="' + escapeHtml(opt.label) + '" onclick="toggleEvalHistChip(this)">' + escapeHtml(opt.label) + '</button>';
+      }).join('');
+      var titleHtml = sec.title
+        ? '<div class="eval-hist-subtitle">' + escapeHtml(sec.title) + '</div>'
+        : '';
+      return (
+        '<div class="eval-hist-subrow" data-sec-id="' + escapeHtml(sec.id) + '">' +
+          titleHtml +
+          (sec.hint ? '<p class="eval-hist-hint">' + escapeHtml(sec.hint) + '</p>' : '') +
+          '<div class="eval-hist-chips">' + chips + '</div>' +
+        '</div>'
+      );
+    }
 
     function renderEvalHistoryForm() {
       var root = document.getElementById('evalHistoryForm');
       if (!root) return;
-      root.innerHTML = EVAL_HISTORY_SECTIONS.map(function (sec) {
-        var chips = (sec.options || []).map(function (opt) {
-          return '<button type="button" class="eval-hist-chip" data-sec="' + escapeHtml(sec.id) + '" data-val="' + escapeHtml(opt.label) + '" onclick="toggleEvalHistChip(this)">' + escapeHtml(opt.label) + '</button>';
-        }).join('');
-        var stepCls = sec.stepClass ? ' ' + sec.stepClass : '';
+      root.innerHTML = EVAL_HISTORY_GROUPS.map(function (grp) {
+        if (grp.isMemo) {
+          return (
+            '<div class="eval-hist-section eval-hist-memo-block">' +
+              '<div class="eval-hist-section-hd"><span class="eval-hist-title">' + escapeHtml(grp.title) + '</span></div>' +
+              '<textarea id="evalHistoryExtraMemo" class="eval-hist-note eval-hist-extra" rows="3" placeholder="기록되지 않은 특이사항, 보충 설명"></textarea>' +
+            '</div>'
+          );
+        }
+        var stepCls = grp.stepClass ? ' ' + grp.stepClass : '';
+        var hd =
+          '<span class="eval-hist-step' + stepCls + '">' + escapeHtml(grp.step) + '</span>' +
+          (grp.groupTag ? '<span class="eval-hist-group-tag">' + escapeHtml(grp.groupTag) + '</span>' : '') +
+          (grp.title ? '<span class="eval-hist-title">' + escapeHtml(grp.title) + '</span>' : '') +
+          (grp.sub ? '<span class="eval-hist-sub">(' + escapeHtml(grp.sub) + ')</span>' : '');
         return (
-          '<div class="eval-hist-section" data-sec-id="' + escapeHtml(sec.id) + '">' +
-            '<div class="eval-hist-section-hd">' +
-              '<span class="eval-hist-step' + stepCls + '">' + escapeHtml(sec.step) + '</span>' +
-              '<span class="eval-hist-title">' + escapeHtml(sec.title) + '</span>' +
-            '</div>' +
-            (sec.hint ? '<p class="eval-hist-hint">' + escapeHtml(sec.hint) + '</p>' : '') +
-            '<div class="eval-hist-chips">' + chips + '</div>' +
-            '<textarea class="eval-hist-note" data-sec="' + escapeHtml(sec.id) + '" rows="2" placeholder="개별 메모 (선택)"></textarea>' +
+          '<div class="eval-hist-section">' +
+            '<div class="eval-hist-section-hd">' + hd + '</div>' +
+            (grp.items || []).map(renderEvalHistoryChipRow).join('') +
           '</div>'
         );
       }).join('');
@@ -2409,30 +2533,50 @@
     function toggleEvalHistChip(btn) {
       if (!btn) return;
       var secId = btn.dataset.sec;
-      var sec = EVAL_HISTORY_SECTIONS.find(function (s) { return s.id === secId; });
+      var sec = getEvalHistoryChipSections().find(function (s) { return s.id === secId; });
+      var grpItem = null;
+      EVAL_HISTORY_GROUPS.forEach(function (g) {
+        (g.items || []).forEach(function (it) { if (it.id === secId) grpItem = it; });
+      });
       var on = btn.classList.toggle('on');
-      if (sec && !sec.multi && on) {
-        document.querySelectorAll('.eval-hist-chip[data-sec="' + secId + '"].on').forEach(function (el) {
-          if (el !== btn) el.classList.remove('on');
-        });
+      if ((sec && !sec.multi) || (grpItem && grpItem.multi === false)) {
+        if (on) {
+          document.querySelectorAll('.eval-hist-chip[data-sec="' + secId + '"].on').forEach(function (el) {
+            if (el !== btn) el.classList.remove('on');
+          });
+        }
       }
     }
 
     function compileEvalHistoryText() {
       var lines = [];
-      EVAL_HISTORY_SECTIONS.forEach(function (sec) {
-        var selected = [];
-        document.querySelectorAll('.eval-hist-chip[data-sec="' + sec.id + '"].on').forEach(function (el) {
-          selected.push(el.dataset.val || el.textContent.trim());
+      EVAL_HISTORY_GROUPS.forEach(function (grp) {
+        if (grp.isMemo) return;
+        var rows = [];
+        (grp.items || []).forEach(function (sec) {
+          var selected = [];
+          document.querySelectorAll('.eval-hist-chip[data-sec="' + sec.id + '"].on').forEach(function (el) {
+            selected.push(el.dataset.val || el.textContent.trim());
+          });
+          if (!selected.length) return;
+          if (sec.title) rows.push('  · ' + sec.title + ': ' + selected.join(' / '));
+          else rows.push('  · ' + selected.join(' / '));
         });
-        var noteEl = document.querySelector('.eval-hist-note[data-sec="' + sec.id + '"]');
-        var note = noteEl ? String(noteEl.value || '').trim() : '';
-        if (!selected.length && !note) return;
-        lines.push('■ ' + sec.title);
-        if (selected.length) lines.push('  · ' + selected.join(' / '));
-        if (note) lines.push('  · 메모: ' + note);
+        if (!rows.length) return;
+        var head = '■ ' + grp.step;
+        if (grp.groupTag) head += ' ' + grp.groupTag;
+        else if (grp.title) head += ' ' + grp.title + (grp.sub ? ' (' + grp.sub + ')' : '');
+        else if ((grp.items || [])[0] && (grp.items || [])[0].title) head += ' ' + (grp.items || [])[0].title;
+        lines.push(head);
+        rows.forEach(function (r) { lines.push(r); });
         lines.push('');
       });
+      var extra = document.getElementById('evalHistoryExtraMemo');
+      var extraText = extra ? String(extra.value || '').trim() : '';
+      if (extraText) {
+        lines.push('■ 그 외 사항');
+        lines.push('  · ' + extraText);
+      }
       return lines.join('\n').trim();
     }
 
@@ -2475,15 +2619,15 @@
 
     function gatherEvalHistoryState() {
       var out = {};
-      EVAL_HISTORY_SECTIONS.forEach(function (sec) {
+      getEvalHistoryChipSections().forEach(function (sec) {
         var selected = [];
         document.querySelectorAll('.eval-hist-chip[data-sec="' + sec.id + '"].on').forEach(function (el) {
           selected.push(el.dataset.val || el.textContent.trim());
         });
-        var noteEl = document.querySelector('.eval-hist-note[data-sec="' + sec.id + '"]');
         out[sec.id] = selected;
-        out[sec.id + '_note'] = noteEl ? String(noteEl.value || '').trim() : '';
       });
+      var extra = document.getElementById('evalHistoryExtraMemo');
+      out.extraMemo = extra ? String(extra.value || '').trim() : '';
       return out;
     }
 
@@ -2502,13 +2646,10 @@
       else if (histHasAny(histState, 'goal', [/예방/])) goalId = 'prevention';
       else if (histHasAny(histState, 'goal', [/자세/])) goalId = 'posture';
 
-      var comfort = (histState.comfort || [])[0] || '';
       var careStep = 'active';
       if (histHasAny(histState, 'severity', [/7~10|중증|항상 필요|안정 시에도 통증/])) careStep = 'invasive';
-      else if (comfort === '일상생활 어려움') careStep = 'manual';
       else if (histHasAny(histState, 'severity', [/4~6|중등도/])) careStep = 'manual';
       else if (histHasAny(histState, 'quality', [/전기|한 점|찢어|욱씬/])) careStep = 'manual';
-      else if (comfort === '운동·스트레칭 시 불편') careStep = 'manual';
       else if (goalId === 'stretch' || goalId === 'prevention') careStep = 'pstr';
       else if (goalId === 'fitness') {
         careStep = histHasAny(histState, 'severity', [/0~3|경증/]) ? 'aa' : 'resistive';
