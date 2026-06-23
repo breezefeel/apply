@@ -159,12 +159,6 @@
       border:1px solid var(--border); border-radius:0 0 10px 10px;
       padding:10px; background:#fafbfd;
     }
-    .psp-goal-box {
-      font-size:11px; color:var(--dim); background:#fff;
-      border:1px solid var(--border); border-radius:8px;
-      padding:10px; margin-bottom:10px; line-height:1.55;
-    }
-    .psp-goal-box strong { color:var(--text); }
     .psp-part-hd {
       display:flex; align-items:center; gap:8px;
       margin:12px 0 6px; font-size:12px; font-weight:700;
@@ -209,7 +203,7 @@
     .method-row.done input[type="checkbox"]:checked { accent-color: var(--green); }
     .method-row input { width:18px; height:18px; margin-top:2px; cursor:pointer; flex-shrink:0; }
     .method-label { font-size:12px; font-weight:500; line-height:1.45; }
-    /* Position 1 — Passive/AA/Resistive: 4부위 컴팩트 (모바일 2×2, 넓은 화면 1줄) */
+    /* Lying PAR — 4부위 한 줄(넓은 화면) / 2×2(모바일) */
     .psp-part-card.p1-kind-card {
       display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px;
       padding:8px;
@@ -218,30 +212,24 @@
       .psp-part-card.p1-kind-card { grid-template-columns:repeat(4, minmax(0, 1fr)); }
     }
     .psp-part-card.p1-kind-card .method-row {
-      display:flex; align-items:center; gap:6px;
+      display:flex; align-items:center; gap:5px;
       grid-template-columns:none;
-      margin:0; padding:7px 8px;
+      margin:0; padding:7px 6px;
       border:1px solid var(--border); border-radius:8px; background:#fafbfc;
       min-width:0;
     }
-    .psp-part-card.p1-kind-card .method-row input { margin-top:0; flex-shrink:0; }
+    .psp-part-card.p1-kind-card .method-row input { margin-top:0; flex-shrink:0; width:16px; height:16px; }
     .psp-part-card.p1-kind-card .method-row > div { flex:1; min-width:0; }
     .psp-part-card.p1-kind-card .method-label {
-      font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .psp-part-card.p1-kind-card .vid-tag {
-      flex-shrink:0; font-size:9px; padding:2px 4px; white-space:nowrap;
+      flex-shrink:0; font-size:8px; padding:1px 3px; white-space:nowrap;
     }
     .psp-part-card.p1-kind-card .method-row.done { border-left-width:1px; border-left-color:var(--green); }
     .method-vid { font-size:10px; color:var(--green); margin-top:2px; }
     .vid-tag { font-size:10px; padding:2px 6px; border-radius:5px; background:#f1f5f9; color:#94a3b8; }
     .vid-tag.ok { background:var(--green-bg); color:var(--green); }
-    .psp-trio { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:8px; }
-    .psp-trio-item { background:#fff; border:1px solid var(--border); border-radius:8px; padding:8px 6px; text-align:center; }
-    .psp-trio-ico { font-size:16px; margin-bottom:2px; }
-    .psp-trio-t { font-size:10px; font-weight:700; }
-    .psp-trio-s { font-size:9px; color:var(--dim); }
-    .psp-coach-foot { font-size:10px; color:var(--dim); margin-bottom:10px; font-style:italic; }
     .psp-part-lead { font-size:11px; color:var(--dim); margin:0 0 8px; line-height:1.5; }
     .psp-align-chain { display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-bottom:10px; }
     .psp-align-step { font-size:10px; font-weight:600; background:var(--blue-soft); color:var(--blue); padding:4px 8px; border-radius:6px; }
@@ -737,77 +725,57 @@
       { index:2, name:'이상민', color:'#E2EFDA', lightColor:'#F0F7EB' },
     ];
 
-    const SECTION_META = {
-      posture: {
-        goal: '밸런스를 잡으며 천천히 움직입니다. 가능하면 거울을 보며 좌우·전후 대칭, 호흡, 긴장 최소화를 확인합니다. 기초 체력 향상이 또 다른 목표입니다.',
-        trio: [
-          { t:'편안한 호흡', s:'자연스럽게 흐름', ico:'🌬' },
-          { t:'긴장 자각', s:'스스로 판단', ico:'🧠' },
-          { t:'자기 조절', s:'스스로 해소', ico:'🔄' },
-        ],
-        coachFoot: '코치의 역할 — 이 세 가지를 스스로 할 수 있도록 안내하는 것',
-        programLeads: {
-          '1': '편안한 호흡 다음으로 호흡 운동을 코칭하며 몸을 바르게 정렬합니다.',
-          '2': '호흡·정렬 후 · 상·하체를 번갈아 분절 → 정식 Sit-up · 천천히 구르기로 마무리.',
-          '3': '엎드린 채 후방 경선·체간 안정·회전을 단계적으로 진행합니다.',
-        },
-        alignChain: ['엉덩이','발','무릎','척추','어깨','손끝'],
-      },
-    };
+    function programCategoryTitle(progName) {
+      return String(progName || '').replace(/^\d+\s*·\s*/, '');
+    }
+
     function programSortKey(name) {
       const s = String(name || '');
+      var parOrder = { 'Passive Stretching': 1, 'Assisted Active': 2, 'Resistive': 3 };
+      if (parOrder[s] != null) return parOrder[s];
+      if (s === ACTIVE_STRETCHING_TITLE || s === '근막경선별 Active Stretching') return 0;
+      if (/Active Stretching · 상체|근막경선별 Active · 상체/.test(s)) return 0.1;
+      if (/Active Stretching · 하체|근막경선별 Active · 하체/.test(s)) return 0.2;
+      var programOrder = {
+        '생활습관': 20,
+        '스쿼트 6단계': 21,
+        '밸런스 트레이닝 6단계': 22,
+        '척추+상지 분절 운동 6단계': 30,
+        'Push-up 6단계': 31,
+      };
+      if (programOrder[s] != null) return programOrder[s];
       const postM = s.match(/^(\d+)\s*·/);
       if (postM && /호흡|Sit-up|Superman/.test(s)) {
-        var postureOrder = { 1: 10, 3: 11, 2: 12 };
-        return postureOrder[postM[1]] != null ? postureOrder[postM[1]] : 20;
+        return 10 + parseInt(postM[1], 10);
       }
       var circled = { '①': 1, '②': 2, '③': 3, '④': 4 };
       if (circled[s.charAt(0)] != null) return circled[s.charAt(0)];
       const m = s.match(/^(\d+)/);
       return m ? parseInt(m[1], 10) : 99;
     }
-    function isPostureProgramBlock(items) {
-      return (items || []).some(function(it) { return /^post_/.test(it.id); });
+    var P1_PAR_PROGRAMS = ['Passive Stretching', 'Assisted Active', 'Resistive'];
+
+    function isP1ParProgram(progName) {
+      return P1_PAR_PROGRAMS.indexOf(progName) >= 0;
     }
 
-    var P1_BODY_MAP = {
-      '① Supine Lower': 'Supine 하지',
-      '② Supine Upper': 'Supine 상지',
-      '③ Prone Lower': 'Prone 하지',
-      '④ Prone Upper': 'Prone 상지',
-    };
-
-    function simplifyExerciseLabel(raw) {
-      var s = String(raw || '').trim();
-      if (/^Passive Stretching/i.test(s)) return 'Passive Stretching';
-      if (/^Assisted Active/i.test(s)) return 'Assisted Active';
-      if (/^Resistive/i.test(s)) return 'Resistive';
-      return s;
+    function isP1ParItem(item) {
+      return !!(item && isP1ParProgram(item.program));
     }
 
-    function isP1BodyItem(item) {
-      return !!(item && P1_BODY_MAP[item.program]);
+    /** Lying PAR 컴팩트 칩 — Supine 하지 / Prone 상지 */
+    function p1CompactLabel(item) {
+      var label = String(item.label || '');
+      var m = label.match(/^[①②③④]\s*(Supine|Prone)\s*·\s*(하지|상지)/);
+      if (m) return m[1] + ' ' + m[2];
+      return methodDisplayLabel(item);
     }
-
-    function p1BodyPartLabel(item) {
-      return P1_BODY_MAP[item.program] || '';
-    }
-
-    function p1BodyPartOrder(prog) {
-      var order = { '① Supine Lower': 1, '② Supine Upper': 2, '③ Prone Lower': 3, '④ Prone Upper': 4 };
-      return order[prog] != null ? order[prog] : 99;
-    }
-
-    var P1_EXERCISE_KINDS = ['Passive Stretching', 'Assisted Active', 'Resistive'];
 
     function methodDisplayLabel(item) {
       if (!item) return '';
-      var prog = String(item.program || '');
       var label = String(item.label || '');
-      if (P1_BODY_MAP[prog]) {
-        return P1_BODY_MAP[prog] + ' — ' + simplifyExerciseLabel(label);
-      }
       if (label.indexOf(' — ') >= 0) return label;
+      var prog = String(item.program || '');
       if (prog === '생활습관') return label;
       if (prog === 'Resistive — Advanced') return 'Resistive — Advanced — ' + label;
       return label;
@@ -822,17 +790,16 @@
       '엎드려서 · 저항 운동',
     ];
 
-    /** 알림톡 #{오늘진도} — Position 1 4부위는 운동 유형으로 통합 */
+    /** 알림톡 #{오늘진도} — Lying PAR는 자세·유형으로 통합 */
     function methodAlimtalkLabel(item) {
       if (!item) return '';
       var prog = String(item.program || '');
       var label = String(item.label || '');
-      if (P1_BODY_MAP[prog]) {
-        var posture = /Supine/i.test(prog) ? '누워서' : '엎드려서';
-        var kind = simplifyExerciseLabel(label);
-        if (kind === 'Passive Stretching') return posture + ' · 패시브 스트레칭';
-        if (kind === 'Assisted Active') return posture + ' · 보조 능동 운동';
-        if (kind === 'Resistive') return posture + ' · 저항 운동';
+      if (P1_PAR_PROGRAMS.indexOf(prog) >= 0) {
+        var posture = /Prone/i.test(label) ? '엎드려서' : '누워서';
+        if (prog === 'Passive Stretching') return posture + ' · 패시브 스트레칭';
+        if (prog === 'Assisted Active') return posture + ' · 보조 능동 운동';
+        if (prog === 'Resistive') return posture + ' · 저항 운동';
       }
       return methodDisplayLabel(item);
     }
@@ -843,10 +810,18 @@
     }
 
     function useFlatCheckboxRows(progName) {
-      if (P1_BODY_MAP[progName]) return true;
-      if (progName === '근막경선별 Active Stretching') return true;
       if (/근막경선별 Active ·/.test(progName)) return true;
       return false;
+    }
+
+    var ACTIVE_STRETCHING_TITLE = 'Active Stretching';
+
+    function isActiveStretchingProgram(progName) {
+      var p = String(progName || '');
+      return p === ACTIVE_STRETCHING_TITLE
+        || p === '근막경선별 Active Stretching'
+        || /^Active Stretching ·/.test(p)
+        || /^근막경선별 Active ·/.test(p);
     }
 
     /* 서버 연결 전에도 표시 — code.gs PSP_PROGRAM_CATALOG_ 와 동기화 */
@@ -857,73 +832,73 @@
       { id:'ball_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'복부', linkUrl:'https://www.youtube.com/shorts/zjvXLTL9E5A' },
       { id:'ball_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'엉덩이', linkUrl:'https://m.blog.naver.com/allenjoy/223442108509' },
       { id:'ball_scapula', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'견갑골', linkUrl:'https://m.blog.naver.com/allenjoy/223449532242' },
-      { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'① Supine Lower', label:'Passive Stretching' },
-      { id:'p1_sl_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'① Supine Lower', label:'Assisted Active' },
-      { id:'p1_sl_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'① Supine Lower', label:'Resistive' },
-      { id:'p1_su_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'② Supine Upper', label:'Passive Stretching' },
-      { id:'p1_su_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'② Supine Upper', label:'Assisted Active' },
-      { id:'p1_su_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'② Supine Upper', label:'Resistive' },
-      { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'③ Prone Lower', label:'Passive Stretching' },
-      { id:'p1_pl_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'③ Prone Lower', label:'Assisted Active' },
-      { id:'p1_pl_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'③ Prone Lower', label:'Resistive' },
-      { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Passive Stretching' },
-      { id:'p1_pu_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Assisted Active' },
-      { id:'p1_pu_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'④ Prone Upper', label:'Resistive' },
-      { id:'post_breath_relax', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'1 · 누워서 호흡 운동', label:'편안한 호흡' },
-      { id:'post_breath', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬 (엉덩이→발→머리→어깨→손끝)' },
-      { id:'post_super_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'3 · Prone Superman 6단계', label:'① 척추 — 경추부터 척추분절 순으로 전체 들기' },
-      { id:'post_super_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'3 · Prone Superman 6단계', label:'② 대각선 — 한 손 + 반대 발 동시 들기' },
-      { id:'post_super_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'3 · Prone Superman 6단계', label:'③ 양손·양발 — 낮게 동시 들기' },
-      { id:'post_super_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'3 · Prone Superman 6단계', label:'④ 접영 — 양손·양발 든 상태 접영 + 발 벌림' },
-      { id:'post_super_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'3 · Prone Superman 6단계', label:'⑤ 팔 신전·무릎 굴곡 — 견갑 모으기 → 무릎 높게 밴딩' },
-      { id:'post_super_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'3 · Prone Superman 6단계', label:'⑥ 팔꿈치·회전 — 한쪽 팔꿈치부터 번갈아 높이 들며 회전' },
-      { id:'post_situp_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'2 · Supine Sit-up 6단계', label:'① 상체 — 누운 상태 상체 약 45° (견갑 이탈)' },
-      { id:'post_situp_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'2 · Supine Sit-up 6단계', label:'② 하체 — 견갑 띄운 채 다리 한쪽씩 → 양쪽 동시' },
-      { id:'post_situp_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'2 · Supine Sit-up 6단계', label:'③ 상체 — 앉은 90°에서 45°까지 내려갔다 복귀' },
-      { id:'post_situp_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'2 · Supine Sit-up 6단계', label:'④ 하체 — 등 닿은 상태 다리 한쪽씩 → 양쪽 동시' },
-      { id:'post_situp_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'2 · Supine Sit-up 6단계', label:'⑤ 정식 Sit-up — 통증 없는 범위' },
-      { id:'post_situp_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Supine/Prone', program:'2 · Supine Sit-up 6단계', label:'⑥ 구르기 — 뒤로 굴렀다 복귀, 무릎 펴고 발끝 닿기' },
-      { id:'p2_a_front', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active Stretching', label:'전방 경선 — 경추 굴곡·흉추 굴곡·고관절 굴곡·발목 배굴' },
-      { id:'p2_a_back', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active Stretching', label:'후방 경선 — 경추 신전·흉추 신전·햄스트링·발목 저굴' },
-      { id:'p2_a_lat', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active Stretching', label:'측방 경선 — 경추·흉추 측굴·고관절 외전·발목 내외번' },
-      { id:'p2_a_spiral', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'근막경선별 Active Stretching', label:'나선·회전 경선 — 경추·흉추 회전·견갑·GH 회전' },
+      { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'① Supine · 하지' },
+      { id:'p1_su_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'② Supine · 상지' },
+      { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'③ Prone · 하지' },
+      { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'④ Prone · 상지' },
+      { id:'p1_sl_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Assisted Active', label:'① Supine · 하지' },
+      { id:'p1_su_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Assisted Active', label:'② Supine · 상지' },
+      { id:'p1_pl_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Assisted Active', label:'③ Prone · 하지' },
+      { id:'p1_pu_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Assisted Active', label:'④ Prone · 상지' },
+      { id:'p1_sl_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Resistive', label:'① Supine · 하지' },
+      { id:'p1_su_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Resistive', label:'② Supine · 상지' },
+      { id:'p1_pl_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Resistive', label:'③ Prone · 하지' },
+      { id:'p1_pu_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Resistive', label:'④ Prone · 상지' },
+      { id:'post_breath_relax', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'1 · 누워서 호흡 운동', label:'편안한 호흡' },
+      { id:'post_breath', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬 (엉덩이→발→머리→어깨→손끝)' },
+      { id:'post_super_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'① 척추 — 경추부터 척추분절 순으로 전체 들기' },
+      { id:'post_super_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'② 대각선 — 한 손 + 반대 발 동시 들기' },
+      { id:'post_super_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'③ 양손·양발 — 낮게 동시 들기' },
+      { id:'post_super_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'④ 접영 — 양손·양발 든 상태 접영 + 발 벌림' },
+      { id:'post_super_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'⑤ 팔 신전·무릎 굴곡 — 견갑 모으기 → 무릎 높게 밴딩' },
+      { id:'post_super_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'⑥ 팔꿈치·회전 — 한쪽 팔꿈치부터 번갈아 높이 들며 회전' },
+      { id:'post_situp_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'① 상체 — 누운 상태 상체 약 45° (견갑 이탈)' },
+      { id:'post_situp_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'② 하체 — 견갑 띄운 채 다리 한쪽씩 → 양쪽 동시' },
+      { id:'post_situp_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'③ 상체 — 앉은 90°에서 45°까지 내려갔다 복귀' },
+      { id:'post_situp_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'④ 하체 — 등 닿은 상태 다리 한쪽씩 → 양쪽 동시' },
+      { id:'post_situp_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'⑤ 정식 Sit-up — 통증 없는 범위' },
+      { id:'post_situp_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'⑥ 구르기 — 뒤로 굴렀다 복귀, 무릎 펴고 발끝 닿기' },
+      { id:'p2_a_front', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'전방 경선 — 경추 굴곡·흉추 굴곡·고관절 굴곡·발목 배굴' },
+      { id:'p2_a_back', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'후방 경선 — 경추 신전·흉추 신전·햄스트링·발목 저굴' },
+      { id:'p2_a_lat', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'측방 경선 — 경추·흉추 측굴·고관절 외전·발목 내외번' },
+      { id:'p2_a_spiral', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'나선·회전 경선 — 경추·흉추 회전·견갑·GH 회전' },
       { id:'p2_sit_posture', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'생활습관', label:'바르게 앉는 방법' },
       { id:'p2_sit_breath', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'생활습관', label:'호흡 운동 + 등척성 정렬 (엉덩이→머리→어깨→손끝)' },
-      { id:'p2_seg_1', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동', label:'① 시작 정렬 — 바르게 앉아 양팔 벌리고 손끝 바깥으로 길게 뻗기' },
-      { id:'p2_seg_2', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동', label:'② 앞으로 모으기(날숨 5초) — 손등부터 Internal rotation' },
-      { id:'p2_seg_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동', label:'③ 근위 분절 연결 — 팔꿈치→어깨 순차 Internal rotation' },
-      { id:'p2_seg_4', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동', label:'④ 척추 굴곡 동반 — 전 구간 Flexion으로 연결' },
-      { id:'p2_seg_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동', label:'⑤ 뒤로 벌리기(들숨 5초) — 손부터 External rotation 순차 진행' },
-      { id:'p2_seg_6', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동', label:'⑥ 마무리 정렬 — Lower thoracic 갈비뼈 살짝 누르기 + 전 구간 Extension' },
+      { id:'p2_seg_1', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'① 골반 전/후방 굴리며 척추 움직임' },
+      { id:'p2_seg_2', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'② + 상지 움직임 추가' },
+      { id:'p2_seg_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'③ 골반 좌우 굴리며 척추 움직임' },
+      { id:'p2_seg_4', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'④ + 상지 움직임 추가' },
+      { id:'p2_seg_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'⑤ 골반 회전 움직임' },
+      { id:'p2_seg_6', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'⑥ + 상지 움직임 추가' },
       { id:'p2_pushup_1', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'① 무릎 대고 네발 — 웨이브로 내려갔다 올라오기' },
       { id:'p2_pushup_2', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'② 무릎 지지 — 몸통+골반 동시 하강 → 웨이브로 상승' },
       { id:'p2_pushup_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'③ 무릎 지지 — 몸통+골반 동시 하강·상승 (웨이브 없이)' },
       { id:'p2_pushup_4', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'④ 무릎 뗀 네발 — 웨이브로 내려갔다 올라오기' },
       { id:'p2_pushup_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'⑤ 무릎 뗀 네발 — 몸통+골반 동시 하강 → 웨이브로 상승' },
       { id:'p2_pushup_6', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'⑥ 정상 Push-up — 통증 없는 범위에서 완성 동작' },
-      { id:'p3_a_upper_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 상체', label:'① 상지 — 손·손목·팔 연쇄' },
-      { id:'p3_a_upper_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 상체', label:'② 목 — 경추 굴곡·신전·측굴·회전' },
-      { id:'p3_a_upper_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 상체', label:'③ 어깨 — GH·견갑 연쇄' },
-      { id:'p3_a_upper_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 상체', label:'④ 몸통 — 흉·요추 분절 (Roll down/up)' },
-      { id:'p3_a_lower_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 하체', label:'① 허리 — 요추·골반 정렬' },
-      { id:'p3_a_lower_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 하체', label:'② 고관절 — 굴곡·신전·회전' },
-      { id:'p3_a_lower_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 하체', label:'③ 무릎 — 슬관절 가동' },
-      { id:'p3_a_lower_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'근막경선별 Active · 하체', label:'④ 발목 — 족부·종아리 연쇄' },
-      { id:'p3_balance_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'① 일어선 상태 한발 살짝 들기 — 30초 유지 (좌·우)' },
-      { id:'p3_balance_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'② 무릎 높이까지 들어 올리기 — 30초 유지 (좌·우)' },
-      { id:'p3_balance_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'③ 한 발 지지 · 반대 다리 뒤로 짧게 뻗기 + 소폭 전굴' },
-      { id:'p3_balance_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'④ 한 발 지지 · 반대 다리 뒤로 뻗기(발 미접지) + 전굴' },
-      { id:'p3_balance_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑤ ④ 자세에서 반대 다리 앞으로 — 대퇴 수평(무릎 약 90°)' },
-      { id:'p3_balance_6', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑥ 최종 — 뒤로 뻗기(전굴)→무릎 들기 한 사이클 연속·리듬 있게' },
+      { id:'p3_a_upper_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'① 상지 — 손·손목·팔 연쇄' },
+      { id:'p3_a_upper_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'② 목 — 경추 굴곡·신전·측굴·회전' },
+      { id:'p3_a_upper_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'③ 어깨 — GH·견갑 연쇄' },
+      { id:'p3_a_upper_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'④ 몸통 — 흉·요추 분절 (Roll down/up)' },
+      { id:'p3_a_lower_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'① 허리 — 요추·골반 정렬' },
+      { id:'p3_a_lower_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'② 고관절 — 굴곡·신전·회전' },
+      { id:'p3_a_lower_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'③ 무릎 — 슬관절 가동' },
+      { id:'p3_a_lower_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'④ 발목 — 족부·종아리 연쇄' },
+      { id:'p3_stand_posture', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 서기' },
+      { id:'p3_stand_breath', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'호흡 정렬 운동' },
+      { id:'p3_stand_walk', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 걷기' },
       { id:'p3_squat_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'① 의자에 살짝 걸터 앉은 상태 — 엉덩이 앞으로 떼었다 앉기' },
       { id:'p3_squat_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'② 엉덩이 앞으로 뗀 뒤 — 일어났다가 다시 앉기' },
       { id:'p3_squat_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'③ 일어났다가 깊게 앉았다가 — 의자 높이까지 일어난 후 다시 앉기' },
       { id:'p3_squat_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'④ 한쪽 다리에 중심 — ①번 동작 (좌·우)' },
       { id:'p3_squat_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'⑤ 한쪽 다리에 중심 — ②번 동작 (좌·우)' },
       { id:'p3_squat_6', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'⑥ 한쪽 다리에 중심 — ③번 동작 (좌·우)' },
-      { id:'p3_stand_posture', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 서기' },
-      { id:'p3_stand_breath', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'호흡 정렬 운동' },
-      { id:'p3_stand_walk', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 걷기' },
+      { id:'p3_balance_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'① 일어선 상태 한발 살짝 들기 — 30초 유지 (좌·우)' },
+      { id:'p3_balance_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'② 무릎 높이까지 들어 올리기 — 30초 유지 (좌·우)' },
+      { id:'p3_balance_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'③ 한 발 지지 · 반대 다리 뒤로 짧게 뻗기 + 소폭 전굴' },
+      { id:'p3_balance_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'④ 한 발 지지 · 반대 다리 뒤로 뻗기(발 미접지) + 전굴' },
+      { id:'p3_balance_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑤ ④ 자세에서 반대 다리 앞으로 — 대퇴 수평(무릎 약 90°)' },
+      { id:'p3_balance_6', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑥ 최종 — 뒤로 뻗기(전굴)→무릎 들기 한 사이클 연속·리듬 있게' },
       { id:'func_adv_a', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'A' },
       { id:'func_adv_b', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'B' },
       { id:'func_adv_c', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'C' },
@@ -947,8 +922,8 @@
 
     var PROGRAM_TABS = [
       { id: 'movement', label: 'Re:Al Movement', sub: '5단계 프로토콜 · 기능운동·P-스트레칭·이상민 담당' },
-      { id: 'face', label: '얼굴', sub: '작은얼굴 · Re:Al Face 프로그램' },
       { id: 'func', label: '기능 운동', sub: '최진옥 담당 · 기능 운동 프로그램' },
+      { id: 'face', label: '얼굴', sub: '작은얼굴 · Re:Al Face 프로그램' },
     ];
 
     var SCHEDULE_PROGRAM_COLORS_FALLBACK = {
@@ -1624,30 +1599,17 @@
     function memberKey(m) {
       return (m.suffix8 || ('n:' + m.name)) + '|' + (m.time || '') + '|' + (m.instructorIndex != null ? m.instructorIndex : '');
     }
-    /** 1회 출석 = 스케줄 1칸(1칸 회원) · 2칸 회원은 1회당 2칸 */
-    function slotsPerCredit(m) {
-      if (m && typeof m.slotsPerCredit === 'number') return m.slotsPerCredit;
-      return m && m.usesDualSlot ? 2 : 1;
-    }
-
     function todayAttendCredits(m) {
       if (!m) return 0;
       if (typeof m.todayAttendCount === 'number') return m.todayAttendCount;
       return m.attendedToday ? 1 : 0;
     }
 
-    function todaySlotsUsed(m) {
-      if (m && typeof m.todaySlotsUsed === 'number') return m.todaySlotsUsed;
-      return todayAttendCredits(m) * slotsPerCredit(m);
-    }
-
-    function todaySlotsLabel(m) {
+    /** 회원 칩 — 다회차(2회+)만 표시, 1회·1칸은 취소선으로 충분 */
+    function todayAttendChipLabel(m) {
       var credits = todayAttendCredits(m);
-      if (credits <= 0) return '';
-      if (credits > 1) return '오늘 ' + credits + '회';
-      var used = todaySlotsUsed(m);
-      if (used <= 0) return '';
-      return '오늘 ' + used + '칸';
+      if (credits <= 1) return '';
+      return '오늘 ' + credits + '회';
     }
 
     function isMemberCompleted(m) {
@@ -1856,12 +1818,13 @@
             const sess = m.sessionDisplay || '';
             const timeTag = m.time ? '<span class="time-tag">'+escapeHtml(m.time)+'</span>' : '';
             const nameColor = memberProgramColor(m);
-            const dualTag = todayAttendCredits(m) > 0
-              ? '<span class="dual-tag">' + escapeHtml(todaySlotsLabel(m)) + '</span>'
+            const attendLbl = todayAttendChipLabel(m);
+            const attendTag = attendLbl
+              ? '<span class="dual-tag">' + escapeHtml(attendLbl) + '</span>'
               : '';
             html += '<button type="button" class="member-chip'+on+(done?' done':'')+'" style="background:'+escapeHtml(bg)+';border-color:'+escapeHtml(border)+'" onclick="selectMemberByKey(\''+chipKeyAttr(key)+'\')">'+
               timeTag + '<span class="chip-name" style="color:'+escapeHtml(nameColor)+'">'+escapeHtml(m.name)+'</span>' +
-              dualTag +
+              attendTag +
               (sess ? '<span class="sess">'+escapeHtml(sess)+'</span>' : '') + '</button>';
           });
         }
@@ -2009,29 +1972,6 @@
         vidTag + '</label>';
     }
 
-    function renderP1ParByExerciseType(p1Items, secKey, hasMember) {
-      var byKind = {};
-      p1Items.forEach(function (item) {
-        var kind = simplifyExerciseLabel(item.label);
-        if (!byKind[kind]) byKind[kind] = [];
-        byKind[kind].push(item);
-      });
-      var html = '';
-      P1_EXERCISE_KINDS.forEach(function (kind) {
-        var items = byKind[kind];
-        if (!items || !items.length) return;
-        html += '<div class="psp-part-hd" style="margin-top:4px;"><span>' + escapeHtml(kind) + '</span></div>';
-        html += '<div class="psp-part-card p1-kind-card">';
-        items.sort(function (a, b) {
-          return p1BodyPartOrder(a.program) - p1BodyPartOrder(b.program);
-        }).forEach(function (item) {
-          html += renderMethodRowHtml(item, secKey, hasMember, p1BodyPartLabel(item));
-        });
-        html += '</div>';
-      });
-      return html;
-    }
-
     function renderProgramList() {
       const root = document.getElementById('pspProgramList');
       const list = state.program;
@@ -2046,8 +1986,6 @@
       const hasMember = !!state.selected;
 
       const sections = ['self_tool','pos1_par','pos2','pos3','func'];
-      const sectionOrder = {};
-      sections.forEach(function(s,i){ sectionOrder[s]=i; });
       const grouped = {};
       list.forEach(function(item){
         const sec = item.uiSection || 'other';
@@ -2068,18 +2006,9 @@
           html += '<div class="psp-section-hd">'+escapeHtml(g.title)+'</div>';
         }
         html += '<div class="psp-section-body">';
-        let postureIntroShown = false;
+        let activeStretchingMainShown = false;
         let programsInSection = {};
-        var sectionItems = g.items.slice();
-        if (secKey === 'pos1_par') {
-          var p1BodyItems = sectionItems.filter(isP1BodyItem);
-          var restItems = sectionItems.filter(function (it) { return !isP1BodyItem(it); });
-          if (p1BodyItems.length) {
-            html += renderP1ParByExerciseType(p1BodyItems, secKey, hasMember);
-          }
-          sectionItems = restItems;
-        }
-        sectionItems.forEach(function(item){
+        g.items.forEach(function(item){
           if (!programsInSection[item.program]) programsInSection[item.program] = [];
           programsInSection[item.program].push(item);
         });
@@ -2089,38 +2018,23 @@
           return String(a).localeCompare(String(b),'ko');
         }).forEach(function(progName){
           const items = programsInSection[progName];
-          const isPosture = isPostureProgramBlock(items);
-          if (secKey === 'pos1_par' && isPosture && !postureIntroShown) {
-            postureIntroShown = true;
-            html += '<div class="psp-goal-box" style="margin-top:12px;"><strong>생활습관 & 자세 교정</strong> — '+escapeHtml(SECTION_META.posture.goal)+'</div>';
-            html += '<div class="psp-trio">';
-            SECTION_META.posture.trio.forEach(function(t){
-              html += '<div class="psp-trio-item"><div class="psp-trio-ico">'+t.ico+'</div>'+
-                '<div class="psp-trio-t">'+escapeHtml(t.t)+'</div><div class="psp-trio-s">'+escapeHtml(t.s)+'</div></div>';
-            });
-            html += '</div><p class="psp-coach-foot">'+escapeHtml(SECTION_META.posture.coachFoot)+'</p>';
-          }
-          if (isPosture) {
-            const numMatch = progName.match(/^(\d+)/);
-            const num = numMatch ? numMatch[1] : '';
-            html += '<div class="psp-part-hd">'+(num ? '<span class="psp-part-num">'+num+'</span>' : '')+
-              '<span>'+escapeHtml(progName.replace(/^\d+\s*·\s*/,''))+'</span></div>';
-            const lead = SECTION_META.posture.programLeads[num];
-            if (lead) html += '<p class="psp-part-lead">'+escapeHtml(lead)+'</p>';
-            if (num === '1') {
-              html += '<div class="psp-align-chain">';
-              SECTION_META.posture.alignChain.forEach(function(step, i){
-                if (i) html += '<span class="psp-align-arrow">→</span>';
-                html += '<span class="psp-align-step">'+escapeHtml(step)+'</span>';
-              });
-              html += '</div>';
+          if (isActiveStretchingProgram(progName)) {
+            if (!activeStretchingMainShown) {
+              activeStretchingMainShown = true;
+              html += '<div class="psp-part-hd" style="margin-top:4px;"><span>' + escapeHtml(ACTIVE_STRETCHING_TITLE) + '</span></div>';
             }
           } else if (!useFlatCheckboxRows(progName)) {
-            html += '<div class="psp-part-hd" style="margin-top:4px;"><span>'+escapeHtml(progName)+'</span></div>';
+            html += '<div class="psp-part-hd" style="margin-top:4px;"><span>'+escapeHtml(programCategoryTitle(progName))+'</span></div>';
           }
-          html += '<div class="psp-part-card'+(secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0 ? ' horizontal' : '')+'">';
+          var cardCls = 'psp-part-card';
+          if (secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0) cardCls += ' horizontal';
+          else if (isP1ParProgram(progName)) cardCls += ' p1-kind-card';
+          html += '<div class="' + cardCls + '">';
           items.forEach(function(item){
-            html += renderMethodRowHtml(item, secKey, hasMember);
+            html += renderMethodRowHtml(
+              item, secKey, hasMember,
+              isP1ParProgram(progName) ? p1CompactLabel(item) : null
+            );
           });
           html += '</div>';
         });
@@ -2242,12 +2156,6 @@
       if (typeof data.todayAttendCount === 'number') {
         m.todayAttendCount = data.todayAttendCount;
       }
-      if (typeof data.todaySlotsUsed === 'number') m.todaySlotsUsed = data.todaySlotsUsed;
-      else if (typeof data.todayAttendCount === 'number') {
-        m.todaySlotsUsed = data.todayAttendCount * (m.usesDualSlot ? 2 : 1);
-      }
-      if (typeof data.slotsPerCredit === 'number') m.slotsPerCredit = data.slotsPerCredit;
-      else if (m.usesDualSlot) m.slotsPerCredit = 2;
       if (data.sessionDisplay) m.sessionDisplay = data.sessionDisplay;
       resetAttendPassCount(m);
       refreshSectionCollapseDefaults();
