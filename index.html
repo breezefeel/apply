@@ -552,8 +552,8 @@
         <p id="dateLine">—</p>
       </div>
       <div class="page-hd-actions">
-        <a class="page-hd-link" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠 올리기</a>
-        <a class="page-hd-link" href="https://breezefeel.github.io/yaksu/" target="_blank" rel="noopener noreferrer">신청서 작성</a>
+        <a class="page-hd-link" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠</a>
+        <a class="page-hd-link" href="https://breezefeel.github.io/yaksu/" target="_blank" rel="noopener noreferrer">신청서</a>
         <a class="page-hd-link" href="https://docs.google.com/spreadsheets/d/1I8zIUUaP-eIGpB2y4dMgZbDRiBBzjpAGEWU0RD3yk8g/edit?gid=263546936#gid=263546936" target="_blank" rel="noopener noreferrer">예약 스케줄</a>
       </div>
     </div>
@@ -738,10 +738,10 @@
       if (/Active Stretching · 하체|근막경선별 Active · 하체/.test(s)) return 0.2;
       var programOrder = {
         '생활습관': 20,
-        '스쿼트 6단계': 21,
+        '스쿼트 6단계': 31,
         '밸런스 트레이닝 6단계': 22,
         '척추+상지 분절 운동 6단계': 30,
-        'Push-up 6단계': 31,
+        'Push-up 6단계': 14,
       };
       if (programOrder[s] != null) return programOrder[s];
       const postM = s.match(/^(\d+)\s*·/);
@@ -858,6 +858,12 @@
       { id:'post_situp_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'④ 하체 — 등 닿은 상태 다리 한쪽씩 → 양쪽 동시' },
       { id:'post_situp_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'⑤ 정식 Sit-up — 통증 없는 범위' },
       { id:'post_situp_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'⑥ 구르기 — 뒤로 굴렀다 복귀, 무릎 펴고 발끝 닿기' },
+      { id:'p2_pushup_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'① 무릎 대고 네발 — 웨이브로 내려갔다 올라오기' },
+      { id:'p2_pushup_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'② 무릎 지지 — 몸통+골반 동시 하강 → 웨이브로 상승' },
+      { id:'p2_pushup_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'③ 무릎 지지 — 몸통+골반 동시 하강·상승 (웨이브 없이)' },
+      { id:'p2_pushup_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'④ 무릎 뗀 네발 — 웨이브로 내려갔다 올라오기' },
+      { id:'p2_pushup_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'⑤ 무릎 뗀 네발 — 몸통+골반 동시 하강 → 웨이브로 상승' },
+      { id:'p2_pushup_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'⑥ 정상 Push-up — 통증 없는 범위에서 완성 동작' },
       { id:'p2_a_front', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'전방 경선 — 경추 굴곡·흉추 굴곡·고관절 굴곡·발목 배굴' },
       { id:'p2_a_back', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'후방 경선 — 경추 신전·흉추 신전·햄스트링·발목 저굴' },
       { id:'p2_a_lat', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'측방 경선 — 경추·흉추 측굴·고관절 외전·발목 내외번' },
@@ -866,16 +872,16 @@
       { id:'p2_sit_breath', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'생활습관', label:'호흡 운동 + 등척성 정렬 (엉덩이→머리→어깨→손끝)' },
       { id:'p2_seg_1', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'① 골반 전/후방 굴리며 척추 움직임' },
       { id:'p2_seg_2', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'② + 상지 움직임 추가' },
-      { id:'p2_seg_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'③ 골반 좌우 굴리며 척추 움직임' },
+      { id:'p2_seg_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'③ 머리부터 골반까지 좌우 숙이며 척추 분절 움직임' },
       { id:'p2_seg_4', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'④ + 상지 움직임 추가' },
-      { id:'p2_seg_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'⑤ 골반 회전 움직임' },
+      { id:'p2_seg_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'⑤ 머리부터 골반까지 회전하며 척추 분절 움직임' },
       { id:'p2_seg_6', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'⑥ + 상지 움직임 추가' },
-      { id:'p2_pushup_1', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'① 무릎 대고 네발 — 웨이브로 내려갔다 올라오기' },
-      { id:'p2_pushup_2', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'② 무릎 지지 — 몸통+골반 동시 하강 → 웨이브로 상승' },
-      { id:'p2_pushup_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'③ 무릎 지지 — 몸통+골반 동시 하강·상승 (웨이브 없이)' },
-      { id:'p2_pushup_4', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'④ 무릎 뗀 네발 — 웨이브로 내려갔다 올라오기' },
-      { id:'p2_pushup_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'⑤ 무릎 뗀 네발 — 몸통+골반 동시 하강 → 웨이브로 상승' },
-      { id:'p2_pushup_6', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Push-up 6단계', label:'⑥ 정상 Push-up — 통증 없는 범위에서 완성 동작' },
+      { id:'p3_squat_1', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'① 의자에 살짝 걸터 앉은 상태 — 엉덩이 앞으로 떼었다 앉기' },
+      { id:'p3_squat_2', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'② 엉덩이 앞으로 뗀 뒤 — 일어났다가 다시 앉기' },
+      { id:'p3_squat_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'③ 일어났다가 깊게 앉았다가 — 의자 높이까지 일어난 후 다시 앉기' },
+      { id:'p3_squat_4', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'④ 한쪽 다리에 중심 — ①번 동작 (좌·우)' },
+      { id:'p3_squat_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'⑤ 한쪽 다리에 중심 — ②번 동작 (좌·우)' },
+      { id:'p3_squat_6', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'⑥ 한쪽 다리에 중심 — ③번 동작 (좌·우)' },
       { id:'p3_a_upper_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'① 상지 — 손·손목·팔 연쇄' },
       { id:'p3_a_upper_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'② 목 — 경추 굴곡·신전·측굴·회전' },
       { id:'p3_a_upper_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'③ 어깨 — GH·견갑 연쇄' },
@@ -887,12 +893,6 @@
       { id:'p3_stand_posture', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 서기' },
       { id:'p3_stand_breath', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'호흡 정렬 운동' },
       { id:'p3_stand_walk', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 걷기' },
-      { id:'p3_squat_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'① 의자에 살짝 걸터 앉은 상태 — 엉덩이 앞으로 떼었다 앉기' },
-      { id:'p3_squat_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'② 엉덩이 앞으로 뗀 뒤 — 일어났다가 다시 앉기' },
-      { id:'p3_squat_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'③ 일어났다가 깊게 앉았다가 — 의자 높이까지 일어난 후 다시 앉기' },
-      { id:'p3_squat_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'④ 한쪽 다리에 중심 — ①번 동작 (좌·우)' },
-      { id:'p3_squat_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'⑤ 한쪽 다리에 중심 — ②번 동작 (좌·우)' },
-      { id:'p3_squat_6', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'스쿼트 6단계', label:'⑥ 한쪽 다리에 중심 — ③번 동작 (좌·우)' },
       { id:'p3_balance_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'① 일어선 상태 한발 살짝 들기 — 30초 유지 (좌·우)' },
       { id:'p3_balance_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'② 무릎 높이까지 들어 올리기 — 30초 유지 (좌·우)' },
       { id:'p3_balance_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'③ 한 발 지지 · 반대 다리 뒤로 짧게 뻗기 + 소폭 전굴' },
@@ -921,9 +921,9 @@
     }
 
     var PROGRAM_TABS = [
-      { id: 'movement', label: 'Re:Al Movement', sub: '5단계 프로토콜 · 기능운동·P-스트레칭·이상민 담당' },
-      { id: 'func', label: '기능 운동', sub: '최진옥 담당 · 기능 운동 프로그램' },
-      { id: 'face', label: '얼굴', sub: '작은얼굴 · Re:Al Face 프로그램' },
+      { id: 'movement', label: 'Re:Al 움직임', sub: '5단계 프로토콜 · 기능운동' },
+      { id: 'func', label: '기능 운동', sub: '최진옥 프로그램' },
+      { id: 'face', label: 'Re:Al 페이스', sub: '작은얼굴 · 안면비대칭 프로그램' },
     ];
 
     var SCHEDULE_PROGRAM_COLORS_FALLBACK = {
