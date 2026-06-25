@@ -46,8 +46,9 @@
     .card-title { font-size:14px; font-weight:800; color:var(--blue); margin-bottom:4px; }
     .card-sub { font-size:11px; color:var(--dim); margin-bottom:10px; }
 
-    .toolbar { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+    .toolbar { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; align-items:center; }
     .btn { border:none; border-radius:9px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; }
+    a.btn { display:inline-block; text-decoration:none; line-height:1.25; box-sizing:border-box; }
     .btn-primary { background:var(--blue); color:#fff; }
     .btn-ghost { background:var(--blue-bg); color:var(--blue); }
     .btn-eval { background:#7c3aed; color:#fff; }
@@ -139,7 +140,8 @@
     .member-brief.show { display:block; }
     .member-brief .line1 { font-size:14px; font-weight:700; }
     .member-brief .line1 .phone { font-weight:600; color:var(--dim); margin-left:8px; font-size:13px; }
-    .member-brief .line2 { font-size:12px; color:var(--dim); margin-top:6px; white-space:pre-wrap; }
+    .member-brief .line2 { font-size:12px; color:var(--dim); margin-top:6px; white-space:pre-wrap; line-height:1.5; }
+    .member-brief .brief-label { font-weight:700; color:var(--text); margin-right:6px; }
 
     /* Re:Al Movement 섹션 */
     .psp-section { margin-bottom:16px; }
@@ -279,8 +281,6 @@
     .member-chip .chip-name { font-weight:inherit; }
     .member-chip .sess { color:inherit; opacity:.75; }
 
-    .add-panel { display:none; margin-top:12px; padding-top:12px; border-top:1px dashed var(--border); }
-    .add-panel.open { display:block; }
     .field { margin-bottom:8px; }
     .field label { display:block; font-size:11px; font-weight:600; color:var(--dim); margin-bottom:4px; }
     .field input, .field textarea { width:100%; border:1px solid var(--border); border-radius:8px; padding:9px 10px; font:inherit; font-size:13px; }
@@ -580,6 +580,20 @@
     .stage-today-link-check.disabled { opacity:.4; cursor:default; pointer-events:none; }
     .stage-today-hint { font-size:10px; color:var(--dim); margin:-4px 0 8px; }
     .stage-today-empty { font-size:12px; color:var(--dim); }
+    .session-special-notes-field {
+      margin-top:12px; padding-top:12px; border-top:1px dashed var(--border);
+    }
+    .session-special-notes-field label {
+      display:block; font-size:11px; font-weight:800; color:var(--blue); margin-bottom:6px;
+    }
+    .session-special-notes-field textarea {
+      width:100%; min-height:72px; resize:vertical;
+      font-size:12px; line-height:1.5; padding:8px 10px;
+      border:1px solid var(--border); border-radius:8px; font-family:inherit;
+    }
+    .session-special-notes-field textarea:focus {
+      outline:none; border-color:var(--blue); box-shadow:0 0 0 2px rgba(59,130,246,.15);
+    }
     .alimtalk-preview {
       font-size:12px; line-height:1.6; white-space:pre-wrap;
       background:#1e293b; color:#f1f5f9; border-radius:10px;
@@ -611,7 +625,6 @@
       </div>
       <div class="page-hd-actions">
         <a class="page-hd-link" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠</a>
-        <a class="page-hd-link" href="https://breezefeel.github.io/yaksu/" target="_blank" rel="noopener noreferrer">신청서</a>
         <a class="page-hd-link" href="https://docs.google.com/spreadsheets/d/1I8zIUUaP-eIGpB2y4dMgZbDRiBBzjpAGEWU0RD3yk8g/edit?gid=263546936#gid=263546936" target="_blank" rel="noopener noreferrer">예약 스케줄</a>
       </div>
     </div>
@@ -624,19 +637,13 @@
       <div class="card-sub">강사별 한 줄 · <strong>이름 색상 = 신청 프로그램</strong>(시트와 동일) · 완료 회원은 취소선</div>
       <div class="toolbar">
         <button type="button" class="btn btn-ghost" onclick="loadBoard()">새로고침</button>
-        <button type="button" class="btn btn-ghost" onclick="toggleAddMember()">+ 회원 추가</button>
+        <a class="btn btn-ghost" href="https://breezefeel.github.io/yaksu/" target="_blank" rel="noopener noreferrer">회원등록</a>
         <button type="button" class="btn btn-eval" onclick="openEvalModal()">초회 평가</button>
       </div>
       <div class="member-chips" id="memberChips"><span class="empty-hint">불러오는 중…</span></div>
       <div class="member-brief" id="memberBrief">
         <div class="line1"><span id="briefName">—</span><span class="phone" id="briefPhone"></span></div>
-        <div class="line2" id="briefMemo">특이사항 없음</div>
-      </div>
-      <div class="add-panel" id="addMemberPanel">
-        <div class="field"><label>이름</label><input type="text" id="addName"></div>
-        <div class="field"><label>연락처</label><input type="tel" id="addPhone" placeholder="01012345678"></div>
-        <label class="check-inline"><input type="checkbox" id="addSaveSheet" checked> 회원정보 시트 등록</label>
-        <button type="button" class="btn btn-primary" onclick="addMember()">추가</button>
+        <div class="line2"><span class="brief-label">특이사항</span><span id="briefMemo">없음</span></div>
       </div>
     </section>
 
@@ -767,6 +774,10 @@
         <h3>✅ 오늘 진행한 항목</h3>
         <p class="stage-today-hint">왼쪽 체크 — 알림톡 포함(기본 전체 선택) · URL 체크 — 운동명 아래 링크 함께 발송</p>
         <div id="sessionTodayList"></div>
+        <div class="field session-special-notes-field">
+          <label for="sessionSpecialNotes">특이사항 · 다음 진도</label>
+          <textarea id="sessionSpecialNotes" rows="3" placeholder="특이사항, 다음 진도 계획, 회원 컨디션 등을 기록하세요." oninput="onSessionSpecialNotesInput()"></textarea>
+        </div>
       </div>
       <div class="field">
         <label>오늘 키포인트 (회원 알림톡 · 1~2문장)</label>
@@ -790,7 +801,6 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     const PIN_KEY = 'real_instructor_pin_v1';
-    const CUSTOM_KEY = 'real_instructor_custom_v1';
     const INSTRUCTORS_FALLBACK = [
       { index:0, name:'박준규', color:'#BDD7EE', lightColor:'#DEEEF7' },
       { index:1, name:'최진옥', color:'#FCE4D6', lightColor:'#FEF2EB' },
@@ -1181,7 +1191,6 @@
       selectedKey: '',
       savedProgress: {},
       todayProgress: {},
-      customMembers: [],
       evalReportText: '',
       completedKeys: {},
       attendPassCount: 1,
@@ -1444,10 +1453,30 @@
             '</div>';
         }).join('');
       }
+      var specialEl = document.getElementById('sessionSpecialNotes');
+      if (specialEl) specialEl.value = (m.specialNotes || '').trim();
       var memoEl = document.getElementById('sessionCoachMemo');
       memoEl.value = DEFAULT_SESSION_COACH_MEMO;
       memoEl.dataset.usingDefault = '1';
       updateSessionWrapPreview();
+    }
+
+    function getSessionSpecialNotes() {
+      var el = document.getElementById('sessionSpecialNotes');
+      return el ? String(el.value || '').trim() : '';
+    }
+
+    function syncSessionSpecialNotesFromModal() {
+      var m = state.selected;
+      if (!m) return '';
+      var notes = getSessionSpecialNotes();
+      m.specialNotes = notes;
+      return notes;
+    }
+
+    function onSessionSpecialNotesInput() {
+      syncSessionSpecialNotesFromModal();
+      renderSelectedMemberUi();
     }
 
     function onSessionIncludeToggle(cb) {
@@ -1509,12 +1538,14 @@
 
     var _pendingAttendAlimtalk = null;
 
-    function applySaveOnlyResult(m) {
+    function applySaveOnlyResult(m, data) {
       Object.keys(state.todayProgress).forEach(function(k) { state.savedProgress[k] = true; });
       state.todayProgress = {};
       saveProgressToMemberStore();
+      if (data && data.specialNotes != null) m.specialNotes = data.specialNotes;
       refreshSectionCollapseDefaults();
       renderProgramList();
+      renderSelectedMemberUi();
       updateSendBar();
     }
 
@@ -1536,7 +1567,7 @@
         toast(data.message || '저장 실패');
         return false;
       }
-      applySaveOnlyResult(m);
+      applySaveOnlyResult(m, data);
       toast('저장 완료');
       return true;
     }
@@ -1544,6 +1575,7 @@
     async function confirmSessionWrapSaveOnly() {
       var m = state.selected;
       if (!m || !m.suffix8) return;
+      syncSessionSpecialNotesFromModal();
       closeSessionWrapModal();
       await runSaveSessionOnly(m, mergedProgressMapForSave());
     }
@@ -1551,6 +1583,7 @@
     async function confirmSessionWrapSaveAndAttend() {
       var m = state.selected;
       if (!m || !m.suffix8) return;
+      syncSessionSpecialNotesFromModal();
       _pendingAttendAlimtalk = buildAttendAlimtalkPayload();
       closeSessionWrapModal();
       var progress = mergedProgressMapForSave();
@@ -1689,10 +1722,6 @@
         clearTimeout(timer);
       }
     }
-    function loadCustomMembers() {
-      try { state.customMembers = JSON.parse(localStorage.getItem(CUSTOM_KEY) || '[]'); } catch(e) { state.customMembers = []; }
-    }
-    function saveCustomMembers() { localStorage.setItem(CUSTOM_KEY, JSON.stringify(state.customMembers)); }
     function memberKey(m) {
       return (m.suffix8 || ('n:' + m.name)) + '|' + (m.time || '') + '|' + (m.instructorIndex != null ? m.instructorIndex : '');
     }
@@ -1824,13 +1853,7 @@
       return m ? parseInt(m[1],10)*60+parseInt(m[2],10) : 9999;
     }
     function todayMembers() {
-      const list = (state.board && state.board.members) ? state.board.members.slice() : [];
-      const keys = {};
-      list.forEach(function(m){ keys[memberKey(m)] = true; });
-      state.customMembers.forEach(function(m){
-        if (!keys[memberKey(m)]) list.push(m);
-      });
-      return list;
+      return (state.board && state.board.members) ? state.board.members.slice() : [];
     }
     function mergedProgressMap() {
       const out = {};
@@ -1879,7 +1902,6 @@
 
     async function loadBoard(opts) {
       opts = opts || {};
-      loadCustomMembers();
       if (!opts.silent) startMemberLoadCountdown();
       if (_boardSyncInFlight) return;
       _boardSyncInFlight = true;
@@ -2044,7 +2066,7 @@
       document.getElementById('memberBrief').classList.add('show');
       document.getElementById('briefName').textContent = m.name || '—';
       document.getElementById('briefPhone').textContent = m.phoneDigits ? formatPhone(m.phoneDigits) : '';
-      var memo = (m.specialNotes || '').trim() || '특이사항 없음';
+      var memo = (m.specialNotes || '').trim() || '없음';
       document.getElementById('briefMemo').textContent = memo;
       document.getElementById('sendMemberLabel').textContent = (m.name || '회원') + '님';
       renderProgramTabs();
@@ -2325,10 +2347,12 @@
         m.todayAttendCount = data.todayAttendCount;
       }
       if (data.sessionDisplay) m.sessionDisplay = data.sessionDisplay;
+      if (data.specialNotes != null) m.specialNotes = data.specialNotes;
       resetAttendPassCount(m);
       refreshSectionCollapseDefaults();
       renderProgramList();
       renderMemberChips();
+      renderSelectedMemberUi();
       updateSendBar();
     }
 
@@ -2605,26 +2629,6 @@
       _pendingAttendAlimtalk = null;
       var progress = mergedProgressMapForSave();
       await runCompleteSession(m, progress, { basicAttendOnly: true });
-    }
-
-    function toggleAddMember() { document.getElementById('addMemberPanel').classList.toggle('open'); }
-
-    async function addMember() {
-      const name = document.getElementById('addName').value.trim();
-      const phone = document.getElementById('addPhone').value.replace(/\D/g,'');
-      if (!name || phone.length < 10) { toast('이름·연락처 확인'); return; }
-      const data = await api({ action:'instructorAddMember', name:name, phone:phone, saveToSheet:document.getElementById('addSaveSheet').checked });
-      if (!data.ok) { toast(data.message||'실패'); return; }
-      const suffix8 = data.suffix8 || (phone.length>=11 && /^010/.test(phone) ? phone.slice(3) : phone.slice(-8));
-      const entry = { suffix8:suffix8, name:name, phoneDigits:phone, phoneLast4:phone.slice(-4), sessionDisplay:'', time:'', specialNotes:'' };
-      const ix = state.customMembers.findIndex(function(c){ return c.suffix8===suffix8; });
-      if (ix<0) state.customMembers.push(entry); else state.customMembers[ix]=entry;
-      saveCustomMembers();
-      document.getElementById('addMemberPanel').classList.remove('open');
-      if (data.added) await loadBoard();
-      else renderMemberChips();
-      selectMember(entry, true);
-      toast('추가 완료');
     }
 
     function evalMemberInfo() {
@@ -3138,7 +3142,6 @@
       if (document.visibilityState === 'visible') tryAutoSyncBoard();
     });
     window.addEventListener('focus', function() { tryAutoSyncBoard(); });
-    loadCustomMembers();
     refreshSectionCollapseDefaults();
     renderProgramList();
     renderProgramTabs();
