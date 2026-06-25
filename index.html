@@ -292,6 +292,51 @@
     .modal-hd { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
     .modal-hd h2 { font-size:16px; font-weight:800; color:var(--blue); }
     .modal-close { border:none; background:#f1f5f9; width:32px; height:32px; border-radius:8px; font-size:18px; cursor:pointer; }
+    .attend-result-modal { max-width:440px; text-align:center; }
+    .attend-result-body { line-height:1.55; }
+    .attend-result-line1 {
+      font-size:24px; font-weight:800; color:var(--blue); letter-spacing:.02em;
+    }
+    .attend-result-line2 {
+      margin-top:10px; font-size:18px; font-weight:700; color:#475569;
+    }
+    .attend-result-notice {
+      margin-top:12px; padding:12px 10px; border-radius:12px;
+      font-size:14px; font-weight:700; line-height:1.55; color:var(--blue);
+      background:#fff; border:1px solid var(--border); text-align:left;
+    }
+    .attend-result-notice.done {
+      color:#9f1239; background:#ffe4e6; border-color:#fda4af;
+    }
+    .attend-result-extension {
+      margin-top:12px; padding:10px 12px; border-radius:10px;
+      font-size:13px; font-weight:700; color:#92400e; background:#fef3c7; border:1px solid #fcd34d;
+      text-align:left;
+    }
+    .attend-result-alimtalk {
+      margin-top:14px; padding:12px; border-radius:10px;
+      background:#f8fafc; border:1px solid var(--border);
+      font-size:12px; line-height:1.6; white-space:pre-wrap; text-align:left;
+    }
+    .attend-result-alimtalk-label {
+      font-size:11px; font-weight:800; color:var(--dim); margin-bottom:8px; text-align:center;
+    }
+    .attend-result-status {
+      margin-top:12px; font-size:13px; font-weight:700; line-height:1.5;
+    }
+    .attend-result-status.ok { color:#047857; }
+    .attend-result-status.warn { color:#b45309; }
+    .attend-result-status.err { color:#b91c1c; }
+    .attend-result-loading {
+      font-size:18px; font-weight:800; color:var(--blue); margin-bottom:8px;
+    }
+    .attend-result-loading-sub { font-size:14px; color:var(--dim); font-weight:600; }
+    .attend-result-error {
+      font-size:15px; font-weight:700; color:#b91c1c; line-height:1.55;
+    }
+    .attend-result-partial {
+      margin-top:10px; font-size:14px; font-weight:700; color:#475569;
+    }
     .eval-tabs { display:flex; gap:6px; margin-bottom:12px; }
     .eval-tab { flex:1; border:1px solid var(--border); background:#fff; border-radius:8px; padding:8px; font-size:12px; font-weight:600; cursor:pointer; }
     .eval-tab.on { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
@@ -662,11 +707,24 @@
         <h2>출석 확인</h2>
         <button type="button" class="modal-close" onclick="closeExtraPassModal()">×</button>
       </div>
-      <p id="extraPassModalText" style="font-size:14px;line-height:1.55;margin-bottom:16px;">이미 오늘 출석이 기록되어 있습니다. 수강권을 하나 더 사용하시겠습니까?</p>
+      <p id="extraPassModalText" style="font-size:14px;line-height:1.55;margin-bottom:8px;">이미 오늘 출석이 기록되어 있습니다. 수강권을 하나 더 사용하시겠습니까?</p>
+      <p class="attend-result-partial" style="margin-bottom:16px;text-align:left;">진도는 저장되었습니다. 「네, 사용할게요」를 누르면 출석·알림톡·스케줄 반영이 진행됩니다.</p>
       <div style="display:flex;gap:8px;">
         <button type="button" class="btn btn-primary" style="flex:1;" onclick="confirmExtraPassSave(true)">네, 사용할게요</button>
         <button type="button" class="btn btn-ghost" style="flex:1;" onclick="confirmExtraPassSave(false)">아니요</button>
       </div>
+    </div>
+  </div>
+
+  <!-- 출석 결과 (출석체크.html과 동일 형식) -->
+  <div class="modal-overlay" id="attendResultModal">
+    <div class="modal attend-result-modal">
+      <div class="modal-hd">
+        <h2 id="attendResultTitle">출석 결과</h2>
+        <button type="button" class="modal-close" id="attendResultCloseBtn" onclick="closeAttendResultModal()">×</button>
+      </div>
+      <div class="attend-result-body" id="attendResultBody"></div>
+      <button type="button" class="btn btn-primary" style="width:100%;margin-top:14px;" id="attendResultOkBtn" onclick="closeAttendResultModal()">확인</button>
     </div>
   </div>
 
@@ -677,6 +735,7 @@
         <button type="button" class="modal-close" onclick="closePhonePickerModal()">×</button>
       </div>
       <p style="font-size:13px;color:var(--dim);margin-bottom:12px;">동일한 번호가 여러 건 있습니다. 회원을 선택해 주세요.</p>
+      <p class="attend-result-partial" style="margin-bottom:12px;text-align:left;">진도는 저장되었습니다. 아래에서 회원을 선택하면 출석 결과가 표시됩니다.</p>
       <div id="phonePickerBtns" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
   </div>
@@ -1296,7 +1355,7 @@
       return v || DEFAULT_SESSION_COACH_MEMO;
     }
 
-    function buildAttendAlimtalkPreview(m, summary, memo, linkIds, includedIds) {
+    function buildAttendAlimtalkPreview(m, summary, memo, linkIds, includedIds, afterAttend) {
       var stageLine = '';
       if (state.activeProgramTab === 'movement' && summary) {
         stageLine = stageAlimtalkLine(summary.currentStageNum);
@@ -1309,11 +1368,11 @@
       var parts = sess.split('/');
       var attendNow = parseInt(parts[0], 10) || 0;
       var payTotal = parseInt(parts[1], 10) || 0;
-      var attendNext = attendNow + 1;
-      var remainNext = payTotal ? Math.max(0, payTotal - attendNext) : '—';
+      var attendShown = afterAttend ? attendNow : attendNow + 1;
+      var remainNext = payTotal ? Math.max(0, payTotal - attendShown) : '—';
       return (
         '🌟 출석 체크 완료 🌟\n\n' +
-        '📅 ' + (payTotal ? attendNext + '회차 / ' + payTotal + '회 중' : '—') + '\n' +
+        '📅 ' + (payTotal ? attendShown + '회차 / ' + payTotal + '회 중' : '—') + '\n' +
         '— 남은 회차: ' + (remainNext === '—' ? '—' : remainNext + '회') + '\n\n' +
         '📍 ' + stageLine + '\n' +
         '✅ 오늘:\n' + todayBlock + '\n\n' +
@@ -2193,7 +2252,10 @@
       _pendingCompleteSession = null;
       if (pending && pending.data) {
         applyCompleteSessionResult(pending.member, pending.data);
-        toast(pending.data.attendMessage || '진도 저장됨 · 출석·알림톡은 처리되지 않았습니다');
+        showAttendResult(pending.member, Object.assign({}, pending.data, {
+          completed: false,
+          attendMessage: pending.data.attendMessage || '출석·알림톡은 처리되지 않았습니다',
+        }), pending.opts || {});
       }
     }
 
@@ -2202,7 +2264,11 @@
       document.getElementById('phonePickerModal').classList.remove('open');
       _pendingCompleteSession = null;
       if (pending) {
-        toast('진도 저장됨 · 출석을 완료하려면 회원을 선택해 주세요');
+        showAttendResult(pending.member, Object.assign({}, pending.data || {}, {
+          ok: true,
+          completed: false,
+          attendMessage: '회원 선택 없이 출석이 완료되지 않았습니다',
+        }), pending.opts || {});
       }
     }
 
@@ -2212,16 +2278,19 @@
       if (!pending || !useExtra) {
         if (pending && pending.data) {
           applyCompleteSessionResult(pending.member, pending.data);
-          toast(pending.data.attendMessage || '진도 저장됨 · 출석·알림톡은 처리되지 않았습니다');
+          showAttendResult(pending.member, Object.assign({}, pending.data, {
+            completed: false,
+            attendMessage: pending.data.attendMessage || '출석·알림톡은 처리되지 않았습니다',
+          }), pending.opts || {});
         }
         return;
       }
-      await runCompleteSession(pending.member, pending.progress, {
+      await runCompleteSession(pending.member, pending.progress, Object.assign({}, pending.opts || {}, {
         confirmExtraPass: true,
         rowKey: pending.opts && pending.opts.rowKey,
         phoneLast4: pending.opts && pending.opts.phoneLast4,
         attendAlimtalk: pending.opts && pending.opts.attendAlimtalk,
-      });
+      }));
     }
 
     function openPhonePickerModal(candidates, member, progress, data) {
@@ -2234,7 +2303,7 @@
         btn.style.width = '100%';
         btn.textContent = (c.name ? c.name + ' · ' : '') + '끝자리 ' + c.last4;
         btn.onclick = function() {
-          closePhonePickerModal();
+          closePhonePickerModal(true);
           runCompleteSession(member, progress, {
             rowKey: c.rowKey,
             phoneLast4: c.last4,
@@ -2244,7 +2313,12 @@
         };
         box.appendChild(btn);
       });
-      _pendingCompleteSession = { member: member, progress: progress, data: data };
+      _pendingCompleteSession = {
+        member: member,
+        progress: progress,
+        data: data,
+        opts: { attendAlimtalk: _pendingAttendAlimtalk },
+      };
       document.getElementById('phonePickerModal').classList.add('open');
     }
 
@@ -2254,63 +2328,185 @@
       document.getElementById('extraPassModal').classList.add('open');
     }
 
-    function alimtalkHint(alimtalk) {
-      if (!alimtalk) return '';
-      var ev = alimtalk.everyVisit || alimtalk;
-      if (ev && ev.ok) return '';
-      if (ev && ev.skipped) {
-        if (ev.reason === 'no_template') return ' · 알림톡 미발송(템플릿 미설정)';
-        if (ev.reason === 'solapi') return ' · 알림톡 미발송(Solapi 미설정)';
-        if (ev.reason === 'no_phone') return ' · 알림톡 미발송(회원 전화번호 없음)';
-        if (ev.reason === 'no_config') return ' · 알림톡 미발송(설정 없음)';
+    function formatAttendResultLine1(data) {
+      var attend = data && data.attendCount;
+      var total = data && data.payRounds;
+      if (data && data.sessionDisplay) {
+        var m = String(data.sessionDisplay).match(/^(\d+)\s*\/\s*(\d+)$/);
+        if (m) {
+          attend = parseInt(m[1], 10);
+          total = parseInt(m[2], 10);
+        }
       }
-      return ' · 알림톡 미발송';
+      if (attend == null || isNaN(attend) || total == null || isNaN(total)) return '—';
+      return attend + '회차 / 총' + total + '회';
     }
 
-    function scheduleSyncHint(data) {
-      if (data && data.scheduleSynced === false) {
-        return ' · 스케줄표 미반영(' + (data.scheduleSyncMessage || '확인 필요') + ')';
+    function formatAttendMemberRemainLine(data, fallbackName) {
+      var name = String((data && data.memberName) || fallbackName || '').trim();
+      var remain = data && data.remaining != null ? data.remaining : '-';
+      if (name) return name + '님, 남은 횟수 ' + remain + '회';
+      return '남은 횟수 ' + remain + '회';
+    }
+
+    function buildAttendPostNoticeHtml(data) {
+      if (!data) return '';
+      var rem = Number(data.remaining);
+      if (data.rollbookBanner) {
+        var cls = rem <= 0 ? 'attend-result-notice done' : 'attend-result-notice';
+        return '<p class="' + cls + '">' + escapeHtml(data.rollbookBanner) + '</p>';
+      }
+      if (rem <= 0 && data.completed) {
+        return '<p class="attend-result-notice done">모든 회차를 소모하셨습니다. 감사합니다!</p>';
       }
       return '';
+    }
+
+    function buildAttendStatusFootnotes(data, opts) {
+      opts = opts || {};
+      var html = '';
+      if (data.completed) {
+        if (data.scheduleSynced === false) {
+          html += '<p class="attend-result-status warn">스케줄표 반영: ' +
+            escapeHtml(data.scheduleSyncMessage || '실패') + '</p>';
+        } else         if (data.scheduleSynced === true) {
+          html += '<p class="attend-result-status ok">스케줄표 출석 반영 완료</p>';
+        }
+        var ev = data.alimtalk && (data.alimtalk.everyVisit || data.alimtalk);
+        if (ev && ev.ok) {
+          html += '<p class="attend-result-status ok">회원 알림톡 발송 완료</p>';
+        } else if (ev && ev.skipped) {
+          var reason = ev.reason === 'no_template' ? '템플릿 미설정'
+            : ev.reason === 'solapi' ? 'Solapi 미설정'
+            : ev.reason === 'no_phone' ? '회원 전화번호 없음'
+            : ev.reason === 'no_config' ? '설정 없음'
+            : '발송 실패';
+          html += '<p class="attend-result-status warn">알림톡 미발송(' + escapeHtml(reason) + ')</p>';
+        } else if (data.alimtalk) {
+          html += '<p class="attend-result-status warn">알림톡 미발송</p>';
+        }
+      }
+      var passN = data.passesApplied || data.attendPassCount || 1;
+      if (passN > 1) {
+        html += '<p class="attend-result-status ok">' + passN + '회차 사용 처리됨</p>';
+      }
+      if (data.partialPass) {
+        html += '<p class="attend-result-status warn">' + (data.passesApplied || 1) + '회만 출석 처리됨</p>';
+      }
+      if (data.showExtensionModal) {
+        html += '<p class="attend-result-extension">잔여 1회 — 회원에게 연장 안내가 필요합니다.</p>';
+      }
+      if (opts.basicAttendOnly && data.saved && data.completed) {
+        html += '<p class="attend-result-status ok">출석 처리 완료 (기본 알림톡)</p>';
+      } else if (!opts.basicAttendOnly && data.saved && data.completed) {
+        html += '<p class="attend-result-status ok">진도 저장 + 출석 처리 완료</p>';
+      }
+      return html;
+    }
+
+    function buildAttendAlimtalkResultPreview(m, data, opts) {
+      if (opts.basicAttendOnly || !data.completed) return '';
+      var ata = opts.attendAlimtalk || _pendingAttendAlimtalk;
+      if (!ata) return '';
+      var previewMember = Object.assign({}, m, {
+        sessionDisplay: data.sessionDisplay || m.sessionDisplay,
+        name: data.memberName || m.name,
+      });
+      var summary = state.activeProgramTab === 'movement' ? computeProgramStageSummary() : null;
+      var memo = ata.memo || '';
+      var text = buildAttendAlimtalkPreview(
+        previewMember,
+        summary,
+        memo,
+        ata.linkIds || [],
+        ata.todayIds || [],
+        true
+      );
+      return (
+        '<div class="attend-result-alimtalk-label">회원에게 발송된 알림톡</div>' +
+        '<div class="attend-result-alimtalk">' + escapeHtml(text) + '</div>'
+      );
+    }
+
+    function openAttendResultModal(title, html, options) {
+      options = options || {};
+      document.getElementById('attendResultTitle').textContent = title || '출석 결과';
+      document.getElementById('attendResultBody').innerHTML = html || '';
+      document.getElementById('attendResultCloseBtn').style.display = options.hideClose ? 'none' : '';
+      document.getElementById('attendResultOkBtn').style.display = options.hideClose ? 'none' : '';
+      document.getElementById('attendResultModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAttendResultModal() {
+      document.getElementById('attendResultModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function showAttendProcessing(title) {
+      openAttendResultModal(title || '처리 중', (
+        '<p class="attend-result-loading">⏳ 출석 기록 중입니다…</p>' +
+        '<p class="attend-result-loading-sub">잠시만 기다려 주세요</p>'
+      ), { hideClose: true });
+    }
+
+    function showAttendResult(m, data, opts) {
+      opts = opts || {};
+      if (!data.ok) {
+        openAttendResultModal('처리 실패', (
+          '<p class="attend-result-error">❌ ' + escapeHtml(data.message || '저장 실패') + '</p>'
+        ));
+        return;
+      }
+      if (data.completed) {
+        var html =
+          '<p class="attend-result-line1">' + escapeHtml(formatAttendResultLine1(data)) + '</p>' +
+          '<p class="attend-result-line2">' + escapeHtml(formatAttendMemberRemainLine(data, m.name)) + '</p>' +
+          buildAttendPostNoticeHtml(data) +
+          buildAttendAlimtalkResultPreview(m, data, opts) +
+          buildAttendStatusFootnotes(data, opts);
+        openAttendResultModal(
+          opts.basicAttendOnly ? '🌟 출석 체크 완료' : '🌟 저장+출석 완료',
+          html
+        );
+        return;
+      }
+      var partialHtml =
+        '<p class="attend-result-error">⚠ ' + escapeHtml(data.attendMessage || '출석이 처리되지 않았습니다') + '</p>' +
+        '<p class="attend-result-partial">진도는 스케줄 메모에 저장되었을 수 있습니다.</p>' +
+        buildAttendStatusFootnotes(data, opts);
+      openAttendResultModal('처리 안내', partialHtml);
     }
 
     async function runCompleteSession(m, progress, opts) {
       opts = opts || {};
       document.getElementById('saveBtn').disabled = true;
       document.getElementById('attendBtn').disabled = true;
+      showAttendProcessing(opts.basicAttendOnly ? '출석 처리 중' : '저장+출석 처리 중');
       const data = await api(completeSessionPayload(m, progress, opts));
       updateSendBar();
       if (!data.ok) {
-        toast(data.message || '저장 실패');
+        showAttendResult(m, data, opts);
         return;
       }
       if (data.needPhoneSelect && (data.candidates || []).length) {
+        closeAttendResultModal();
         applyCompleteSessionResult(m, data);
         openPhonePickerModal(data.candidates, m, progress, data);
-        toast('진도 저장됨 · 회원을 선택해 출석을 완료해 주세요');
         return;
       }
       if (data.needExtraPassConfirm) {
+        closeAttendResultModal();
         applyCompleteSessionResult(m, data);
         openExtraPassModal(data.attendMessage, m, progress, data, opts);
-        toast('진도 저장됨 · 출석 확인 창에서 수강권 사용 여부를 선택해 주세요');
         return;
       }
       applyCompleteSessionResult(m, data);
+      var resultOpts = Object.assign({}, opts, {
+        attendAlimtalk: opts.attendAlimtalk || _pendingAttendAlimtalk,
+      });
+      showAttendResult(m, data, resultOpts);
       _pendingAttendAlimtalk = null;
-      const sess = data.sessionDisplay ? ' (' + data.sessionDisplay + ')' : '';
-      const ataHint = alimtalkHint(data.alimtalk);
-      const syncHint = scheduleSyncHint(data);
-      var passN = data.passesApplied || data.attendPassCount || state.attendPassCount || 1;
-      var passNote = passN > 1 ? ' · ' + passN + '회차 사용' : '';
-      if (data.partialPass) passNote = ' · ' + (data.passesApplied || 1) + '회만 처리됨';
-      if (data.completed) {
-        toast((opts.basicAttendOnly ? '출석만 체크 완료' : '저장+출석 완료') + sess + passNote + ataHint + syncHint);
-      } else if (data.partialPass) {
-        toast((data.attendMessage || '일부만 출석됨') + passNote + ataHint + syncHint);
-      } else {
-        toast((data.attendMessage || '진도 저장됨') + ataHint + syncHint);
-      }
     }
 
     async function saveSession() {
@@ -2848,6 +3044,7 @@
 
     document.getElementById('evalModal').addEventListener('click', function(e){ if(e.target===this) closeEvalModal(); });
     document.getElementById('sessionWrapModal').addEventListener('click', function(e){ if(e.target===this) closeSessionWrapModal(); });
+    document.getElementById('attendResultModal').addEventListener('click', function(e){ if(e.target===this) closeAttendResultModal(); });
     document.getElementById('extraPassModal').addEventListener('click', function(e){ if(e.target===this) closeExtraPassModal(); });
     document.getElementById('phonePickerModal').addEventListener('click', function(e){ if(e.target===this) closePhonePickerModal(); });
     document.getElementById('pinInput').addEventListener('keydown', function(e){ if(e.key==='Enter') submitPin(); });
