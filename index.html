@@ -387,20 +387,52 @@
     .eval-send-row { margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
     .eval-member-hint { font-size:12px; font-weight:700; color:var(--blue); margin-bottom:12px; padding:8px 10px; background:var(--blue-bg); border-radius:8px; }
     #evalModal .modal { max-width:680px; }
-    .eval-hist-lead { font-size:11px; color:var(--dim); margin:-4px 0 8px; line-height:1.45; }
+    .eval-hist-lead { font-size:11px; color:var(--dim); margin:0 0 8px; line-height:1.45; }
     .eval-hist-form {
       display:flex; flex-direction:column; gap:8px;
-      max-height:min(52vh, 420px); overflow:auto; padding-right:4px; margin-bottom:4px;
+      max-height:min(52vh, 420px); overflow:auto; padding-right:4px; margin-bottom:0;
     }
+    .eval-panel {
+      border:1px solid var(--border); border-radius:12px; padding:12px 14px 14px;
+      margin-bottom:12px; background:#fff;
+    }
+    .eval-panel:last-of-type { margin-bottom:0; }
+    .eval-panel-head {
+      display:flex; gap:10px; align-items:flex-start; margin-bottom:10px;
+      padding-bottom:10px; border-bottom:1px solid var(--border);
+    }
+    .eval-panel-mark {
+      width:28px; height:28px; border-radius:8px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px; font-weight:800; line-height:1;
+    }
+    .eval-panel-head-text { flex:1; min-width:0; }
+    .eval-panel-head label {
+      display:block; font-size:13px; font-weight:800; color:var(--text); margin:0 0 2px;
+    }
+    .eval-panel-desc { font-size:11px; color:var(--dim); line-height:1.45; margin:0; }
+    .eval-panel--history { border-left:4px solid var(--blue); background:linear-gradient(135deg,#f8fafc 0%,#fff 100%); }
+    .eval-panel--history .eval-panel-mark { background:var(--blue-bg); color:var(--blue); }
+    .eval-panel--inspection { border-left:4px solid #7c3aed; background:linear-gradient(135deg,#faf5ff 0%,#fff 100%); }
+    .eval-panel--inspection .eval-panel-mark { background:#ede9fe; color:#6d28d9; }
+    .eval-panel--movement { border-left:4px solid #059669; background:linear-gradient(135deg,#ecfdf5 0%,#fff 100%); }
+    .eval-panel--movement .eval-panel-mark { background:#d1fae5; color:#047857; }
+    .eval-panel--palpation { border-left:4px solid #d97706; background:linear-gradient(135deg,#fffbeb 0%,#fff 100%); }
+    .eval-panel--palpation .eval-panel-mark { background:#fef3c7; color:#b45309; }
     .eval-hist-section {
-      border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:#fafbfc;
+      border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:#fff;
     }
+    .eval-hist-section--goals { border-color:#bfdbfe; background:#f8fbff; }
+    .eval-hist-section--detail { border-color:#e2e8f0; background:#fafbfc; }
+    .eval-hist-section--pain { border-color:#6ee7b7; background:#f0fdf4; }
     .eval-hist-section-hd { display:flex; flex-wrap:wrap; gap:6px 8px; align-items:center; margin-bottom:6px; }
     .eval-hist-step {
-      font-size:10px; font-weight:800; color:#fff; background:var(--blue);
-      padding:2px 8px; border-radius:999px; flex-shrink:0;
+      font-size:12px; font-weight:800; color:#fff; background:var(--blue);
+      width:22px; height:22px; border-radius:6px; flex-shrink:0;
+      display:inline-flex; align-items:center; justify-content:center; line-height:1;
     }
     .eval-hist-step.clinical { background:#047857; }
+    .eval-hist-step.memo { background:#64748b; font-size:11px; }
     .eval-hist-title { font-size:12px; font-weight:800; color:var(--text); }
     .eval-hist-hint { font-size:10px; color:var(--dim); line-height:1.4; margin-bottom:6px; }
     .eval-hist-chips { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:6px; }
@@ -410,6 +442,8 @@
       font-weight:600; line-height:1.35; text-align:left;
     }
     .eval-hist-chip.on { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
+    .eval-hist-chip--pain { border-color:#fca5a5; }
+    .eval-hist-chip--pain.on { background:#fef2f2; border-color:#ef4444; color:#b91c1c; }
     .eval-hist-group-tag { font-size:12px; font-weight:800; color:var(--blue); }
     .eval-hist-sub { font-size:11px; color:var(--dim); font-weight:600; }
     .eval-hist-subrow + .eval-hist-subrow { margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); }
@@ -421,7 +455,7 @@
       font-family:inherit; line-height:1.45;
     }
     .eval-hist-section.eval-hist-hidden { display: none; }
-    .eval-exam-block { margin-top: 4px; }
+    .eval-exam-block { margin-top: 0; }
     /* 초회 평가 — 권장 프로그램·5단계 */
     .eval-rec-panel {
       margin-bottom:14px; display:flex; flex-direction:column; gap:10px;
@@ -736,14 +770,46 @@
       </div>
       <div class="eval-pane on" id="evalWrite">
         <p class="eval-member-hint" id="evalMemberHint">—</p>
-        <div class="field eval-history-field">
-          <label>History Taking</label>
-          <p class="eval-hist-lead">내원 목적을 먼저 선택하면 관련 항목이 아래에 표시됩니다 · 통증 선택 시 OPQRST · 다중 선택 가능</p>
+        <div class="eval-panel eval-panel--history">
+          <div class="eval-panel-head">
+            <span class="eval-panel-mark" aria-hidden="true">◈</span>
+            <div class="eval-panel-head-text">
+              <label>History Taking</label>
+              <p class="eval-panel-desc">내원 목적을 먼저 선택하면 관련 항목이 아래에 표시됩니다 · 통증 선택 시 OPQRST · 다중 선택 가능</p>
+            </div>
+          </div>
           <div class="eval-hist-form" id="evalHistoryForm"></div>
         </div>
-        <div class="field eval-exam-block"><label>Inspection</label><div class="eval-hist-form" id="evalInspectionForm"></div></div>
-        <div class="field eval-exam-block"><label>Movement Test</label><div class="eval-hist-form" id="evalMovementForm"></div></div>
-        <div class="field eval-exam-block"><label>Palpation</label><div class="eval-hist-form" id="evalPalpationForm"></div></div>
+        <div class="eval-panel eval-panel--inspection">
+          <div class="eval-panel-head">
+            <span class="eval-panel-mark" aria-hidden="true">◎</span>
+            <div class="eval-panel-head-text">
+              <label>Inspection</label>
+              <p class="eval-panel-desc">자세·관찰 소견 · 다중 선택</p>
+            </div>
+          </div>
+          <div class="eval-hist-form" id="evalInspectionForm"></div>
+        </div>
+        <div class="eval-panel eval-panel--movement">
+          <div class="eval-panel-head">
+            <span class="eval-panel-mark" aria-hidden="true">↻</span>
+            <div class="eval-panel-head-text">
+              <label>Movement Test</label>
+              <p class="eval-panel-desc">동작·ROM 관련 소견 · 다중 선택</p>
+            </div>
+          </div>
+          <div class="eval-hist-form" id="evalMovementForm"></div>
+        </div>
+        <div class="eval-panel eval-panel--palpation">
+          <div class="eval-panel-head">
+            <span class="eval-panel-mark" aria-hidden="true">⊕</span>
+            <div class="eval-panel-head-text">
+              <label>Palpation</label>
+              <p class="eval-panel-desc">촉진·압통 소견 · 다중 선택</p>
+            </div>
+          </div>
+          <div class="eval-hist-form" id="evalPalpationForm"></div>
+        </div>
         <div class="field"><label>추가 메모</label><textarea id="evalMemo" rows="2"></textarea></div>
         <label class="check-inline"><input type="checkbox" id="evalSendMember" checked> 저장 후 회원 발송</label>
         <button type="button" class="btn btn-primary" style="width:100%;margin-top:8px;" id="evalSubmitBtn" onclick="submitFirstEval()">AI 리포트 생성</button>
@@ -3158,24 +3224,26 @@
 
     var EVAL_HISTORY_GROUPS = (function () {
       var wellnessGoals = [
+        { id: 'pain', label: '통증' },
         { id: 'stretch', label: '유연성 향상' },
         { id: 'posture', label: '자세·체형 교정' },
         { id: 'fitness', label: '기능·체력 향상' },
         { id: 'face', label: '얼굴 교정·관리' },
         { id: 'prevention', label: '예방·셀프 케어' },
-        { id: 'pain', label: '통증' },
       ];
       return [
         {
           alwaysVisible: true,
-          step: '1',
+          sectionKind: 'goals',
+          step: '◈',
           title: '내원 목적',
           sub: '웰니스 목표 · 다중 선택',
           items: [evalHistItem('goal', '', '', wellnessGoals, true)],
         },
         {
           showWhenGoals: ['stretch'],
-          step: '2',
+          sectionKind: 'detail',
+          step: '▸',
           groupTag: '[유연성]',
           items: [
             evalHistItem('stretch_area', '불편 부위', '', [
@@ -3188,7 +3256,8 @@
         },
         {
           showWhenGoals: ['posture'],
-          step: '3',
+          sectionKind: 'detail',
+          step: '▸',
           groupTag: '[자세]',
           items: [
             evalHistItem('posture_focus', '우선 교정 부위', '', [
@@ -3201,7 +3270,8 @@
         },
         {
           showWhenGoals: ['fitness'],
-          step: '4',
+          sectionKind: 'detail',
+          step: '▸',
           groupTag: '[기능]',
           items: [
             evalHistItem('fitness_move', '목표 동작', '', [
@@ -3214,7 +3284,8 @@
         },
         {
           showWhenGoals: ['prevention'],
-          step: '5',
+          sectionKind: 'detail',
+          step: '▸',
           groupTag: '[예방]',
           items: [
             evalHistItem('prev_reason', '관리 이유', '', [
@@ -3227,7 +3298,8 @@
         },
         {
           showWhenGoals: ['face'],
-          step: '6',
+          sectionKind: 'detail',
+          step: '▸',
           groupTag: '[얼굴]',
           items: [
             evalHistItem('face_focus', '개선 우선', '', [
@@ -3240,7 +3312,9 @@
         },
         {
           showWhenPain: true,
-          step: 'OPQRST',
+          sectionKind: 'pain',
+          step: '◉',
+          stepClass: 'clinical',
           title: '통증 문진',
           sub: 'OPQRST',
           items: [
@@ -3273,7 +3347,7 @@
             ], true),
           ],
         },
-        { isMemo: true, title: '그 외 사항', showWhenAnyGoal: true },
+        { isMemo: true, title: '그 외 사항', step: '✎', stepClass: 'memo', showWhenAnyGoal: true },
       ];
     })();
 
@@ -3332,7 +3406,8 @@
     function renderEvalHistoryChipRow(sec) {
       var chips = (sec.options || []).map(function (opt) {
         var goalAttr = sec.id === 'goal' && opt.id ? ' data-goal-id="' + escapeHtml(opt.id) + '"' : '';
-        return '<button type="button" class="eval-hist-chip" data-sec="' + escapeHtml(sec.id) + '"' +
+        var painCls = sec.id === 'goal' && opt.id === 'pain' ? ' eval-hist-chip--pain' : '';
+        return '<button type="button" class="eval-hist-chip' + painCls + '" data-sec="' + escapeHtml(sec.id) + '"' +
           goalAttr + ' data-val="' + escapeHtml(opt.label) + '" onclick="toggleEvalHistChip(this)">' +
           escapeHtml(opt.label) + '</button>';
       }).join('');
@@ -3352,20 +3427,24 @@
       if (grp.isMemo) {
         return (
           '<div class="eval-hist-section eval-hist-memo-block eval-hist-hidden" data-eval-group="' + groupIndex + '">' +
-            '<div class="eval-hist-section-hd"><span class="eval-hist-title">' + escapeHtml(grp.title) + '</span></div>' +
+            '<div class="eval-hist-section-hd">' +
+              '<span class="eval-hist-step memo">' + escapeHtml(String(grp.step || '✎')) + '</span>' +
+              '<span class="eval-hist-title">' + escapeHtml(grp.title) + '</span>' +
+            '</div>' +
             '<textarea id="evalHistoryExtraMemo" class="eval-hist-note eval-hist-extra" rows="3" placeholder="기록되지 않은 특이사항, 보충 설명"></textarea>' +
           '</div>'
         );
       }
       var stepCls = grp.stepClass ? ' ' + grp.stepClass : '';
       var hiddenCls = grp.alwaysVisible ? '' : ' eval-hist-hidden';
+      var kindCls = grp.sectionKind ? ' eval-hist-section--' + grp.sectionKind : '';
       var hd =
-        '<span class="eval-hist-step' + stepCls + '">' + escapeHtml(String(grp.step)) + '</span>' +
+        '<span class="eval-hist-step' + stepCls + '">' + escapeHtml(String(grp.step || '▸')) + '</span>' +
         (grp.groupTag ? '<span class="eval-hist-group-tag">' + escapeHtml(grp.groupTag) + '</span>' : '') +
         (grp.title ? '<span class="eval-hist-title">' + escapeHtml(grp.title) + '</span>' : '') +
         (grp.sub ? '<span class="eval-hist-sub">(' + escapeHtml(grp.sub) + ')</span>' : '');
       return (
-        '<div class="eval-hist-section' + hiddenCls + '" data-eval-group="' + groupIndex + '">' +
+        '<div class="eval-hist-section' + kindCls + hiddenCls + '" data-eval-group="' + groupIndex + '">' +
           '<div class="eval-hist-section-hd">' + hd + '</div>' +
           (grp.items || []).map(renderEvalHistoryChipRow).join('') +
         '</div>'
