@@ -2187,23 +2187,32 @@
       updateSendBar();
     }
 
-    function closeExtraPassModal() {
+    function closeExtraPassModal(dismissOnly) {
+      var pending = dismissOnly ? null : _pendingCompleteSession;
       document.getElementById('extraPassModal').classList.remove('open');
       _pendingCompleteSession = null;
+      if (pending && pending.data) {
+        applyCompleteSessionResult(pending.member, pending.data);
+        toast(pending.data.attendMessage || '진도 저장됨 · 출석·알림톡은 처리되지 않았습니다');
+      }
     }
 
-    function closePhonePickerModal() {
+    function closePhonePickerModal(dismissOnly) {
+      var pending = dismissOnly ? null : _pendingCompleteSession;
       document.getElementById('phonePickerModal').classList.remove('open');
       _pendingCompleteSession = null;
+      if (pending) {
+        toast('진도 저장됨 · 출석을 완료하려면 회원을 선택해 주세요');
+      }
     }
 
     async function confirmExtraPassSave(useExtra) {
       const pending = _pendingCompleteSession;
-      closeExtraPassModal();
+      closeExtraPassModal(true);
       if (!pending || !useExtra) {
         if (pending && pending.data) {
           applyCompleteSessionResult(pending.member, pending.data);
-          toast(pending.data.attendMessage || '진도 저장됨 (출석 미처리)');
+          toast(pending.data.attendMessage || '진도 저장됨 · 출석·알림톡은 처리되지 않았습니다');
         }
         return;
       }
@@ -2258,6 +2267,13 @@
       return ' · 알림톡 미발송';
     }
 
+    function scheduleSyncHint(data) {
+      if (data && data.scheduleSynced === false) {
+        return ' · 스케줄표 미반영(' + (data.scheduleSyncMessage || '확인 필요') + ')';
+      }
+      return '';
+    }
+
     async function runCompleteSession(m, progress, opts) {
       opts = opts || {};
       document.getElementById('saveBtn').disabled = true;
@@ -2277,21 +2293,23 @@
       if (data.needExtraPassConfirm) {
         applyCompleteSessionResult(m, data);
         openExtraPassModal(data.attendMessage, m, progress, data, opts);
+        toast('진도 저장됨 · 출석 확인 창에서 수강권 사용 여부를 선택해 주세요');
         return;
       }
       applyCompleteSessionResult(m, data);
       _pendingAttendAlimtalk = null;
       const sess = data.sessionDisplay ? ' (' + data.sessionDisplay + ')' : '';
       const ataHint = alimtalkHint(data.alimtalk);
+      const syncHint = scheduleSyncHint(data);
       var passN = data.passesApplied || data.attendPassCount || state.attendPassCount || 1;
       var passNote = passN > 1 ? ' · ' + passN + '회차 사용' : '';
       if (data.partialPass) passNote = ' · ' + (data.passesApplied || 1) + '회만 처리됨';
       if (data.completed) {
-        toast((opts.basicAttendOnly ? '출석만 체크 완료' : '저장+출석 완료') + sess + passNote + ataHint);
+        toast((opts.basicAttendOnly ? '출석만 체크 완료' : '저장+출석 완료') + sess + passNote + ataHint + syncHint);
       } else if (data.partialPass) {
-        toast((data.attendMessage || '일부만 출석됨') + passNote);
+        toast((data.attendMessage || '일부만 출석됨') + passNote + ataHint + syncHint);
       } else {
-        toast(data.attendMessage || '진도 저장됨');
+        toast((data.attendMessage || '진도 저장됨') + ataHint + syncHint);
       }
     }
 
