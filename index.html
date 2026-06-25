@@ -103,6 +103,17 @@
       text-decoration-color:rgba(0,0,0,.35);
     }
     .member-chip.done .sess { text-decoration:none; display:inline-block; }
+    .member-chip.absent {
+      background:#fef2f2 !important;
+      border-color:#fecaca !important;
+      opacity:.92;
+    }
+    .member-chip.absent.on {
+      box-shadow:0 0 0 2px #b91c1c, 0 2px 10px rgba(185,28,28,.15);
+    }
+    .member-chip.absent.done {
+      opacity:.72;
+    }
     .member-chip.dual-partial {
       opacity:1;
       text-decoration:none;
@@ -1612,7 +1623,9 @@
       return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
     var BOARD_LOAD_ESTIMATE_SEC = 25;
+    var BOARD_AUTO_SYNC_IDLE_MS = 12 * 60 * 1000;
     var _loadCountdownTimer = null;
+    var _boardSyncInFlight = false;
 
     function clearLoadCountdown() {
       if (_loadCountdownTimer) {
@@ -1694,8 +1707,34 @@
       return '오늘 ' + credits + '회';
     }
 
+    function scheduleSessionShowsAttendanceClient(val) {
+      var first = String(val || '').split(/\r?\n/)[0].trim();
+      if (!first || first === '결석') return false;
+      if (first === '〃') return true;
+      return /\d+\s*\/\s*\d+/.test(first);
+    }
+
     function isMemberCompleted(m) {
-      return !!(m.sessionCompleted || m.attendedToday || state.completedKeys[memberKey(m)]);
+      if (m.sessionCompleted || m.attendedToday || state.completedKeys[memberKey(m)]) return true;
+      return scheduleSessionShowsAttendanceClient(m.scheduleSession);
+    }
+
+    function isMemberAbsent(m) {
+      if (!m || isMemberCompleted(m)) return false;
+      if (m.absentToday) return true;
+      var first = String(m.scheduleSession || '').split(/\r?\n/)[0].trim();
+      return first === '결석' || /^결석\b/.test(first);
+    }
+
+    function memberChipExtraClass(m) {
+      var cls = isMemberCompleted(m) ? ' done' : '';
+      if (isMemberAbsent(m)) cls += ' absent';
+      return cls;
+    }
+
+    function memberChipInlineStyle(m, bg, border) {
+      if (isMemberAbsent(m)) return '';
+      return ' style="background:' + escapeHtml(bg) + ';border-color:' + escapeHtml(border) + '"';
     }
 
     function memberRemainSessions(m) {
@@ -1819,9 +1858,12 @@
       } else toast(data.message || 'PIN 확인');
     }
 
-    async function loadBoard() {
+    async function loadBoard(opts) {
+      opts = opts || {};
       loadCustomMembers();
-      startMemberLoadCountdown();
+      if (!opts.silent) startMemberLoadCountdown();
+      if (_boardSyncInFlight) return;
+      _boardSyncInFlight = true;
       try {
         const data = await api({ action: 'instructorDayBoard' }, { timeoutMs: 75000 });
 
@@ -1843,12 +1885,13 @@
           if (!state.program.length) state.program = getProgramCatalog(state.activeProgramTab);
           renderProgramTabs();
           renderProgramList();
-          toast(data.message || '서버 연결 실패');
+          if (!opts.silent) toast(data.message || '서버 연결 실패');
           return;
         }
 
         state.board = data;
         state.boardOnline = true;
+        state.lastBoardSyncAt = Date.now();
         state.movementCatalog = mergeMovementCatalogFromServer_(data.pspProgram || data.pspCatalog);
         state.scheduleProgramColors = data.scheduleProgramColors || SCHEDULE_PROGRAM_COLORS_FALLBACK;
         state.program = getProgramCatalog(state.activeProgramTab);
@@ -1863,7 +1906,31 @@
         }
       } finally {
         clearLoadCountdown();
+        _boardSyncInFlight = false;
       }
+    }
+
+    function isSyncBlockingModalOpen() {
+      return ['sessionWrapModal', 'evalModal', 'attendResultModal', 'extraPassModal', 'phonePickerModal'].some(function(id) {
+        var el = document.getElementById(id);
+        return el && el.classList.contains('open');
+      });
+    }
+
+    function canAutoSyncBoard() {
+      if (!state.pin) return false;
+      if (document.getElementById('pinOverlay').classList.contains('open')) return false;
+      if (Object.keys(state.todayProgress || {}).length > 0) return false;
+      if (isSyncBlockingModalOpen()) return false;
+      if (_boardSyncInFlight) return false;
+      return true;
+    }
+
+    function tryAutoSyncBoard() {
+      if (!canAutoSyncBoard()) return;
+      var elapsed = Date.now() - (state.lastBoardSyncAt || 0);
+      if (elapsed < BOARD_AUTO_SYNC_IDLE_MS) return;
+      loadBoard({ silent: true });
     }
 
     function renderMemberChips() {
@@ -1895,7 +1962,6 @@
             const key = memberKey(m);
             const bg = m.instructorLightColor || inst.lightColor || inst.color;
             const border = m.instructorColor || inst.color;
-            const done = isMemberCompleted(m);
             const on = state.selectedKey === key ? ' on' : '';
             const sess = m.sessionDisplay || '';
             const timeTag = m.time ? '<span class="time-tag">'+escapeHtml(m.time)+'</span>' : '';
@@ -1904,7 +1970,7 @@
             const attendTag = attendLbl
               ? '<span class="dual-tag">' + escapeHtml(attendLbl) + '</span>'
               : '';
-            html += '<button type="button" class="member-chip'+on+(done?' done':'')+'" style="background:'+escapeHtml(bg)+';border-color:'+escapeHtml(border)+'" onclick="selectMemberByKey(\''+chipKeyAttr(key)+'\')">'+
+            html += '<button type="button" class="member-chip'+on+memberChipExtraClass(m)+'"'+memberChipInlineStyle(m, bg, border)+' onclick="selectMemberByKey(\''+chipKeyAttr(key)+'\')">'+
               timeTag + '<span class="chip-name" style="color:'+escapeHtml(nameColor)+'">'+escapeHtml(m.name)+'</span>' +
               attendTag +
               (sess ? '<span class="sess">'+escapeHtml(sess)+'</span>' : '') + '</button>';
@@ -1920,10 +1986,9 @@
         html += '<div class="inst-row"><div class="inst-row-hd" style="background:#f1f5f9;border-left:4px solid #94a3b8">기타</div><div class="inst-row-chips">';
         others.forEach(function(m) {
           const key = memberKey(m);
-          const done = isMemberCompleted(m);
           const on = state.selectedKey === key ? ' on' : '';
           const nameColor = memberProgramColor(m);
-          html += '<button type="button" class="member-chip'+on+(done?' done':'')+'" onclick="selectMemberByKey(\''+chipKeyAttr(key)+'\')">'+
+          html += '<button type="button" class="member-chip'+on+memberChipExtraClass(m)+'" onclick="selectMemberByKey(\''+chipKeyAttr(key)+'\')">'+
             '<span class="chip-name" style="color:'+escapeHtml(nameColor)+'">'+escapeHtml(m.name)+'</span></button>';
         });
         html += '</div></div>';
@@ -2234,6 +2299,7 @@
         state.completedKeys[memberKey(m)] = true;
         m.sessionCompleted = true;
         m.attendedToday = true;
+        m.absentToday = false;
       }
       if (typeof data.todayAttendCount === 'number') {
         m.todayAttendCount = data.todayAttendCount;
@@ -3048,6 +3114,10 @@
     document.getElementById('extraPassModal').addEventListener('click', function(e){ if(e.target===this) closeExtraPassModal(); });
     document.getElementById('phonePickerModal').addEventListener('click', function(e){ if(e.target===this) closePhonePickerModal(); });
     document.getElementById('pinInput').addEventListener('keydown', function(e){ if(e.key==='Enter') submitPin(); });
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'visible') tryAutoSyncBoard();
+    });
+    window.addEventListener('focus', function() { tryAutoSyncBoard(); });
     loadCustomMembers();
     refreshSectionCollapseDefaults();
     renderProgramList();
