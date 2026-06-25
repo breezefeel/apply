@@ -141,6 +141,7 @@
     .member-brief .line1 { font-size:14px; font-weight:700; }
     .member-brief .line1 .phone { font-weight:600; color:var(--dim); margin-left:8px; font-size:13px; }
     .member-brief .line2 { font-size:12px; color:var(--dim); margin-top:6px; white-space:pre-wrap; line-height:1.5; }
+    .member-brief .line3 { font-size:12px; color:var(--dim); margin-top:6px; white-space:pre-wrap; line-height:1.5; }
     .member-brief .brief-label { font-weight:700; color:var(--text); margin-right:6px; }
 
     /* Re:Al Movement 섹션 */
@@ -583,15 +584,27 @@
     .session-special-notes-field {
       margin-top:12px; padding-top:12px; border-top:1px dashed var(--border);
     }
-    .session-special-notes-field label {
+    .session-progress-notes-field {
+      margin-top:12px; padding-top:12px; border-top:1px dashed var(--border);
+    }
+    .session-special-notes-field label,
+    .session-progress-notes-field label {
       display:block; font-size:11px; font-weight:800; color:var(--blue); margin-bottom:6px;
     }
-    .session-special-notes-field textarea {
-      width:100%; min-height:72px; resize:vertical;
+    .session-notes-history {
+      font-size:11px; line-height:1.55; color:var(--dim); white-space:pre-wrap;
+      background:#f8fafc; border:1px solid var(--border); border-radius:8px;
+      padding:8px 10px; margin-bottom:10px; max-height:120px; overflow-y:auto;
+    }
+    .session-notes-history.empty { color:var(--dim); font-style:italic; }
+    .session-special-notes-field textarea,
+    .session-progress-notes-field textarea {
+      width:100%; min-height:56px; resize:vertical;
       font-size:12px; line-height:1.5; padding:8px 10px;
       border:1px solid var(--border); border-radius:8px; font-family:inherit;
     }
-    .session-special-notes-field textarea:focus {
+    .session-special-notes-field textarea:focus,
+    .session-progress-notes-field textarea:focus {
       outline:none; border-color:var(--blue); box-shadow:0 0 0 2px rgba(59,130,246,.15);
     }
     .alimtalk-preview {
@@ -644,6 +657,7 @@
       <div class="member-brief" id="memberBrief">
         <div class="line1"><span id="briefName">—</span><span class="phone" id="briefPhone"></span></div>
         <div class="line2"><span class="brief-label">특이사항</span><span id="briefMemo">없음</span></div>
+        <div class="line3"><span class="brief-label">다음 진도</span><span id="briefNextProgress">없음</span></div>
       </div>
     </section>
 
@@ -775,8 +789,15 @@
         <p class="stage-today-hint">왼쪽 체크 — 알림톡 포함(기본 전체 선택) · URL 체크 — 운동명 아래 링크 함께 발송</p>
         <div id="sessionTodayList"></div>
         <div class="field session-special-notes-field">
-          <label for="sessionSpecialNotes">특이사항 · 다음 진도</label>
-          <textarea id="sessionSpecialNotes" rows="3" placeholder="특이사항, 다음 진도 계획, 회원 컨디션 등을 기록하세요." oninput="onSessionSpecialNotesInput()"></textarea>
+          <label>특이사항 (누적 기록)</label>
+          <div id="sessionSpecialNotesHistory" class="session-notes-history empty">이전 특이사항 없음</div>
+          <label for="sessionSpecialNotesNew">이번 세션 특이사항 추가</label>
+          <textarea id="sessionSpecialNotesNew" rows="2" placeholder="회원 컨디션, 주의사항 등 이번에 새로 기록할 내용" oninput="onSessionSpecialNotesNewInput()"></textarea>
+        </div>
+        <div class="field session-progress-notes-field">
+          <label for="sessionNextProgress">진도 · 다음 계획</label>
+          <textarea id="sessionNextProgress" rows="2" placeholder="다음 회차 진도 계획, 오늘 세션 요약 등 (최신 내용만 유지)" oninput="onSessionNextProgressInput()"></textarea>
+          <p class="stage-today-hint">진도 계획은 최신 기록만 회원 정보에 표시됩니다.</p>
         </div>
       </div>
       <div class="field">
@@ -1037,10 +1058,34 @@
     };
 
     function buildFaceCatalog() {
+      function faceItem(id, uiSection, sectionTitle, label) {
+        return {
+          id: id,
+          uiSection: uiSection,
+          sectionTitle: sectionTitle,
+          program: sectionTitle,
+          label: label,
+          group: sectionTitle,
+          hasVideo: false,
+        };
+      }
       return [
-        { id: 'face_basic_25', uiSection: 'face_main', sectionTitle: '얼굴 프로그램', program: '기본', label: '기본 프로그램 25분', group: '얼굴 프로그램', hasVideo: false },
-        { id: 'face_asymmetry', uiSection: 'face_main', sectionTitle: '얼굴 프로그램', program: '비대칭', label: '비대칭', group: '얼굴 프로그램', hasVideo: false },
-        { id: 'face_jaw', uiSection: 'face_main', sectionTitle: '얼굴 프로그램', program: '턱관절', label: '턱관절 운동 프로그램', group: '얼굴 프로그램', hasVideo: false },
+        faceItem('face_man_fascia', 'face_manual', 'Manual', 'Fascia Manual 테크닉'),
+        faceItem('face_man_hf', 'face_manual', 'Manual', '고주파'),
+        faceItem('face_man_lymph_drain', 'face_manual', 'Manual', '간질액 배출 테크닉'),
+        faceItem('face_man_lymph_press', 'face_manual', 'Manual', '간질액 압박 테크닉'),
+        faceItem('face_man_scalp', 'face_manual', 'Manual', '두피 압박'),
+        faceItem('face_man_cheek', 'face_manual', 'Manual', '광대 압박'),
+        faceItem('face_man_jawline', 'face_manual', 'Manual', '턱 라인 압박'),
+        faceItem('face_man_terminus', 'face_manual', 'Manual', '터미누스 압박'),
+        faceItem('face_self_scalp', 'face_self', '셀프 관리', '두피 압박'),
+        faceItem('face_self_head', 'face_self', '셀프 관리', '두상 축소'),
+        faceItem('face_self_heart', 'face_self', '셀프 관리', '하트 라인'),
+        faceItem('face_self_cheek', 'face_self', '셀프 관리', '광대 리프팅'),
+        faceItem('face_self_jawline', 'face_self', '셀프 관리', '턱 라인 정리'),
+        faceItem('face_ex_smile', 'face_exercise', 'Exercise', '스마일 운동'),
+        faceItem('face_ex_jaw', 'face_exercise', 'Exercise', '턱 관절 운동'),
+        faceItem('face_ex_scalp', 'face_exercise', 'Exercise', '두피 이완 운동'),
       ];
     }
 
@@ -1453,29 +1498,56 @@
             '</div>';
         }).join('');
       }
-      var specialEl = document.getElementById('sessionSpecialNotes');
-      if (specialEl) specialEl.value = (m.specialNotes || '').trim();
+      var histEl = document.getElementById('sessionSpecialNotesHistory');
+      var hist = (m.specialNotes || '').trim();
+      if (histEl) {
+        histEl.textContent = hist || '이전 특이사항 없음';
+        histEl.classList.toggle('empty', !hist);
+      }
+      var newEl = document.getElementById('sessionSpecialNotesNew');
+      if (newEl) newEl.value = '';
+      var nextEl = document.getElementById('sessionNextProgress');
+      if (nextEl) nextEl.value = (m.nextProgress || '').trim();
       var memoEl = document.getElementById('sessionCoachMemo');
       memoEl.value = DEFAULT_SESSION_COACH_MEMO;
       memoEl.dataset.usingDefault = '1';
       updateSessionWrapPreview();
     }
 
-    function getSessionSpecialNotes() {
-      var el = document.getElementById('sessionSpecialNotes');
+    function getSessionSpecialNotesNew() {
+      var el = document.getElementById('sessionSpecialNotesNew');
       return el ? String(el.value || '').trim() : '';
     }
 
-    function syncSessionSpecialNotesFromModal() {
-      var m = state.selected;
-      if (!m) return '';
-      var notes = getSessionSpecialNotes();
-      m.specialNotes = notes;
-      return notes;
+    function getSessionNextProgress() {
+      var el = document.getElementById('sessionNextProgress');
+      return el ? String(el.value || '').trim() : '';
     }
 
-    function onSessionSpecialNotesInput() {
-      syncSessionSpecialNotesFromModal();
+    function getSessionRecordPayloadExtras() {
+      var m = state.selected;
+      var nextFromDom = getSessionNextProgress();
+      return {
+        specialNotesNew: getSessionSpecialNotesNew(),
+        nextProgress: nextFromDom || (m && m.nextProgress) || '',
+      };
+    }
+
+    function syncSessionRecordFieldsFromModal() {
+      var m = state.selected;
+      if (!m) return getSessionRecordPayloadExtras();
+      m.nextProgress = getSessionNextProgress();
+      return getSessionRecordPayloadExtras();
+    }
+
+    function onSessionSpecialNotesNewInput() {
+      /* 이번 세션 추가분은 저장 시에만 누적 반영 */
+    }
+
+    function onSessionNextProgressInput() {
+      var m = state.selected;
+      if (!m) return;
+      m.nextProgress = getSessionNextProgress();
       renderSelectedMemberUi();
     }
 
@@ -1543,6 +1615,7 @@
       state.todayProgress = {};
       saveProgressToMemberStore();
       if (data && data.specialNotes != null) m.specialNotes = data.specialNotes;
+      if (data && data.nextProgress != null) m.nextProgress = data.nextProgress;
       refreshSectionCollapseDefaults();
       renderProgramList();
       renderSelectedMemberUi();
@@ -1552,13 +1625,16 @@
     async function runSaveSessionOnly(m, progress) {
       document.getElementById('saveBtn').disabled = true;
       document.getElementById('attendBtn').disabled = true;
+      var extras = getSessionRecordPayloadExtras();
       var data = await api({
         action: 'instructorSaveSession',
         suffix8: m.suffix8,
         name: m.name,
         time: m.time,
         instructorIndex: m.instructorIndex,
-        specialNotes: (m.specialNotes || '').trim(),
+        specialNotesNew: extras.specialNotesNew,
+        nextProgress: extras.nextProgress,
+        recordMode: 'session',
         sessionNote: sessionNoteForSave(),
         pspProgress: progress,
       });
@@ -1575,7 +1651,7 @@
     async function confirmSessionWrapSaveOnly() {
       var m = state.selected;
       if (!m || !m.suffix8) return;
-      syncSessionSpecialNotesFromModal();
+      syncSessionRecordFieldsFromModal();
       closeSessionWrapModal();
       await runSaveSessionOnly(m, mergedProgressMapForSave());
     }
@@ -1583,7 +1659,7 @@
     async function confirmSessionWrapSaveAndAttend() {
       var m = state.selected;
       if (!m || !m.suffix8) return;
-      syncSessionSpecialNotesFromModal();
+      syncSessionRecordFieldsFromModal();
       _pendingAttendAlimtalk = buildAttendAlimtalkPayload();
       closeSessionWrapModal();
       var progress = mergedProgressMapForSave();
@@ -2058,6 +2134,7 @@
         delete memoEl.dataset.touched;
       }
       m.specialNotes = (m.memoSummary && m.memoSummary.specialNotes) || m.specialNotes || '';
+      m.nextProgress = (m.memoSummary && m.memoSummary.nextProgress) || m.nextProgress || '';
     }
 
     function renderSelectedMemberUi() {
@@ -2068,6 +2145,8 @@
       document.getElementById('briefPhone').textContent = m.phoneDigits ? formatPhone(m.phoneDigits) : '';
       var memo = (m.specialNotes || '').trim() || '없음';
       document.getElementById('briefMemo').textContent = memo;
+      var nextProg = (m.nextProgress || '').trim() || '없음';
+      document.getElementById('briefNextProgress').textContent = nextProg;
       document.getElementById('sendMemberLabel').textContent = (m.name || '회원') + '님';
       renderProgramTabs();
       refreshSectionCollapseDefaults();
@@ -2087,6 +2166,7 @@
         if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
         if (!detail.ok || !detail.member) return;
         m.specialNotes = detail.member.specialNotes || m.specialNotes || '';
+        m.nextProgress = detail.member.nextProgress || m.nextProgress || '';
         m.pspProgress = detail.member.pspProgress || m.pspProgress || {};
         distributeServerProgressToStore(m);
         Object.keys(detail.member.pspProgress || {}).forEach(function(id) {
@@ -2127,20 +2207,33 @@
 
     function renderSimpleProgramList(root, list) {
       const hasMember = !!state.selected;
-      var title = list.length ? (list[0].sectionTitle || '프로그램') : '프로그램';
-      var html = '<div class="psp-section"><div class="psp-section-hd">' + escapeHtml(title) + sectionHeaderMeta(list[0] ? list[0].uiSection : '') + '</div><div class="psp-section-body"><div class="psp-part-card">';
+      var grouped = {};
+      var sectionOrder = [];
       list.forEach(function(item) {
-        const isPrior = hasMember && !!state.savedProgress[item.id];
-        const isToday = hasMember && !!state.todayProgress[item.id];
-        const checked = isToday;
-        const rowCls = isPrior ? ' done' : '';
-        const displayLabel = methodDisplayLabel(item);
-        html += '<label class="method-row' + rowCls + '">' +
-          '<input type="checkbox"' + (checked ? ' checked' : '') +
-          ' onchange="toggleToday(\'' + item.id + '\',this)">' +
-          '<div><div class="method-label">' + escapeHtml(displayLabel) + '</div></div></label>';
+        var sec = item.uiSection || 'default';
+        if (!grouped[sec]) {
+          grouped[sec] = { title: item.sectionTitle || '프로그램', items: [] };
+          sectionOrder.push(sec);
+        }
+        grouped[sec].items.push(item);
       });
-      html += '</div></div></div>';
+      var html = '';
+      sectionOrder.forEach(function(secKey) {
+        var g = grouped[secKey];
+        html += '<div class="psp-section"><div class="psp-section-hd">' + escapeHtml(g.title) + sectionHeaderMeta(secKey) + '</div><div class="psp-section-body"><div class="psp-part-card">';
+        g.items.forEach(function(item) {
+          const isPrior = hasMember && !!state.savedProgress[item.id];
+          const isToday = hasMember && !!state.todayProgress[item.id];
+          const checked = isToday;
+          const rowCls = isPrior ? ' done' : '';
+          const displayLabel = methodDisplayLabel(item);
+          html += '<label class="method-row' + rowCls + '">' +
+            '<input type="checkbox"' + (checked ? ' checked' : '') +
+            ' onchange="toggleToday(\'' + item.id + '\',this)">' +
+            '<div><div class="method-label">' + escapeHtml(displayLabel) + '</div></div></label>';
+        });
+        html += '</div></div></div>';
+      });
       root.innerHTML = html;
     }
 
@@ -2262,7 +2355,9 @@
       const data = await api({
         action:'instructorSaveSession',
         suffix8:m.suffix8, name:m.name, time:m.time, instructorIndex:m.instructorIndex,
-        specialNotes: (m.specialNotes || '').trim(),
+        specialNotesNew: '',
+        nextProgress: (m.nextProgress || '').trim(),
+        recordMode: 'progress',
         sessionNote: todayLabels.length ? '오늘 진도: ' + todayLabels.join(', ') : '',
         pspProgress: mergedProgressMapForSave(),
       });
@@ -2305,6 +2400,10 @@
 
     function completeSessionPayload(m, progress, opts) {
       opts = opts || {};
+      var isBasicAttend = !!opts.basicAttendOnly;
+      var extras = isBasicAttend
+        ? { specialNotesNew: '', nextProgress: (m.nextProgress || '').trim() }
+        : getSessionRecordPayloadExtras();
       var payload = {
         action: 'instructorCompleteSession',
         suffix8: m.suffix8,
@@ -2313,7 +2412,9 @@
         instructorIndex: m.instructorIndex,
         rowKey: opts.rowKey != null ? opts.rowKey : (m.rowKey || m.rowIndex),
         phoneLast4: opts.phoneLast4 != null ? opts.phoneLast4 : m.phoneLast4,
-        specialNotes: (m.specialNotes || '').trim(),
+        specialNotesNew: extras.specialNotesNew,
+        nextProgress: extras.nextProgress,
+        recordMode: isBasicAttend ? 'progress' : 'session',
         sessionNote: sessionNoteForSave(),
         pspProgress: progress,
         confirmExtraPass: !!opts.confirmExtraPass,
@@ -2348,6 +2449,7 @@
       }
       if (data.sessionDisplay) m.sessionDisplay = data.sessionDisplay;
       if (data.specialNotes != null) m.specialNotes = data.specialNotes;
+      if (data.nextProgress != null) m.nextProgress = data.nextProgress;
       resetAttendPassCount(m);
       refreshSectionCollapseDefaults();
       renderProgramList();
@@ -2583,7 +2685,7 @@
       }
       var partialHtml =
         '<p class="attend-result-error">⚠ ' + escapeHtml(data.attendMessage || '출석이 처리되지 않았습니다') + '</p>' +
-        '<p class="attend-result-partial">진도는 스케줄 메모에 저장되었을 수 있습니다.</p>' +
+        '<p class="attend-result-partial">진도는 회원평가 시트에 저장되었을 수 있습니다.</p>' +
         buildAttendStatusFootnotes(data, opts);
       openAttendResultModal('처리 안내', partialHtml);
     }
