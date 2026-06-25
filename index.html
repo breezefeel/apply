@@ -113,6 +113,8 @@
     }
     .member-chip.absent.done {
       opacity:.72;
+      text-decoration:line-through;
+      text-decoration-color:rgba(185,28,28,.35);
     }
     .member-chip.dual-partial {
       opacity:1;
@@ -1707,6 +1709,13 @@
       return '오늘 ' + credits + '회';
     }
 
+    function isScheduleSessionAbsentClient(val) {
+      var first = String(val || '').split(/\r?\n/)[0].trim();
+      if (!first) return false;
+      if (first === '결석') return true;
+      return /^결석\b/.test(first);
+    }
+
     function scheduleSessionShowsAttendanceClient(val) {
       var first = String(val || '').split(/\r?\n/)[0].trim();
       if (!first || first === '결석') return false;
@@ -1714,21 +1723,31 @@
       return /\d+\s*\/\s*\d+/.test(first);
     }
 
+    function isMemberScheduleResolved(m) {
+      if (!m) return false;
+      if (m.scheduleResolvedToday) return true;
+      var s = m.scheduleSession;
+      return scheduleSessionShowsAttendanceClient(s) || isScheduleSessionAbsentClient(s);
+    }
+
     function isMemberCompleted(m) {
-      if (m.sessionCompleted || m.attendedToday || state.completedKeys[memberKey(m)]) return true;
-      return scheduleSessionShowsAttendanceClient(m.scheduleSession);
+      if (state.completedKeys[memberKey(m)]) return true;
+      if (m && (m.sessionCompleted || m.attendedToday)) return true;
+      return isMemberScheduleResolved(m);
     }
 
     function isMemberAbsent(m) {
-      if (!m || isMemberCompleted(m)) return false;
+      if (!m) return false;
+      if (scheduleSessionShowsAttendanceClient(m.scheduleSession)) return false;
       if (m.absentToday) return true;
-      var first = String(m.scheduleSession || '').split(/\r?\n/)[0].trim();
-      return first === '결석' || /^결석\b/.test(first);
+      return isScheduleSessionAbsentClient(m.scheduleSession);
     }
 
     function memberChipExtraClass(m) {
-      var cls = isMemberCompleted(m) ? ' done' : '';
-      if (isMemberAbsent(m)) cls += ' absent';
+      var absent = isMemberAbsent(m);
+      var resolved = isMemberCompleted(m) || absent;
+      var cls = resolved ? ' done' : '';
+      if (absent) cls += ' absent';
       return cls;
     }
 
@@ -2300,6 +2319,7 @@
         m.sessionCompleted = true;
         m.attendedToday = true;
         m.absentToday = false;
+        m.scheduleResolvedToday = true;
       }
       if (typeof data.todayAttendCount === 'number') {
         m.todayAttendCount = data.todayAttendCount;
