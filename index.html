@@ -105,17 +105,25 @@
     }
     .member-chip.done .sess { text-decoration:none; display:inline-block; }
     .member-chip.absent {
-      background:#fef2f2 !important;
-      border-color:#fecaca !important;
-      opacity:.92;
+      background:#fee2e2 !important;
+      border-color:#fca5a5 !important;
+      color:#991b1b;
+    }
+    .member-chip.absent .chip-name {
+      color:#991b1b !important;
+    }
+    .member-chip.absent .sess,
+    .member-chip.absent .time-tag {
+      color:#991b1b;
+      opacity:.82;
     }
     .member-chip.absent.on {
-      box-shadow:0 0 0 2px #b91c1c, 0 2px 10px rgba(185,28,28,.15);
+      box-shadow:0 0 0 2px #991b1b, 0 2px 10px rgba(153,27,27,.18);
     }
     .member-chip.absent.done {
-      opacity:.72;
+      opacity:.78;
       text-decoration:line-through;
-      text-decoration-color:rgba(185,28,28,.35);
+      text-decoration-color:rgba(153,27,27,.45);
     }
     .member-chip.dual-partial {
       opacity:1;
@@ -207,10 +215,20 @@
       padding:8px 6px; border-radius:8px; margin-bottom:2px;
     }
     .method-row:hover { background:rgba(255,255,255,.7); }
+    .method-row.done-prior {
+      background:#f0fdf4; border-left:3px solid #bbf7d0;
+    }
+    .method-row.done-prior .method-label { color:#059669; font-weight:500; }
+    .method-row.done-recent {
+      background:var(--green-bg); border-left:3px solid var(--green);
+    }
+    .method-row.done-recent .method-label { color:#047857; font-weight:600; }
     .method-row.done {
       background:var(--green-bg); border-left:3px solid var(--green);
     }
     .method-row.done .method-label { color:#047857; font-weight:600; }
+    .method-row.done-prior input[type="checkbox"]:checked { accent-color: #86efac; }
+    .method-row.done-recent input[type="checkbox"]:checked { accent-color: var(--green); }
     .method-row.done .check-prior-only {
       accent-color: var(--green);
       width:18px; height:18px;
@@ -242,6 +260,8 @@
     .psp-part-card.p1-kind-card .vid-tag {
       flex-shrink:0; font-size:8px; padding:1px 3px; white-space:nowrap;
     }
+    .psp-part-card.p1-kind-card .method-row.done-prior { border-left-width:1px; border-left-color:#bbf7d0; }
+    .psp-part-card.p1-kind-card .method-row.done-recent { border-left-width:1px; border-left-color:var(--green); }
     .psp-part-card.p1-kind-card .method-row.done { border-left-width:1px; border-left-color:var(--green); }
     .method-vid { font-size:10px; color:var(--green); margin-top:2px; }
     .vid-tag { font-size:10px; padding:2px 6px; border-radius:5px; background:#f1f5f9; color:#94a3b8; }
@@ -253,6 +273,8 @@
     .movement-legend { display:flex; flex-wrap:wrap; gap:10px; font-size:10px; color:var(--dim); margin-bottom:10px; }
     .movement-legend span { display:inline-flex; align-items:center; gap:5px; }
     .legend-swatch { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+    .legend-swatch.done-prior { background:#f0fdf4; border:1px solid #bbf7d0; }
+    .legend-swatch.done-recent { background:var(--green-bg); border:1px solid var(--green); }
     .legend-swatch.done { background:var(--green-bg); border:1px solid var(--green); }
     .legend-swatch.today {
       width:14px; height:14px; border-radius:3px;
@@ -345,6 +367,12 @@
       font-size:18px; font-weight:800; color:var(--blue); margin-bottom:8px;
     }
     .attend-result-loading-sub { font-size:14px; color:var(--dim); font-weight:600; }
+    .attend-result-loading-count {
+      margin-top:10px; font-size:14px; color:var(--dim); font-weight:600; line-height:1.5;
+    }
+    .attend-result-loading-count .attend-process-sec {
+      font-weight:800; color:var(--blue); font-size:22px;
+    }
     .attend-result-error {
       font-size:15px; font-weight:700; color:#b91c1c; line-height:1.55;
     }
@@ -392,7 +420,8 @@
       padding:6px 8px; border:1px solid var(--border); border-radius:6px; resize:vertical;
       font-family:inherit; line-height:1.45;
     }
-    .eval-hist-note::placeholder { color:#94a3b8; }
+    .eval-hist-section.eval-hist-hidden { display: none; }
+    .eval-exam-block { margin-top: 4px; }
     /* 초회 평가 — 권장 프로그램·5단계 */
     .eval-rec-panel {
       margin-bottom:14px; display:flex; flex-direction:column; gap:10px;
@@ -667,10 +696,11 @@
         <div class="program-tabs" id="programTabs"></div>
         <div class="program-card-title" id="programCardTitle">Re:Al Movement</div>
       </div>
-      <div class="card-sub" id="programCardSub">이전 진도는 <strong style="color:var(--green);font-weight:700;">초록 체크</strong>, 오늘 진행은 <strong style="color:#047857;font-weight:700;">오늘</strong> 표시 · 초록 항목을 다시 누르면 오늘 진행으로 표시됩니다.</div>
+      <div class="card-sub" id="programCardSub">과거 진행은 <strong style="color:#86efac;font-weight:700;">옅은 초록</strong>, 직전 회차는 <strong style="color:var(--green);font-weight:700;">진한 초록</strong>, 오늘 진행은 <strong style="color:var(--blue);font-weight:700;">체크</strong> · 초록 항목을 다시 누르면 오늘 진행으로 표시됩니다.</div>
       <div class="movement-legend" id="programLegend">
-        <span><i class="legend-swatch done"></i>이전에 진행한 항목</span>
-        <span><i class="legend-swatch today"></i>오늘 진행한 항목</span>
+        <span><i class="legend-swatch done-prior"></i>과거 진행</span>
+        <span><i class="legend-swatch done-recent"></i>직전 회차</span>
+        <span><i class="legend-swatch today"></i>오늘 진행</span>
       </div>
       <div id="pspProgramList"><div class="empty-hint">불러오는 중…</div></div>
     </section>
@@ -708,12 +738,12 @@
         <p class="eval-member-hint" id="evalMemberHint">—</p>
         <div class="field eval-history-field">
           <label>History Taking</label>
-          <p class="eval-hist-lead">항목은 탭으로 선택 · 보충 사항은 하단 「그 외 사항」에 기록</p>
+          <p class="eval-hist-lead">내원 목적을 먼저 선택하면 관련 항목이 아래에 표시됩니다 · 통증 선택 시 OPQRST · 다중 선택 가능</p>
           <div class="eval-hist-form" id="evalHistoryForm"></div>
         </div>
-        <div class="field"><label>Inspection</label><textarea id="evalInspection" rows="2"></textarea></div>
-        <div class="field"><label>Movement Test</label><textarea id="evalMovement" rows="2"></textarea></div>
-        <div class="field"><label>Palpation</label><textarea id="evalPalpation" rows="2"></textarea></div>
+        <div class="field eval-exam-block"><label>Inspection</label><div class="eval-hist-form" id="evalInspectionForm"></div></div>
+        <div class="field eval-exam-block"><label>Movement Test</label><div class="eval-hist-form" id="evalMovementForm"></div></div>
+        <div class="field eval-exam-block"><label>Palpation</label><div class="eval-hist-form" id="evalPalpationForm"></div></div>
         <div class="field"><label>추가 메모</label><textarea id="evalMemo" rows="2"></textarea></div>
         <label class="check-inline"><input type="checkbox" id="evalSendMember" checked> 저장 후 회원 발송</label>
         <button type="button" class="btn btn-primary" style="width:100%;margin-top:8px;" id="evalSubmitBtn" onclick="submitFirstEval()">AI 리포트 생성</button>
@@ -730,6 +760,22 @@
             <button type="button" class="btn btn-green" style="width:100%;" onclick="sendEvalSms()">보내기 (SMS)</button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 다회차 출석 확인 -->
+  <div class="modal-overlay" id="multiPassModal">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-hd">
+        <h2>다회차 출석 확인</h2>
+        <button type="button" class="modal-close" onclick="closeMultiPassModal()">×</button>
+      </div>
+      <p id="multiPassModalText" style="font-size:14px;line-height:1.55;margin-bottom:8px;">다회차 출석을 진행할까요?</p>
+      <p id="multiPassModalHint" class="attend-result-partial" style="margin-bottom:16px;text-align:left;">선택한 회차만큼 회원권이 차감되고, 스케줄표에도 같은 횟수만큼 반영됩니다.</p>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="btn btn-primary" style="flex:1;" onclick="confirmMultiPassAttend(true)">네, 진행할게요</button>
+        <button type="button" class="btn btn-ghost" style="flex:1;" onclick="confirmMultiPassAttend(false)">아니요</button>
       </div>
     </div>
   </div>
@@ -1048,7 +1094,9 @@
 
     var PROGRAM_TABS = [
       { id: 'movement', label: 'Re:Al 움직임', sub: '5단계 프로토콜 · 기능운동' },
-      { id: 'func', label: '기능 운동', sub: '최진옥 프로그램' },
+      { id: 'func', label: '최진옥 원장', sub: '최진옥 원장 프로그램 (임시)' },
+      { id: 'hongtaek', label: '최홍택 원장', sub: '최홍택 원장 프로그램 (임시)' },
+      { id: 'injun', label: '김인준 원장', sub: '김인준 원장 프로그램 (임시)' },
       { id: 'face', label: 'Re:Al 페이스', sub: '작은얼굴 · 안면비대칭 프로그램' },
     ];
 
@@ -1089,18 +1137,33 @@
       ];
     }
 
-    function buildFuncJinokCatalog() {
-      return ['A','B','C','D','E','F','G','H'].map(function(l) {
-        return {
-          id: 'func_prog_' + l.toLowerCase(),
-          uiSection: 'func_main',
-          sectionTitle: '기능 운동 프로그램',
-          program: '기능 운동',
-          label: l,
-          group: '기능 운동 프로그램',
+    function buildDirectorPlaceholderCatalog(tabId, idPrefix, directorLabel) {
+      var items = [];
+      var i;
+      for (i = 1; i <= 5; i++) {
+        items.push({
+          id: idPrefix + '_prog_' + i,
+          uiSection: tabId + '_main',
+          sectionTitle: directorLabel,
+          program: directorLabel,
+          label: '임시 항목 ' + i,
+          group: directorLabel,
           hasVideo: false,
-        };
-      });
+        });
+      }
+      return items;
+    }
+
+    function buildFuncJinokCatalog() {
+      return buildDirectorPlaceholderCatalog('func', 'func', '최진옥 원장');
+    }
+
+    function buildHongtaekCatalog() {
+      return buildDirectorPlaceholderCatalog('hongtaek', 'hongtaek', '최홍택 원장');
+    }
+
+    function buildInjunCatalog() {
+      return buildDirectorPlaceholderCatalog('injun', 'injun', '김인준 원장');
     }
 
     function normalizeProgramKeyClient(raw) {
@@ -1131,6 +1194,8 @@
     function catalogTabForItemId(id) {
       if (/^face_/.test(id)) return 'face';
       if (/^func_prog_/.test(id)) return 'func';
+      if (/^hongtaek_prog_/.test(id)) return 'hongtaek';
+      if (/^injun_prog_/.test(id)) return 'injun';
       return 'movement';
     }
 
@@ -1140,7 +1205,9 @@
       var instName = String(m.instructorName || '').trim();
       var instIdx = m.instructorIndex;
       if (prog === '작은얼굴') return 'face';
-      if (instName === '최진옥' || instIdx === 1) return 'func';
+      if (instName.indexOf('최진옥') >= 0 || instIdx === 1) return 'func';
+      if (instName.indexOf('최홍택') >= 0) return 'hongtaek';
+      if (instName.indexOf('김인준') >= 0) return 'injun';
       if (instName === '이상민' || instIdx === 2) return 'movement';
       if (prog === '기능 운동' || prog === 'P-스트레칭') return 'movement';
       return 'movement';
@@ -1149,6 +1216,8 @@
     function getProgramCatalog(tabId) {
       if (tabId === 'face') return buildFaceCatalog();
       if (tabId === 'func') return buildFuncJinokCatalog();
+      if (tabId === 'hongtaek') return buildHongtaekCatalog();
+      if (tabId === 'injun') return buildInjunCatalog();
       return state.movementCatalog && state.movementCatalog.length
         ? state.movementCatalog.slice()
         : buildLocalProgram();
@@ -1165,6 +1234,7 @@
       }
       state.progressByMember[state.selectedKey][state.activeProgramTab] = {
         saved: Object.assign({}, state.savedProgress),
+        recent: Object.assign({}, state.recentSessionProgress),
         today: Object.assign({}, state.todayProgress),
         sectionCollapsed: Object.assign({}, state.sectionCollapsed),
         sectionCollapsedTouched: Object.assign({}, state.sectionCollapsedTouched),
@@ -1173,6 +1243,7 @@
 
     function distributeServerProgressToStore(m) {
       var prog = m.pspProgress || {};
+      var recent = m.previousSessionProgress || {};
       if (!state.progressByMember[state.selectedKey]) {
         state.progressByMember[state.selectedKey] = {};
       }
@@ -1180,8 +1251,16 @@
       Object.keys(prog).forEach(function(id) {
         if (!prog[id] || !prog[id].length) return;
         var tab = catalogTabForItemId(id);
-        if (!store[tab]) store[tab] = { saved: {}, today: {}, sectionCollapsed: {}, sectionCollapsedTouched: {} };
-        store[tab].saved[id] = true;
+        if (!store[tab]) {
+          store[tab] = { saved: {}, recent: {}, today: {}, sectionCollapsed: {}, sectionCollapsedTouched: {} };
+        }
+        if (recent[id] && recent[id].length) {
+          store[tab].recent[id] = true;
+          delete store[tab].saved[id];
+        } else {
+          store[tab].saved[id] = true;
+          delete store[tab].recent[id];
+        }
       });
     }
 
@@ -1189,9 +1268,30 @@
       var bucket = state.progressByMember[state.selectedKey];
       var data = bucket && bucket[tabId] ? bucket[tabId] : null;
       state.savedProgress = data ? Object.assign({}, data.saved) : {};
+      state.recentSessionProgress = data ? Object.assign({}, data.recent) : {};
       state.todayProgress = data ? Object.assign({}, data.today) : {};
+      state.progressOrigin = {};
       state.sectionCollapsed = data ? Object.assign({}, data.sectionCollapsed) : {};
       state.sectionCollapsedTouched = data ? Object.assign({}, data.sectionCollapsedTouched) : {};
+    }
+
+    function promoteTodayProgressToRecent() {
+      Object.keys(state.recentSessionProgress).forEach(function(k) {
+        state.savedProgress[k] = true;
+      });
+      state.recentSessionProgress = {};
+      Object.keys(state.todayProgress).forEach(function(k) {
+        if (state.todayProgress[k]) state.recentSessionProgress[k] = true;
+      });
+      state.todayProgress = {};
+      state.progressOrigin = {};
+    }
+
+    function methodRowProgressClass(item, hasMember) {
+      if (!hasMember || state.todayProgress[item.id]) return '';
+      if (state.recentSessionProgress[item.id]) return ' done-recent';
+      if (state.savedProgress[item.id]) return ' done-prior';
+      return '';
     }
 
     function switchProgramTab(tabId) {
@@ -1220,7 +1320,7 @@
       document.getElementById('programCardTitle').textContent = meta.label;
       document.getElementById('programCardSub').textContent = meta.sub;
       var legend = document.getElementById('programLegend');
-      if (legend) legend.style.display = state.activeProgramTab === 'movement' ? '' : 'none';
+      if (legend) legend.style.display = '';
     }
 
     let state = {
@@ -1235,7 +1335,9 @@
       selected: null,
       selectedKey: '',
       savedProgress: {},
+      recentSessionProgress: {},
       todayProgress: {},
+      progressOrigin: {},
       evalReportText: '',
       completedKeys: {},
       attendPassCount: 1,
@@ -1274,7 +1376,7 @@
         var sec = item.uiSection || '';
         if (!stageActivity[sec]) return;
         stageActivity[sec].total++;
-        if (state.savedProgress[item.id]) {
+        if (state.savedProgress[item.id] || state.recentSessionProgress[item.id]) {
           stageActivity[sec].prior = true;
           stageActivity[sec].priorCount++;
         }
@@ -1356,6 +1458,21 @@
       return out;
     }
 
+    function catalogOrderIndexForId(id) {
+      var i = state.program.findIndex(function(x) { return x.id === id; });
+      return i >= 0 ? i : 9999;
+    }
+
+    function joinTodayAlimtalkBlocks(blocks) {
+      var result = '';
+      blocks.forEach(function(b, i) {
+        if (i > 0) result += blocks[i - 1].url ? '\n\n' : '\n';
+        result += b.line;
+        if (b.url) result += '\n' + b.url;
+      });
+      return result;
+    }
+
     function formatTodayAlimtalkBlock(linkIds, includedIds) {
       includedIds = includedIds != null
         ? includedIds
@@ -1366,27 +1483,16 @@
       (linkIds || []).forEach(function(id) { linkSet[id] = true; });
       var entries = todayProgressEntries().filter(function(ent) { return includeSet[ent.id]; });
       if (!entries.length) return '—';
-      var grouped = {};
-      var order = [];
-      entries.forEach(function(ent) {
+      entries.sort(function(a, b) {
+        return catalogOrderIndexForId(a.id) - catalogOrderIndexForId(b.id);
+      });
+      var blocks = entries.map(function(ent, idx) {
         var p = state.program.find(function(x) { return x.id === ent.id; });
-        var lbl = p ? methodAlimtalkLabel(p) : ent.label;
-        if (!grouped[lbl]) {
-          grouped[lbl] = { label: lbl, url: '' };
-          order.push(lbl);
-        }
-        if (linkSet[ent.id] && ent.youtubeUrl && !grouped[lbl].url) {
-          grouped[lbl].url = ent.youtubeUrl;
-        }
+        var lbl = p ? methodDisplayLabel(p) : ent.label;
+        var url = linkSet[ent.id] && ent.youtubeUrl ? ent.youtubeUrl : '';
+        return { line: (idx + 1) + ') ' + lbl, url: url };
       });
-      order.sort(function(a, b) {
-        var d = alimtalkLabelSortKey(a) - alimtalkLabelSortKey(b);
-        return d !== 0 ? d : a.localeCompare(b, 'ko');
-      });
-      return order.map(function(lbl) {
-        var g = grouped[lbl];
-        return g.url ? g.label + '\n' + g.url : g.label;
-      }).join('\n\n');
+      return joinTodayAlimtalkBlocks(blocks);
     }
 
     function todayProgressLabels(limit) {
@@ -1398,7 +1504,135 @@
       return labels;
     }
 
-    const DEFAULT_SESSION_COACH_MEMO = '편한게 호흡하면서, 불필요한 긴장하지 말기!';
+    const DEFAULT_SESSION_COACH_MEMO = '편하게 호흡하며, 불필요한 긴장하지 말기!';
+    var COACH_MEMO_TAB_ORDER = { movement: 0, func: 1, hongtaek: 2, injun: 3, face: 4 };
+
+    function catalogOrderRankForItemId(id) {
+      var tab = catalogTabForItemId(id);
+      var tabIdx = COACH_MEMO_TAB_ORDER[tab] != null ? COACH_MEMO_TAB_ORDER[tab] : 9;
+      var catalog = getProgramCatalog(tab);
+      var catIdx = catalog.findIndex(function(x) { return x.id === id; });
+      if (catIdx < 0 && tab !== 'movement') {
+        catIdx = getProgramCatalog('movement').findIndex(function(x) { return x.id === id; });
+        if (catIdx >= 0) tabIdx = COACH_MEMO_TAB_ORDER.movement;
+      }
+      return tabIdx * 100000 + (catIdx >= 0 ? catIdx : 9999);
+    }
+
+    function catalogItemById(id) {
+      var tab = catalogTabForItemId(id);
+      var item = getProgramCatalog(tab).find(function(x) { return x.id === id; });
+      if (item) return item;
+      return getProgramCatalog('movement').find(function(x) { return x.id === id; }) || null;
+    }
+
+    /** 오늘 체크 항목 중 카탈로그 맨 아래(진도 최선행) 항목 */
+    function bottomMostTodayProgressItem() {
+      saveProgressToMemberStore();
+      var ids = [];
+      var store = state.progressByMember[state.selectedKey];
+      if (store) {
+        PROGRAM_TABS.forEach(function(tab) {
+          var bucket = store[tab.id];
+          if (!bucket || !bucket.today) return;
+          Object.keys(bucket.today).forEach(function(k) {
+            if (bucket.today[k]) ids.push(k);
+          });
+        });
+      }
+      if (!ids.length) {
+        Object.keys(state.todayProgress || {}).forEach(function(k) {
+          if (state.todayProgress[k]) ids.push(k);
+        });
+      }
+      if (!ids.length) return null;
+      ids.sort(function(a, b) {
+        return catalogOrderRankForItemId(a) - catalogOrderRankForItemId(b);
+      });
+      return catalogItemById(ids[ids.length - 1]);
+    }
+
+    function coachMemoForCatalogItem(item) {
+      if (!item) return DEFAULT_SESSION_COACH_MEMO;
+      var prog = String(item.program || '');
+      if (prog === 'Passive Stretching') {
+        return '편하게 호흡하며, 몸에 힘 빼고 이완하세요.';
+      }
+      if (prog === 'Assisted Active') {
+        return '끝까지 밀지 말고, 통증 없는 범위에서 천천히!';
+      }
+      if (prog === 'Resistive') {
+        return '발끝·손끝부터 순서대로 힘 주고, 등·목은 힘 빼세요.';
+      }
+      if (prog === 'Resistive — Advanced') {
+        return '원위→원심 순으로 힘 주고, 흔들림 없이 컨트롤!';
+      }
+      if (isActiveStretchingProgram(prog)) {
+        return '늘리는 쪽만 움직이고, 나머지는 힘 빼고 유지!';
+      }
+      if (prog.indexOf('호흡') >= 0 || prog === '생활습관') {
+        return '코 호흡, 어깨·턱 힘 빼고 바른 자세 유지!';
+      }
+      if (prog.indexOf('Superman') >= 0) {
+        return '경추→흉→요추 순으로, 통증 나면 범위 줄이기.';
+      }
+      if (prog.indexOf('Sit-up') >= 0) {
+        return '복부 중심, 목 힘 빼고 통증 없는 범위만!';
+      }
+      if (prog === 'Push-up 6단계') {
+        return '몸통→가슴→팔 순 웨이브, 허리 꺾지 않기.';
+      }
+      if (prog.indexOf('분절 운동') >= 0) {
+        return '골반 고정, 척추 한 마디씩 천천히 움직이기.';
+      }
+      if (prog.indexOf('스쿼트') >= 0) {
+        return '발바닥 전체로 받치고, 무릎·골반 정렬 유지!';
+      }
+      if (prog.indexOf('밸런스') >= 0) {
+        return '시선 고정, 발바닥 중심 잡고 천천히 유지!';
+      }
+      if (prog.indexOf('마사지볼') >= 0 || item.uiSection === 'self_tool') {
+        return '호흡하며 가볍게, 통증 부위만 짧게 반복.';
+      }
+      if (prog === '기능 운동') {
+        return '통증 없는 범위, 발·골반 정렬부터 순서대로!';
+      }
+      if (/원장/.test(prog) || item.uiSection === 'func_main' ||
+          item.uiSection === 'hongtaek_main' || item.uiSection === 'injun_main') {
+        return '통증 없는 범위, 호흡 유지하며 천천히!';
+      }
+      if (item.uiSection === 'face_manual') {
+        return '가볍게, 통증·붓기 없는 범위에서!';
+      }
+      if (item.uiSection === 'face_self') {
+        return '거울 보며 가볍게, 과한 압력은 피하기!';
+      }
+      if (item.uiSection === 'face_exercise') {
+        return '턱·어깨 힘 빼고, 천천히 반복!';
+      }
+      return DEFAULT_SESSION_COACH_MEMO;
+    }
+
+    function computeDefaultCoachMemo() {
+      var item = bottomMostTodayProgressItem();
+      return coachMemoForCatalogItem(item).slice(0, 80);
+    }
+
+    function applyDefaultCoachMemoIfNeeded() {
+      var memoEl = document.getElementById('sessionCoachMemo');
+      if (!memoEl) return;
+      var raw = String(memoEl.value || '').trim();
+      if (memoEl.dataset.usingDefault !== '1' && raw) return;
+      memoEl.value = computeDefaultCoachMemo();
+      memoEl.dataset.usingDefault = '1';
+    }
+
+    function syncCoachMemoFromTodayProgress() {
+      var modal = document.getElementById('sessionWrapModal');
+      if (!modal || !modal.classList.contains('open')) return;
+      applyDefaultCoachMemoIfNeeded();
+      updateSessionWrapPreview();
+    }
 
     function onSessionCoachMemoFocus() {
       var el = document.getElementById('sessionCoachMemo');
@@ -1412,24 +1646,30 @@
       var el = document.getElementById('sessionCoachMemo');
       if (!el) return;
       if (String(el.value || '').trim()) return;
-      el.value = DEFAULT_SESSION_COACH_MEMO;
+      el.value = computeDefaultCoachMemo();
       el.dataset.usingDefault = '1';
       updateSessionWrapPreview();
     }
 
     function effectiveSessionCoachMemo(raw) {
       var v = String(raw != null ? raw : '').trim();
-      return v || DEFAULT_SESSION_COACH_MEMO;
+      return v || computeDefaultCoachMemo();
     }
 
-    function buildAttendAlimtalkPreview(m, summary, memo, linkIds, includedIds, afterAttend) {
-      var stageLine = '';
-      if (state.activeProgramTab === 'movement' && summary) {
-        stageLine = stageAlimtalkLine(summary.currentStageNum);
-      } else {
-        stageLine = programTabMeta(state.activeProgramTab).label;
+    function buildAttendAlimtalkPreview(m, summary, memo, linkIds, includedIds, afterAttend, fixedBlocks) {
+      fixedBlocks = fixedBlocks || {};
+      var stageLine = String(fixedBlocks.stageLine != null ? fixedBlocks.stageLine : '').trim();
+      if (!stageLine) {
+        if (state.activeProgramTab === 'movement' && summary) {
+          stageLine = stageAlimtalkLine(summary.currentStageNum);
+        } else {
+          stageLine = programTabMeta(state.activeProgramTab).label;
+        }
       }
-      var todayBlock = formatTodayAlimtalkBlock(linkIds, includedIds);
+      var todayBlock = String(fixedBlocks.todayBlock != null ? fixedBlocks.todayBlock : '').trim();
+      if (!todayBlock) {
+        todayBlock = formatTodayAlimtalkBlock(linkIds, includedIds);
+      }
       var memoLine = (memo || '').trim() || '—';
       var sess = m && m.sessionDisplay ? m.sessionDisplay : '';
       var parts = sess.split('/');
@@ -1509,8 +1749,7 @@
       var nextEl = document.getElementById('sessionNextProgress');
       if (nextEl) nextEl.value = (m.nextProgress || '').trim();
       var memoEl = document.getElementById('sessionCoachMemo');
-      memoEl.value = DEFAULT_SESSION_COACH_MEMO;
-      memoEl.dataset.usingDefault = '1';
+      applyDefaultCoachMemoIfNeeded();
       updateSessionWrapPreview();
     }
 
@@ -1558,6 +1797,7 @@
     }
 
     function updateSessionWrapPreview() {
+      applyDefaultCoachMemoIfNeeded();
       var m = state.selected;
       var memoEl = document.getElementById('sessionCoachMemo');
       var raw = memoEl ? memoEl.value : '';
@@ -1610,10 +1850,21 @@
 
     var _pendingAttendAlimtalk = null;
 
-    function applySaveOnlyResult(m, data) {
-      Object.keys(state.todayProgress).forEach(function(k) { state.savedProgress[k] = true; });
-      state.todayProgress = {};
+    function syncMemberProgressFromServer(m, data) {
+      if (data && data.pspProgress) {
+        m.pspProgress = data.pspProgress;
+        m.previousSessionProgress = data.previousSessionProgress || {};
+        distributeServerProgressToStore(m);
+        loadProgressFromMemberStore(state.activeProgramTab);
+        saveProgressToMemberStore();
+        return;
+      }
+      promoteTodayProgressToRecent();
       saveProgressToMemberStore();
+    }
+
+    function applySaveOnlyResult(m, data) {
+      syncMemberProgressFromServer(m, data);
       if (data && data.specialNotes != null) m.specialNotes = data.specialNotes;
       if (data && data.nextProgress != null) m.nextProgress = data.nextProgress;
       refreshSectionCollapseDefaults();
@@ -1637,6 +1888,7 @@
         recordMode: 'session',
         sessionNote: sessionNoteForSave(),
         pspProgress: progress,
+        sessionProgress: todayProgressMap(),
       });
       updateSendBar();
       if (!data.ok) {
@@ -1675,7 +1927,7 @@
       const total = items.length;
       let checked = 0;
       items.forEach(function(item) {
-        if (state.savedProgress[item.id] || state.todayProgress[item.id]) checked++;
+        if (state.savedProgress[item.id] || state.recentSessionProgress[item.id] || state.todayProgress[item.id]) checked++;
       });
       return {
         total: total,
@@ -1934,6 +2186,7 @@
     function mergedProgressMap() {
       const out = {};
       Object.keys(state.savedProgress).forEach(function(k){ if(state.savedProgress[k]) out[k]=['done']; });
+      Object.keys(state.recentSessionProgress).forEach(function(k){ if(state.recentSessionProgress[k]) out[k]=['done']; });
       Object.keys(state.todayProgress).forEach(function(k){ if(state.todayProgress[k]) out[k]=['done']; });
       return out;
     }
@@ -1946,6 +2199,7 @@
           var b = store[tab.id];
           if (!b) return;
           Object.keys(b.saved || {}).forEach(function(k) { if (b.saved[k]) out[k] = ['done']; });
+          Object.keys(b.recent || {}).forEach(function(k) { if (b.recent[k]) out[k] = ['done']; });
           Object.keys(b.today || {}).forEach(function(k) { if (b.today[k]) out[k] = ['done']; });
         });
       }
@@ -1959,7 +2213,7 @@
     }
     function sendableMethodIds() {
       return state.program.filter(function(p) {
-        return (state.savedProgress[p.id] || state.todayProgress[p.id]) && p.hasVideo;
+        return (state.savedProgress[p.id] || state.recentSessionProgress[p.id] || state.todayProgress[p.id]) && p.hasVideo;
       }).map(function(p) { return p.id; });
     }
 
@@ -2124,6 +2378,8 @@
       state.selectedKey = memberKey(m);
       state.todayProgress = {};
       state.savedProgress = {};
+      state.recentSessionProgress = {};
+      state.progressOrigin = {};
       state.sectionCollapsedTouched = {};
       state.sectionCollapsed = {};
       _pendingAttendAlimtalk = null;
@@ -2168,11 +2424,10 @@
         m.specialNotes = detail.member.specialNotes || m.specialNotes || '';
         m.nextProgress = detail.member.nextProgress || m.nextProgress || '';
         m.pspProgress = detail.member.pspProgress || m.pspProgress || {};
+        m.previousSessionProgress = detail.member.previousSessionProgress || m.previousSessionProgress || {};
         distributeServerProgressToStore(m);
-        Object.keys(detail.member.pspProgress || {}).forEach(function(id) {
-          if (!detail.member.pspProgress[id] || !detail.member.pspProgress[id].length) return;
-          if (!state.todayProgress[id]) state.savedProgress[id] = true;
-        });
+        loadProgressFromMemberStore(state.activeProgramTab);
+        saveProgressToMemberStore();
         renderSelectedMemberUi();
       } catch (e) { /* 보드 데이터로 이미 표시됨 */ }
     }
@@ -2222,10 +2477,9 @@
         var g = grouped[secKey];
         html += '<div class="psp-section"><div class="psp-section-hd">' + escapeHtml(g.title) + sectionHeaderMeta(secKey) + '</div><div class="psp-section-body"><div class="psp-part-card">';
         g.items.forEach(function(item) {
-          const isPrior = hasMember && !!state.savedProgress[item.id];
           const isToday = hasMember && !!state.todayProgress[item.id];
           const checked = isToday;
-          const rowCls = isPrior ? ' done' : '';
+          const rowCls = methodRowProgressClass(item, hasMember);
           const displayLabel = methodDisplayLabel(item);
           html += '<label class="method-row' + rowCls + '">' +
             '<input type="checkbox"' + (checked ? ' checked' : '') +
@@ -2238,10 +2492,9 @@
     }
 
     function renderMethodRowHtml(item, secKey, hasMember, displayLabel) {
-      const isPrior = hasMember && !!state.savedProgress[item.id];
       const isToday = hasMember && !!state.todayProgress[item.id];
       const checked = isToday;
-      const rowCls = isPrior ? ' done' : '';
+      const rowCls = methodRowProgressClass(item, hasMember);
       const tagLabel = item.hasVideo ? (secKey === 'self_tool' ? '링크' : '영상') : 'URL없음';
       const isHoriz = secKey === 'self_tool' && String(item.program || '').indexOf('마사지볼') >= 0;
       const vidTag = isHoriz ? '' : '<span class="vid-tag' + (item.hasVideo ? ' ok' : '') + '">' + tagLabel + '</span>';
@@ -2260,7 +2513,7 @@
         root.innerHTML = '<div class="empty-hint">프로그램 없음</div>';
         return;
       }
-      if (state.activeProgramTab === 'face' || state.activeProgramTab === 'func') {
+      if (state.activeProgramTab !== 'movement') {
         renderSimpleProgramList(root, list);
         return;
       }
@@ -2328,13 +2581,29 @@
       if (!state.selected) {
         toast('회원을 먼저 선택해 주세요'); cb.checked = false; return;
       }
+      const wasRecent = !!state.recentSessionProgress[id];
       const wasPrior = !!state.savedProgress[id];
       const wasToday = !!state.todayProgress[id];
       if (cb.checked) {
-        if (!wasToday) state.todayProgress[id] = true;
+        if (wasRecent) {
+          state.progressOrigin[id] = 'recent';
+          delete state.recentSessionProgress[id];
+        } else if (wasPrior) {
+          state.progressOrigin[id] = 'saved';
+          delete state.savedProgress[id];
+        }
+        state.todayProgress[id] = true;
       } else {
         if (wasToday) {
           delete state.todayProgress[id];
+          if (state.progressOrigin[id] === 'recent') {
+            state.recentSessionProgress[id] = true;
+          } else if (state.progressOrigin[id] === 'saved') {
+            state.savedProgress[id] = true;
+          }
+          delete state.progressOrigin[id];
+        } else if (wasRecent) {
+          delete state.recentSessionProgress[id];
         } else if (wasPrior) {
           delete state.savedProgress[id];
         }
@@ -2342,6 +2611,7 @@
       refreshSectionCollapseDefaults();
       renderProgramList();
       updateSendBar();
+      syncCoachMemoFromTodayProgress();
       await autoSaveProgress();
     }
 
@@ -2360,6 +2630,7 @@
         recordMode: 'progress',
         sessionNote: todayLabels.length ? '오늘 진도: ' + todayLabels.join(', ') : '',
         pspProgress: mergedProgressMapForSave(),
+        sessionProgress: todayProgressMap(),
       });
       if (!data.ok) {
         toast(data.message || '진도 저장 실패');
@@ -2369,7 +2640,9 @@
     function updateSendBar() {
       const todayN = Object.keys(state.todayProgress).length;
       const priorN = Object.keys(state.savedProgress).length;
-      let label = '이전 ' + priorN + '개';
+      const recentN = Object.keys(state.recentSessionProgress).length;
+      let label = '과거 ' + priorN + '개';
+      if (recentN) label += ' · 직전 ' + recentN;
       if (todayN) label += ' · 오늘 ' + todayN;
       document.getElementById('sendCountLabel').textContent = label;
       const m = state.selected;
@@ -2417,6 +2690,7 @@
         recordMode: isBasicAttend ? 'progress' : 'session',
         sessionNote: sessionNoteForSave(),
         pspProgress: progress,
+        sessionProgress: todayProgressMap(),
         confirmExtraPass: !!opts.confirmExtraPass,
         basicAttendOnly: !!opts.basicAttendOnly,
         attendPassCount: opts.attendPassCount != null ? opts.attendPassCount : (state.attendPassCount || 1),
@@ -2434,9 +2708,7 @@
     }
 
     function applyCompleteSessionResult(m, data) {
-      Object.keys(state.todayProgress).forEach(function(k) { state.savedProgress[k] = true; });
-      state.todayProgress = {};
-      saveProgressToMemberStore();
+      syncMemberProgressFromServer(m, data);
       if (data.completed) {
         state.completedKeys[memberKey(m)] = true;
         m.sessionCompleted = true;
@@ -2456,6 +2728,41 @@
       renderMemberChips();
       renderSelectedMemberUi();
       updateSendBar();
+    }
+
+    function resolveAttendPassCount(opts) {
+      opts = opts || {};
+      return opts.attendPassCount != null ? opts.attendPassCount : (state.attendPassCount || 1);
+    }
+
+    function closeMultiPassModal(dismissOnly) {
+      document.getElementById('multiPassModal').classList.remove('open');
+      if (!dismissOnly) _pendingCompleteSession = null;
+    }
+
+    function openMultiPassModal(member, progress, opts) {
+      var n = resolveAttendPassCount(opts);
+      var m = member || state.selected;
+      var remain = m ? memberRemainSessions(m) : '-';
+      document.getElementById('multiPassModalText').textContent =
+        '다회차 ' + n + '회 출석을 한 번에 처리합니다. 회원권 ' + n + '회가 차감됩니다.' +
+        (remain !== '-' ? ' (남은 회차 ' + remain + '회)' : '') +
+        ' 진행할까요?';
+      document.getElementById('multiPassModalHint').textContent =
+        opts && opts.basicAttendOnly
+          ? '스케줄표에도 ' + n + '칸이 반영됩니다.'
+          : '진도 저장 후 출석·알림톡·스케줄표에 ' + n + '회가 반영됩니다.';
+      _pendingCompleteSession = { member: member, progress: progress, opts: opts || {} };
+      document.getElementById('multiPassModal').classList.add('open');
+    }
+
+    async function confirmMultiPassAttend(proceed) {
+      var pending = _pendingCompleteSession;
+      closeMultiPassModal(true);
+      if (!pending || !proceed) return;
+      await executeCompleteSession(pending.member, pending.progress, Object.assign({}, pending.opts || {}, {
+        confirmMultiPass: true,
+      }));
     }
 
     function closeExtraPassModal(dismissOnly) {
@@ -2624,15 +2931,18 @@
         sessionDisplay: data.sessionDisplay || m.sessionDisplay,
         name: data.memberName || m.name,
       });
-      var summary = state.activeProgramTab === 'movement' ? computeProgramStageSummary() : null;
       var memo = ata.memo || '';
       var text = buildAttendAlimtalkPreview(
         previewMember,
-        summary,
+        null,
         memo,
-        ata.linkIds || [],
-        ata.todayIds || [],
-        true
+        [],
+        [],
+        true,
+        {
+          stageLine: ata.stage || '',
+          todayBlock: ata.today || '',
+        }
       );
       return (
         '<div class="attend-result-alimtalk-label">회원에게 발송된 알림톡</div>' +
@@ -2651,19 +2961,57 @@
     }
 
     function closeAttendResultModal() {
+      stopAttendProcessingCountdown();
       document.getElementById('attendResultModal').classList.remove('open');
       document.body.style.overflow = '';
     }
 
-    function showAttendProcessing(title) {
+    /** 출석체크.html과 동일 개념 — Apps Script 왕복 + 시트·알림톡 처리 예상 */
+    var ATTEND_PROCESS_EST_SEC_BASIC = 8;
+    var ATTEND_PROCESS_EST_SEC_FULL = 12;
+    var _attendProcessingTimer = null;
+
+    function stopAttendProcessingCountdown() {
+      if (_attendProcessingTimer) {
+        clearInterval(_attendProcessingTimer);
+        _attendProcessingTimer = null;
+      }
+    }
+
+    function paintAttendProcessingCountdown(sec, overdue) {
+      var countEl = document.getElementById('attendProcessCountdown');
+      if (!countEl) return;
+      if (overdue) {
+        countEl.innerHTML = '평소보다 조금 더 걸리고 있어요…';
+        return;
+      }
+      countEl.innerHTML = '예상 대기 <span class="attend-process-sec">' + sec + '</span>초';
+    }
+
+    function showAttendProcessing(title, opts) {
+      opts = opts || {};
+      stopAttendProcessingCountdown();
+      var estSec = opts.basicAttendOnly ? ATTEND_PROCESS_EST_SEC_BASIC : ATTEND_PROCESS_EST_SEC_FULL;
+      var sec = estSec;
       openAttendResultModal(title || '처리 중', (
         '<p class="attend-result-loading">⏳ 출석 기록 중입니다…</p>' +
-        '<p class="attend-result-loading-sub">잠시만 기다려 주세요</p>'
+        '<p class="attend-result-loading-sub">잠시만 기다려 주세요</p>' +
+        '<p class="attend-result-loading-count" id="attendProcessCountdown" aria-live="polite"></p>'
       ), { hideClose: true });
+      paintAttendProcessingCountdown(sec, false);
+      _attendProcessingTimer = setInterval(function() {
+        sec -= 1;
+        if (sec <= 0) {
+          paintAttendProcessingCountdown(0, true);
+          return;
+        }
+        paintAttendProcessingCountdown(sec, false);
+      }, 1000);
     }
 
     function showAttendResult(m, data, opts) {
       opts = opts || {};
+      stopAttendProcessingCountdown();
       if (!data.ok) {
         openAttendResultModal('처리 실패', (
           '<p class="attend-result-error">❌ ' + escapeHtml(data.message || '저장 실패') + '</p>'
@@ -2692,9 +3040,21 @@
 
     async function runCompleteSession(m, progress, opts) {
       opts = opts || {};
+      if (!opts.confirmMultiPass && resolveAttendPassCount(opts) > 1) {
+        openMultiPassModal(m, progress, opts);
+        return;
+      }
+      await executeCompleteSession(m, progress, opts);
+    }
+
+    async function executeCompleteSession(m, progress, opts) {
+      opts = opts || {};
       document.getElementById('saveBtn').disabled = true;
       document.getElementById('attendBtn').disabled = true;
-      showAttendProcessing(opts.basicAttendOnly ? '출석 처리 중' : '저장+출석 처리 중');
+      showAttendProcessing(
+        opts.basicAttendOnly ? '출석 처리 중' : '저장+출석 처리 중',
+        { basicAttendOnly: !!opts.basicAttendOnly }
+      );
       const data = await api(completeSessionPayload(m, progress, opts));
       updateSendBar();
       if (!data.ok) {
@@ -2742,144 +3102,208 @@
       };
     }
 
-    /** History Taking — 내원 목적 → 목표별 세부 → OPPQRST → 그 외 메모 */
-    var EVAL_HISTORY_GROUPS = (function () {
-      function opts(list) {
-        return list.map(function (x) {
+    /** History Taking — 내원 목적(항상) → 목적별 세부 · 통증 → OPQRST */
+    function evalHistItem(id, title, hint, options, multi) {
+      return {
+        id: id,
+        title: title || '',
+        hint: hint || '',
+        multi: multi !== false,
+        options: (options || []).map(function(x) {
           return typeof x === 'string' ? { id: x, label: x } : x;
-        });
-      }
-      function item(id, title, hint, options, multi) {
-        return { id: id, title: title, hint: hint || '', multi: multi !== false, options: opts(options) };
-      }
-      var wellnessGoals = opts([
+        }),
+      };
+    }
+
+    var EVAL_INSPECTION_SECTION = {
+      title: 'Inspection',
+      items: [
+        evalHistItem('insp_findings', '자세·관찰', '다중 선택', [
+          '거북목·일자목', '굽은 등·라운드 숄더', '허리 전만·요추전만', '어깨 비대칭',
+          '골반 틀어짐·골반 높이 차', '오다리', 'X자 다리', '척추 측만 의심',
+        ], true),
+      ],
+      extraId: 'evalInspectionExtra',
+      extraPlaceholder: '그 외 inspection 소견',
+    };
+
+    var EVAL_MOVEMENT_SECTION = {
+      title: 'Movement Test',
+      items: [
+        evalHistItem('mov_region', '제한·불편 부위', '다중 선택', [
+          '목', '어깨', '등·흉추', '허리·요추', '골반·고관절', '하체·무릎·발목',
+        ], true),
+        evalHistItem('mov_pattern', '문제 동작·상황', '', [
+          '굴곡 시 불편', '신전·뒤로 젖힘 불편', '회전·비틀기 불편',
+          '오래 같은 자세', '기상·아침에 심함', '활동·운동 후 악화',
+        ], true),
+      ],
+      extraId: 'evalMovementExtra',
+      extraPlaceholder: '그 외 movement test 소견',
+    };
+
+    var EVAL_PALPATION_SECTION = {
+      title: 'Palpation',
+      items: [
+        evalHistItem('palp_region', '압통·긴장 부위', '다중 선택', [
+          '목', '어깨', '상지', '등', '허리', '골반', '하지',
+        ], true),
+        evalHistItem('palp_quality', '촉진 소견', '', [
+          '근긴장·뭉침', '트리거 포인트', '부종·열감', 'ROM 제한', '특이 소견 없음',
+        ], true),
+      ],
+      extraId: 'evalPalpationExtra',
+      extraPlaceholder: '그 외 palpation 소견',
+    };
+
+    var EVAL_HISTORY_GROUPS = (function () {
+      var wellnessGoals = [
         { id: 'stretch', label: '유연성 향상' },
         { id: 'posture', label: '자세·체형 교정' },
         { id: 'fitness', label: '기능·체력 향상' },
         { id: 'face', label: '얼굴 교정·관리' },
         { id: 'prevention', label: '예방·셀프 케어' },
-      ]);
+        { id: 'pain', label: '통증' },
+      ];
       return [
         {
+          alwaysVisible: true,
           step: '1',
           title: '내원 목적',
-          sub: '웰니스 목표',
-          items: [item('goal', '', '', wellnessGoals, true)],
+          sub: '웰니스 목표 · 다중 선택',
+          items: [evalHistItem('goal', '', '', wellnessGoals, true)],
         },
         {
+          showWhenGoals: ['stretch'],
           step: '2',
           groupTag: '[유연성]',
           items: [
-            item('stretch_area', '불편 부위', '목·어깨·등 / 허리·골반 / 무릎·하지 / 여러 곳·전신', [
+            evalHistItem('stretch_area', '불편 부위', '', [
               '목·어깨·등', '허리·골반', '무릎·하지', '여러 곳·전신',
-            ]),
-            item('stretch_timing', '불편 시기', '아침 / 오래 앉을 때 / 운동 전후 / 특별히 없음', [
+            ], true),
+            evalHistItem('stretch_timing', '불편 시기', '', [
               '아침에 특히 뻣뻣', '오래 앉아 있을 때', '운동 전·후', '특별히 없음',
-            ]),
+            ], true),
           ],
         },
         {
+          showWhenGoals: ['posture'],
           step: '3',
           groupTag: '[자세]',
           items: [
-            item('posture_focus', '우선 교정 부위', '거북목 / 굽은 어깨 / 골반·허리 / 전신 균형', [
+            evalHistItem('posture_focus', '우선 교정 부위', '', [
               '거북목·목', '굽은 어깨·등', '골반·허리', '전신 균형·체형',
-            ]),
-            item('posture_life', '생활 패턴', '책상 / 스마트폰 / 서서 일함 / 운전·반복 동작', [
+            ], true),
+            evalHistItem('posture_life', '생활 패턴', '', [
               '장시간 책상·PC', '스마트폰·목 사용', '서서 일함', '운전·반복 동작',
-            ]),
+            ], true),
           ],
         },
         {
+          showWhenGoals: ['fitness'],
           step: '4',
           groupTag: '[기능]',
           items: [
-            item('fitness_move', '목표 동작', '일상 / 걷기·뛰기 / 스포츠 / 업무·오래 서기', [
+            evalHistItem('fitness_move', '목표 동작', '', [
               '계단·들기 등 일상', '걷기·뛰기', '스포츠·취미', '업무·오래 서기',
-            ]),
-            item('fitness_level', '활동 수준', '거의 안 움직임 / 가벼운 산책 / 주2~3회 / 꾸준히 운동', [
+            ], true),
+            evalHistItem('fitness_level', '활동 수준', '', [
               '거의 안 움직임', '가벼운 산책', '주 2~3회 운동', '꾸준히 운동 중',
-            ]),
+            ], true),
           ],
         },
         {
+          showWhenGoals: ['prevention'],
           step: '5',
           groupTag: '[예방]',
           items: [
-            item('prev_reason', '관리 이유', '재발 걱정 / 치료 후 유지 / 예방·습관 / 셀프 관리', [
+            evalHistItem('prev_reason', '관리 이유', '', [
               '통증 재발 걱정', '치료 후 유지', '예방·습관 교정', '스스로 관리 배우기',
-            ]),
-            item('prev_area', '관리 부위', '목·어깨 / 허리·골반 / 무릎·하지 / 전신', [
+            ], true),
+            evalHistItem('prev_area', '관리 부위', '', [
               '목·어깨', '허리·골반', '무릎·하지', '전신·여러 곳',
-            ]),
+            ], true),
           ],
         },
         {
+          showWhenGoals: ['face'],
           step: '6',
           groupTag: '[얼굴]',
           items: [
-            item('face_focus', '개선 우선', '비대칭 / 붓기·축소 / 턱·목 / 전체 균형', [
+            evalHistItem('face_focus', '개선 우선', '', [
               '안면 비대칭', '얼굴 축소·붓기', '턱·목 라인', '전체 균형',
-            ]),
-            item('face_symptom', '동반 증상', '두통·어깨 / 턱·저작 / 특별히 없음', [
+            ], true),
+            evalHistItem('face_symptom', '동반 증상', '', [
               '두통·어깨 결림', '턱·저작 불편', '특별히 없음(미용·균형)',
-            ]),
+            ], true),
           ],
         },
         {
-          step: 'A', stepClass: 'clinical',
-          items: [item('cc', 'C/C — Chief Complaint', '「어제 오늘, 가장 불편한 게 뭔가요?」 · 손으로 짚기', [
-            '정확히 짚음 (국소)', '애매·넓은 범위 (방사·연관 의심)',
-          ])],
+          showWhenPain: true,
+          step: 'OPQRST',
+          title: '통증 문진',
+          sub: 'OPQRST',
+          items: [
+            evalHistItem('cc', 'C/C — Chief Complaint', '', [
+              '정확히 짚음 (국소)', '애매·넓은 범위 (방사·연관 의심)',
+            ], true),
+            evalHistItem('onset', 'O — Onset', '', [
+              '급성', '만성', '외상·사건 있음', '외상 없음 → 자세·습관 의심',
+            ], true),
+            evalHistItem('provocation', 'P — Provocation', '', [
+              '힘 쓸 때 악화', '패시브 늘릴 때 악화', '특정 자세·동작', '안정 시에도',
+            ], true),
+            evalHistItem('palliation', 'P — Palliation', '', [
+              '쉬면 나아짐', '움직이면 나아짐', '열에 좋아짐', '냉에 좋아짐',
+            ], true),
+            evalHistItem('quality', 'Q — Quality', '', [
+              '전기·찌릿 (신경)', '한 점 날카로움 (관절)', '뻐근·쥐어짜는 (근육)',
+              '당기는·뻣뻣 (Fascia)', '찢어지는', '욱씬거림', '저림·타는',
+            ], true),
+            evalHistItem('region', 'R — Region / Radiation', '', [
+              '국소·한 부위', '경로를 따라 방사', '여러 부위',
+            ], true),
+            evalHistItem('severity', 'S — Severity', '', [
+              'VAS 0~3 경증', 'VAS 4~6 중등도', 'VAS 7~10 중증',
+              '도움 불필요', '도움 가끔 필요', '도움 항상 필요',
+              '안정 시 통증 없음', '안정 시 약간 불편', '안정 시에도 통증',
+            ], true),
+            evalHistItem('timing', 'T — Timing', '', [
+              '쉬면 나아짐', '특정 자세·시간대 악화', '아침에 심함', '안정 시에도 지속',
+            ], true),
+          ],
         },
-        {
-          step: 'O', stepClass: 'clinical',
-          items: [item('onset', 'O — Onset', '시작 시점 · 급성/만성 · 외상 여부', [
-            '급성', '만성', '외상·사건 있음', '외상·사건 없음 → 자세·습관 의심',
-          ])],
-        },
-        {
-          step: 'P', stepClass: 'clinical',
-          items: [item('provocation', 'P — Provocation', '어떤 동작·자세에서 악화?', [
-            '힘 쓸 때 악화 (근육·힘줄)', '패시브 늘릴 때 악화 (Fascia·인대·관절)',
-          ])],
-        },
-        {
-          step: 'P', stepClass: 'clinical',
-          items: [item('palliation', 'P — Palliation', '완화 요인', [
-            '쉬면 나아짐', '움직이면 나아짐', '열에 좋아짐', '냉에 좋아짐',
-          ])],
-        },
-        {
-          step: 'Q', stepClass: 'clinical',
-          items: [item('quality', 'Q — Quality', '통증 종류 — 조직 특이 단서', [
-            '전기 튀는 날카로움 (신경)', '한 점 날카로움 (관절)', '뻐근·쥐어짜는 (근육)',
-            '당기는·뻣뻣 (Fascia)', '찢어지는 (결합조직)', '욱씬거림 (급성 염증)', '저림·타는 (신경 만성)',
-          ])],
-        },
-        {
-          step: 'R', stepClass: 'clinical',
-          items: [item('region', 'R — Region / Radiation', '위치·범위 · 방사', [
-            '국소·한 부위', '경로를 따라 방사',
-          ])],
-        },
-        {
-          step: 'S', stepClass: 'clinical',
-          items: [item('severity', 'S — Severity', 'VAS · 일상 영향', [
-            'VAS 0~3 경증', 'VAS 4~6 중등도', 'VAS 7~10 중증',
-            '도움 불필요', '도움 가끔 필요', '도움 항상 필요',
-            '안정 시 통증 없음', '안정 시 약간 불편', '안정 시에도 통증',
-          ])],
-        },
-        {
-          step: 'T', stepClass: 'clinical',
-          items: [item('timing', 'T — Timing', '지속·간헐 · 시간대·활동', [
-            '쉬면 나아짐', '특정 자세·시간대 악화', '아침에 심함', '안정 시에도 지속',
-          ])],
-        },
-        { isMemo: true, title: '그 외 사항' },
+        { isMemo: true, title: '그 외 사항', showWhenAnyGoal: true },
       ];
     })();
+
+    function getSelectedEvalGoalIds() {
+      var ids = [];
+      document.querySelectorAll('.eval-hist-chip[data-sec="goal"].on').forEach(function(el) {
+        if (el.dataset.goalId) ids.push(el.dataset.goalId);
+      });
+      return ids;
+    }
+
+    function evalGroupShouldShow(grp, goalIds) {
+      if (grp.alwaysVisible) return true;
+      if (grp.showWhenAnyGoal && goalIds.length) return true;
+      if (grp.showWhenPain && goalIds.indexOf('pain') >= 0) return true;
+      if (grp.showWhenGoals && grp.showWhenGoals.length) {
+        return grp.showWhenGoals.some(function(g) { return goalIds.indexOf(g) >= 0; });
+      }
+      return false;
+    }
+
+    function updateEvalFormVisibility() {
+      var goalIds = getSelectedEvalGoalIds();
+      document.querySelectorAll('#evalHistoryForm .eval-hist-section[data-eval-group]').forEach(function(el) {
+        var idx = parseInt(el.dataset.evalGroup, 10);
+        var grp = EVAL_HISTORY_GROUPS[idx];
+        if (!grp) return;
+        el.classList.toggle('eval-hist-hidden', !evalGroupShouldShow(grp, goalIds));
+      });
+    }
 
     function getEvalHistoryChipSections() {
       var flat = [];
@@ -2897,12 +3321,20 @@
           });
         });
       });
+      [EVAL_INSPECTION_SECTION, EVAL_MOVEMENT_SECTION, EVAL_PALPATION_SECTION].forEach(function(block) {
+        (block.items || []).forEach(function(sec) {
+          flat.push({ id: sec.id, title: sec.title, multi: sec.multi, examBlock: block.title });
+        });
+      });
       return flat;
     }
 
     function renderEvalHistoryChipRow(sec) {
       var chips = (sec.options || []).map(function (opt) {
-        return '<button type="button" class="eval-hist-chip" data-sec="' + escapeHtml(sec.id) + '" data-val="' + escapeHtml(opt.label) + '" onclick="toggleEvalHistChip(this)">' + escapeHtml(opt.label) + '</button>';
+        var goalAttr = sec.id === 'goal' && opt.id ? ' data-goal-id="' + escapeHtml(opt.id) + '"' : '';
+        return '<button type="button" class="eval-hist-chip" data-sec="' + escapeHtml(sec.id) + '"' +
+          goalAttr + ' data-val="' + escapeHtml(opt.label) + '" onclick="toggleEvalHistChip(this)">' +
+          escapeHtml(opt.label) + '</button>';
       }).join('');
       var titleHtml = sec.title
         ? '<div class="eval-hist-subtitle">' + escapeHtml(sec.title) + '</div>'
@@ -2916,31 +3348,50 @@
       );
     }
 
+    function renderEvalHistoryGroupSection(grp, groupIndex) {
+      if (grp.isMemo) {
+        return (
+          '<div class="eval-hist-section eval-hist-memo-block eval-hist-hidden" data-eval-group="' + groupIndex + '">' +
+            '<div class="eval-hist-section-hd"><span class="eval-hist-title">' + escapeHtml(grp.title) + '</span></div>' +
+            '<textarea id="evalHistoryExtraMemo" class="eval-hist-note eval-hist-extra" rows="3" placeholder="기록되지 않은 특이사항, 보충 설명"></textarea>' +
+          '</div>'
+        );
+      }
+      var stepCls = grp.stepClass ? ' ' + grp.stepClass : '';
+      var hiddenCls = grp.alwaysVisible ? '' : ' eval-hist-hidden';
+      var hd =
+        '<span class="eval-hist-step' + stepCls + '">' + escapeHtml(String(grp.step)) + '</span>' +
+        (grp.groupTag ? '<span class="eval-hist-group-tag">' + escapeHtml(grp.groupTag) + '</span>' : '') +
+        (grp.title ? '<span class="eval-hist-title">' + escapeHtml(grp.title) + '</span>' : '') +
+        (grp.sub ? '<span class="eval-hist-sub">(' + escapeHtml(grp.sub) + ')</span>' : '');
+      return (
+        '<div class="eval-hist-section' + hiddenCls + '" data-eval-group="' + groupIndex + '">' +
+          '<div class="eval-hist-section-hd">' + hd + '</div>' +
+          (grp.items || []).map(renderEvalHistoryChipRow).join('') +
+        '</div>'
+      );
+    }
+
+    function renderEvalExamBlock(section, rootId) {
+      var root = document.getElementById(rootId);
+      if (!root || !section) return;
+      root.innerHTML =
+        (section.items || []).map(renderEvalHistoryChipRow).join('') +
+        '<div class="eval-hist-subrow eval-hist-memo-block" style="margin-top:8px;">' +
+          '<div class="eval-hist-subtitle">그 외 사항</div>' +
+          '<textarea id="' + escapeHtml(section.extraId) + '" class="eval-hist-note eval-hist-extra" rows="2" placeholder="' +
+          escapeHtml(section.extraPlaceholder || '그 외 사항') + '"></textarea>' +
+        '</div>';
+    }
+
     function renderEvalHistoryForm() {
       var root = document.getElementById('evalHistoryForm');
       if (!root) return;
-      root.innerHTML = EVAL_HISTORY_GROUPS.map(function (grp) {
-        if (grp.isMemo) {
-          return (
-            '<div class="eval-hist-section eval-hist-memo-block">' +
-              '<div class="eval-hist-section-hd"><span class="eval-hist-title">' + escapeHtml(grp.title) + '</span></div>' +
-              '<textarea id="evalHistoryExtraMemo" class="eval-hist-note eval-hist-extra" rows="3" placeholder="기록되지 않은 특이사항, 보충 설명"></textarea>' +
-            '</div>'
-          );
-        }
-        var stepCls = grp.stepClass ? ' ' + grp.stepClass : '';
-        var hd =
-          '<span class="eval-hist-step' + stepCls + '">' + escapeHtml(grp.step) + '</span>' +
-          (grp.groupTag ? '<span class="eval-hist-group-tag">' + escapeHtml(grp.groupTag) + '</span>' : '') +
-          (grp.title ? '<span class="eval-hist-title">' + escapeHtml(grp.title) + '</span>' : '') +
-          (grp.sub ? '<span class="eval-hist-sub">(' + escapeHtml(grp.sub) + ')</span>' : '');
-        return (
-          '<div class="eval-hist-section">' +
-            '<div class="eval-hist-section-hd">' + hd + '</div>' +
-            (grp.items || []).map(renderEvalHistoryChipRow).join('') +
-          '</div>'
-        );
-      }).join('');
+      root.innerHTML = EVAL_HISTORY_GROUPS.map(renderEvalHistoryGroupSection).join('');
+      renderEvalExamBlock(EVAL_INSPECTION_SECTION, 'evalInspectionForm');
+      renderEvalExamBlock(EVAL_MOVEMENT_SECTION, 'evalMovementForm');
+      renderEvalExamBlock(EVAL_PALPATION_SECTION, 'evalPalpationForm');
+      updateEvalFormVisibility();
     }
 
     function toggleEvalHistChip(btn) {
@@ -2951,26 +3402,39 @@
       EVAL_HISTORY_GROUPS.forEach(function (g) {
         (g.items || []).forEach(function (it) { if (it.id === secId) grpItem = it; });
       });
+      if (!grpItem) {
+        [EVAL_INSPECTION_SECTION, EVAL_MOVEMENT_SECTION, EVAL_PALPATION_SECTION].forEach(function(block) {
+          (block.items || []).forEach(function(it) { if (it.id === secId) grpItem = it; });
+        });
+      }
       var on = btn.classList.toggle('on');
-      if ((sec && !sec.multi) || (grpItem && grpItem.multi === false)) {
+      if ((sec && sec.multi === false) || (grpItem && grpItem.multi === false)) {
         if (on) {
           document.querySelectorAll('.eval-hist-chip[data-sec="' + secId + '"].on').forEach(function (el) {
             if (el !== btn) el.classList.remove('on');
           });
         }
       }
+      if (secId === 'goal') updateEvalFormVisibility();
+    }
+
+    function evalChipSelectionsForSec(secId) {
+      var selected = [];
+      document.querySelectorAll('.eval-hist-chip[data-sec="' + secId + '"].on').forEach(function (el) {
+        selected.push(el.dataset.val || el.textContent.trim());
+      });
+      return selected;
     }
 
     function compileEvalHistoryText() {
+      var goalIds = getSelectedEvalGoalIds();
       var lines = [];
       EVAL_HISTORY_GROUPS.forEach(function (grp) {
         if (grp.isMemo) return;
+        if (!evalGroupShouldShow(grp, goalIds)) return;
         var rows = [];
         (grp.items || []).forEach(function (sec) {
-          var selected = [];
-          document.querySelectorAll('.eval-hist-chip[data-sec="' + sec.id + '"].on').forEach(function (el) {
-            selected.push(el.dataset.val || el.textContent.trim());
-          });
+          var selected = evalChipSelectionsForSec(sec.id);
           if (!selected.length) return;
           if (sec.title) rows.push('  · ' + sec.title + ': ' + selected.join(' / '));
           else rows.push('  · ' + selected.join(' / '));
@@ -2979,17 +3443,31 @@
         var head = '■ ' + grp.step;
         if (grp.groupTag) head += ' ' + grp.groupTag;
         else if (grp.title) head += ' ' + grp.title + (grp.sub ? ' (' + grp.sub + ')' : '');
-        else if ((grp.items || [])[0] && (grp.items || [])[0].title) head += ' ' + (grp.items || [])[0].title;
         lines.push(head);
         rows.forEach(function (r) { lines.push(r); });
         lines.push('');
       });
       var extra = document.getElementById('evalHistoryExtraMemo');
       var extraText = extra ? String(extra.value || '').trim() : '';
-      if (extraText) {
+      if (extraText && goalIds.length) {
         lines.push('■ 그 외 사항');
         lines.push('  · ' + extraText);
       }
+      return lines.join('\n').trim();
+    }
+
+    function compileEvalExamText(section) {
+      if (!section) return '';
+      var lines = [];
+      (section.items || []).forEach(function (sec) {
+        var selected = evalChipSelectionsForSec(sec.id);
+        if (!selected.length) return;
+        if (sec.title) lines.push(sec.title + ': ' + selected.join(' / '));
+        else lines.push(selected.join(' / '));
+      });
+      var extraEl = document.getElementById(section.extraId);
+      var extraText = extraEl ? String(extraEl.value || '').trim() : '';
+      if (extraText) lines.push('그 외: ' + extraText);
       return lines.join('\n').trim();
     }
 
@@ -3059,10 +3537,15 @@
       else if (histHasAny(histState, 'goal', [/예방/])) goalId = 'prevention';
       else if (histHasAny(histState, 'goal', [/자세/])) goalId = 'posture';
 
+      if (histHasAny(histState, 'goal', [/통증/]) && !histHasAny(histState, 'goal', [/유연성|자세|기능|얼굴|예방/])) {
+        goalId = 'posture';
+      }
+
       var careStep = 'active';
       if (histHasAny(histState, 'severity', [/7~10|중증|항상 필요|안정 시에도 통증/])) careStep = 'invasive';
       else if (histHasAny(histState, 'severity', [/4~6|중등도/])) careStep = 'manual';
       else if (histHasAny(histState, 'quality', [/전기|한 점|찢어|욱씬/])) careStep = 'manual';
+      else if (histHasAny(histState, 'goal', [/통증/]) && careStep === 'active') careStep = 'manual';
       else if (goalId === 'stretch' || goalId === 'prevention') careStep = 'pstr';
       else if (goalId === 'fitness') {
         careStep = histHasAny(histState, 'severity', [/0~3|경증/]) ? 'aa' : 'resistive';
@@ -3218,9 +3701,9 @@
       const data = await api({
         action:'submitInstructorFirstEval', name:info.name, phone:info.phone,
         history: compileEvalHistoryText(),
-        inspection: document.getElementById('evalInspection').value.trim(),
-        movement: document.getElementById('evalMovement').value.trim(),
-        palpation: document.getElementById('evalPalpation').value.trim(),
+        inspection: compileEvalExamText(EVAL_INSPECTION_SECTION),
+        movement: compileEvalExamText(EVAL_MOVEMENT_SECTION),
+        palpation: compileEvalExamText(EVAL_PALPATION_SECTION),
         memo: document.getElementById('evalMemo').value.trim(),
         sendToMember: document.getElementById('evalSendMember').checked,
         programRecommendation: programRec,
@@ -3238,6 +3721,7 @@
     document.getElementById('sessionWrapModal').addEventListener('click', function(e){ if(e.target===this) closeSessionWrapModal(); });
     document.getElementById('attendResultModal').addEventListener('click', function(e){ if(e.target===this) closeAttendResultModal(); });
     document.getElementById('extraPassModal').addEventListener('click', function(e){ if(e.target===this) closeExtraPassModal(); });
+    document.getElementById('multiPassModal').addEventListener('click', function(e){ if(e.target===this) closeMultiPassModal(); });
     document.getElementById('phonePickerModal').addEventListener('click', function(e){ if(e.target===this) closePhonePickerModal(); });
     document.getElementById('pinInput').addEventListener('keydown', function(e){ if(e.key==='Enter') submitPin(); });
     document.addEventListener('visibilitychange', function() {
