@@ -149,6 +149,7 @@
     .member-brief .line1 { font-size:14px; font-weight:700; }
     .member-brief .line1 .phone { font-weight:600; color:var(--dim); margin-left:8px; font-size:13px; }
     .member-brief .line2 { font-size:12px; color:var(--dim); margin-top:6px; white-space:pre-wrap; line-height:1.5; }
+    .member-brief .line2.brief-wellness span:last-child { color:#3a63a8; }
     .member-brief .line3 { font-size:12px; color:var(--dim); margin-top:6px; white-space:pre-wrap; line-height:1.5; }
     .member-brief .brief-label { font-weight:700; color:var(--text); margin-right:6px; }
 
@@ -266,6 +267,27 @@
     .method-vid { font-size:10px; color:var(--green); margin-top:2px; }
     .vid-tag { font-size:10px; padding:2px 6px; border-radius:5px; background:#f1f5f9; color:#94a3b8; }
     .vid-tag.ok { background:var(--green-bg); color:var(--green); }
+    .method-badge-row { display:flex; align-items:center; gap:4px; flex-shrink:0; align-self:center; }
+    .method-badge-btn {
+      font-size:10px; padding:3px 7px; border-radius:5px; border:1px solid;
+      cursor:pointer; font-weight:700; line-height:1.2; white-space:nowrap;
+      font-family:inherit; background:#fff;
+    }
+    .method-badge-btn:active:not(:disabled) { transform:scale(0.97); }
+    .method-badge-btn--coach { border-color:#bfdbfe; color:var(--blue); background:var(--blue-bg); }
+    .method-badge-btn--coach.has-note { border-color:#60a5fa; }
+    .method-badge-btn--link { border-color:#bbf7d0; color:#047857; background:var(--green-bg); }
+    .method-badge-btn--link.is-disabled,
+    .method-badge-btn--link:disabled { opacity:.5; cursor:default; border-color:#e2e8f0; color:#94a3b8; background:#f1f5f9; }
+    .psp-part-card.horizontal .method-badge-row { align-self:flex-end; }
+    .psp-part-card.horizontal .method-badge-btn,
+    .psp-part-card.p1-kind-card .method-badge-btn { font-size:9px; padding:2px 5px; }
+    .coach-note-body {
+      font-size:13px; line-height:1.65; white-space:pre-wrap;
+      background:#f8fafc; border:1px solid var(--border); border-radius:10px;
+      padding:14px; min-height:80px; color:var(--text);
+    }
+    .coach-note-body.empty { color:var(--dim); font-style:italic; text-align:center; padding:24px 14px; }
     .psp-part-lead { font-size:11px; color:var(--dim); margin:0 0 8px; line-height:1.5; }
     .psp-align-chain { display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-bottom:10px; }
     .psp-align-step { font-size:10px; font-weight:600; background:var(--blue-soft); color:var(--blue); padding:4px 8px; border-radius:6px; }
@@ -444,6 +466,21 @@
     .eval-hist-chip.on { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
     .eval-hist-chip--pain { border-color:#fca5a5; }
     .eval-hist-chip--pain.on { background:#fef2f2; border-color:#ef4444; color:#b91c1c; }
+    .eval-prefill-panel {
+      margin: 0 0 12px; padding: 12px 14px; border-radius: 12px;
+      background: linear-gradient(165deg, #f8fbff 0%, #f2f7fd 100%);
+      border: 1px solid #c5d8ee;
+    }
+    .eval-prefill-panel[hidden] { display: none !important; }
+    .eval-prefill-hd { font-size: 12px; font-weight: 700; color: var(--blue); margin: 0 0 4px; }
+    .eval-prefill-meta { font-size: 11px; color: var(--dim); margin: 0 0 8px; line-height: 1.45; }
+    .eval-prefill-body {
+      margin: 0; padding: 10px 12px; border-radius: 10px; background: #fff;
+      border: 1px solid var(--border); font-size: 12px; line-height: 1.55; color: #374151;
+      white-space: pre-wrap; max-height: 160px; overflow-y: auto;
+    }
+    .eval-prefill-hint { font-size: 10px; color: var(--dim); margin: 8px 0 0; line-height: 1.45; }
+    .eval-prefill-chips { font-size: 10px; color: #3a63a8; margin: 0 0 6px; line-height: 1.45; }
     .eval-hist-group-tag { font-size:12px; font-weight:800; color:var(--blue); }
     .eval-hist-sub { font-size:11px; color:var(--dim); font-weight:600; }
     .eval-hist-subrow + .eval-hist-subrow { margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); }
@@ -720,6 +757,9 @@
       <div class="member-brief" id="memberBrief">
         <div class="line1"><span id="briefName">—</span><span class="phone" id="briefPhone"></span></div>
         <div class="line2"><span class="brief-label">특이사항</span><span id="briefMemo">없음</span></div>
+        <div class="line2 brief-wellness" id="briefWellnessRow" hidden>
+          <span class="brief-label">사전 문진</span><span id="briefWellness">—</span>
+        </div>
         <div class="line3"><span class="brief-label">다음 진도</span><span id="briefNextProgress">없음</span></div>
       </div>
     </section>
@@ -770,6 +810,13 @@
       </div>
       <div class="eval-pane on" id="evalWrite">
         <p class="eval-member-hint" id="evalMemberHint">—</p>
+        <div class="eval-prefill-panel" id="evalWellnessPrefillPanel" hidden>
+          <div class="eval-prefill-hd">사전 평가 참고</div>
+          <p class="eval-prefill-meta" id="evalWellnessPrefillMeta"></p>
+          <p class="eval-prefill-chips" id="evalWellnessPrefillChips" hidden></p>
+          <pre class="eval-prefill-body" id="evalWellnessPrefillBody"></pre>
+          <p class="eval-prefill-hint">일치하는 History 항목은 자동 선택되었습니다. 아래에서 확인·수정해 주세요.</p>
+        </div>
         <div class="eval-panel eval-panel--history">
           <div class="eval-panel-head">
             <span class="eval-panel-mark" aria-hidden="true">◈</span>
@@ -929,6 +976,18 @@
     </div>
   </div>
 
+  <!-- 운동 코칭 참고 -->
+  <div class="modal-overlay" id="coachNoteModal">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-hd">
+        <h2 id="coachNoteTitle">코칭 참고</h2>
+        <button type="button" class="modal-close" onclick="closeCoachingNoteModal()">×</button>
+      </div>
+      <div id="coachNoteBody" class="coach-note-body"></div>
+      <button type="button" class="btn btn-primary" style="width:100%;margin-top:12px;" onclick="closeCoachingNoteModal()">닫기</button>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
@@ -1042,8 +1101,8 @@
     /* 서버 연결 전에도 표시 — code.gs PSP_PROGRAM_CATALOG_ 와 동기화 */
     const MOVEMENT_CATALOG_RAW = [
       { id:'tool_list', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'소도구 목록', label:'소도구 목록', linkUrl:'https://blog.naver.com/allenjoy/222657632345' },
-      { id:'ball_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'어깨', linkUrl:'https://www.youtube.com/watch?v=drx2-P2OgpQ' },
-      { id:'ball_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'허리', linkUrl:'https://www.youtube.com/watch?v=PgKSRcIW9c4' },
+      { id:'ball_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'어깨', linkUrl:'https://www.youtube.com/watch?v=drx2-P2OgpQ', coachingNote:'견갑골 위에 볼을 올리고 통증 없는 범위에서 천천히 원을 그립니다. 호흡을 멈추지 않고 어깨를 들어 올리지 않도록 안내합니다.' },
+      { id:'ball_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'허리', linkUrl:'https://www.youtube.com/watch?v=PgKSRcIW9c4', coachingNote:'요추 양쪽 근육에 볼을 대고 체중을 천천히 실어줍니다. 척추 뼈 위가 아닌 근육 부위에 위치시키는지 확인합니다.' },
       { id:'ball_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'복부', linkUrl:'https://www.youtube.com/shorts/zjvXLTL9E5A' },
       { id:'ball_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'엉덩이', linkUrl:'https://m.blog.naver.com/allenjoy/223442108509' },
       { id:'ball_scapula', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'견갑골', linkUrl:'https://m.blog.naver.com/allenjoy/223449532242' },
@@ -1131,9 +1190,12 @@
           hasVideo: !!url,
           videoTitle: item.label,
           youtubeUrl: url,
+          coachingNote: String(item.coachingNote || '').trim(),
         });
       });
     }
+
+    let exerciseMetaById_ = {};
 
     /** 서버 카탈로그 — 영상 URL만 반영, 표시·순서·라벨은 로컬 MOVEMENT_CATALOG_RAW 우선 */
     function mergeMovementCatalogFromServer_(serverItems) {
@@ -1154,6 +1216,7 @@
           videoTitle: srv.videoTitle || loc.videoTitle || loc.label,
           videoMatch: srv.videoMatch || loc.videoMatch,
           kind: srv.kind || loc.kind,
+          coachingNote: String(srv.coachingNote || loc.coachingNote || '').trim(),
         });
       });
     }
@@ -2467,6 +2530,26 @@
       document.getElementById('briefPhone').textContent = m.phoneDigits ? formatPhone(m.phoneDigits) : '';
       var memo = (m.specialNotes || '').trim() || '없음';
       document.getElementById('briefMemo').textContent = memo;
+      var wiRow = document.getElementById('briefWellnessRow');
+      var wiEl = document.getElementById('briefWellness');
+      var wi = m.wellnessIntake;
+      if (wiRow && wiEl) {
+        if (wi && (wi.summary || (wi.chipPrefill && wi.chipPrefill.length))) {
+          wiRow.hidden = false;
+          var wiLabel = wiRow.querySelector('.brief-label');
+          if (wiLabel) wiLabel.textContent = wi.intakeType === 'treatment' ? '통증 문진' : '사전 문진';
+          var wiParts = [];
+          if (wi.submittedAt) wiParts.push(String(wi.submittedAt).slice(0, 10));
+          if (wi.channel === 'online') wiParts.push('온라인');
+          else if (wi.channel === 'visit') wiParts.push('방문');
+          var wiText = String(wi.summary || '').trim().split('\n')[0];
+          if (wiText) wiParts.push(wiText);
+          wiEl.textContent = wiParts.join(' · ').slice(0, 200);
+        } else {
+          wiRow.hidden = true;
+          wiEl.textContent = '—';
+        }
+      }
       var nextProg = (m.nextProgress || '').trim() || '없음';
       document.getElementById('briefNextProgress').textContent = nextProg;
       document.getElementById('sendMemberLabel').textContent = (m.name || '회원') + '님';
@@ -2491,6 +2574,7 @@
         m.nextProgress = detail.member.nextProgress || m.nextProgress || '';
         m.pspProgress = detail.member.pspProgress || m.pspProgress || {};
         m.previousSessionProgress = detail.member.previousSessionProgress || m.previousSessionProgress || {};
+        m.wellnessIntake = detail.member.wellnessIntake || detail.wellnessIntake || null;
         distributeServerProgressToStore(m);
         loadProgressFromMemberStore(state.activeProgramTab);
         saveProgressToMemberStore();
@@ -2543,14 +2627,7 @@
         var g = grouped[secKey];
         html += '<div class="psp-section"><div class="psp-section-hd">' + escapeHtml(g.title) + sectionHeaderMeta(secKey) + '</div><div class="psp-section-body"><div class="psp-part-card">';
         g.items.forEach(function(item) {
-          const isToday = hasMember && !!state.todayProgress[item.id];
-          const checked = isToday;
-          const rowCls = methodRowProgressClass(item, hasMember);
-          const displayLabel = methodDisplayLabel(item);
-          html += '<label class="method-row' + rowCls + '">' +
-            '<input type="checkbox"' + (checked ? ' checked' : '') +
-            ' onchange="toggleToday(\'' + item.id + '\',this)">' +
-            '<div><div class="method-label">' + escapeHtml(displayLabel) + '</div></div></label>';
+          html += renderMethodRowHtml(item, secKey, hasMember, methodDisplayLabel(item));
         });
         html += '</div></div></div>';
       });
@@ -2558,22 +2635,88 @@
     }
 
     function renderMethodRowHtml(item, secKey, hasMember, displayLabel) {
+      const label = displayLabel != null ? displayLabel : methodDisplayLabel(item);
+      cacheExerciseMeta_(item, label);
       const isToday = hasMember && !!state.todayProgress[item.id];
       const checked = isToday;
       const rowCls = methodRowProgressClass(item, hasMember);
-      const tagLabel = item.hasVideo ? (secKey === 'self_tool' ? '링크' : '영상') : 'URL없음';
-      const isHoriz = secKey === 'self_tool' && String(item.program || '').indexOf('마사지볼') >= 0;
-      const vidTag = isHoriz ? '' : '<span class="vid-tag' + (item.hasVideo ? ' ok' : '') + '">' + tagLabel + '</span>';
-      const label = displayLabel != null ? displayLabel : methodDisplayLabel(item);
+      const badgeRow = renderMethodBadges_(item, secKey);
+      const showVidLine = secKey !== 'self_tool' && item.videoTitle && item.videoTitle !== item.label;
       return '<label class="method-row' + rowCls + '">' +
         '<input type="checkbox"' + (checked ? ' checked' : '') +
         ' onchange="toggleToday(\'' + item.id + '\',this)">' +
-        '<div><div class="method-label">' + escapeHtml(label) + '</div></div>' +
-        vidTag + '</label>';
+        '<div><div class="method-label">' + escapeHtml(label) + '</div>' +
+        (showVidLine ? '<div class="method-vid">▶ ' + escapeHtml(item.videoTitle) + '</div>' : '') +
+        '</div>' + badgeRow + '</label>';
+    }
+
+    function cacheExerciseMeta_(item, displayLabel) {
+      exerciseMetaById_[item.id] = {
+        label: displayLabel != null ? displayLabel : (item.label || ''),
+        url: String(item.youtubeUrl || '').trim(),
+        note: String(item.coachingNote || '').trim(),
+      };
+    }
+
+    function renderMethodBadges_(item, secKey) {
+      const tagLabel = item.hasVideo ? (secKey === 'self_tool' ? '링크' : '영상') : 'URL없음';
+      const note = String(item.coachingNote || '').trim();
+      const linkDisabled = !item.hasVideo;
+      return '<span class="method-badge-row">' +
+        '<button type="button" class="method-badge-btn method-badge-btn--coach' + (note ? ' has-note' : '') + '" onclick="openCoachingNoteModal_(event,\'' + item.id + '\')">설명</button>' +
+        '<button type="button" class="method-badge-btn method-badge-btn--link' + (linkDisabled ? ' is-disabled' : '') + '"' +
+        (linkDisabled ? ' disabled' : ' onclick="copyExerciseLink_(event,\'' + item.id + '\')"') + '>' + escapeHtml(tagLabel) + '</button>' +
+        '</span>';
+    }
+
+    function openCoachingNoteModal_(ev, itemId) {
+      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+      const data = exerciseMetaById_[itemId] || {};
+      const titleEl = document.getElementById('coachNoteTitle');
+      const bodyEl = document.getElementById('coachNoteBody');
+      if (titleEl) titleEl.textContent = data.label ? data.label + ' · 코칭 참고' : '코칭 참고';
+      const note = String(data.note || '').trim();
+      if (bodyEl) {
+        bodyEl.textContent = note || '설명 없음';
+        bodyEl.classList.toggle('empty', !note);
+      }
+      document.getElementById('coachNoteModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCoachingNoteModal() {
+      document.getElementById('coachNoteModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    async function copyExerciseLink_(ev, itemId) {
+      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+      const data = exerciseMetaById_[itemId] || {};
+      const url = String(data.url || '').trim();
+      if (!url) { toast('복사할 링크가 없습니다'); return; }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+        } else {
+          throw new Error('clipboard unavailable');
+        }
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      toast('링크가 복사되었습니다');
     }
 
     function renderProgramList() {
       const root = document.getElementById('pspProgramList');
+      exerciseMetaById_ = {};
       const list = state.program;
       if (!list.length) {
         root.innerHTML = '<div class="empty-hint">프로그램 없음</div>';
@@ -3463,6 +3606,111 @@
         '</div>';
     }
 
+    function clearEvalFormSelections_() {
+      document.querySelectorAll('.eval-hist-chip.on').forEach(function (el) { el.classList.remove('on'); });
+      ['evalHistoryExtraMemo', 'evalInspectionExtra', 'evalMovementExtra', 'evalPalpationExtra', 'evalMemo'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      var panel = document.getElementById('evalWellnessPrefillPanel');
+      if (panel) panel.hidden = true;
+      updateEvalFormVisibility();
+    }
+
+    function applyEvalChipPrefill_(chipPrefill) {
+      if (!chipPrefill || !chipPrefill.length) return 0;
+      var applied = 0;
+      chipPrefill.forEach(function (item) {
+        if (!item || !item.sec || !item.val) return;
+        document.querySelectorAll('.eval-hist-chip[data-sec="' + item.sec + '"]').forEach(function (btn) {
+          var val = btn.dataset.val || btn.textContent.trim();
+          if (val !== item.val) return;
+          if (item.goalId && btn.dataset.goalId && btn.dataset.goalId !== item.goalId) return;
+          if (!btn.classList.contains('on')) {
+            btn.classList.add('on');
+            applied++;
+          }
+        });
+      });
+      updateEvalFormVisibility();
+      return applied;
+    }
+
+    function showEvalWellnessPrefillPanel_(data, appliedCount) {
+      var panel = document.getElementById('evalWellnessPrefillPanel');
+      var meta = document.getElementById('evalWellnessPrefillMeta');
+      var body = document.getElementById('evalWellnessPrefillBody');
+      var chips = document.getElementById('evalWellnessPrefillChips');
+      var hd = panel ? panel.querySelector('.eval-prefill-hd') : null;
+      if (!panel || !meta || !body) return;
+      if (!data || !data.found) {
+        panel.hidden = true;
+        return;
+      }
+      var intake = data.intake || {};
+      var isTreatment = intake.intakeType === 'treatment';
+      if (hd) hd.textContent = isTreatment ? '통증 문진 참고' : '사전 평가 참고';
+      var submitted = '';
+      if (intake.submittedAt) submitted = String(intake.submittedAt).slice(0, 16).replace('T', ' ');
+      var channel = intake.channel === 'online' ? '온라인' : (intake.channel === 'visit' ? '센터 방문' : '');
+      meta.textContent = [submitted, channel].filter(Boolean).join(' · ');
+      var parts = [];
+      if (intake.summary) parts.push(intake.summary);
+      var ref = String(data.referenceNotes || '').trim();
+      if (ref) parts.push('[참고]\n' + ref);
+      body.textContent = parts.join('\n\n').trim() || '(요약 없음)';
+      if (chips) {
+        if (appliedCount > 0) {
+          chips.hidden = false;
+          chips.textContent = '자동 선택 ' + appliedCount + '개 — History 칩에 반영됨';
+        } else {
+          chips.hidden = true;
+          chips.textContent = '';
+        }
+      }
+      panel.hidden = false;
+    }
+
+    async function loadWellnessIntakePrefill_(phone) {
+      var prefillData = null;
+      var m = state.selected;
+      if (m && m.wellnessIntake && (m.wellnessIntake.summary || (m.wellnessIntake.chipPrefill && m.wellnessIntake.chipPrefill.length))) {
+        prefillData = {
+          ok: true,
+          found: true,
+          intake: {
+            summary: m.wellnessIntake.summary,
+            channel: m.wellnessIntake.channel,
+            goal: m.wellnessIntake.goal,
+            submittedAt: m.wellnessIntake.submittedAt,
+            intakeType: m.wellnessIntake.intakeType || 'wellness',
+            source: m.wellnessIntake.source || '회원정보',
+          },
+          chipPrefill: m.wellnessIntake.chipPrefill || [],
+          referenceNotes: m.wellnessIntake.referenceNotes || '',
+        };
+      } else if (phone && phone.length >= 10) {
+        try {
+          prefillData = await api({ action: 'instructorGetWellnessIntake', phone: phone }, { timeoutMs: 20000 });
+        } catch (e) {
+          prefillData = null;
+        }
+      }
+      var applied = 0;
+      if (prefillData && prefillData.found) {
+        applied = applyEvalChipPrefill_(prefillData.chipPrefill || []);
+        var ref = String(prefillData.referenceNotes || '').trim();
+        if (ref) {
+          var extra = document.getElementById('evalHistoryExtraMemo');
+          if (extra && !String(extra.value || '').trim()) extra.value = ref;
+        }
+        showEvalWellnessPrefillPanel_(prefillData, applied);
+      } else {
+        showEvalWellnessPrefillPanel_(null, 0);
+      }
+      return prefillData;
+    }
+
     function renderEvalHistoryForm() {
       var root = document.getElementById('evalHistoryForm');
       if (!root) return;
@@ -3710,7 +3958,7 @@
         '</div>';
     }
 
-    function openEvalModal() {
+    async function openEvalModal() {
       const info = evalMemberInfo();
       if (!info.name || info.phone.length < 10) {
         toast('회원을 먼저 선택해 주세요');
@@ -3718,6 +3966,8 @@
       }
       document.getElementById('evalMemberHint').textContent = info.name + ' · ' + formatPhone(info.phone);
       renderEvalHistoryForm();
+      clearEvalFormSelections_();
+      await loadWellnessIntakePrefill_(info.phone);
       loadFirstEvalView(info.phone);
       document.getElementById('evalModal').classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -3797,6 +4047,7 @@
     }
 
     document.getElementById('evalModal').addEventListener('click', function(e){ if(e.target===this) closeEvalModal(); });
+    document.getElementById('coachNoteModal').addEventListener('click', function(e){ if(e.target===this) closeCoachingNoteModal(); });
     document.getElementById('sessionWrapModal').addEventListener('click', function(e){ if(e.target===this) closeSessionWrapModal(); });
     document.getElementById('attendResultModal').addEventListener('click', function(e){ if(e.target===this) closeAttendResultModal(); });
     document.getElementById('extraPassModal').addEventListener('click', function(e){ if(e.target===this) closeExtraPassModal(); });
