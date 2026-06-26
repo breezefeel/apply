@@ -52,6 +52,7 @@
     .btn-primary { background:var(--blue); color:#fff; }
     .btn-ghost { background:var(--blue-bg); color:var(--blue); }
     .btn-eval { background:#7c3aed; color:#fff; }
+    .btn-intake { background:#0d9488; color:#fff; }
     .btn-green { background:var(--green); color:#fff; }
     .btn-save { background:var(--blue); color:#fff; }
     .attend-pass-stepper {
@@ -258,6 +259,8 @@
     .psp-part-card.p1-kind-card .method-label {
       font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
+    .psp-part-card.p1-kind-card .method-vid,
+    .psp-part-card.horizontal .method-vid { display:none; }
     .psp-part-card.p1-kind-card .vid-tag {
       flex-shrink:0; font-size:8px; padding:1px 3px; white-space:nowrap;
     }
@@ -750,7 +753,8 @@
       <div class="card-sub">강사별 한 줄 · <strong>이름 색상 = 신청 프로그램</strong>(시트와 동일) · 완료 회원은 취소선</div>
       <div class="toolbar">
         <button type="button" class="btn btn-ghost" onclick="loadBoard()">새로고침</button>
-        <a class="btn btn-ghost" href="https://breezefeel.github.io/yaksu/" target="_blank" rel="noopener noreferrer">회원등록</a>
+        <a class="btn btn-ghost" href="#" onclick="openApplicationForm_(event)">회원등록</a>
+        <button type="button" class="btn btn-intake" onclick="sendWellnessIntakeSms_()">사전 문진</button>
         <button type="button" class="btn btn-eval" onclick="openEvalModal()">초회 평가</button>
       </div>
       <div class="member-chips" id="memberChips"><span class="empty-hint">불러오는 중…</span></div>
@@ -1189,6 +1193,7 @@
           group: item.sectionTitle,
           hasVideo: !!url,
           videoTitle: item.label,
+          videoDetailTitle: '',
           youtubeUrl: url,
           coachingNote: String(item.coachingNote || '').trim(),
         });
@@ -1209,11 +1214,14 @@
         var srv = serverById[loc.id];
         if (!srv) return loc;
         var url = String(srv.youtubeUrl || loc.youtubeUrl || '').trim();
+        var srvTitle = String(srv.videoTitle || '').trim();
+        var shortTitle = String(loc.label || loc.videoTitle || '').trim();
         return Object.assign({}, loc, {
           youtubeUrl: url,
-          hasVideo: !!(srv.hasVideo != null ? srv.hasVideo : url),
+          hasVideo: !!url,
           videoId: srv.videoId || loc.videoId || loc.id,
-          videoTitle: srv.videoTitle || loc.videoTitle || loc.label,
+          videoTitle: shortTitle,
+          videoDetailTitle: srvTitle && srvTitle !== shortTitle ? srvTitle : '',
           videoMatch: srv.videoMatch || loc.videoMatch,
           kind: srv.kind || loc.kind,
           coachingNote: String(srv.coachingNote || loc.coachingNote || '').trim(),
@@ -2641,32 +2649,44 @@
       const checked = isToday;
       const rowCls = methodRowProgressClass(item, hasMember);
       const badgeRow = renderMethodBadges_(item, secKey);
-      const showVidLine = secKey !== 'self_tool' && item.videoTitle && item.videoTitle !== item.label;
+      const detailTitle = String(item.videoDetailTitle || '').trim();
+      const showVidLine = !isP1ParItem(item)
+        && secKey !== 'self_tool'
+        && detailTitle
+        && detailTitle !== label;
       return '<label class="method-row' + rowCls + '">' +
         '<input type="checkbox"' + (checked ? ' checked' : '') +
         ' onchange="toggleToday(\'' + item.id + '\',this)">' +
         '<div><div class="method-label">' + escapeHtml(label) + '</div>' +
-        (showVidLine ? '<div class="method-vid">▶ ' + escapeHtml(item.videoTitle) + '</div>' : '') +
+        (showVidLine ? '<div class="method-vid">▶ ' + escapeHtml(detailTitle) + '</div>' : '') +
         '</div>' + badgeRow + '</label>';
     }
 
     function cacheExerciseMeta_(item, displayLabel) {
+      var detail = String(item.videoDetailTitle || '').trim();
       exerciseMetaById_[item.id] = {
         label: displayLabel != null ? displayLabel : (item.label || ''),
+        detailTitle: detail,
         url: String(item.youtubeUrl || '').trim(),
         note: String(item.coachingNote || '').trim(),
       };
     }
 
     function renderMethodBadges_(item, secKey) {
-      const tagLabel = item.hasVideo ? (secKey === 'self_tool' ? '링크' : '영상') : 'URL없음';
       const note = String(item.coachingNote || '').trim();
-      const linkDisabled = !item.hasVideo;
-      return '<span class="method-badge-row">' +
-        '<button type="button" class="method-badge-btn method-badge-btn--coach' + (note ? ' has-note' : '') + '" onclick="openCoachingNoteModal_(event,\'' + item.id + '\')">설명</button>' +
-        '<button type="button" class="method-badge-btn method-badge-btn--link' + (linkDisabled ? ' is-disabled' : '') + '"' +
-        (linkDisabled ? ' disabled' : ' onclick="copyExerciseLink_(event,\'' + item.id + '\')"') + '>' + escapeHtml(tagLabel) + '</button>' +
-        '</span>';
+      const detailTitle = String(item.videoDetailTitle || '').trim();
+      const hasNote = !!(note || (detailTitle && detailTitle !== String(item.label || '').trim()));
+      const hasUrl = !!(item.hasVideo && String(item.youtubeUrl || '').trim());
+      if (!hasNote && !hasUrl) return '';
+      var html = '<span class="method-badge-row">';
+      if (hasNote) {
+        html += '<button type="button" class="method-badge-btn method-badge-btn--coach has-note" onclick="openCoachingNoteModal_(event,\'' + item.id + '\')">설명</button>';
+      }
+      if (hasUrl) {
+        var tagLabel = secKey === 'self_tool' ? '링크' : '영상';
+        html += '<button type="button" class="method-badge-btn method-badge-btn--link" onclick="copyExerciseLink_(event,\'' + item.id + '\')">' + escapeHtml(tagLabel) + '</button>';
+      }
+      return html + '</span>';
     }
 
     function openCoachingNoteModal_(ev, itemId) {
@@ -2677,8 +2697,13 @@
       if (titleEl) titleEl.textContent = data.label ? data.label + ' · 코칭 참고' : '코칭 참고';
       const note = String(data.note || '').trim();
       if (bodyEl) {
-        bodyEl.textContent = note || '설명 없음';
-        bodyEl.classList.toggle('empty', !note);
+        var detail = String(data.detailTitle || '').trim();
+        var bodyText = note || '설명 없음';
+        if (detail && detail !== (data.label || '')) {
+          bodyText = detail + (note ? '\n\n—\n\n' + note : '');
+        }
+        bodyEl.textContent = bodyText;
+        bodyEl.classList.toggle('empty', !note && !detail);
       }
       document.getElementById('coachNoteModal').classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -3302,6 +3327,29 @@
       await runCompleteSession(m, progress, { basicAttendOnly: true });
     }
 
+    const APPLICATION_FORM_URL = 'https://breezefeel.github.io/yaksu/신청서.html';
+
+    function openApplicationForm_(ev) {
+      if (ev) ev.preventDefault();
+      const m = state.selected;
+      let url = APPLICATION_FORM_URL;
+      if (m && String(m.name || '').trim()) {
+        const params = new URLSearchParams();
+        params.set('name', String(m.name).trim());
+        const phone = String(m.phoneDigits || '').replace(/\D/g, '');
+        if (phone.length >= 10) params.set('phone', phone);
+        const prog = String(m.program || '').trim();
+        if (prog) params.set('program', prog);
+        const branch = String(m.branch || '').trim();
+        if (/인천|작전/.test(branch)) params.set('branch', '인천');
+        else if (/약수/.test(branch)) params.set('branch', '약수');
+        const inst = String(m.instructorName || '').trim();
+        if (inst) params.set('instructor', inst);
+        url += '?' + params.toString();
+      }
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
     function evalMemberInfo() {
       const m = state.selected;
       if (!m) return { name: '', phone: '' };
@@ -3309,6 +3357,38 @@
         name: String(m.name || '').trim(),
         phone: String(m.phoneDigits || '').replace(/\D/g, ''),
       };
+    }
+
+    async function sendWellnessIntakeSms_() {
+      const m = state.selected;
+      if (!m || !String(m.name || '').trim()) {
+        toast('회원을 먼저 선택해 주세요');
+        return;
+      }
+      const name = String(m.name || '').trim();
+      let phone = String(m.phoneDigits || '').replace(/\D/g, '');
+      if (phone.length < 10 && m.suffix8) {
+        try {
+          const detail = await api({ action: 'instructorMemberDetail', suffix8: m.suffix8 }, { timeoutMs: 20000 });
+          if (detail.ok && detail.member && detail.member.phoneDigits) {
+            phone = String(detail.member.phoneDigits).replace(/\D/g, '');
+            m.phoneDigits = phone;
+          }
+        } catch (e) { /* ignore */ }
+      }
+      if (phone.length < 10) {
+        toast('연락처가 없습니다. 회원 시트에 번호를 등록해 주세요.');
+        return;
+      }
+      if (!confirm(name + '님에게 사전 문진 링크를 문자로 보낼까요?')) return;
+      const data = await api({
+        action: 'instructorSendWellnessIntake',
+        name: name,
+        phone: phone,
+        suffix8: m.suffix8 || '',
+      });
+      if (data.ok) toast('사전 문진 문자 발송 완료');
+      else toast(data.message || data.error || '발송 실패');
     }
 
     /** History Taking — 내원 목적(항상) → 목적별 세부 · 통증 → OPQRST */
