@@ -18,7 +18,7 @@
     body {
       font-family: "Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
       background: var(--bg); color: var(--text); line-height: 1.5;
-      min-height: 100dvh; padding-bottom: calc(88px + var(--safe-b));
+      min-height: 100dvh; padding-bottom: calc(24px + var(--safe-b));
     }
     .page-hd { background: linear-gradient(135deg,#1e3a6e,#2563eb); color:#fff; padding:14px 16px 12px; }
     .page-hd-inner {
@@ -176,6 +176,39 @@
     .member-brief .line2.brief-wellness span:last-child { color:#3a63a8; }
     .member-brief .line3 { font-size:12px; color:var(--dim); margin-top:6px; white-space:pre-wrap; line-height:1.5; }
     .member-brief .brief-label { font-weight:700; color:var(--text); margin-right:6px; }
+
+    .session-check-panel {
+      margin-top:10px; padding:12px; border-radius:10px;
+      background:#f8fafc; border:1px solid var(--border);
+      display:none;
+    }
+    .session-check-panel.show { display:block; }
+    .session-check-title {
+      font-size:12px; font-weight:800; color:var(--text); margin-bottom:10px;
+    }
+    .session-check-row { margin-top:10px; }
+    .session-check-row:first-of-type { margin-top:0; }
+    .session-check-label {
+      display:block; font-size:11px; font-weight:700; color:var(--dim); margin-bottom:6px;
+    }
+    .session-check-chips, .session-check-vas {
+      display:flex; flex-wrap:wrap; gap:6px;
+    }
+    .session-check-chips .session-check-chip,
+    .session-check-vas .session-check-chip {
+      flex:0 1 auto; padding:6px 10px; font-size:11px; border-radius:999px;
+      border:1px solid var(--border); background:#fff; cursor:pointer;
+    }
+    .session-check-chips .session-check-chip.on,
+    .session-check-vas .session-check-chip.on {
+      background:var(--blue-bg); border-color:var(--blue); color:var(--blue); font-weight:700;
+    }
+    .session-check-vas .session-check-chip { min-width:34px; text-align:center; padding:6px 0; }
+    .session-check-note-row textarea {
+      width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:8px;
+      font-size:12px; line-height:1.45; resize:vertical; min-height:52px;
+    }
+    .member-brief .brief-history-line { font-size:11px; color:#475569; }
 
     /* Re:Al Movement 섹션 */
     .psp-section { margin-bottom:16px; }
@@ -358,15 +391,27 @@
     .check-inline { display:flex; align-items:center; gap:6px; font-size:12px; margin:8px 0; }
 
     .send-bar {
-      position:fixed; bottom:0; left:0; right:0; z-index:40;
-      background:var(--surface); border-top:1px solid var(--border);
-      padding:10px 12px calc(10px + var(--safe-b));
-      display:flex; gap:8px; align-items:center;
-      box-shadow:0 -4px 20px rgba(0,0,0,.08);
+      display:none;
     }
-    .send-bar .actions { display:flex; gap:8px; flex-shrink:0; }
-    .send-bar .info { flex:1; font-size:12px; color:var(--dim); min-width:0; }
-    .send-bar .info strong { color:var(--text); display:block; font-size:13px; }
+
+    .session-wrap-panel { display:none; }
+    .session-wrap-panel.show { display:block; }
+    .session-wrap-panel .card-sub { margin-bottom:12px; }
+    .alimtalk-preview-hint {
+      font-size:10px; color:#94a3b8; margin:-2px 0 8px; line-height:1.45;
+    }
+    .session-wrap-actions {
+      display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+      margin-top:8px; padding-top:12px; border-top:1px solid var(--border);
+    }
+    .session-wrap-actions .attend-pass-stepper {
+      flex:1 1 100%; justify-content:center;
+    }
+    @media(min-width:520px){
+      .session-wrap-actions .attend-pass-stepper { flex:0 0 auto; justify-content:flex-start; }
+    }
+    .session-wrap-actions .btn-attend-basic { flex:1; background:var(--green); color:#fff; border:none; }
+    .session-wrap-actions .btn-attend-progress { flex:1; }
 
     .modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(15,23,42,.5); display:none; align-items:flex-end; justify-content:center; }
     .modal-overlay.open { display:flex; }
@@ -742,9 +787,6 @@
       font-size:10px; font-weight:700; color:#94a3b8; margin-bottom:6px;
     }
     .memo-counter { font-size:10px; color:var(--dim); text-align:right; margin-top:4px; }
-    .session-wrap-actions { display:flex; gap:8px; margin-top:4px; }
-    .session-wrap-actions .btn { flex:1; padding:12px 8px; font-size:12px; }
-    .session-wrap-actions .btn-save-attend { flex:1.15; }
   </style>
 </head>
 <body>
@@ -784,10 +826,31 @@
       <div class="member-brief" id="memberBrief">
         <div class="line1"><span id="briefName">—</span><span class="phone" id="briefPhone"></span></div>
         <div class="line2"><span class="brief-label">특이사항</span><span id="briefMemo">없음</span></div>
+        <div class="line2" id="briefFirstEvalRow" hidden>
+          <span class="brief-label">초회 평가</span><span id="briefFirstEval">—</span>
+        </div>
         <div class="line2 brief-wellness" id="briefWellnessRow" hidden>
           <span class="brief-label">사전 문진</span><span id="briefWellness">—</span>
         </div>
+        <div class="line2" id="briefDiscomfortRow" hidden>
+          <span class="brief-label">불편 변화</span><span id="briefDiscomfortHistory" class="brief-history-line">—</span>
+        </div>
         <div class="line3"><span class="brief-label">다음 진도</span><span id="briefNextProgress">없음</span></div>
+      </div>
+      <div class="session-check-panel" id="sessionCheckPanel">
+        <div class="session-check-title">오늘 컨디션</div>
+        <div class="session-check-row">
+          <span class="session-check-label">불편한 부위</span>
+          <div class="session-check-chips" id="sessionDiscomfortChips"></div>
+        </div>
+        <div class="session-check-row">
+          <span class="session-check-label">VAS (0~10)</span>
+          <div class="session-check-vas" id="sessionVasChips"></div>
+        </div>
+        <div class="session-check-row session-check-note-row">
+          <label class="session-check-label" for="sessionCheckNote">특이사항</label>
+          <textarea id="sessionCheckNote" rows="2" placeholder="오늘 컨디션·주의사항" oninput="onSessionCheckNoteInput()"></textarea>
+        </div>
       </div>
     </section>
 
@@ -805,24 +868,47 @@
       </div>
       <div id="pspProgramList"><div class="empty-hint">불러오는 중…</div></div>
     </section>
-  </main>
 
-  <div class="send-bar">
-    <div class="info">
-      <strong id="sendMemberLabel">회원 미선택</strong>
-      <span id="sendCountLabel">오늘 0개 선택</span>
-    </div>
-    <div class="actions">
-      <div class="attend-pass-stepper" id="attendPassStepper" title="한 번에 사용할 회차 수">
-        <span class="pass-caption">다회차</span>
-        <button type="button" class="pass-btn" id="attendPassMinus" onclick="changeAttendPassCount(-1)" disabled aria-label="회차 줄이기">−</button>
-        <span class="pass-num" id="attendPassCountLabel">1</span>
-        <button type="button" class="pass-btn" id="attendPassPlus" onclick="changeAttendPassCount(1)" disabled aria-label="회차 늘리기">+</button>
+    <!-- 차트 · 출석 (인라인) -->
+    <section class="card session-wrap-panel" id="sessionWrapPanel">
+      <div class="card-title">차트 · 출석</div>
+      <div class="card-sub" id="sessionWrapMemberHint">회원을 선택하면 아래에서 확인·저장할 수 있습니다.</div>
+      <div class="stage-today-list">
+        <h3>오늘 진행한 항목</h3>
+        <p class="stage-today-hint">왼쪽 체크 — 알림톡 포함(기본 전체 선택) · URL 체크 — 운동명 아래 링크 함께 발송</p>
+        <div id="sessionTodayList"></div>
+        <div class="field session-special-notes-field">
+          <label for="sessionSpecialNotesNew">이번 세션 중 특이사항 추가</label>
+          <textarea id="sessionSpecialNotesNew" rows="2" placeholder="회원 컨디션, 주의사항 등 이번에 새로 기록할 내용" oninput="onSessionSpecialNotesNewInput()"></textarea>
+        </div>
+        <div class="field session-progress-notes-field">
+          <label for="sessionNextProgress">진도 · 다음 계획</label>
+          <textarea id="sessionNextProgress" rows="2" placeholder="다음 회차 진도 계획, 오늘 세션 요약 등 (최신 내용만 유지)" oninput="onSessionNextProgressInput()"></textarea>
+          <p class="stage-today-hint">진도 계획은 최신 기록만 회원 정보에 표시됩니다.</p>
+        </div>
       </div>
-      <button type="button" class="btn btn-green" id="attendBtn" onclick="quickAttendSession()" disabled>출석만 체크</button>
-      <button type="button" class="btn btn-save" id="saveBtn" onclick="saveSession()" disabled>차트 기록</button>
-    </div>
-  </div>
+      <div class="field">
+        <label for="sessionCoachMemo">오늘 키포인트 (회원 알림톡 · 1~2문장)</label>
+        <textarea id="sessionCoachMemo" rows="2" maxlength="80" placeholder="직접 작성할 키포인트를 입력하세요." onfocus="onSessionCoachMemoFocus()" onblur="onSessionCoachMemoBlur()" oninput="updateSessionWrapPreview()"></textarea>
+        <div class="memo-counter"><span id="sessionMemoCount">0</span>/80</div>
+      </div>
+      <div class="alimtalk-preview">
+        <div class="preview-label">알림톡으로 보내질 내용 (출석+진도보내기)</div>
+        <p class="alimtalk-preview-hint">출석체크는 진도·출석 저장은 동일하고, 기본 알림톡만 발송됩니다.</p>
+        <div id="sessionAlimtalkPreview"></div>
+      </div>
+      <div class="session-wrap-actions">
+        <div class="attend-pass-stepper" id="attendPassStepper" title="한 번에 사용할 회차 수">
+          <span class="pass-caption">다회차</span>
+          <button type="button" class="pass-btn" id="attendPassMinus" onclick="changeAttendPassCount(-1)" disabled aria-label="회차 줄이기">−</button>
+          <span class="pass-num" id="attendPassCountLabel">1</span>
+          <button type="button" class="pass-btn" id="attendPassPlus" onclick="changeAttendPassCount(1)" disabled aria-label="회차 늘리기">+</button>
+        </div>
+        <button type="button" class="btn btn-attend-basic" id="attendBasicBtn" onclick="attendBasicSession()" disabled>출석체크</button>
+        <button type="button" class="btn btn-save btn-attend-progress" id="attendProgressBtn" onclick="attendWithProgressSession()" disabled>출석+진도보내기</button>
+      </div>
+    </section>
+  </main>
 
   <!-- 초회 평가 모달 -->
   <div class="modal-overlay" id="evalModal">
@@ -957,49 +1043,6 @@
       <p style="font-size:13px;color:var(--dim);margin-bottom:12px;">동일한 번호가 여러 건 있습니다. 회원을 선택해 주세요.</p>
       <p class="attend-result-partial" style="margin-bottom:12px;text-align:left;">진도는 저장되었습니다. 아래에서 회원을 선택하면 출석 결과가 표시됩니다.</p>
       <div id="phonePickerBtns" style="display:flex;flex-direction:column;gap:8px;"></div>
-    </div>
-  </div>
-
-  <!-- 세션 마무리 — 5단계 로드맵 (회원과 함께 확인 후 저장) -->
-  <div class="modal-overlay" id="sessionWrapModal">
-    <div class="modal session-wrap-modal">
-      <div class="modal-hd">
-        <h2>오늘 세션 정리</h2>
-        <button type="button" class="modal-close" onclick="closeSessionWrapModal()">×</button>
-      </div>
-      <p class="eval-member-hint" id="sessionWrapMemberHint">—</p>
-      <div class="session-wrap-intro" id="sessionWrapIntro"></div>
-      <div class="stage-roadmap" id="sessionStageRoadmap"></div>
-      <div class="stage-today-list">
-        <h3>✅ 오늘 진행한 항목</h3>
-        <p class="stage-today-hint">왼쪽 체크 — 알림톡 포함(기본 전체 선택) · URL 체크 — 운동명 아래 링크 함께 발송</p>
-        <div id="sessionTodayList"></div>
-        <div class="field session-special-notes-field">
-          <label>특이사항 (누적 기록)</label>
-          <div id="sessionSpecialNotesHistory" class="session-notes-history empty">이전 특이사항 없음</div>
-          <label for="sessionSpecialNotesNew">이번 세션 특이사항 추가</label>
-          <textarea id="sessionSpecialNotesNew" rows="2" placeholder="회원 컨디션, 주의사항 등 이번에 새로 기록할 내용" oninput="onSessionSpecialNotesNewInput()"></textarea>
-        </div>
-        <div class="field session-progress-notes-field">
-          <label for="sessionNextProgress">진도 · 다음 계획</label>
-          <textarea id="sessionNextProgress" rows="2" placeholder="다음 회차 진도 계획, 오늘 세션 요약 등 (최신 내용만 유지)" oninput="onSessionNextProgressInput()"></textarea>
-          <p class="stage-today-hint">진도 계획은 최신 기록만 회원 정보에 표시됩니다.</p>
-        </div>
-      </div>
-      <div class="field">
-        <label>오늘 키포인트 (회원 알림톡 · 1~2문장)</label>
-        <textarea id="sessionCoachMemo" rows="2" maxlength="80" placeholder="직접 작성할 키포인트를 입력하세요." onfocus="onSessionCoachMemoFocus()" onblur="onSessionCoachMemoBlur()" oninput="updateSessionWrapPreview()"></textarea>
-        <div class="memo-counter"><span id="sessionMemoCount">0</span>/80</div>
-      </div>
-      <div class="alimtalk-preview">
-        <div class="preview-label">저장+출석 시 회원에게 전송될 알림톡 미리보기</div>
-        <div id="sessionAlimtalkPreview"></div>
-      </div>
-      <div class="session-wrap-actions">
-        <button type="button" class="btn btn-ghost" onclick="closeSessionWrapModal()">취소</button>
-        <button type="button" class="btn btn-ghost" id="sessionWrapSaveBtn" onclick="confirmSessionWrapSaveOnly()">저장</button>
-        <button type="button" class="btn btn-save btn-save-attend" id="sessionWrapSaveAttendBtn" onclick="confirmSessionWrapSaveAndAttend()">저장+출석</button>
-      </div>
     </div>
   </div>
 
@@ -1622,6 +1665,7 @@
       refreshSectionCollapseDefaults();
       renderProgramTabs();
       renderProgramList();
+      renderSessionWrapPanel();
       updateSendBar();
     }
 
@@ -1662,7 +1706,25 @@
       attendPassCount: 1,
       sectionCollapsed: {},
       sectionCollapsedTouched: {},
+      sessionCheck: { areas: [], vas: null, note: '' },
     };
+
+    var SESSION_DISCOMFORT_AREAS = [
+      { id: 'comfortable', label: '편안함' },
+      { id: 'same', label: '동일 부위' },
+      { id: 'headache', label: '두통' },
+      { id: 'jaw', label: '턱' },
+      { id: 'neck', label: '목' },
+      { id: 'shoulder', label: '어깨' },
+      { id: 'arm', label: '팔' },
+      { id: 'back', label: '등' },
+      { id: 'waist', label: '허리' },
+      { id: 'pelvis', label: '골반' },
+      { id: 'leg', label: '다리' },
+      { id: 'other', label: '기타' },
+    ];
+
+    var _sessionCheckSaveTimer = null;
 
     var COLLAPSIBLE_SECTIONS = ['self_tool', 'pos1_par', 'pos2', 'pos3', 'func'];
 
@@ -1947,8 +2009,8 @@
     }
 
     function syncCoachMemoFromTodayProgress() {
-      var modal = document.getElementById('sessionWrapModal');
-      if (!modal || !modal.classList.contains('open')) return;
+      var panel = document.getElementById('sessionWrapPanel');
+      if (!panel || !panel.classList.contains('show')) return;
       applyDefaultCoachMemoIfNeeded();
       updateSessionWrapPreview();
     }
@@ -2007,37 +2069,16 @@
       );
     }
 
-    function renderSessionWrapModal() {
+    function renderSessionWrapPanel() {
       var m = state.selected;
       if (!m) return;
-      var isMovement = state.activeProgramTab === 'movement';
-      var summary = isMovement ? computeProgramStageSummary() : null;
-      document.getElementById('sessionWrapMemberHint').textContent =
-        (m.name || '회원') + (m.sessionDisplay ? ' · ' + m.sessionDisplay : '');
-      document.getElementById('sessionWrapIntro').innerHTML = isMovement
-        ? '<strong>리얼 무브먼트 5단계 프로토콜</strong>'
-        : '<strong>' + escapeHtml(programTabMeta(state.activeProgramTab).label) + '</strong>';
-      var roadmap = document.getElementById('sessionStageRoadmap');
-      roadmap.innerHTML = '';
-      roadmap.style.display = isMovement ? '' : 'none';
-      if (isMovement && summary) {
-        summary.stages.forEach(function(st) {
-        var a = summary.activity[st.key] || {};
-        var cls = 'stage-step';
-        if (a.today) cls += ' today';
-        else if (a.prior) cls += ' prior';
-        else if (st.num <= summary.activeThrough) cls += ' recommended';
-        else cls += ' future';
-        var el = document.createElement('div');
-        el.className = cls;
-        el.innerHTML =
-          '<div class="stage-num">' + st.num + '</div>' +
-          '<div class="stage-title">' + escapeHtml(st.title) + '</div>' +
-          '<div class="stage-title-ko">' + escapeHtml(st.titleKo) + '</div>';
-        roadmap.appendChild(el);
-        });
+      var hint = document.getElementById('sessionWrapMemberHint');
+      if (hint) {
+        hint.textContent = (m.name || '회원') + (m.sessionDisplay ? ' · ' + m.sessionDisplay : '') +
+          ' · 오늘 ' + Object.keys(state.todayProgress || {}).length + '개 선택';
       }
       var todayBox = document.getElementById('sessionTodayList');
+      if (!todayBox) return;
       var entries = todayProgressEntries();
       if (!entries.length) {
         todayBox.innerHTML = '<p class="stage-today-empty">오늘 체크한 항목이 없습니다. 진도 없이 출석만 처리할 수도 있어요.</p>';
@@ -2057,17 +2098,10 @@
             '</div>';
         }).join('');
       }
-      var histEl = document.getElementById('sessionSpecialNotesHistory');
-      var hist = (m.specialNotes || '').trim();
-      if (histEl) {
-        histEl.textContent = hist || '이전 특이사항 없음';
-        histEl.classList.toggle('empty', !hist);
-      }
-      var newEl = document.getElementById('sessionSpecialNotesNew');
-      if (newEl) newEl.value = '';
       var nextEl = document.getElementById('sessionNextProgress');
-      if (nextEl) nextEl.value = (m.nextProgress || '').trim();
-      var memoEl = document.getElementById('sessionCoachMemo');
+      if (nextEl && document.activeElement !== nextEl) {
+        nextEl.value = (m.nextProgress || '').trim();
+      }
       applyDefaultCoachMemoIfNeeded();
       updateSessionWrapPreview();
     }
@@ -2085,9 +2119,15 @@
     function getSessionRecordPayloadExtras() {
       var m = state.selected;
       var nextFromDom = getSessionNextProgress();
+      var check = getSessionCheckPayload();
+      var specialNew = getSessionSpecialNotesNew();
+      if (!specialNew && check.sessionCheckNote) specialNew = check.sessionCheckNote;
       return {
-        specialNotesNew: getSessionSpecialNotesNew(),
+        specialNotesNew: specialNew,
         nextProgress: nextFromDom || (m && m.nextProgress) || '',
+        discomfortAreas: check.discomfortAreas,
+        vas: check.vas,
+        sessionCheckNote: check.sessionCheckNote,
       };
     }
 
@@ -2106,7 +2146,8 @@
       var m = state.selected;
       if (!m) return;
       m.nextProgress = getSessionNextProgress();
-      renderSelectedMemberUi();
+      var briefNext = document.getElementById('briefNextProgress');
+      if (briefNext) briefNext.textContent = m.nextProgress || '없음';
     }
 
     function onSessionIncludeToggle(cb) {
@@ -2129,17 +2170,29 @@
         buildAttendAlimtalkPreview(m, summary, memo, getSessionLinkIds(), getSessionIncludedIds());
     }
 
-    function openSessionWrapModal() {
-      var m = state.selected;
-      if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
-      renderSessionWrapModal();
-      document.getElementById('sessionWrapModal').classList.add('open');
-      document.body.style.overflow = 'hidden';
+    function setSessionActionButtonsDisabled(disabled) {
+      var basic = document.getElementById('attendBasicBtn');
+      var progress = document.getElementById('attendProgressBtn');
+      if (basic) basic.disabled = disabled;
+      if (progress) progress.disabled = disabled;
     }
 
-    function closeSessionWrapModal() {
-      document.getElementById('sessionWrapModal').classList.remove('open');
-      document.body.style.overflow = '';
+    async function attendBasicSession() {
+      var m = state.selected;
+      if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
+      syncSessionRecordFieldsFromModal();
+      _pendingAttendAlimtalk = null;
+      var progress = mergedProgressMapForSave();
+      await runCompleteSession(m, progress, { basicAttendOnly: true });
+    }
+
+    async function attendWithProgressSession() {
+      var m = state.selected;
+      if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
+      syncSessionRecordFieldsFromModal();
+      _pendingAttendAlimtalk = buildAttendAlimtalkPayload();
+      var progress = mergedProgressMapForSave();
+      await runCompleteSession(m, progress, { attendAlimtalk: _pendingAttendAlimtalk });
     }
 
     function buildAttendAlimtalkPayload() {
@@ -2176,16 +2229,20 @@
         distributeServerProgressToStore(m);
         loadProgressFromMemberStore(state.activeProgramTab);
         saveProgressToMemberStore();
+        syncSessionCheckFromServer(m, data);
         return;
       }
       promoteTodayProgressToRecent();
       saveProgressToMemberStore();
+      syncSessionCheckFromServer(m, data);
     }
 
     function applySaveOnlyResult(m, data) {
       syncMemberProgressFromServer(m, data);
       if (data && data.specialNotes != null) m.specialNotes = data.specialNotes;
       if (data && data.nextProgress != null) m.nextProgress = data.nextProgress;
+      if (data && data.discomfortHistoryLine != null) m.discomfortHistoryLine = data.discomfortHistoryLine;
+      if (data && data.discomfortHistory) m.discomfortHistory = data.discomfortHistory;
       refreshSectionCollapseDefaults();
       renderProgramList();
       renderSelectedMemberUi();
@@ -2193,8 +2250,7 @@
     }
 
     async function runSaveSessionOnly(m, progress) {
-      document.getElementById('saveBtn').disabled = true;
-      document.getElementById('attendBtn').disabled = true;
+      setSessionActionButtonsDisabled(true);
       var extras = getSessionRecordPayloadExtras();
       var data = await api({
         action: 'instructorSaveSession',
@@ -2208,6 +2264,9 @@
         sessionNote: sessionNoteForSave(),
         pspProgress: progress,
         sessionProgress: todayProgressMap(),
+        discomfortAreas: extras.discomfortAreas,
+        vas: extras.vas,
+        sessionCheckNote: extras.sessionCheckNote,
       });
       updateSendBar();
       if (!data.ok) {
@@ -2217,24 +2276,6 @@
       applySaveOnlyResult(m, data);
       toast('저장 완료');
       return true;
-    }
-
-    async function confirmSessionWrapSaveOnly() {
-      var m = state.selected;
-      if (!m || !m.suffix8) return;
-      syncSessionRecordFieldsFromModal();
-      closeSessionWrapModal();
-      await runSaveSessionOnly(m, mergedProgressMapForSave());
-    }
-
-    async function confirmSessionWrapSaveAndAttend() {
-      var m = state.selected;
-      if (!m || !m.suffix8) return;
-      syncSessionRecordFieldsFromModal();
-      _pendingAttendAlimtalk = buildAttendAlimtalkPayload();
-      closeSessionWrapModal();
-      var progress = mergedProgressMapForSave();
-      await runCompleteSession(m, progress, { attendAlimtalk: _pendingAttendAlimtalk });
     }
 
     function sectionItems(secKey) {
@@ -2601,7 +2642,7 @@
     }
 
     function isSyncBlockingModalOpen() {
-      return ['sessionWrapModal', 'evalModal', 'attendResultModal', 'extraPassModal', 'phonePickerModal'].some(function(id) {
+      return ['evalModal', 'attendResultModal', 'extraPassModal', 'multiPassModal', 'phonePickerModal'].some(function(id) {
         var el = document.getElementById(id);
         return el && el.classList.contains('open');
       });
@@ -2692,6 +2733,124 @@
       if (m) selectMember(m, true);
     }
 
+    function getLastDiscomfortFromMember(m) {
+      m = m || state.selected;
+      if (!m || !m.discomfortHistory || !m.discomfortHistory.length) return null;
+      return m.discomfortHistory[m.discomfortHistory.length - 1];
+    }
+
+    function initSessionCheckPanel() {
+      var areaRoot = document.getElementById('sessionDiscomfortChips');
+      var vasRoot = document.getElementById('sessionVasChips');
+      if (!areaRoot || areaRoot.dataset.ready) return;
+      areaRoot.innerHTML = SESSION_DISCOMFORT_AREAS.map(function (opt) {
+        return '<button type="button" class="session-check-chip" data-area="' + escapeHtml(opt.id) + '" onclick="toggleSessionDiscomfort(\'' + opt.id.replace(/'/g, "\\'") + '\')">' + escapeHtml(opt.label) + '</button>';
+      }).join('');
+      if (vasRoot) {
+        var vasHtml = '';
+        for (var v = 0; v <= 10; v++) {
+          vasHtml += '<button type="button" class="session-check-chip" data-vas="' + v + '" onclick="setSessionVas(' + v + ')">' + v + '</button>';
+        }
+        vasRoot.innerHTML = vasHtml;
+      }
+      areaRoot.dataset.ready = '1';
+    }
+
+    function resetSessionCheckState(m) {
+      state.sessionCheck = { areas: [], vas: null, note: '' };
+      var sc = m && m.currentSessionCheck;
+      if (sc) {
+        state.sessionCheck.areas = (sc.areas || []).slice();
+        state.sessionCheck.vas = sc.vas != null ? sc.vas : null;
+        state.sessionCheck.note = sc.note || '';
+      }
+      renderSessionCheckPanel();
+    }
+
+    function renderSessionCheckPanel() {
+      initSessionCheckPanel();
+      var sc = state.sessionCheck || { areas: [], vas: null, note: '' };
+      document.querySelectorAll('#sessionDiscomfortChips .session-check-chip').forEach(function (btn) {
+        var id = btn.getAttribute('data-area');
+        btn.classList.toggle('on', sc.areas.indexOf(id) >= 0);
+      });
+      document.querySelectorAll('#sessionVasChips .session-check-chip').forEach(function (btn) {
+        var n = parseInt(btn.getAttribute('data-vas'), 10);
+        btn.classList.toggle('on', sc.vas === n);
+      });
+      var noteEl = document.getElementById('sessionCheckNote');
+      if (noteEl && noteEl !== document.activeElement) {
+        noteEl.value = sc.note || '';
+      }
+    }
+
+    function toggleSessionDiscomfort(id) {
+      var areas = (state.sessionCheck.areas || []).slice();
+      var idx = areas.indexOf(id);
+      if (id === 'comfortable') {
+        areas = idx >= 0 ? [] : ['comfortable'];
+      } else if (id === 'same') {
+        if (idx >= 0) {
+          areas.splice(idx, 1);
+        } else {
+          var last = getLastDiscomfortFromMember();
+          var copied = last && last.areas
+            ? last.areas.filter(function (a) { return a !== 'comfortable' && a !== 'same'; })
+            : [];
+          areas = copied.length ? copied.slice() : ['same'];
+        }
+      } else {
+        areas = areas.filter(function (a) { return a !== 'comfortable' && a !== 'same'; });
+        if (idx >= 0) areas.splice(areas.indexOf(id), 1);
+        else areas.push(id);
+      }
+      state.sessionCheck.areas = areas;
+      renderSessionCheckPanel();
+      scheduleSessionCheckAutoSave();
+    }
+
+    function setSessionVas(n) {
+      state.sessionCheck.vas = state.sessionCheck.vas === n ? null : n;
+      renderSessionCheckPanel();
+      scheduleSessionCheckAutoSave();
+    }
+
+    function onSessionCheckNoteInput() {
+      var el = document.getElementById('sessionCheckNote');
+      state.sessionCheck.note = el ? String(el.value || '') : '';
+      scheduleSessionCheckAutoSave();
+    }
+
+    function getSessionCheckPayload() {
+      var sc = state.sessionCheck || {};
+      return {
+        discomfortAreas: (sc.areas || []).slice(),
+        vas: sc.vas != null ? sc.vas : '',
+        sessionCheckNote: String(sc.note || '').trim(),
+      };
+    }
+
+    function scheduleSessionCheckAutoSave() {
+      if (_sessionCheckSaveTimer) clearTimeout(_sessionCheckSaveTimer);
+      _sessionCheckSaveTimer = setTimeout(function () {
+        _sessionCheckSaveTimer = null;
+        autoSaveProgress();
+      }, 800);
+    }
+
+    function syncSessionCheckFromServer(m, data) {
+      if (!m || !data) return;
+      if (data.discomfortHistory) m.discomfortHistory = data.discomfortHistory;
+      if (data.discomfortHistoryLine != null) m.discomfortHistoryLine = data.discomfortHistoryLine;
+      if (data.currentSessionCheck) {
+        m.currentSessionCheck = data.currentSessionCheck;
+        state.sessionCheck.areas = (data.currentSessionCheck.areas || []).slice();
+        state.sessionCheck.vas = data.currentSessionCheck.vas != null ? data.currentSessionCheck.vas : null;
+        state.sessionCheck.note = data.currentSessionCheck.note || '';
+        renderSessionCheckPanel();
+      }
+    }
+
     function resetMemberSessionState(m) {
       state.selected = m;
       state.selectedKey = memberKey(m);
@@ -2708,18 +2867,49 @@
         delete memoEl.dataset.usingDefault;
         delete memoEl.dataset.touched;
       }
+      var sessionNotesNew = document.getElementById('sessionSpecialNotesNew');
+      if (sessionNotesNew) sessionNotesNew.value = '';
       m.specialNotes = (m.memoSummary && m.memoSummary.specialNotes) || m.specialNotes || '';
       m.nextProgress = (m.memoSummary && m.memoSummary.nextProgress) || m.nextProgress || '';
+      resetSessionCheckState(m);
     }
 
     function renderSelectedMemberUi() {
       var m = state.selected;
       if (!m) return;
       document.getElementById('memberBrief').classList.add('show');
+      var panel = document.getElementById('sessionCheckPanel');
+      if (panel) panel.classList.add('show');
       document.getElementById('briefName').textContent = m.name || '—';
       document.getElementById('briefPhone').textContent = m.phoneDigits ? formatPhone(m.phoneDigits) : '';
       var memo = (m.specialNotes || '').trim() || '없음';
       document.getElementById('briefMemo').textContent = memo;
+      var feRow = document.getElementById('briefFirstEvalRow');
+      var feEl = document.getElementById('briefFirstEval');
+      var fe = m.firstEvalBrief;
+      if (feRow && feEl) {
+        if (fe && fe.has && fe.summary) {
+          feRow.hidden = false;
+          var feText = fe.summary;
+          if (fe.dateStr) feText = fe.dateStr + ' · ' + feText;
+          feEl.textContent = feText;
+        } else {
+          feRow.hidden = true;
+          feEl.textContent = '—';
+        }
+      }
+      var discRow = document.getElementById('briefDiscomfortRow');
+      var discEl = document.getElementById('briefDiscomfortHistory');
+      var discLine = (m.discomfortHistoryLine || '').trim();
+      if (discRow && discEl) {
+        if (discLine) {
+          discRow.hidden = false;
+          discEl.textContent = discLine;
+        } else {
+          discRow.hidden = true;
+          discEl.textContent = '—';
+        }
+      }
       var wiRow = document.getElementById('briefWellnessRow');
       var wiEl = document.getElementById('briefWellness');
       var wi = m.wellnessIntake;
@@ -2742,7 +2932,9 @@
       }
       var nextProg = (m.nextProgress || '').trim() || '없음';
       document.getElementById('briefNextProgress').textContent = nextProg;
-      document.getElementById('sendMemberLabel').textContent = (m.name || '회원') + '님';
+      var wrapPanel = document.getElementById('sessionWrapPanel');
+      if (wrapPanel) wrapPanel.classList.add('show');
+      renderSessionWrapPanel();
       renderProgramTabs();
       refreshSectionCollapseDefaults();
       renderMemberChips();
@@ -2764,6 +2956,15 @@
         m.nextProgress = detail.member.nextProgress || m.nextProgress || '';
         m.pspProgress = detail.member.pspProgress || m.pspProgress || {};
         m.previousSessionProgress = detail.member.previousSessionProgress || m.previousSessionProgress || {};
+        m.discomfortHistory = detail.member.discomfortHistory || m.discomfortHistory || [];
+        m.discomfortHistoryLine = detail.member.discomfortHistoryLine || m.discomfortHistoryLine || '';
+        m.firstEvalBrief = detail.member.firstEvalBrief || m.firstEvalBrief || null;
+        if (detail.member.currentSessionCheck) {
+          m.currentSessionCheck = detail.member.currentSessionCheck;
+          state.sessionCheck.areas = (detail.member.currentSessionCheck.areas || []).slice();
+          state.sessionCheck.vas = detail.member.currentSessionCheck.vas != null ? detail.member.currentSessionCheck.vas : null;
+          state.sessionCheck.note = detail.member.currentSessionCheck.note || '';
+        }
         m.wellnessIntake = detail.member.wellnessIntake || detail.wellnessIntake || null;
         distributeServerProgressToStore(m);
         loadProgressFromMemberStore(state.activeProgramTab);
@@ -3026,8 +3227,8 @@
       }
       refreshSectionCollapseDefaults();
       renderProgramList();
+      renderSessionWrapPanel();
       updateSendBar();
-      syncCoachMemoFromTodayProgress();
       await autoSaveProgress();
     }
 
@@ -3047,6 +3248,9 @@
         sessionNote: todayLabels.length ? '오늘 진도: ' + todayLabels.join(', ') : '',
         pspProgress: mergedProgressMapForSave(),
         sessionProgress: todayProgressMap(),
+        discomfortAreas: getSessionCheckPayload().discomfortAreas,
+        vas: getSessionCheckPayload().vas,
+        sessionCheckNote: getSessionCheckPayload().sessionCheckNote,
       });
       if (!data.ok) {
         toast(data.message || '진도 저장 실패');
@@ -3054,18 +3258,12 @@
     }
 
     function updateSendBar() {
-      const todayN = Object.keys(state.todayProgress).length;
-      const priorN = Object.keys(state.savedProgress).length;
-      const recentN = Object.keys(state.recentSessionProgress).length;
-      let label = '과거 ' + priorN + '개';
-      if (recentN) label += ' · 직전 ' + recentN;
-      if (todayN) label += ' · 오늘 ' + todayN;
-      document.getElementById('sendCountLabel').textContent = label;
       const m = state.selected;
       const hasSheetMember = !!(m && m.suffix8);
+      const panel = document.getElementById('sessionWrapPanel');
+      if (panel) panel.classList.toggle('show', hasSheetMember);
       updateAttendPassStepper(m);
-      document.getElementById('attendBtn').disabled = !hasSheetMember;
-      document.getElementById('saveBtn').disabled = !hasSheetMember;
+      setSessionActionButtonsDisabled(!hasSheetMember);
     }
 
     function sessionNoteFromProgress() {
@@ -3090,9 +3288,7 @@
     function completeSessionPayload(m, progress, opts) {
       opts = opts || {};
       var isBasicAttend = !!opts.basicAttendOnly;
-      var extras = isBasicAttend
-        ? { specialNotesNew: '', nextProgress: (m.nextProgress || '').trim() }
-        : getSessionRecordPayloadExtras();
+      var extras = getSessionRecordPayloadExtras();
       var payload = {
         action: 'instructorCompleteSession',
         suffix8: m.suffix8,
@@ -3103,13 +3299,16 @@
         phoneLast4: opts.phoneLast4 != null ? opts.phoneLast4 : m.phoneLast4,
         specialNotesNew: extras.specialNotesNew,
         nextProgress: extras.nextProgress,
-        recordMode: isBasicAttend ? 'progress' : 'session',
+        recordMode: 'session',
         sessionNote: sessionNoteForSave(),
         pspProgress: progress,
         sessionProgress: todayProgressMap(),
         confirmExtraPass: !!opts.confirmExtraPass,
-        basicAttendOnly: !!opts.basicAttendOnly,
+        basicAttendOnly: isBasicAttend,
         attendPassCount: opts.attendPassCount != null ? opts.attendPassCount : (state.attendPassCount || 1),
+        discomfortAreas: extras.discomfortAreas,
+        vas: extras.vas,
+        sessionCheckNote: extras.sessionCheckNote,
       };
       var ata = opts.basicAttendOnly ? null : (opts.attendAlimtalk || _pendingAttendAlimtalk);
       if (ata) {
@@ -3138,6 +3337,8 @@
       if (data.sessionDisplay) m.sessionDisplay = data.sessionDisplay;
       if (data.specialNotes != null) m.specialNotes = data.specialNotes;
       if (data.nextProgress != null) m.nextProgress = data.nextProgress;
+      if (data.discomfortHistoryLine != null) m.discomfortHistoryLine = data.discomfortHistoryLine;
+      if (data.discomfortHistory) m.discomfortHistory = data.discomfortHistory;
       resetAttendPassCount(m);
       refreshSectionCollapseDefaults();
       renderProgramList();
@@ -3465,8 +3666,7 @@
 
     async function executeCompleteSession(m, progress, opts) {
       opts = opts || {};
-      document.getElementById('saveBtn').disabled = true;
-      document.getElementById('attendBtn').disabled = true;
+      setSessionActionButtonsDisabled(true);
       showAttendProcessing(
         opts.basicAttendOnly ? '출석 처리 중' : '저장+출석 처리 중',
         { basicAttendOnly: !!opts.basicAttendOnly }
@@ -3498,15 +3698,16 @@
     }
 
     async function saveSession() {
-      openSessionWrapModal();
+      var m = state.selected;
+      if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
+      var panel = document.getElementById('sessionWrapPanel');
+      if (panel) {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
 
     async function quickAttendSession() {
-      var m = state.selected;
-      if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
-      _pendingAttendAlimtalk = null;
-      var progress = mergedProgressMapForSave();
-      await runCompleteSession(m, progress, { basicAttendOnly: true });
+      await attendBasicSession();
     }
 
     const APPLICATION_FORM_URL = 'https://breezefeel.github.io/yaksu/';
@@ -4310,7 +4511,6 @@
 
     document.getElementById('evalModal').addEventListener('click', function(e){ if(e.target===this) closeEvalModal(); });
     document.getElementById('coachNoteModal').addEventListener('click', function(e){ if(e.target===this) closeCoachingNoteModal(); });
-    document.getElementById('sessionWrapModal').addEventListener('click', function(e){ if(e.target===this) closeSessionWrapModal(); });
     document.getElementById('attendResultModal').addEventListener('click', function(e){ if(e.target===this) closeAttendResultModal(); });
     document.getElementById('extraPassModal').addEventListener('click', function(e){ if(e.target===this) closeExtraPassModal(); });
     document.getElementById('multiPassModal').addEventListener('click', function(e){ if(e.target===this) closeMultiPassModal(); });
@@ -4323,6 +4523,7 @@
     refreshSectionCollapseDefaults();
     renderProgramList();
     renderProgramTabs();
+    initSessionCheckPanel();
     loadBoard();
   </script>
 </body>
