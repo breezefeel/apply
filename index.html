@@ -9,6 +9,7 @@
     :root {
       --bg: #f0f4fa; --surface: #fff; --text: #1a2332; --dim: #64748b;
       --border: #e2e8f0; --blue: #1e3a6e; --blue-bg: #eef3fb; --blue-soft: #dbeafe;
+      --blue-mid: #2563eb; --blue-bright: #3b82f6;
       --green: #059669; --green-bg: #ecfdf5;
       --shadow: 0 2px 14px rgba(30,58,110,0.07);
       --radius: 12px; --safe-b: env(safe-area-inset-bottom, 0px);
@@ -47,14 +48,36 @@
     .card-sub { font-size:11px; color:var(--dim); margin-bottom:10px; }
 
     .toolbar { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; align-items:center; }
-    .btn { border:none; border-radius:9px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; }
+    .btn {
+      border:1px solid transparent; border-radius:9px; padding:8px 12px;
+      font-size:12px; font-weight:700; cursor:pointer;
+      transition: background .15s, border-color .15s, box-shadow .15s, transform .1s;
+    }
     a.btn { display:inline-block; text-decoration:none; line-height:1.25; box-sizing:border-box; }
-    .btn-primary { background:var(--blue); color:#fff; }
-    .btn-ghost { background:var(--blue-bg); color:var(--blue); }
-    .btn-eval { background:#7c3aed; color:#fff; }
-    .btn-intake { background:#0d9488; color:#fff; }
-    .btn-green { background:var(--green); color:#fff; }
-    .btn-save { background:var(--blue); color:#fff; }
+    .btn:active:not(:disabled) { transform:scale(.98); }
+    .btn-primary { background:var(--blue); color:#fff; border-color:#1e3a6e; }
+    .btn-ghost {
+      background:var(--surface); color:var(--blue);
+      border-color:#bfdbfe; box-shadow:0 1px 3px rgba(30,58,110,0.04);
+    }
+    .btn-ghost:hover { background:var(--blue-bg); border-color:#93c5fd; }
+    .btn-primary:hover { background:#1d4ed8; border-color:#1e40af; }
+    .toolbar .btn-intake {
+      background:var(--surface); color:var(--blue-mid);
+      border-color:#93c5fd; box-shadow:0 1px 3px rgba(30,58,110,0.05);
+    }
+    .toolbar .btn-intake:hover { background:var(--blue-bg); border-color:#60a5fa; }
+    .toolbar .btn-eval {
+      background:linear-gradient(135deg, var(--blue), var(--blue-mid));
+      color:#fff; border-color:var(--blue);
+      box-shadow:0 2px 8px rgba(30,58,110,0.2);
+    }
+    .toolbar .btn-eval:hover {
+      background:linear-gradient(135deg, #1a3560, var(--blue));
+      box-shadow:0 3px 10px rgba(30,58,110,0.28);
+    }
+    .btn-green { background:var(--green); color:#fff; border-color:#047857; }
+    .btn-save { background:var(--blue); color:#fff; border-color:#1e3a6e; }
     .attend-pass-stepper {
       display:inline-flex; align-items:center; gap:2px;
       background:#f1f5f9; border:1px solid var(--border); border-radius:10px;
@@ -753,9 +776,9 @@
       <div class="card-sub">강사별 한 줄 · <strong>이름 색상 = 신청 프로그램</strong>(시트와 동일) · 완료 회원은 취소선</div>
       <div class="toolbar">
         <button type="button" class="btn btn-ghost" onclick="loadBoard()">새로고침</button>
-        <a class="btn btn-ghost" href="#" onclick="openApplicationForm_(event)">회원등록</a>
         <button type="button" class="btn btn-intake" onclick="sendWellnessIntakeSms_()">사전 문진</button>
         <button type="button" class="btn btn-eval" onclick="openEvalModal()">초회 평가</button>
+        <a class="btn btn-ghost" href="#" onclick="openApplicationForm_(event)">회원등록</a>
       </div>
       <div class="member-chips" id="memberChips"><span class="empty-hint">불러오는 중…</span></div>
       <div class="member-brief" id="memberBrief">
@@ -1232,8 +1255,8 @@
     var PROGRAM_TABS = [
       { id: 'movement', label: 'Re:Al 움직임', sub: '5단계 프로토콜 · 기능운동' },
       { id: 'func', label: '최진옥 원장', sub: '최진옥 원장 프로그램 (임시)' },
-      { id: 'hongtaek', label: '최홍택 원장', sub: '최홍택 원장 프로그램 (임시)' },
-      { id: 'injun', label: '김인준 원장', sub: '김인준 원장 프로그램 (임시)' },
+      { id: 'hongtaek', label: '최홍택 원장', sub: '코어·골반 안정화 · 기능 패턴' },
+      { id: 'injun', label: '김인준 원장', sub: '런지·안티로테이션 · 케이블 코어' },
       { id: 'face', label: 'Re:Al 페이스', sub: '작은얼굴 · 안면비대칭 프로그램' },
     ];
 
@@ -1274,6 +1297,77 @@
       ];
     }
 
+    function buildDirectorCatalogItems_(items) {
+      return items.map(function(item) {
+        var url = String(item.linkUrl || '').trim();
+        return Object.assign({}, item, {
+          group: item.sectionTitle || item.group,
+          hasVideo: !!url,
+          videoTitle: item.label,
+          videoDetailTitle: '',
+          youtubeUrl: url,
+          coachingNote: String(item.coachingNote || '').trim(),
+        });
+      });
+    }
+
+    var HONGTAEK_CATALOG_RAW = [
+      {
+        id: 'hongtaek_thoracic_mob',
+        uiSection: 'hongtaek_quad',
+        sectionTitle: '네발기기 · 흉추·골반',
+        program: '네발기기 · 흉추·골반',
+        label: '① 네발기기 흉추 가동성 스트레칭',
+        linkUrl: 'https://youtu.be/KMecCAhaXCc',
+        coachingNote: '메디신볼을 가슴 앞에 안고 스플릿 런지에서 앞발 방향으로 명치·배꼽이 함께 돌아가게 흉추를 회전합니다. 올라올 때 앞발바닥으로 바닥을 밀고 양쪽 무릎을 곧게 펴 정렬을 유지합니다.',
+      },
+      {
+        id: 'hongtaek_hip_ext',
+        uiSection: 'hongtaek_quad',
+        sectionTitle: '네발기기 · 흉추·골반',
+        program: '네발기기 · 흉추·골반',
+        label: '② 코어-골반 안정화 힙 익스텐션',
+        linkUrl: 'https://youtu.be/7Q7bNbKbKQQ',
+        coachingNote: '박스 위 팔꿈치 지지 네발기기에서 배꼽을 당겨 척추 중립을 유지합니다. 숨을 내쉬며 다리를 들 때 허리가 아닌 엉덩이 근육 수축에 집중하고, 지지 무릎·골반이 한쪽으로 쏠리지 않게 합니다.',
+      },
+      {
+        id: 'hongtaek_push_front_reach',
+        uiSection: 'hongtaek_prone',
+        sectionTitle: '엎드려서 · 코어 안정화',
+        program: '엎드려서 · 코어 안정화',
+        label: '③ 푸시-업 프론트 리치',
+        linkUrl: 'https://youtu.be/80AUVnW-WL0',
+        coachingNote: '무릎 지지 엎드린 자세에서 어깨~무릎 일직선을 유지하고 엉덩이를 들어 허리를 평평하게 합니다. 갈비뼈를 모으며 한 팔을 앞으로 뻗을 때 골반이 흔들리지 않도록 반대쪽 지지점에 힘을 줍니다.',
+      },
+      {
+        id: 'hongtaek_glute_circle',
+        uiSection: 'hongtaek_prone',
+        sectionTitle: '엎드려서 · 코어 안정화',
+        program: '엎드려서 · 코어 안정화',
+        label: '④ 측면 사슬 안정화 중둔근 서클',
+        linkUrl: 'https://youtu.be/4W5zyWJoDPw',
+        coachingNote: '엎드린 코어 플랭크 자세에서 팔을 머리 위로 원(반원) 궤적으로 움직입니다. 골반·엉덩이가 좌우로 흔들리지 않게 중둔근으로 측면 사슬을 안정화합니다.',
+      },
+      {
+        id: 'hongtaek_plank_twist',
+        uiSection: 'hongtaek_side',
+        sectionTitle: '측면·서기 · 기능 패턴',
+        program: '측면·서기 · 기능 패턴',
+        label: '⑤ 내전근-코어 안정화 플랭크 트위스트',
+        linkUrl: 'https://youtu.be/20IZhWC1YGg',
+        coachingNote: '사이드 플랭크에서 무릎을 박스에 올리고 골반을 들어 일직선을 만듭니다. 상체를 아래로 회전할 때 골반이 뒤로 빠지지 않게 고정하고, 박스를 누르는 허벅지 안쪽 힘을 유지합니다.',
+      },
+      {
+        id: 'hongtaek_hip_hinge_dl',
+        uiSection: 'hongtaek_side',
+        sectionTitle: '측면·서기 · 기능 패턴',
+        program: '측면·서기 · 기능 패턴',
+        label: '⑥ 고관절 힌지 밸런스 데드리프트',
+        linkUrl: 'https://youtu.be/nR-kiCG6fo8',
+        coachingNote: '한 발을 박스에 올리고 뒤쪽 골반을 벽 쪽으로 밀며 힙 힌지로 상체를 숙입니다. 무릎이 앞으로 튀어나가지 않게 하고, 발바닥 전체로 바닥을 밀어 올릴 때 허리 곧은 정렬과 둔근 수축을 유지합니다.',
+      },
+    ];
+
     function buildDirectorPlaceholderCatalog(tabId, idPrefix, directorLabel) {
       var items = [];
       var i;
@@ -1296,11 +1390,99 @@
     }
 
     function buildHongtaekCatalog() {
-      return buildDirectorPlaceholderCatalog('hongtaek', 'hongtaek', '최홍택 원장');
+      return buildDirectorCatalogItems_(HONGTAEK_CATALOG_RAW);
     }
 
+    function buildHongtaekCatalog() {
+      return buildDirectorCatalogItems_(HONGTAEK_CATALOG_RAW);
+    }
+
+    var INJUN_CATALOG_RAW = [
+      {
+        id: 'injun_lunge_rotation',
+        uiSection: 'injun_lunge',
+        sectionTitle: '런지 · 회전·가동성',
+        program: '런지 · 회전·가동성',
+        label: '① 고관절 안정화 런지 로테이션',
+        linkUrl: 'https://youtube.com/shorts/NV72ehC1ksE',
+        coachingNote: '메디신볼을 가슴 앞에 안고 스플릿 런지에서 앞발 방향으로 명치·배꼽이 함께 돌아가게 몸통을 회전합니다. 올라올 때 앞발바닥으로 바닥을 밀고 무릎을 끝까지 펴 하체를 고정합니다.',
+      },
+      {
+        id: 'injun_ct_lunge',
+        uiSection: 'injun_lunge',
+        sectionTitle: '런지 · 회전·가동성',
+        program: '런지 · 회전·가동성',
+        label: '② 경추-흉추 가동성 통합 런지',
+        linkUrl: 'https://youtube.com/shorts/CkamZGjmEfs',
+        coachingNote: '낮은 스플릿 런지에서 정수리를 길게 뽑아 척추 중립을 만듭니다. 앞발 방향으로 가슴·시선을 함께 회전할 때 등뼈(흉추)가 돌고 목이 자연스럽게 따라가게 하고, 골반이 흔들리지 않게 하체로 버팁니다.',
+      },
+      {
+        id: 'injun_cable_lunge_rot',
+        uiSection: 'injun_lunge',
+        sectionTitle: '런지 · 회전·가동성',
+        program: '런지 · 회전·가동성',
+        label: '③ 회전 저항 고관절 안정화 런지',
+        linkUrl: 'https://youtube.com/shorts/ZC21WcUTV6g',
+        coachingNote: '케이블 손잡이를 가슴 앞에 모아 스플릿 스탠스로 섭니다. 하강·회전 시 케이블 저항에 끌려가지 않게 앞다리 고관절과 옆구리로 제어하고, 올라올 때 앞발바닥으로 바닥을 밀며 빠르게 일어납니다.',
+      },
+      {
+        id: 'injun_hip_seg',
+        uiSection: 'injun_lunge',
+        sectionTitle: '런지 · 회전·가동성',
+        program: '런지 · 회전·가동성',
+        label: '④ 코어-고관절 분절 가동성 트레이닝',
+        linkUrl: 'https://youtube.com/shorts/-5U5qwGWLeQ',
+        coachingNote: '사이드 플랭크에서 위쪽 다리 무릎을 가슴 쪽으로 당겼다 뒤로 뻗을 때 상체·골반이 흔들리지 않게 합니다. 고관절만 움직이며 천천히 제어하고, 다리를 뒤로 뻗을 때 둔근 수축을 느낍니다.',
+      },
+      {
+        id: 'injun_wide_side_lunge',
+        uiSection: 'injun_antirot',
+        sectionTitle: '안티로테이션 · 사이드 런지',
+        program: '안티로테이션 · 사이드 런지',
+        label: '⑤ 안티-로테이션 와이드 사이드 런지',
+        linkUrl: 'https://youtube.com/shorts/dF79hvn-flU',
+        coachingNote: '와이드 스탠스에서 메디신볼을 가슴·배에 밀착합니다. 한쪽으로 체중을 이동하며 골반을 접어 내려갈 때 반대쪽 무릎은 곧게 펴고, 굽힌 쪽 발바닥으로 바닥을 밀어 중앙으로 돌아옵니다.',
+      },
+      {
+        id: 'injun_side_lunge_press',
+        uiSection: 'injun_antirot',
+        sectionTitle: '안티로테이션 · 사이드 런지',
+        program: '안티로테이션 · 사이드 런지',
+        label: '⑥ 안티 로테이션 사이드 런지 앤 프레스',
+        linkUrl: 'https://youtube.com/shorts/11F9PAsFISs',
+        coachingNote: '메디신볼을 가슴에 고정한 채 좌우로 골반을 접어 내려갔다 올라옵니다. 올라올 때 무릎을 펴고 둔근·코어로 저항을 이기며, 이어서 공을 머리 위 대각선 앞으로 뻗습니다. 팔만 따로 움직이지 않게 가슴과 한 몸처럼 유지합니다.',
+      },
+      {
+        id: 'injun_pallof_squat',
+        uiSection: 'injun_cable',
+        sectionTitle: '케이블 · 팔로프·스플릿',
+        program: '케이블 · 팔로프·스플릿',
+        label: '⑦ 팔로프 프레스 스쿼트 변형',
+        linkUrl: 'https://youtube.com/shorts/xY0-QsCoYkY',
+        coachingNote: '밴드를 가슴 정중앙에 깍지 낀 채 와이드 스탠스로 섭니다. 하강 시 손만 떨어지지 않게 체스트와 붙여 함께 내리고, 일어나며 밴드를 머리 위로 뻗어 코어로 좌우 흔들림을 억제합니다.',
+      },
+      {
+        id: 'injun_cable_split_hold',
+        uiSection: 'injun_cable',
+        sectionTitle: '케이블 · 팔로프·스플릿',
+        program: '케이블 · 팔로프·스플릿',
+        label: '⑧ 케이블 안티로테이션 스플릿 스쿼트 홀드',
+        linkUrl: 'https://youtube.com/shorts/dHDoUzqRs9c',
+        coachingNote: '스플릿 자세에서 케이블 회전 저항을 코어로 억제하며 내려갑니다. 올라올 때 앞쪽으로 훅 가듯 폭발적으로 가속하고, 밀리지 않게 허리를 펴며 요추 정렬을 유지합니다. 좌우 방향을 바꿔 반복합니다.',
+      },
+      {
+        id: 'injun_cable_split_explosive',
+        uiSection: 'injun_cable',
+        sectionTitle: '케이블 · 팔로프·스플릿',
+        program: '케이블 · 팔로프·스플릿',
+        label: '⑨ 케이블 스플릿 홀드 & 익스플로시브',
+        linkUrl: 'https://youtube.com/shorts/Ypo_lIz7DnQ',
+        coachingNote: '케이블 저항을 이겨내며 스플릿 스쿼트 하강 후 홀드합니다. 올라올 때 빠르게 가속하되 허리를 펴고, 내려가는 구간은 천천히 제어합니다. 골반이 저항 방향으로 밀리지 않게 지지 기반을 단단히 잡습니다.',
+      },
+    ];
+
     function buildInjunCatalog() {
-      return buildDirectorPlaceholderCatalog('injun', 'injun', '김인준 원장');
+      return buildDirectorCatalogItems_(INJUN_CATALOG_RAW);
     }
 
     function normalizeProgramKeyClient(raw) {
@@ -1331,8 +1513,8 @@
     function catalogTabForItemId(id) {
       if (/^face_/.test(id)) return 'face';
       if (/^func_prog_/.test(id)) return 'func';
-      if (/^hongtaek_prog_/.test(id)) return 'hongtaek';
-      if (/^injun_prog_/.test(id)) return 'injun';
+      if (/^hongtaek_/.test(id)) return 'hongtaek';
+      if (/^injun_/.test(id)) return 'injun';
       return 'movement';
     }
 
@@ -1735,7 +1917,7 @@
         return '통증 없는 범위, 발·골반 정렬부터 순서대로!';
       }
       if (/원장/.test(prog) || item.uiSection === 'func_main' ||
-          item.uiSection === 'hongtaek_main' || item.uiSection === 'injun_main') {
+          /^hongtaek_/.test(item.uiSection || '') || /^injun_/.test(item.uiSection || '')) {
         return '통증 없는 범위, 호흡 유지하며 천천히!';
       }
       if (item.uiSection === 'face_manual') {
@@ -3327,7 +3509,7 @@
       await runCompleteSession(m, progress, { basicAttendOnly: true });
     }
 
-    const APPLICATION_FORM_URL = 'https://breezefeel.github.io/yaksu/신청서.html';
+    const APPLICATION_FORM_URL = 'https://breezefeel.github.io/yaksu/';
 
     function openApplicationForm_(ev) {
       if (ev) ev.preventDefault();
