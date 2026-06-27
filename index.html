@@ -98,7 +98,7 @@
     }
     .btn:disabled { opacity:.45; cursor:not-allowed; }
 
-    /* 오늘 회원 — 강사명 한 줄 + 칩 2열(모바일) */
+    /* 오늘 회원 — 강사명 한 줄 + 칩 3열(모바일) */
     .instructor-rows { display:flex; flex-direction:column; gap:10px; }
     .inst-row {
       display:flex; flex-wrap:wrap; align-items:stretch; gap:5px 6px;
@@ -107,7 +107,7 @@
       flex:0 0 100%;
       width:100%;
       font-size:11px; font-weight:800; padding:4px 8px; border-radius:8px;
-      color:var(--text); white-space:nowrap;
+      color:var(--text); white-space:nowrap; text-align:center;
     }
     .inst-row-chips {
       display:flex; flex-wrap:wrap; gap:5px 6px;
@@ -116,13 +116,12 @@
     .inst-empty { font-size:11px; color:var(--dim); padding:4px 6px; flex:1 1 100%; }
     .member-chip {
       box-sizing:border-box;
-      flex:1 1 calc(50% - 3px);
-      max-width:calc(50% - 3px);
+      flex:1 1 calc((100% - 12px) / 3);
+      max-width:calc((100% - 12px) / 3);
       min-width:0;
       border:1.5px solid var(--border); border-radius:999px;
-      padding:4px 5px; font-size:11px; font-weight:700; cursor:pointer;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-      text-align:left;
+      padding:4px 3px; font-size:10px; font-weight:700; cursor:pointer;
+      display:inline-flex; align-items:center; justify-content:center;
       transition: transform .12s, box-shadow .12s, opacity .12s;
     }
     .member-chip:hover { transform:translateY(-1px); box-shadow:0 2px 8px rgba(0,0,0,.08); }
@@ -166,14 +165,26 @@
       font-size:8px; font-weight:800; color:#b45309;
       margin-left:2px; white-space:nowrap;
     }
-    .member-chip .time-tag {
-      font-size:8px; font-weight:600; opacity:.75; margin-right:2px;
+    .member-chip .chip-line {
+      display:flex; align-items:center; justify-content:space-between;
+      width:100%; min-width:7.4em; gap:1px;
     }
-    .member-chip .chip-name { font-weight:inherit; }
+    .member-chip .time-tag {
+      flex:0 0 2.5em; font-size:8px; font-weight:600; opacity:.75;
+      white-space:nowrap; overflow:hidden; font-variant-numeric:tabular-nums;
+    }
+    .member-chip .time-tag-ph { visibility:hidden; }
+    .member-chip .chip-name {
+      flex:0 0 3em; min-width:3em; max-width:3em;
+      font-weight:inherit; text-align:center;
+      white-space:nowrap; overflow:hidden;
+    }
     .member-chip .sess {
-      font-size:9px; font-weight:700; opacity:.85; margin-left:2px;
+      flex:0 0 2.5em; font-size:9px; font-weight:700; opacity:.85;
+      text-align:right; white-space:nowrap; overflow:hidden;
       font-variant-numeric:tabular-nums;
     }
+    .member-chip .sess-ph { visibility:hidden; }
 
     /* 선택 회원 2줄 */
     .member-brief {
@@ -399,8 +410,6 @@
     .program-tab:hover { border-color:#93c5fd; color:var(--blue); }
     .program-tab.on { background:var(--blue); color:#fff; border-color:var(--blue); }
     .program-card-title { font-size:14px; font-weight:800; color:var(--blue); }
-    .member-chip .chip-name { font-weight:inherit; }
-    .member-chip .sess { color:inherit; opacity:.75; }
 
     .field { margin-bottom:8px; }
     .field label { display:block; font-size:11px; font-weight:600; color:var(--dim); margin-bottom:4px; }
@@ -921,7 +930,7 @@
         <div id="sessionAlimtalkPreview"></div>
       </div>
       <div class="session-wrap-actions">
-        <button type="button" class="btn btn-ghost btn-save-only" id="saveProgressOnlyBtn" onclick="saveProgressOnlySession()" disabled title="출석·알림톡 없이 진도만 저장 (가족 2·3번째 이용자)">진도만 저장</button>
+        <button type="button" class="btn btn-ghost btn-save-only" id="saveProgressOnlyBtn" onclick="saveProgressOnlySession()" disabled title="출석·알림톡 없이 진도만 저장 (이미 n/m 출석 반영된 칸)">진도만 저장</button>
         <div class="attend-pass-stepper" id="attendPassStepper" title="한 번에 사용할 회차 수">
           <span class="pass-caption">다회차</span>
           <button type="button" class="pass-btn" id="attendPassMinus" onclick="changeAttendPassCount(-1)" disabled aria-label="회차 줄이기">−</button>
@@ -2195,29 +2204,29 @@
         buildAttendAlimtalkPreview(m, summary, memo, getSessionLinkIds(), getSessionIncludedIds());
     }
 
-    function accountAttendedTodayForMember(m) {
+    /** 이 칩(이름·시간·회차칸)에 출석 n/m이 반영됐을 때만 출석 버튼 잠금 — 결석·미처리·다른 가족 출석은 제외 */
+    function memberAttendSlotLocked_(m) {
       if (!m || !m.suffix8) return false;
-      if (m.attendedToday || m.sessionCompleted) return true;
-      return todayMembers().some(function(x) {
-        return x.suffix8 === m.suffix8 && (x.attendedToday || x.sessionCompleted);
-      });
+      if (state.completedKeys[memberKey(m)]) return true;
+      return scheduleSessionShowsAttendanceClient(m.scheduleSession);
     }
 
     function updateAttendButtonsForFamilyAccount(m) {
       var has = !!(m && m.suffix8);
-      var attended = has && accountAttendedTodayForMember(m);
+      var slotLocked = has && memberAttendSlotLocked_(m);
       var basic = document.getElementById('attendBasicBtn');
       var progress = document.getElementById('attendProgressBtn');
       var hint = document.getElementById('sessionSaveOnlyHint');
-      if (basic) basic.disabled = !has || attended;
-      if (progress) progress.disabled = !has || attended;
+      if (basic) basic.disabled = !has || slotLocked;
+      if (progress) progress.disabled = !has || slotLocked;
       if (hint) {
-        hint.hidden = !attended;
-        if (attended) {
-          hint.textContent = '이 번호는 오늘 출석이 이미 처리되었습니다. 가족 구성원은 「진도만 저장」을 사용해 주세요.';
+        hint.hidden = !slotLocked;
+        if (slotLocked) {
+          hint.textContent =
+            '이 시간·이름 칸에는 출석이 이미 반영되었습니다. 진도 변경은 「진도만 저장」을 사용해 주세요.';
         }
       }
-      if (attended) {
+      if (slotLocked) {
         var minus = document.getElementById('attendPassMinus');
         var plus = document.getElementById('attendPassPlus');
         if (minus) minus.disabled = true;
@@ -2522,8 +2531,7 @@
 
     function isMemberCompleted(m) {
       if (state.completedKeys[memberKey(m)]) return true;
-      if (m && (m.sessionCompleted || m.attendedToday)) return true;
-      return isMemberScheduleResolved(m);
+      return scheduleSessionShowsAttendanceClient(m && m.scheduleSession);
     }
 
     function isMemberAbsent(m) {
@@ -2544,6 +2552,69 @@
     function memberChipInlineStyle(m, bg, border) {
       if (isMemberAbsent(m)) return '';
       return ' style="background:' + escapeHtml(bg) + ';border-color:' + escapeHtml(border) + '"';
+    }
+
+    /** 회차 표시가 00/00 칸을 넘으면 true (예: 22/123) */
+    function memberChipSessionIsWide_(sessionDisplay) {
+      var s = String(sessionDisplay || '').trim();
+      if (!s) return false;
+      var m = s.match(/^(\d+)\s*\/\s*(\d+)$/);
+      if (!m) return s.replace(/\s/g, '').length > 5;
+      return m[1].length > 2 || m[2].length > 2;
+    }
+
+    /** 칩 이름 — 4글자 이상·긴 회차일 때 2글자만 */
+    function formatMemberChipName(name, sessionDisplay) {
+      var n = String(name || '').trim();
+      if (!n) return '';
+      if (n.length >= 4 || memberChipSessionIsWide_(sessionDisplay)) return n.slice(0, 2);
+      return n;
+    }
+
+    /** 칩 회차 — 최대 2자리/2자리 (00/00 칸 고정) */
+    function formatMemberChipSession(sessionDisplay) {
+      var s = String(sessionDisplay || '').trim();
+      if (!s) return '';
+      var m = s.match(/^(\d+)\s*\/\s*(\d+)$/);
+      if (!m) return s.length > 5 ? s.slice(0, 5) : s;
+      var a = m[1].length > 2 ? m[1].slice(0, 2) : m[1];
+      var b = m[2].length > 2 ? m[2].slice(0, 2) : m[2];
+      return a + '/' + b;
+    }
+
+    function memberChipTitleText_(m) {
+      var parts = [m && m.name];
+      if (m && m.time) parts.push(m.time);
+      if (m && m.sessionDisplay) parts.push(m.sessionDisplay);
+      var lbl = todayAttendChipLabel(m);
+      if (lbl) parts.push(lbl);
+      return parts.filter(Boolean).join(' · ');
+    }
+
+    function buildMemberChipButtonHtml_(m, opts) {
+      opts = opts || {};
+      var key = memberKey(m);
+      var on = state.selectedKey === key ? ' on' : '';
+      var nameColor = memberProgramColor(m);
+      var sessRaw = m.sessionDisplay || '';
+      var chipName = formatMemberChipName(m.name, sessRaw);
+      var chipSess = formatMemberChipSession(sessRaw);
+      var timeTag = m.time
+        ? '<span class="time-tag">' + escapeHtml(m.time) + '</span>'
+        : '<span class="time-tag time-tag-ph" aria-hidden="true">00:00</span>';
+      var sessHtml = chipSess
+        ? '<span class="sess">' + escapeHtml(chipSess) + '</span>'
+        : '<span class="sess sess-ph" aria-hidden="true">00/00</span>';
+      var titleAttr = ' title="' + escapeHtml(memberChipTitleText_(m)) + '"';
+      var styleAttr = opts.withInstructorStyle ? memberChipInlineStyle(m, opts.bg, opts.border) : '';
+      return (
+        '<button type="button" class="member-chip' + on + memberChipExtraClass(m) + '"' +
+        styleAttr + titleAttr +
+        ' onclick="selectMemberByKey(\'' + chipKeyAttr(key) + '\')">' +
+        '<span class="chip-line">' + timeTag +
+        '<span class="chip-name" style="color:' + escapeHtml(nameColor) + '">' + escapeHtml(chipName) + '</span>' +
+        sessHtml + '</span></button>'
+      );
     }
 
     function memberRemainSessions(m) {
@@ -2785,21 +2856,9 @@
           html += '<span class="inst-empty">예약 없음</span>';
         } else {
           rowMembers.forEach(function(m) {
-            const key = memberKey(m);
             const bg = m.instructorLightColor || inst.lightColor || inst.color;
             const border = m.instructorColor || inst.color;
-            const on = state.selectedKey === key ? ' on' : '';
-            const sess = m.sessionDisplay || '';
-            const timeTag = m.time ? '<span class="time-tag">'+escapeHtml(m.time)+'</span>' : '';
-            const nameColor = memberProgramColor(m);
-            const attendLbl = todayAttendChipLabel(m);
-            const attendTag = attendLbl
-              ? '<span class="dual-tag">' + escapeHtml(attendLbl) + '</span>'
-              : '';
-            html += '<button type="button" class="member-chip'+on+memberChipExtraClass(m)+'"'+memberChipInlineStyle(m, bg, border)+' onclick="selectMemberByKey(\''+chipKeyAttr(key)+'\')">'+
-              timeTag + '<span class="chip-name" style="color:'+escapeHtml(nameColor)+'">'+escapeHtml(m.name)+'</span>' +
-              attendTag +
-              (sess ? '<span class="sess">'+escapeHtml(sess)+'</span>' : '') + '</button>';
+            html += buildMemberChipButtonHtml_(m, { withInstructorStyle: true, bg: bg, border: border });
           });
         }
         html += '</div></div>';
@@ -2811,11 +2870,7 @@
       if (others.length) {
         html += '<div class="inst-row"><div class="inst-row-hd" style="background:#f1f5f9;border-left:4px solid #94a3b8">기타</div><div class="inst-row-chips">';
         others.forEach(function(m) {
-          const key = memberKey(m);
-          const on = state.selectedKey === key ? ' on' : '';
-          const nameColor = memberProgramColor(m);
-          html += '<button type="button" class="member-chip'+on+memberChipExtraClass(m)+'" onclick="selectMemberByKey(\''+chipKeyAttr(key)+'\')">'+
-            '<span class="chip-name" style="color:'+escapeHtml(nameColor)+'">'+escapeHtml(m.name)+'</span></button>';
+          html += buildMemberChipButtonHtml_(m, { withInstructorStyle: false });
         });
         html += '</div></div>';
       }
@@ -3426,6 +3481,7 @@
         m.attendedToday = true;
         m.absentToday = false;
         m.scheduleResolvedToday = true;
+        if (data.sessionDisplay) m.scheduleSession = data.sessionDisplay;
       }
       if (typeof data.todayAttendCount === 'number') {
         m.todayAttendCount = data.todayAttendCount;
