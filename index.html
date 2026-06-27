@@ -101,7 +101,7 @@
     /* 오늘 회원 — 강사명 + 회원 칩 한 줄(넘치면 줄바꿈) */
     .instructor-rows { display:flex; flex-direction:column; gap:10px; }
     .inst-row {
-      display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px;
+      display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px;
     }
     .inst-row-hd {
       flex:0 0 auto;
@@ -114,7 +114,7 @@
     .inst-empty { font-size:12px; color:var(--dim); padding:4px 8px; }
     .member-chip {
       border:2px solid var(--border); border-radius:999px;
-      padding:7px 13px; font-size:13px; font-weight:700; cursor:pointer;
+      padding:5px 9px; font-size:12px; font-weight:700; cursor:pointer;
       transition: transform .12s, box-shadow .12s, opacity .12s;
     }
     .member-chip:hover { transform:translateY(-1px); box-shadow:0 2px 8px rgba(0,0,0,.08); }
@@ -155,13 +155,13 @@
       box-shadow:0 0 0 2px #f59e0b, 0 2px 8px rgba(245,158,11,.2);
     }
     .member-chip .dual-tag {
-      font-size:10px; font-weight:800; color:#b45309;
-      margin-left:4px; white-space:nowrap;
+      font-size:9px; font-weight:800; color:#b45309;
+      margin-left:3px; white-space:nowrap;
     }
     .member-chip .time-tag {
-      font-size:10px; font-weight:600; opacity:.75; margin-right:4px;
+      font-size:9px; font-weight:600; opacity:.75; margin-right:3px;
     }
-    .member-chip .sess { font-size:11px; font-weight:600; opacity:.85; margin-left:4px; }
+    .member-chip .sess { font-size:10px; font-weight:600; opacity:.85; margin-left:3px; }
 
     /* 선택 회원 2줄 */
     .member-brief {
@@ -171,7 +171,12 @@
     }
     .member-brief.show { display:block; }
     .member-brief .line1 { font-size:14px; font-weight:700; }
-    .member-brief .line1 .phone { font-weight:600; color:var(--dim); margin-left:8px; font-size:13px; }
+    .member-brief .line1 .phone {
+      font-weight:600; color:var(--blue-mid); margin-left:8px; font-size:13px;
+      text-decoration:none; -webkit-tap-highlight-color:transparent;
+    }
+    .member-brief .line1 .phone[hidden] { display:none; }
+    .member-brief .line1 .phone:active { opacity:.7; }
     .member-brief .line2 { font-size:12px; color:var(--dim); margin-top:6px; white-space:pre-wrap; line-height:1.5; }
     .member-brief .line2.brief-wellness span:last-child { color:#3a63a8; }
     .member-brief .line3 { font-size:12px; color:var(--dim); margin-top:6px; white-space:pre-wrap; line-height:1.5; }
@@ -410,8 +415,15 @@
     @media(min-width:520px){
       .session-wrap-actions .attend-pass-stepper { flex:0 0 auto; justify-content:flex-start; }
     }
+    .session-wrap-actions .btn-save-only {
+      flex:0 0 auto; min-width:92px; font-size:11px; font-weight:700;
+      border-color:#cbd5e1; color:var(--blue);
+    }
     .session-wrap-actions .btn-attend-basic { flex:1; background:var(--green); color:#fff; border:none; }
     .session-wrap-actions .btn-attend-progress { flex:1; }
+    .session-save-only-hint {
+      flex:1 1 100%; font-size:10px; color:#b45309; line-height:1.45; margin:0;
+    }
 
     .modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(15,23,42,.5); display:none; align-items:flex-end; justify-content:center; }
     .modal-overlay.open { display:flex; }
@@ -824,7 +836,7 @@
       </div>
       <div class="member-chips" id="memberChips"><span class="empty-hint">불러오는 중…</span></div>
       <div class="member-brief" id="memberBrief">
-        <div class="line1"><span id="briefName">—</span><span class="phone" id="briefPhone"></span></div>
+        <div class="line1"><span id="briefName">—</span><a class="phone" id="briefPhone" href="#" hidden>전화</a></div>
         <div class="line2"><span class="brief-label">특이사항</span><span id="briefMemo">없음</span></div>
         <div class="line2" id="briefFirstEvalRow" hidden>
           <span class="brief-label">초회 평가</span><span id="briefFirstEval">—</span>
@@ -898,6 +910,7 @@
         <div id="sessionAlimtalkPreview"></div>
       </div>
       <div class="session-wrap-actions">
+        <button type="button" class="btn btn-ghost btn-save-only" id="saveProgressOnlyBtn" onclick="saveProgressOnlySession()" disabled title="출석·알림톡 없이 진도만 저장 (가족 2·3번째 이용자)">진도만 저장</button>
         <div class="attend-pass-stepper" id="attendPassStepper" title="한 번에 사용할 회차 수">
           <span class="pass-caption">다회차</span>
           <button type="button" class="pass-btn" id="attendPassMinus" onclick="changeAttendPassCount(-1)" disabled aria-label="회차 줄이기">−</button>
@@ -906,6 +919,7 @@
         </div>
         <button type="button" class="btn btn-attend-basic" id="attendBasicBtn" onclick="attendBasicSession()" disabled>출석체크</button>
         <button type="button" class="btn btn-save btn-attend-progress" id="attendProgressBtn" onclick="attendWithProgressSession()" disabled>출석+진도보내기</button>
+        <p class="session-save-only-hint" id="sessionSaveOnlyHint" hidden></p>
       </div>
     </section>
   </main>
@@ -2170,11 +2184,58 @@
         buildAttendAlimtalkPreview(m, summary, memo, getSessionLinkIds(), getSessionIncludedIds());
     }
 
-    function setSessionActionButtonsDisabled(disabled) {
+    function accountAttendedTodayForMember(m) {
+      if (!m || !m.suffix8) return false;
+      if (m.attendedToday || m.sessionCompleted) return true;
+      return todayMembers().some(function(x) {
+        return x.suffix8 === m.suffix8 && (x.attendedToday || x.sessionCompleted);
+      });
+    }
+
+    function updateAttendButtonsForFamilyAccount(m) {
+      var has = !!(m && m.suffix8);
+      var attended = has && accountAttendedTodayForMember(m);
       var basic = document.getElementById('attendBasicBtn');
       var progress = document.getElementById('attendProgressBtn');
-      if (basic) basic.disabled = disabled;
-      if (progress) progress.disabled = disabled;
+      var hint = document.getElementById('sessionSaveOnlyHint');
+      if (basic) basic.disabled = !has || attended;
+      if (progress) progress.disabled = !has || attended;
+      if (hint) {
+        hint.hidden = !attended;
+        if (attended) {
+          hint.textContent = '이 번호는 오늘 출석이 이미 처리되었습니다. 가족 구성원은 「진도만 저장」을 사용해 주세요.';
+        }
+      }
+      if (attended) {
+        var minus = document.getElementById('attendPassMinus');
+        var plus = document.getElementById('attendPassPlus');
+        if (minus) minus.disabled = true;
+        if (plus) plus.disabled = true;
+      } else {
+        updateAttendPassStepper(m);
+      }
+    }
+
+    function setSessionActionButtonsDisabled(disabled) {
+      var m = state.selected;
+      var has = !!(m && m.suffix8);
+      var saveOnly = document.getElementById('saveProgressOnlyBtn');
+      var basic = document.getElementById('attendBasicBtn');
+      var progress = document.getElementById('attendProgressBtn');
+      if (saveOnly) saveOnly.disabled = disabled || !has;
+      if (disabled) {
+        if (basic) basic.disabled = true;
+        if (progress) progress.disabled = true;
+        return;
+      }
+      updateAttendButtonsForFamilyAccount(m);
+    }
+
+    async function saveProgressOnlySession() {
+      var m = state.selected;
+      if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
+      syncSessionRecordFieldsFromModal();
+      await runSaveSessionOnly(m, mergedProgressMapForSave());
     }
 
     async function attendBasicSession() {
@@ -2274,7 +2335,7 @@
         return false;
       }
       applySaveOnlyResult(m, data);
-      toast('저장 완료');
+      toast('진도만 저장 완료 · 출석·알림 없음');
       return true;
     }
 
@@ -2411,7 +2472,8 @@
       }
     }
     function memberKey(m) {
-      return (m.suffix8 || ('n:' + m.name)) + '|' + (m.time || '') + '|' + (m.instructorIndex != null ? m.instructorIndex : '');
+      var name = String(m.name || '').replace(/\s+/g, ' ').trim();
+      return (m.suffix8 || ('n:' + name)) + '|' + name + '|' + (m.time || '') + '|' + (m.instructorIndex != null ? m.instructorIndex : '');
     }
     function todayAttendCredits(m) {
       if (!m) return 0;
@@ -2535,6 +2597,28 @@
     function formatPhone(d) {
       const s = String(d).replace(/\D/g,'');
       return s.length === 11 ? s.slice(0,3)+'-'+s.slice(3,7)+'-'+s.slice(7) : s;
+    }
+    function phoneTelHref(digits) {
+      var s = String(digits || '').replace(/\D/g, '');
+      if (s.length === 10 && /^10\d{8}$/.test(s)) s = '0' + s;
+      if (s.length < 10) return '';
+      return 'tel:' + s;
+    }
+    function updateBriefPhoneLink(m) {
+      var el = document.getElementById('briefPhone');
+      if (!el) return;
+      var digits = String((m && m.phoneDigits) || '').replace(/\D/g, '');
+      var href = phoneTelHref(digits);
+      if (href) {
+        el.href = href;
+        el.textContent = formatPhone(digits);
+        el.hidden = false;
+        el.setAttribute('aria-label', formatPhone(digits) + ' 전화 걸기');
+      } else {
+        el.textContent = '';
+        el.hidden = true;
+        el.removeAttribute('aria-label');
+      }
     }
     function parseTime(t) {
       const m = String(t||'').match(/(\d{1,2}):(\d{2})/);
@@ -2881,7 +2965,7 @@
       var panel = document.getElementById('sessionCheckPanel');
       if (panel) panel.classList.add('show');
       document.getElementById('briefName').textContent = m.name || '—';
-      document.getElementById('briefPhone').textContent = m.phoneDigits ? formatPhone(m.phoneDigits) : '';
+      updateBriefPhoneLink(m);
       var memo = (m.specialNotes || '').trim() || '없음';
       document.getElementById('briefMemo').textContent = memo;
       var feRow = document.getElementById('briefFirstEvalRow');
@@ -2949,7 +3033,7 @@
       var reqId = ++_memberDetailReq;
       var selKey = memberKey(m);
       try {
-        var detail = await api({ action: 'instructorMemberDetail', suffix8: m.suffix8 }, { timeoutMs: 45000 });
+        var detail = await api({ action: 'instructorMemberDetail', suffix8: m.suffix8, attendeeName: m.name }, { timeoutMs: 45000 });
         if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
         if (!detail.ok || !detail.member) return;
         m.specialNotes = detail.member.specialNotes || m.specialNotes || '';
@@ -3101,7 +3185,8 @@
       if (ev) { ev.preventDefault(); ev.stopPropagation(); }
       const data = exerciseMetaById_[itemId] || {};
       const url = String(data.url || '').trim();
-      if (!url) { toast('복사할 링크가 없습니다'); return; }
+      if (!url) { toast('열 링크가 없습니다'); return; }
+      window.open(url, '_blank', 'noopener,noreferrer');
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           await navigator.clipboard.writeText(url);
@@ -3119,7 +3204,7 @@
         document.execCommand('copy');
         document.body.removeChild(ta);
       }
-      toast('링크가 복사되었습니다');
+      toast('링크 복사 · 새 창에서 열었습니다');
     }
 
     function renderProgramList() {
