@@ -120,8 +120,9 @@
       max-width:calc((100% - 12px) / 3);
       min-width:0;
       border:1.5px solid var(--border); border-radius:999px;
-      padding:4px 3px; font-size:10px; font-weight:700; cursor:pointer;
+      padding:5px 7px; font-size:10px; font-weight:700; cursor:pointer;
       display:inline-flex; align-items:center; justify-content:center;
+      overflow:visible;
       transition: transform .12s, box-shadow .12s, opacity .12s;
     }
     .member-chip:hover { transform:translateY(-1px); box-shadow:0 2px 8px rgba(0,0,0,.08); }
@@ -166,22 +167,22 @@
       margin-left:2px; white-space:nowrap;
     }
     .member-chip .chip-line {
-      display:flex; align-items:center; justify-content:space-between;
-      width:100%; min-width:7.4em; gap:1px;
+      display:grid;
+      grid-template-columns:auto minmax(0, 1fr) auto;
+      align-items:center; width:100%; gap:2px 3px;
     }
     .member-chip .time-tag {
-      flex:0 0 2.5em; font-size:8px; font-weight:600; opacity:.75;
-      white-space:nowrap; overflow:hidden; font-variant-numeric:tabular-nums;
+      font-size:8px; font-weight:600; opacity:.75;
+      white-space:nowrap; font-variant-numeric:tabular-nums;
     }
     .member-chip .time-tag-ph { visibility:hidden; }
     .member-chip .chip-name {
-      flex:0 0 3em; min-width:3em; max-width:3em;
-      font-weight:inherit; text-align:center;
-      white-space:nowrap; overflow:hidden;
+      min-width:0; font-weight:inherit; text-align:center;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .member-chip .sess {
-      flex:0 0 2.5em; font-size:9px; font-weight:700; opacity:.85;
-      text-align:right; white-space:nowrap; overflow:hidden;
+      font-size:9px; font-weight:700; opacity:.85;
+      white-space:nowrap; text-align:right;
       font-variant-numeric:tabular-nums;
     }
     .member-chip .sess-ph { visibility:hidden; }
@@ -427,23 +428,26 @@
       font-size:10px; color:#94a3b8; margin:-2px 0 8px; line-height:1.45;
     }
     .session-wrap-actions {
-      display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+      display:flex; flex-direction:column; gap:8px;
       margin-top:8px; padding-top:12px; border-top:1px solid var(--border);
     }
     .session-wrap-actions .attend-pass-stepper {
-      flex:1 1 100%; justify-content:center;
+      align-self:center;
     }
-    @media(min-width:520px){
-      .session-wrap-actions .attend-pass-stepper { flex:0 0 auto; justify-content:flex-start; }
+    .session-wrap-btns {
+      display:flex; gap:6px; width:100%;
     }
-    .session-wrap-actions .btn-save-only {
-      flex:0 0 auto; min-width:92px; font-size:11px; font-weight:700;
-      border-color:#cbd5e1; color:var(--blue);
+    .session-wrap-btns .btn {
+      flex:1; min-width:0; padding:9px 4px; font-size:11px; font-weight:700;
+      line-height:1.25; white-space:normal; text-align:center;
     }
-    .session-wrap-actions .btn-attend-basic { flex:1; background:var(--green); color:#fff; border:none; }
-    .session-wrap-actions .btn-attend-progress { flex:1; }
+    .session-wrap-btns .btn-save-only {
+      border-color:#cbd5e1; color:var(--blue); background:#fff;
+    }
+    .session-wrap-btns .btn-attend-basic { background:var(--green); color:#fff; border:none; }
+    .session-wrap-btns .btn-attend-progress { background:var(--blue); color:#fff; border:none; }
     .session-save-only-hint {
-      flex:1 1 100%; font-size:10px; color:#b45309; line-height:1.45; margin:0;
+      font-size:10px; color:#b45309; line-height:1.45; margin:0;
     }
 
     .modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(15,23,42,.5); display:none; align-items:flex-end; justify-content:center; }
@@ -870,9 +874,8 @@
         <div class="line3"><span class="brief-label">다음 진도</span><span id="briefNextProgress">없음</span></div>
       </div>
       <div class="session-check-panel" id="sessionCheckPanel">
-        <div class="session-check-title">오늘 컨디션</div>
+        <div class="session-check-title">오늘 컨디션(불편한 부위)</div>
         <div class="session-check-row">
-          <span class="session-check-label">불편한 부위</span>
           <div class="session-check-chips" id="sessionDiscomfortChips"></div>
         </div>
         <div class="session-check-row">
@@ -907,7 +910,7 @@
       <div class="card-sub" id="sessionWrapMemberHint">회원을 선택하면 아래에서 확인·저장할 수 있습니다.</div>
       <div class="stage-today-list">
         <h3>오늘 진행한 항목</h3>
-        <p class="stage-today-hint">왼쪽 체크 — 알림톡 포함(기본 전체 선택) · URL 체크 — 운동명 아래 링크 함께 발송</p>
+        <p class="stage-today-hint">URL 체크 — 운동명 아래 링크 함께 발송</p>
         <div id="sessionTodayList"></div>
         <div class="field session-special-notes-field">
           <label for="sessionSpecialNotesNew">이번 세션 중 특이사항 추가</label>
@@ -930,16 +933,18 @@
         <div id="sessionAlimtalkPreview"></div>
       </div>
       <div class="session-wrap-actions">
-        <button type="button" class="btn btn-ghost btn-save-only" id="saveProgressOnlyBtn" onclick="saveProgressOnlySession()" disabled title="출석·알림톡 없이 진도만 저장 (이미 n/m 출석 반영된 칸)">진도만 저장</button>
         <div class="attend-pass-stepper" id="attendPassStepper" title="한 번에 사용할 회차 수">
           <span class="pass-caption">다회차</span>
           <button type="button" class="pass-btn" id="attendPassMinus" onclick="changeAttendPassCount(-1)" disabled aria-label="회차 줄이기">−</button>
           <span class="pass-num" id="attendPassCountLabel">1</span>
           <button type="button" class="pass-btn" id="attendPassPlus" onclick="changeAttendPassCount(1)" disabled aria-label="회차 늘리기">+</button>
         </div>
-        <button type="button" class="btn btn-attend-basic" id="attendBasicBtn" onclick="attendBasicSession()" disabled>출석체크</button>
-        <button type="button" class="btn btn-save btn-attend-progress" id="attendProgressBtn" onclick="attendWithProgressSession()" disabled>출석+진도보내기</button>
         <p class="session-save-only-hint" id="sessionSaveOnlyHint" hidden></p>
+        <div class="session-wrap-btns">
+          <button type="button" class="btn btn-ghost btn-save-only" id="saveProgressOnlyBtn" onclick="saveProgressOnlySession()" disabled title="출석·알림톡 없이 진도만 저장 (이미 n/m 출석 반영된 칸)">진도만 저장</button>
+          <button type="button" class="btn btn-attend-basic" id="attendBasicBtn" onclick="attendBasicSession()" disabled>출석 체크</button>
+          <button type="button" class="btn btn-attend-progress" id="attendProgressBtn" onclick="attendWithProgressSession()" disabled>출석+진도보내기</button>
+        </div>
       </div>
     </section>
   </main>
@@ -1750,11 +1755,14 @@
       { id: 'jaw', label: '턱' },
       { id: 'neck', label: '목' },
       { id: 'shoulder', label: '어깨' },
-      { id: 'arm', label: '팔' },
+      { id: 'elbow', label: '팔꿈치' },
+      { id: 'wrist', label: '손목' },
       { id: 'back', label: '등' },
       { id: 'waist', label: '허리' },
+      { id: 'abdomen', label: '복부' },
       { id: 'pelvis', label: '골반' },
-      { id: 'leg', label: '다리' },
+      { id: 'knee', label: '무릎' },
+      { id: 'ankle', label: '발목' },
       { id: 'other', label: '기타' },
     ];
 
@@ -2554,34 +2562,6 @@
       return ' style="background:' + escapeHtml(bg) + ';border-color:' + escapeHtml(border) + '"';
     }
 
-    /** 회차 표시가 00/00 칸을 넘으면 true (예: 22/123) */
-    function memberChipSessionIsWide_(sessionDisplay) {
-      var s = String(sessionDisplay || '').trim();
-      if (!s) return false;
-      var m = s.match(/^(\d+)\s*\/\s*(\d+)$/);
-      if (!m) return s.replace(/\s/g, '').length > 5;
-      return m[1].length > 2 || m[2].length > 2;
-    }
-
-    /** 칩 이름 — 4글자 이상·긴 회차일 때 2글자만 */
-    function formatMemberChipName(name, sessionDisplay) {
-      var n = String(name || '').trim();
-      if (!n) return '';
-      if (n.length >= 4 || memberChipSessionIsWide_(sessionDisplay)) return n.slice(0, 2);
-      return n;
-    }
-
-    /** 칩 회차 — 최대 2자리/2자리 (00/00 칸 고정) */
-    function formatMemberChipSession(sessionDisplay) {
-      var s = String(sessionDisplay || '').trim();
-      if (!s) return '';
-      var m = s.match(/^(\d+)\s*\/\s*(\d+)$/);
-      if (!m) return s.length > 5 ? s.slice(0, 5) : s;
-      var a = m[1].length > 2 ? m[1].slice(0, 2) : m[1];
-      var b = m[2].length > 2 ? m[2].slice(0, 2) : m[2];
-      return a + '/' + b;
-    }
-
     function memberChipTitleText_(m) {
       var parts = [m && m.name];
       if (m && m.time) parts.push(m.time);
@@ -2596,14 +2576,13 @@
       var key = memberKey(m);
       var on = state.selectedKey === key ? ' on' : '';
       var nameColor = memberProgramColor(m);
-      var sessRaw = m.sessionDisplay || '';
-      var chipName = formatMemberChipName(m.name, sessRaw);
-      var chipSess = formatMemberChipSession(sessRaw);
+      var sessRaw = String(m.sessionDisplay || '').trim();
+      var chipName = String(m.name || '').trim();
       var timeTag = m.time
         ? '<span class="time-tag">' + escapeHtml(m.time) + '</span>'
         : '<span class="time-tag time-tag-ph" aria-hidden="true">00:00</span>';
-      var sessHtml = chipSess
-        ? '<span class="sess">' + escapeHtml(chipSess) + '</span>'
+      var sessHtml = sessRaw
+        ? '<span class="sess">' + escapeHtml(sessRaw) + '</span>'
         : '<span class="sess sess-ph" aria-hidden="true">00/00</span>';
       var titleAttr = ' title="' + escapeHtml(memberChipTitleText_(m)) + '"';
       var styleAttr = opts.withInstructorStyle ? memberChipInlineStyle(m, opts.bg, opts.border) : '';
