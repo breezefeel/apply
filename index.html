@@ -62,11 +62,6 @@
     }
     .btn-ghost:hover { background:var(--blue-bg); border-color:#93c5fd; }
     .btn-primary:hover { background:#1d4ed8; border-color:#1e40af; }
-    .toolbar .btn-intake {
-      background:var(--surface); color:var(--blue-mid);
-      border-color:#93c5fd; box-shadow:0 1px 3px rgba(30,58,110,0.05);
-    }
-    .toolbar .btn-intake:hover { background:var(--blue-bg); border-color:#60a5fa; }
     .toolbar .btn-eval {
       background:linear-gradient(135deg, var(--blue), var(--blue-mid));
       color:#fff; border-color:var(--blue);
@@ -98,7 +93,7 @@
     }
     .btn:disabled { opacity:.45; cursor:not-allowed; }
 
-    /* 오늘 회원 — 강사명 한 줄 + 칩 3열(모바일) */
+    /* 오늘 회원 — 강사명 한 줄 + 칩 (좁으면 3열, 넓으면 4·5열…) */
     .instructor-rows { display:flex; flex-direction:column; gap:10px; }
     .inst-row {
       display:flex; flex-wrap:wrap; align-items:stretch; gap:5px 6px;
@@ -110,15 +105,15 @@
       color:var(--text); white-space:nowrap; text-align:center;
     }
     .inst-row-chips {
-      display:flex; flex-wrap:wrap; gap:5px 6px;
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(7.1rem, 1fr));
+      gap:5px 6px;
       flex:1 1 100%; width:100%; min-width:0;
     }
-    .inst-empty { font-size:11px; color:var(--dim); padding:4px 6px; flex:1 1 100%; }
+    .inst-empty { font-size:11px; color:var(--dim); padding:4px 6px; grid-column:1 / -1; }
     .member-chip {
       box-sizing:border-box;
-      flex:1 1 calc((100% - 12px) / 3);
-      max-width:calc((100% - 12px) / 3);
-      min-width:0;
+      width:100%; min-width:0;
       border:1.5px solid var(--border); border-radius:999px;
       padding:5px 7px; font-size:10px; font-weight:700; cursor:pointer;
       display:inline-flex; align-items:center; justify-content:center;
@@ -186,6 +181,20 @@
       font-variant-numeric:tabular-nums;
     }
     .member-chip .sess-ph { visibility:hidden; }
+
+    @media (min-width:520px) {
+      .inst-row-chips {
+        grid-template-columns:repeat(auto-fill, minmax(7.6rem, 1fr));
+      }
+      .member-chip { font-size:11px; padding:5px 9px; }
+      .member-chip .time-tag { font-size:9px; }
+      .member-chip .sess { font-size:10px; }
+    }
+    @media (min-width:900px) {
+      .inst-row-chips {
+        grid-template-columns:repeat(auto-fill, minmax(8rem, 1fr));
+      }
+    }
 
     /* 선택 회원 2줄 */
     .member-brief {
@@ -854,7 +863,6 @@
       <div class="card-title">오늘 예약 회원</div>      
       <div class="toolbar">
         <button type="button" class="btn btn-ghost" onclick="loadBoard()">새로고침</button>
-        <button type="button" class="btn btn-intake" onclick="sendWellnessIntakeSms_()">사전 문진</button>
         <button type="button" class="btn btn-eval" onclick="openEvalModal()">초회 평가</button>
         <a class="btn btn-ghost" href="#" onclick="openApplicationForm_(event)">회원등록</a>
       </div>
