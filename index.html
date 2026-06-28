@@ -126,11 +126,32 @@
       font-weight:800;
     }
     .member-chip.done {
-      opacity:.72;
-      text-decoration:line-through;
-      text-decoration-color:rgba(0,0,0,.35);
+      box-shadow: inset 0 0 0 1px rgba(30, 58, 110, 0.12);
     }
-    .member-chip.done .sess { text-decoration:none; display:inline-block; }
+    .member-chip.done .time-tag,
+    .member-chip.done .chip-name {
+      text-decoration: line-through;
+      text-decoration-thickness: 2.5px;
+      text-decoration-skip-ink: none;
+      -webkit-text-decoration-skip: none;
+    }
+    .member-chip.done .time-tag {
+      opacity: 1;
+      font-weight: 700;
+      color: var(--blue);
+      text-decoration-color: rgba(30, 58, 110, 0.82);
+    }
+    .member-chip.done .chip-name {
+      text-decoration-color: currentColor;
+      opacity: 0.9;
+    }
+    .member-chip.done .sess {
+      text-decoration: none;
+      display: inline-block;
+      opacity: 1;
+      font-weight: 800;
+      color: var(--blue);
+    }
     .member-chip.absent {
       background:#fee2e2 !important;
       border-color:#fca5a5 !important;
@@ -148,9 +169,15 @@
       box-shadow:0 0 0 2px #991b1b, 0 2px 10px rgba(153,27,27,.18);
     }
     .member-chip.absent.done {
-      opacity:.78;
-      text-decoration:line-through;
-      text-decoration-color:rgba(153,27,27,.45);
+      box-shadow: inset 0 0 0 1px rgba(153, 27, 27, 0.15);
+    }
+    .member-chip.absent.done .time-tag,
+    .member-chip.absent.done .chip-name {
+      text-decoration: line-through;
+      text-decoration-thickness: 2.5px;
+      text-decoration-color: rgba(153, 27, 27, 0.82);
+      text-decoration-skip-ink: none;
+      -webkit-text-decoration-skip: none;
     }
     .member-chip.dual-partial {
       opacity:1;
@@ -1133,6 +1160,8 @@
         '밸런스 트레이닝 6단계': 22,
         '척추+상지 분절 운동 6단계': 30,
         'Push-up 6단계': 14,
+        'Plank 6단계': 15,
+        'Side Plank 6단계': 16,
       };
       if (programOrder[s] != null) return programOrder[s];
       const postM = s.match(/^(\d+)\s*·/);
@@ -1255,6 +1284,18 @@
       { id:'p2_pushup_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'④ 무릎 뗀 네발 — 웨이브 하강·상승' },
       { id:'p2_pushup_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'⑤ 무릎 뗀 — 몸통 먼저→웨이브 상승' },
       { id:'p2_pushup_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'⑥ 정상 Push-up — 통증 없는 범위' },
+      { id:'p2_plank_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'① 무릎 대고 네발' },
+      { id:'p2_plank_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'② 무릎 떼고 네발' },
+      { id:'p2_plank_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'③ 네발 — 골반 좌우 움직임' },
+      { id:'p2_plank_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'④ 한 팔 앞으로 뻗기 → 복귀' },
+      { id:'p2_plank_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'⑤ 한 손 뒤통수 — 몸통 회전' },
+      { id:'p2_plank_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'⑥ 다리 접기 → 바깥 회전 → 복귀' },
+      { id:'p2_side_plank_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'① 한발 지지 사이드 (좌·우)' },
+      { id:'p2_side_plank_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'② 지지 없이 사이드 (좌·우)' },
+      { id:'p2_side_plank_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'③ 골반 좌우 움직임 (좌·우)' },
+      { id:'p2_side_plank_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'④ 위쪽 다리 벌렸다 모음 (좌·우)' },
+      { id:'p2_side_plank_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'⑤ 위쪽 다리 원그리기 (circumduction)' },
+      { id:'p2_side_plank_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'⑥ 다리 앞·뒤 스윙 (달리기 동작)' },
       { id:'p2_a_front', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'전방 — 경·흉·고관절 굴곡·발목배굴' },
       { id:'p2_a_back', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'후방 — 경·흉 신전·햄·발목저굴' },
       { id:'p2_a_lat', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'측방 — 경·흉 측굴·고관절 외전·발목' },
@@ -1277,19 +1318,19 @@
       { id:'p3_a_upper_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'② 목 — 경추 굴곡·신전·측굴·회전' },
       { id:'p3_a_upper_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'③ 어깨 — GH·견갑 연쇄' },
       { id:'p3_a_upper_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'④ 몸통 — 흉·요추 분절 (Roll down/up)' },
-      { id:'p3_a_lower_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'① 허리 — 요추·골반 정렬' },
-      { id:'p3_a_lower_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'② 고관절 — 굴곡·신전·회전' },
-      { id:'p3_a_lower_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'③ 무릎 — 슬관절 가동' },
-      { id:'p3_a_lower_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'④ 발목 — 족부·종아리 연쇄' },
+      { id:'p3_a_lower_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'⑤ 고관절 — 굴곡·신전·회전' },
+      { id:'p3_a_lower_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'⑥ 무릎 — 슬관절 가동' },
+      { id:'p3_a_lower_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'⑦ 종아리 — 스트레칭' },
+      { id:'p3_a_lower_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'⑧ 발목 — 발가락·발목 연쇄' },
       { id:'p3_stand_posture', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 서기' },
       { id:'p3_stand_breath', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'호흡 정렬 운동' },
       { id:'p3_stand_walk', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 걷기' },
-      { id:'p3_balance_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'① 일어선 상태 한발 살짝 들기 — 30초 유지 (좌·우)' },
-      { id:'p3_balance_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'② 무릎 높이까지 들어 올리기 — 30초 유지 (좌·우)' },
-      { id:'p3_balance_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'③ 한 발 지지 · 반대 다리 뒤로 짧게 뻗기 + 소폭 전굴' },
-      { id:'p3_balance_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'④ 한 발 지지 · 반대 다리 뒤로 뻗기(발 미접지) + 전굴' },
-      { id:'p3_balance_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑤ ④ 자세에서 반대 다리 앞으로 — 대퇴 수평(무릎 약 90°)' },
-      { id:'p3_balance_6', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑥ 최종 — 뒤뻗기(전굴)→무릎들기 사이클' },
+      { id:'p3_balance_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'① 일어선 상태 한발 살짝 들고 돌리기 — 30초 유지' },
+      { id:'p3_balance_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'② 무릎 높이까지 들어 올리고 돌리기 — 30초 유지' },
+      { id:'p3_balance_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'③ 한 발 지지 · 반대 다리 뒤로 뻗기(발 미접지) + 후굴' },
+      { id:'p3_balance_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'④ 뒤뻗기(후굴)→무릎들기(전굴) 사이클' },
+      { id:'p3_balance_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑤ 무릎 들고 몸통-골반 회전' },
+      { id:'p3_balance_6', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑥ 뒤뻗기 하며 몸통-골반 회전' },
       { id:'func_adv_a', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'A' },
       { id:'func_adv_b', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'B' },
       { id:'func_adv_c', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'C' },
@@ -1334,7 +1375,7 @@
           hasVideo: !!url,
           videoId: srv.videoId || loc.videoId || loc.id,
           videoTitle: shortTitle,
-          videoDetailTitle: srvTitle && srvTitle !== shortTitle ? srvTitle : '',
+          videoDetailTitle: '',
           videoMatch: srv.videoMatch || loc.videoMatch,
           kind: srv.kind || loc.kind,
           coachingNote: String(srv.coachingNote || loc.coachingNote || '').trim(),
@@ -2013,6 +2054,12 @@
       if (prog === 'Push-up 6단계') {
         return '몸통→가슴→팔 순 웨이브, 허리 꺾지 않기.';
       }
+      if (prog === 'Plank 6단계') {
+        return '어깨·골반 일직선, 복부 조이고 허리 꺾지 않기.';
+      }
+      if (prog === 'Side Plank 6단계') {
+        return '골반 들어 올리고 측면 일직선 유지, 천천히 좌·우 교대.';
+      }
       if (prog.indexOf('분절 운동') >= 0) {
         return '골반 고정, 척추 한 마디씩 천천히 움직이기.';
       }
@@ -2497,7 +2544,13 @@
         }
       } catch (err) {
         if (err && err.name === 'AbortError') {
-          return { ok: false, offline: true, message: '서버 응답 시간 초과(약 ' + Math.round(timeoutMs / 1000) + '초) — code.gs 배포 후 새로고침' };
+          return {
+            ok: false,
+            offline: true,
+            message:
+              '서버 응답 시간 초과(약 ' + Math.round(timeoutMs / 1000) + '초). ' +
+              '출석·저장이 이미 반영됐을 수 있으니 새로고침 후 확인해 주세요.',
+          };
         }
         var hint = (location.protocol === 'file:')
           ? 'HTML 파일을 직접 열면 안 됩니다 — GitHub Pages 등 HTTPS 주소로 열어 주세요'
@@ -3169,16 +3222,10 @@
       const checked = isToday;
       const rowCls = methodRowProgressClass(item, hasMember);
       const badgeRow = renderMethodBadges_(item, secKey);
-      const detailTitle = String(item.videoDetailTitle || '').trim();
-      const showVidLine = !isP1ParItem(item)
-        && secKey !== 'self_tool'
-        && detailTitle
-        && detailTitle !== label;
       return '<label class="method-row' + rowCls + '">' +
         '<input type="checkbox"' + (checked ? ' checked' : '') +
         ' onchange="toggleToday(\'' + item.id + '\',this)">' +
         '<div><div class="method-label">' + escapeHtml(label) + '</div>' +
-        (showVidLine ? '<div class="method-vid">▶ ' + escapeHtml(detailTitle) + '</div>' : '') +
         '</div>' + badgeRow + '</label>';
     }
 
@@ -3194,8 +3241,7 @@
 
     function renderMethodBadges_(item, secKey) {
       const note = String(item.coachingNote || '').trim();
-      const detailTitle = String(item.videoDetailTitle || '').trim();
-      const hasNote = !!(note || (detailTitle && detailTitle !== String(item.label || '').trim()));
+      const hasNote = !!note;
       const hasUrl = !!(item.hasVideo && String(item.youtubeUrl || '').trim());
       if (!hasNote && !hasUrl) return '';
       var html = '<span class="method-badge-row">';
@@ -3810,7 +3856,7 @@
         opts.basicAttendOnly ? '출석 처리 중' : '저장+출석 처리 중',
         { basicAttendOnly: !!opts.basicAttendOnly }
       );
-      const data = await api(completeSessionPayload(m, progress, opts));
+      const data = await api(completeSessionPayload(m, progress, opts), { timeoutMs: 90000 });
       updateSendBar();
       if (!data.ok) {
         showAttendResult(m, data, opts);
