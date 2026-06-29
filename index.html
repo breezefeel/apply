@@ -1213,6 +1213,7 @@
     /** 알림톡 #{오늘진도} — Lying PAR는 자세·유형으로 통합 */
     function methodAlimtalkLabel(item) {
       if (!item) return '';
+      if (item.alimtalkLabel) return String(item.alimtalkLabel).trim();
       var prog = String(item.program || '');
       var label = String(item.label || '');
       if (P1_PAR_PROGRAMS.indexOf(prog) >= 0) {
@@ -1385,7 +1386,7 @@
 
     var PROGRAM_TABS = [
       { id: 'movement', label: 'Re:Al 움직임', sub: '5단계 프로토콜 · 기능운동' },
-      { id: 'func', label: '최진옥 원장', sub: '최진옥 원장 프로그램 (임시)' },
+      { id: 'func', label: '최진옥 원장', sub: 'Core · Trunk · Hip · Shoulder · Reformer' },
       { id: 'hongtaek', label: '최홍택 원장', sub: '코어·골반 안정화 · 기능 패턴' },
       { id: 'injun', label: '김인준 원장', sub: '런지·안티로테이션 · 케이블 코어' },
       { id: 'face', label: 'Re:Al 페이스', sub: '작은얼굴 · 안면비대칭 프로그램' },
@@ -1499,29 +1500,55 @@
       },
     ];
 
-    function buildDirectorPlaceholderCatalog(tabId, idPrefix, directorLabel) {
-      var items = [];
-      var i;
-      for (i = 1; i <= 5; i++) {
-        items.push({
-          id: idPrefix + '_prog_' + i,
-          uiSection: tabId + '_main',
-          sectionTitle: directorLabel,
-          program: directorLabel,
-          label: '임시 항목 ' + i,
-          group: directorLabel,
-          hasVideo: false,
-        });
-      }
-      return items;
+    function jinokCatalogItem(id, uiSection, sectionTitle, program, label, alimtalkLabel) {
+      return {
+        id: id,
+        uiSection: uiSection,
+        sectionTitle: sectionTitle,
+        program: program,
+        label: label,
+        alimtalkLabel: alimtalkLabel || label,
+        group: sectionTitle,
+        hasVideo: false,
+      };
     }
+
+    var JINOK_CATALOG_RAW = [
+      jinokCatalogItem('func_core_cat_camel', 'func_core', 'Core Exercise', 'Core Exercise', 'Cat camel', '고양이·낙타 자세'),
+      jinokCatalogItem('func_core_bird_dog', 'func_core', 'Core Exercise', 'Core Exercise', 'Bird-dog', '버드독(네발기기 팔다리 들기)'),
+      jinokCatalogItem('func_core_dying_bugs', 'func_core', 'Core Exercise', 'Core Exercise', 'Dying bugs', '다잉 버그'),
+      jinokCatalogItem('func_core_wall_bug', 'func_core', 'Core Exercise', 'Core Exercise', 'Wall bug', '벽 버그'),
+      jinokCatalogItem('func_core_foam_challenges', 'func_core', 'Core Exercise', 'Core Exercise', 'Foam challenges', '폼롤러 챌린지'),
+      jinokCatalogItem('func_core_front_plank', 'func_core', 'Core Exercise', 'Core Exercise', 'Front planks', '프론트 플랭크'),
+      jinokCatalogItem('func_core_front_plank_shoulder_touch', 'func_core', 'Core Exercise', 'Core Exercise', 'Front planks – 양쪽 어깨 터치', '프론트 플랭크 · 양쪽 어깨 터치'),
+      jinokCatalogItem('func_core_side_bridge', 'func_core', 'Core Exercise', 'Core Exercise', 'Side bridge', '사이드 브릿지'),
+      jinokCatalogItem('func_core_carry', 'func_core', 'Core Exercise', 'Core Exercise', 'Carry', '캐리(들고 걷기)'),
+      jinokCatalogItem('func_core_barrel_roll', 'func_core', 'Core Exercise', 'Core Exercise', 'Barrel roll', '배럴 롤'),
+      jinokCatalogItem('func_core_stir_the_pot', 'func_core', 'Core Exercise', 'Core Exercise', 'Stir the pot', '스터 더 팟'),
+      jinokCatalogItem('func_core_plank_rolls', 'func_core', 'Core Exercise', 'Core Exercise', 'Plank rolls', '플랭크 롤'),
+      jinokCatalogItem('func_core_pallof_press', 'func_core', 'Core Exercise', 'Core Exercise', 'Pallof press', '팔로프 프레스'),
+      jinokCatalogItem('func_trunk_stability_ball_leg_curl', 'func_trunk', 'Trunk Mobilization', 'Trunk Mobilization', '스태빌리티 볼 레그 컬', '스태빌리티 볼 레그 컬'),
+      jinokCatalogItem('func_trunk_t4_mob', 'func_trunk', 'Trunk Mobilization', 'Trunk Mobilization', 'T4 mobilization', '흉추(T4) 가동성'),
+      jinokCatalogItem('func_trunk_sphinx_t4', 'func_trunk', 'Trunk Mobilization', 'Trunk Mobilization', 'Sphinx-T4', '스핑크스-T4 가동'),
+      jinokCatalogItem('func_trunk_upper_back_cat', 'func_trunk', 'Trunk Mobilization', 'Trunk Mobilization', 'Upper back cat(폼롤러)', '등 상부 고양이 자세(폼롤러)'),
+      jinokCatalogItem('func_trunk_quad_thoracic_rot', 'func_trunk', 'Trunk Mobilization', 'Trunk Mobilization', '흉추가동성 – 네발기기자세 흉추회전', '네발기기 흉추 회전'),
+      jinokCatalogItem('func_hip_one_leg_dl', 'func_hip', 'Hip Exercise', 'Hip Exercise', 'One leg dead lift', '한발 데드리프트'),
+      jinokCatalogItem('func_hip_joint_mob', 'func_hip', 'Hip Exercise', 'Hip Exercise', 'Hip joint mobilization', '고관절 가동성'),
+      jinokCatalogItem('func_hip_waiters_bow', 'func_hip', 'Hip Exercise', 'Hip Exercise', "Waiter's bow", '웨이터스 보우'),
+      jinokCatalogItem('func_hip_quad_leg_raise', 'func_hip', 'Hip Exercise', 'Hip Exercise', '네발기기자세 – 다리 올리기(오버볼)', '네발기기 · 다리 올리기(오버볼)'),
+      jinokCatalogItem('func_hip_quad_side_leg_raise', 'func_hip', 'Hip Exercise', 'Hip Exercise', '네발기기자세 – 다리 사이드로 올리기', '네발기기 · 다리 옆으로 올리기'),
+      jinokCatalogItem('func_hip_box_squat', 'func_hip', 'Hip Exercise', 'Hip Exercise', 'Box squat', '박스 스쿼트'),
+      jinokCatalogItem('func_hip_monster_walk', 'func_hip', 'Hip Exercise', 'Hip Exercise', 'Monster walk', '몬스터 워크'),
+      jinokCatalogItem('func_hip_split_squat', 'func_hip', 'Hip Exercise', 'Hip Exercise', '스플릿 스쿼트', '스플릿 스쿼트'),
+      jinokCatalogItem('func_hip_lateral_squat', 'func_hip', 'Hip Exercise', 'Hip Exercise', '래터럴 스쿼트', '래터럴 스쿼트'),
+      jinokCatalogItem('func_hip_single_leg_dl', 'func_hip', 'Hip Exercise', 'Hip Exercise', '싱글 레그 데드리프트', '싱글 레그 데드리프트'),
+      jinokCatalogItem('func_hip_airplane', 'func_hip', 'Hip Exercise', 'Hip Exercise', 'Hip airplane', '힙 에어플레인'),
+      jinokCatalogItem('func_hip_clam', 'func_hip', 'Hip Exercise', 'Hip Exercise', 'Clam', '클램'),
+      jinokCatalogItem('func_hip_double_leg_bridge', 'func_hip', 'Hip Exercise', 'Hip Exercise', '더블 레그 브릿지', '더블 레그 브릿지'),
+    ];
 
     function buildFuncJinokCatalog() {
-      return buildDirectorPlaceholderCatalog('func', 'func', '최진옥 원장');
-    }
-
-    function buildHongtaekCatalog() {
-      return buildDirectorCatalogItems_(HONGTAEK_CATALOG_RAW);
+      return buildDirectorCatalogItems_(JINOK_CATALOG_RAW);
     }
 
     function buildHongtaekCatalog() {
@@ -1643,7 +1670,7 @@
 
     function catalogTabForItemId(id) {
       if (/^face_/.test(id)) return 'face';
-      if (/^func_prog_/.test(id)) return 'func';
+      if (/^func_(core|trunk|hip|shoulder|reformer)_/.test(id)) return 'func';
       if (/^hongtaek_/.test(id)) return 'hongtaek';
       if (/^injun_/.test(id)) return 'injun';
       return 'movement';
@@ -1960,7 +1987,7 @@
       });
       var blocks = entries.map(function(ent, idx) {
         var p = state.program.find(function(x) { return x.id === ent.id; });
-        var lbl = p ? methodDisplayLabel(p) : ent.label;
+        var lbl = p ? methodAlimtalkLabel(p) : ent.label;
         var url = linkSet[ent.id] && ent.youtubeUrl ? ent.youtubeUrl : '';
         return { line: (idx + 1) + ') ' + lbl, url: url };
       });
@@ -2075,7 +2102,8 @@
       if (prog === '기능 운동') {
         return '통증 없는 범위, 발·골반 정렬부터 순서대로!';
       }
-      if (/원장/.test(prog) || item.uiSection === 'func_main' ||
+      if (/원장/.test(prog) ||
+          /^func_(core|trunk|hip|shoulder|reformer)/.test(item.uiSection || '') ||
           /^hongtaek_/.test(item.uiSection || '') || /^injun_/.test(item.uiSection || '')) {
         return '통증 없는 범위, 호흡 유지하며 천천히!';
       }
