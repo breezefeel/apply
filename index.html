@@ -2560,9 +2560,77 @@
         clearTimeout(timer);
       }
     }
+    function memberPersonKey(m) {
+      var inst = m.instructorIndex != null ? m.instructorIndex : -1;
+      var suffix8 = String(m.suffix8 || '').replace(/\D/g, '').slice(-8);
+      if (suffix8.length === 8) return inst + '|' + suffix8;
+      var phone = String(m.phoneDigits || '').replace(/\D/g, '');
+      if (phone.length >= 10) return inst + '|p:' + phone;
+      var name = String(m.name || '').replace(/\s+/g, ' ').trim();
+      return inst + '|n:' + name;
+    }
     function memberKey(m) {
       var name = String(m.name || '').replace(/\s+/g, ' ').trim();
-      return (m.suffix8 || ('n:' + name)) + '|' + name + '|' + (m.time || '') + '|' + (m.instructorIndex != null ? m.instructorIndex : '');
+      return (m.suffix8 || ('n:' + name)) + '|' + (m.instructorIndex != null ? m.instructorIndex : '');
+    }
+    function mergeTodayMemberSlotFields_(base, add) {
+      if (add.time && base._times.indexOf(add.time) === -1) base._times.push(add.time);
+      if (add.time && add.scheduleSession) {
+        if (!base._slotSessions) base._slotSessions = {};
+        base._slotSessions[add.time] = add.scheduleSession;
+      }
+      if ((add.todayAttendCount || 0) > (base.todayAttendCount || 0)) {
+        base.todayAttendCount = add.todayAttendCount;
+      }
+      base.attendedToday = !!base.attendedToday || !!add.attendedToday;
+      base.usesDualSlot = !!base.usesDualSlot || !!add.usesDualSlot;
+    }
+    function finalizeMergedTodayMember_(item) {
+      item._times.sort(function (a, b) { return parseTime(a) - parseTime(b); });
+      item.time = item._times.join(', ');
+      if (item._times.length > 1 && item._slotSessions) {
+        var sessions = item._times.map(function (t) { return item._slotSessions[t] || ''; });
+        item.scheduleSession = sessions.filter(Boolean).join('\n');
+        var anyAttend = false;
+        var allResolved = true;
+        var allAbsent = true;
+        item._times.forEach(function (t) {
+          var s = item._slotSessions[t] || '';
+          if (scheduleSessionShowsAttendanceClient(s)) anyAttend = true;
+          if (!scheduleSessionShowsAttendanceClient(s) && !isScheduleSessionAbsentClient(s)) allResolved = false;
+          if (!isScheduleSessionAbsentClient(s)) allAbsent = false;
+        });
+        item.scheduleResolvedToday = allResolved;
+        item.absentToday = allAbsent && !anyAttend;
+        item.sessionCompleted =
+          allResolved || (item.usesDualSlot ? (item.todayAttendCount || 0) >= 2 : anyAttend);
+      }
+      delete item._times;
+      delete item._slotSessions;
+    }
+    function mergeTodayMembersByPerson_(members) {
+      var map = {};
+      var order = [];
+      (members || []).forEach(function (m) {
+        var key = memberPersonKey(m);
+        if (!map[key]) {
+          var copy = Object.assign({}, m);
+          copy._times = m.time ? [m.time] : [];
+          if (m.time && m.scheduleSession) {
+            copy._slotSessions = {};
+            copy._slotSessions[m.time] = m.scheduleSession;
+          }
+          map[key] = copy;
+          order.push(key);
+          return;
+        }
+        mergeTodayMemberSlotFields_(map[key], m);
+      });
+      return order.map(function (key) {
+        var item = map[key];
+        finalizeMergedTodayMember_(item);
+        return item;
+      });
     }
     function todayAttendCredits(m) {
       if (!m) return 0;
@@ -2600,6 +2668,8 @@
 
     function isMemberCompleted(m) {
       if (state.completedKeys[memberKey(m)]) return true;
+      if (m && m.sessionCompleted) return true;
+      if (m && m.scheduleResolvedToday) return !isMemberAbsent(m);
       return scheduleSessionShowsAttendanceClient(m && m.scheduleSession);
     }
 
@@ -2747,7 +2817,8 @@
       return m ? parseInt(m[1],10)*60+parseInt(m[2],10) : 9999;
     }
     function todayMembers() {
-      return (state.board && state.board.members) ? state.board.members.slice() : [];
+      var raw = (state.board && state.board.members) ? state.board.members.slice() : [];
+      return mergeTodayMembersByPerson_(raw);
     }
     function mergedProgressMap() {
       const out = {};
