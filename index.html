@@ -2884,7 +2884,11 @@
         });
         const text = await res.text();
         try {
-          return JSON.parse(text);
+          var data = JSON.parse(text);
+          if (data && data.result === 'error' && data.ok !== true) {
+            data.ok = false;
+          }
+          return data;
         } catch (parseErr) {
           return { ok: false, message: '서버 응답 형식 오류 — Apps Script 배포·URL 확인' };
         }
@@ -3215,8 +3219,11 @@
 
     async function loadBoard(opts) {
       opts = opts || {};
+      if (_boardSyncInFlight) {
+        if (!opts.silent) toast('이미 불러오는 중입니다…');
+        return;
+      }
       if (!opts.silent) startMemberLoadCountdown();
-      if (_boardSyncInFlight) return;
       _boardSyncInFlight = true;
       try {
         const data = await api({ action: 'instructorDayBoard' }, { timeoutMs: 75000 });
