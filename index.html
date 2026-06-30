@@ -2876,10 +2876,11 @@
       var controller = new AbortController();
       var timer = setTimeout(function() { controller.abort(); }, timeoutMs);
       try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(Object.assign({ pin: state.pin }, payload)),
+        // Apps Script /exec 는 POST 시 302 → GET 으로 바뀌며 doGet(unknown action) 이 됨 → GET ?data= 사용
+        var body = JSON.stringify(Object.assign({ pin: state.pin }, payload));
+        var url = API_URL + (API_URL.indexOf('?') >= 0 ? '&' : '?') + 'data=' + encodeURIComponent(body);
+        const res = await fetch(url, {
+          method: 'GET',
           signal: controller.signal,
         });
         const text = await res.text();
