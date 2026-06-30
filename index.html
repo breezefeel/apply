@@ -4488,13 +4488,6 @@
       showAttendResult(m, data, resultOpts);
       _pendingAttendAlimtalk = null;
     }
-      var m = state.selected;
-      if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
-      var panel = document.getElementById('sessionWrapPanel');
-      if (panel) {
-        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
 
     async function quickAttendSession() {
       await attendBasicSession();
