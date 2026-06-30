@@ -1067,7 +1067,7 @@
         <select id="sessionCoachMemoPreset" class="session-coach-memo-preset" onchange="applyCoachMemoPreset()" aria-label="추천 키포인트 선택">
           <option value="">추천 문구 선택…</option>
         </select>
-        <textarea id="sessionCoachMemo" rows="2" maxlength="80" placeholder="직접 작성하거나 위에서 추천 문구를 선택하세요." onfocus="onSessionCoachMemoFocus()" onblur="onSessionCoachMemoBlur()" oninput="onSessionCoachMemoInput()"></textarea>
+        <textarea id="sessionCoachMemo" rows="2" maxlength="80" placeholder="오늘 체크한 진도에 맞는 추천 문구가 자동 입력됩니다. 드롭다운에서 10개 중 선택할 수도 있습니다." onfocus="onSessionCoachMemoFocus()" onblur="onSessionCoachMemoBlur()" oninput="onSessionCoachMemoInput()"></textarea>
         <div class="memo-counter"><span id="sessionMemoCount">0</span>/80</div>
       </div>
       <div class="alimtalk-preview" id="sessionAlimtalkSection">
@@ -2123,58 +2123,437 @@
     const DEFAULT_SESSION_COACH_MEMO = '편하게 호흡하며, 불필요한 긴장하지 말기!';
     var COACH_MEMO_TAB_ORDER = { movement: 0, func: 1, hongtaek: 2, injun: 3, face: 4 };
 
-    /** 프로그램 탭별 추천 키포인트 (각 5개) */
-    var COACH_MEMO_PRESETS = {
-      movement: [
-        '편하게 호흡하며, 불필요한 긴장하지 말기!',
-        '발끝·손끝부터 순서대로 힘 주고, 등·목은 힘 빼세요.',
-        '늘리는 쪽만 움직이고, 나머지는 힘 빼고 유지!',
+    function coachMemoPresetList() {
+      return Array.prototype.slice.call(arguments, 0, 10);
+    }
+
+    /** 진도(항목·단계)별 추천 키포인트 — 각 10개, [0]번이 자동 기본값 */
+    var COACH_MEMO_PRESETS_BY_CONTEXT = {
+      passive: coachMemoPresetList(
+        '편하게 호흡하며, 몸에 힘 빼고 이완하세요.',
+        '늘리는 쪽만 길게, 반대쪽은 힘 빼고 유지!',
+        '통증 없는 범위에서 20~30초, 호흡 멈추지 않기.',
+        '어깨·턱 올라가지 않게, 목 긴장 풀기.',
+        '천천히 들이마시며 이완, 내쉴 때 조금 더 깊게.',
+        '저항 느껴지면 범위 줄이고, 통증 유발 금지.',
+        '골반·어깨 바닥에 고정, 몸통 흔들림 최소화.',
+        '양쪽 균형 맞춰 같은 시간·같은 느낌으로.',
+        '시선·턱 힘 빼고, 편안한 표정 유지.',
+        '끝난 뒤 한 번 더 호흡하며 몸 풀어주기.'
+      ),
+      assisted_active: coachMemoPresetList(
         '끝까지 밀지 말고, 통증 없는 범위에서 천천히!',
+        '보조 받는 쪽만 움직이고, 나머지는 고정!',
+        '호흡 내쉴 때 조금 더 깊게, 무리한 저항 금지.',
+        '관절 끝감 직전에서 멈추고 천천히 복귀.',
+        '어깨 들리지 않게, 견갑 안정 유지.',
+        '좌·우 같은 범위·같은 속도로 반복.',
+        '통증 나면 범위 줄이고, 힘은 5~6할만.',
+        '움직이는 방향으로 호흡 이어가기.',
+        '끝 지점에서 1~2초 멈춤 후 복귀.',
+        '다음 반복 전 호흡 한 번 정리.'
+      ),
+      resistive: coachMemoPresetList(
+        '발끝·손끝부터 순서대로 힘 주고, 등·목은 힘 빼세요.',
+        '천천히 밀었다 당기기, 관절 정렬부터!',
+        '호흡 밖으로 힘 주고, 안으로 이완.',
+        '통증 없는 범위, 5~6할 강도 유지.',
+        '어깨·골반 흔들리지 않게 코어 조이기.',
+        '원위에서 먼저 정렬, 그다음 힘 주기.',
+        '좌·우 균형, 한쪽만 과하게 쓰지 않기.',
+        '끝까지 밀지 말고, 중간 범위에서 컨트롤.',
+        '손·발 위치 고정, 관절만 움직이기.',
+        '세트 사이 호흡으로 긴장 풀기.'
+      ),
+      resistive_advanced: coachMemoPresetList(
+        '원위→원심 순으로 힘 주고, 흔들림 없이 컨트롤!',
+        '고관절·견갑 먼저 고정, 그다음 팔·다리.',
+        '통증 없는 범위, 속도는 천천히.',
+        '호흡 끊기지 않게, 복부 살짝 조이기.',
+        '대각선·회전 시 골반 흔들림 주의.',
+        '좌·우 교대, 같은 느낌으로 반복.',
+        '끝 지점에서 1초 멈춤 후 복귀.',
+        '과한 중량·저항 느껴지면 범위 줄이기.',
+        '목·허리 꺾이지 않게 중립 유지.',
+        '마지막 반복은 강도 낮춰 마무리.'
+      ),
+      active_stretching: coachMemoPresetList(
+        '늘리는 쪽만 움직이고, 나머지는 힘 빼고 유지!',
+        '통증 없는 범위, 천천히 3~5회 호흡 유지.',
+        '골반·어깨 고정, 척추 중립 유지.',
+        '늘어나는 쪽으로 호흡 길게.',
+        '좌·우 같은 시간, 같은 깊이로.',
+        '끝까지 밀지 말고, 편안한 긴장만.',
+        '어깨·턱 힘 빼고, 시선 정면.',
+        '반대쪽 다리·팔은 바닥에 고정.',
+        '통증 나면 범위 줄이고 다시 시도.',
+        '끝난 뒤 가볍게 흔들어 이완.'
+      ),
+      breathing_habit: coachMemoPresetList(
         '코 호흡, 어깨·턱 힘 빼고 바른 자세 유지!',
-      ],
-      func: [
+        '배·옆구리로 숨 들이마시고, 길게 내쉬기.',
+        '어깨 들리지 않게, 목 길게.',
+        '앉거나 누운 자세에서 골반 중립.',
+        '호흡할 때마다 옆구리 확장 느끼기.',
+        '긴장 부위 의식하며 내쉴 때 풀기.',
+        '입보다 코로 천천히 들이마시기.',
+        '일상 자세에서도 턱 당기고 어깨 내리기.',
+        '호흡 4초 들이마시고 6초 내쉬기.',
+        '어깨·목 돌리기 전 호흡 한 번 정리.'
+      ),
+      superman: coachMemoPresetList(
+        '경추→흉→요추 순으로, 통증 나면 범위 줄이기.',
+        '목 길게 뽑고, 시선 바닥 쪽.',
+        '팔·다리 들 때 허리 꺾지 않기.',
+        '골반 바닥에 고정, 복부 살짝 조이기.',
+        '천천히 들었다 내리기, 호흡 유지.',
+        '어깨 귀에 붙지 않게 견갑 하강.',
+        '좌·우 대칭, 한쪽만 높이 들지 않기.',
+        '끝에서 1~2초 유지 후 복귀.',
+        '통증 있으면 팔만·다리만 분리 연습.',
+        '세트 사이 복부 이완 호흡.'
+      ),
+      situp: coachMemoPresetList(
+        '복부 중심, 목 힘 빼고 통증 없는 범위만!',
+        '턱 당기고, 목 앞근 힘 빼기.',
+        '척추 한 마디씩 말아 올리기.',
+        '올라올 때 내쉬고, 내려갈 때 들이마시기.',
+        '허리 바닥에서 뜨지 않게 골반 고정.',
+        '범위 줄여도 좋으니 허리 통증 금지.',
+        '손은 가볍게, 목 잡아당기지 않기.',
+        '천천히 올렸다 내리기, 속도보다 정확도.',
+        '옆구리까지 느끼며 복부 수축.',
+        '마지막은 반만 올려 마무리.'
+      ),
+      pushup: coachMemoPresetList(
+        '몸통→가슴→팔 순 웨이브, 허리 꺾지 않기.',
+        '손바닥으로 바닥 밀기, 견갑 안정.',
+        '어깨·골반·발목 일직선 유지.',
+        '가슴이 바닥에 닿기 전 멈추고 복귀.',
+        '목 길게, 시선 약간 앞쪽.',
+        '복부·둔근 조여 허리 보호.',
+        '통증 나면 무릎 지지로 범위 조절.',
+        '호흡: 내려갈 때 들이마시고 올라올 때 내쉬기.',
+        '좌·우 균형, 한쪽 손만 힘 주지 않기.',
+        '마지막 2회는 범위 줄여 마무리.'
+      ),
+      plank: coachMemoPresetList(
+        '어깨·골반·발목 일직선, 복부 조이고 허리 꺾지 않기.',
+        '팔꿈치 어깨 아래, 견갑 서로 멀리.',
+        '엉덩이 너무 올리거나 처지지 않게.',
+        '호흡 유지, 어깨 귀 쪽으로 올라가지 않게.',
+        '발끝·무릎 힘 빼고 복부·둔근으로 버티기.',
+        '시선 바닥, 목 길게.',
+        '흔들리면 범위 줄이거나 무릎 대고.',
+        '30초 단위로 자세 점검.',
+        '옆구리까지 조여 코어 전체 사용.',
+        '끝난 뒤 고양이·낙타로 허리 풀기.'
+      ),
+      side_plank: coachMemoPresetList(
+        '골반 들어 올리고 측면 일직선 유지, 천천히 좌·우 교대.',
+        '아래 팔꿈치 어깨 아래, 몸통 정면 유지.',
+        '골반 앞뒤로 굴러가지 않게.',
+        '위쪽 어깨 내리고, 목 길게.',
+        '호흡 끊기지 않게, 복부·옆구리 조이기.',
+        '무릎 지지로 시작해도 좋음.',
+        '좌·우 같은 시간 유지.',
+        '발·무릎 정렬, 앞뒤로 흔들리지 않게.',
+        '통증 나면 시간 줄이기.',
+        '양쪽 끝난 뒤 옆구리 스트레칭.'
+      ),
+      segmental: coachMemoPresetList(
+        '골반 고정, 척추 한 마디씩 천천히 움직이기.',
+        '움직이는 구간만 집중, 나머지 고정.',
+        '호흡과 맞춰 작은 범위 반복.',
+        '통증 구간 피하고 가능한 마디부터.',
+        '목·흉·요추 순서 의식하기.',
+        '과한 꺾임 없이 중립 유지.',
+        '좌·우 대칭으로 같은 개수.',
+        '거울·촉각으로 움직임 확인.',
+        '빠르게 하지 말고 정확도 우선.',
+        '끝난 뒤 전체 호흡으로 이완.'
+      ),
+      squat: coachMemoPresetList(
+        '발바닥 전체로 받치고, 무릎·골반 정렬 유지!',
+        '무릎이 발끝 안쪽으로 모이지 않게.',
+        '엉덩이 뒤로 빼며 체중 중심 발 중앙.',
+        '가슴 살짝 열고, 복부 조이기.',
+        '통증 없는 깊이까지만, 허리 중립.',
+        '올라올 때 발바닥으로 바닥 밀기.',
+        '호흡: 내려갈 때 들이마시고 올라올 때 내쉬기.',
+        '무릎·발목 정렬 한 줄로.',
+        '좌·우 균형, 한쪽만 과부하 금지.',
+        '마지막 2회는 높이 줄여 마무리.'
+      ),
+      balance: coachMemoPresetList(
+        '시선 고정, 발바닥 중심 잡고 천천히 유지!',
+        '발가락·발바닥 전체로 바닥 느끼기.',
+        '골반·어깨 수평, 몸통 흔들림 최소화.',
+        '팔은 가볍게 벌려 균형 잡기.',
+        '호흡 끊기지 않게, 어깨 내리기.',
+        '흔들리면 범위·시간 줄이기.',
+        '좌·우 발 번갈아 같은 시간.',
+        '시선 한 점 고정, 주변 보지 않기.',
+        '복부 살짝 조여 중심 잡기.',
+        '끝난 뒤 발목·종아리 가볍게 풀기.'
+      ),
+      self_tool: coachMemoPresetList(
+        '호흡하며 가볍게, 통증 부위만 짧게 반복.',
+        '뼈가 아닌 근육 위에 볼 위치.',
+        '통증 0~3 정도, 깊은 압보다 넓게.',
+        '20~30초 유지 후 옆 구역으로 이동.',
+        '어깨·턱 힘 빼고 이완 호흡.',
+        '좌·우 같은 시간·같은 압력.',
+        '욱씬거림 있으면 압 줄이기.',
+        '움직임은 천천히, 호흡 멈추지 않기.',
+        '시트·의자 등 지지대 활용해 편하게.',
+        '끝난 뒤 가볍게 스트레칭.'
+      ),
+      func_movement: coachMemoPresetList(
+        '통증 없는 범위, 발·골반 정렬부터 순서대로!',
+        '발바닥·지지점 고정 후 움직이기.',
+        '호흡 유지, 어깨·목 긴장 풀기.',
+        '좌·우 같은 패턴·같은 횟수.',
+        '속도보다 정확한 자세 우선.',
+        '골반·어깨 수평 유지.',
+        '통증 나면 범위·강도 줄이기.',
+        '끝까지 밀지 말고 컨트롤.',
+        '세트 사이 1~2회 호흡 정리.',
+        '마지막은 강도 낮춰 마무리.'
+      ),
+      func_tab: coachMemoPresetList(
         '통증 없는 범위, 호흡 유지하며 천천히!',
         '복부 중심, 목·허리 힘 빼고 컨트롤!',
         '골반·어깨 정렬 유지, 흔들림 없이!',
         '원위→원심 순으로 힘 주고, 관절 정렬부터!',
         '통증 나면 범위 줄이고, 호흡은 계속!',
-      ],
-      hongtaek: [
+        '좌·우 균형, 같은 느낌으로 반복.',
+        '지지점(손·발) 먼저 고정 후 움직임.',
+        '5~6할 강도, 끝까지 밀지 않기.',
+        '세트 사이 호흡으로 긴장 풀기.',
+        '마지막 반복은 범위 줄여 마무리.'
+      ),
+      hongtaek_tab: coachMemoPresetList(
         '골반·복부 먼저 잡고, 천천히 패턴 연습!',
         '발바닥 전체로 받치고, 무릎·골반 정렬!',
         '호흡에 맞춰 움직이고, 어깨는 내려놓기!',
         '통증 없는 범위, 좌·우 균형 맞추기!',
         '끝까지 밀지 말고, 중심 잡고 컨트롤!',
-      ],
-      injun: [
+        '무게 중심 발 중앙, 흔들림 최소화.',
+        '회전·이동 시 골반·어깨 따로 움직이지 않기.',
+        '통증 나면 범위·속도 줄이기.',
+        '패턴 익숙해질 때까지 천천히 반복.',
+        '마지막은 강도 낮춰 호흡 정리.'
+      ),
+      injun_tab: coachMemoPresetList(
         '코어 조이고, 허리·목 힘 빼세요!',
         '런지·스쿼트 — 무릎·골반 같은 방향!',
         '케이블 당길 때 견갑 고정, 어깨 올리지 않기!',
         '통증 없는 범위, 천천히 좌·우 교대!',
         '호흡 유지, 몸통 흔들림 최소화!',
-      ],
-      face: [
+        '저항에 끌려가지 않고 코어로 버티기.',
+        '발바닥으로 바닥 밀며 지지.',
+        '회전 시 골반·흉추 함께, 요추만 꺾지 않기.',
+        '5~6할 강도, 관절 정렬 우선.',
+        '세트 끝 호흡으로 이완.'
+      ),
+      face_manual: coachMemoPresetList(
         '가볍게, 통증·붓기 없는 범위에서!',
+        '압은 천천히, 호흡 편하게.',
+        '좌·우 같은 시간·같은 압력.',
+        '턱·어깨 힘 빼고 이완.',
+        '욱씬거림 있으면 압 줄이기.',
+        '시선·목 긴장 풀기.',
+        '끝난 뒤 가볍게 턱·목 스트레칭.',
+        '붓기 느껴지면 범위·시간 줄이기.',
+        '거울 보며 좌·우 균형 확인.',
+        '과한 압력·빠른 동작은 피하기.'
+      ),
+      face_self: coachMemoPresetList(
+        '거울 보며 가볍게, 과한 압력은 피하기!',
+        '좌·우 같은 횟수·같은 느낌.',
+        '턱·어깨 내리고, 호흡 편하게.',
+        '통증·붓기 없는 범위만.',
+        '천천히 반복, 급하게 하지 않기.',
+        '목·어깨 긴장 풀고 시작.',
+        '손끝보다 손바닥 전체로 부드럽게.',
+        '하루 목표 횟수 지키되 무리 금지.',
+        '끝난 뒤 목·어깨 가볍게 돌리기.',
+        '편안한 표정 유지.'
+      ),
+      face_exercise: coachMemoPresetList(
         '턱·어깨 힘 빼고, 천천히 반복!',
-        '거울 보며 좌·우 균형 확인!',
-        '과한 압력·빠른 동작은 피하기!',
-        '호흡 편하게, 얼굴·목 긴장 풀기!',
-      ],
+        '좌·우 균형, 같은 범위로.',
+        '호흡 멈추지 않고, 얼굴·목 이완.',
+        '통증·어지러움 있으면 중단.',
+        '거울로 과한 표정·긴장 확인.',
+        '작은 범위부터 정확도 우선.',
+        '목을 꺾지 않고 정면 유지.',
+        '세트 사이 턱·목 스트레칭.',
+        '빠른 반복보다 천천히 컨트롤.',
+        '마지막은 가볍게 마무리.'
+      ),
+      default: coachMemoPresetList(
+        '편하게 호흡하며, 불필요한 긴장하지 말기!',
+        '통증 없는 범위, 천천히 정확하게!',
+        '어깨·턱 힘 빼고, 골반·발 정렬 유지!',
+        '호흡 끊기지 않게, 복부 살짝 조이기!',
+        '좌·우 균형, 같은 느낌으로 반복!',
+        '끝까지 밀지 말고 컨트롤!',
+        '지지점 고정 후 움직이기!',
+        '통증 나면 범위·강도 줄이기!',
+        '세트 사이 호흡으로 이완!',
+        '마지막은 강도 낮춰 마무리!'
+      ),
+      stage_1: coachMemoPresetList(
+        '호흡하며 가볍게, 통증 부위만 짧게 반복.',
+        '소도구는 근육 위에, 뼈 피하기.',
+        '통증 0~3, 깊은 압보다 넓게.',
+        '어깨·턱 힘 빼고 이완 호흡.',
+        '좌·우 같은 시간으로.',
+        '욱씬거림 있으면 압·시간 줄이기.',
+        '일상에서도 자세·호흡 의식하기.',
+        '끝난 뒤 가볍게 움직여 이완.',
+        '편안한 범위 우선, 무리 금지.',
+        '오늘은 회복·이완에 집중!'
+      ),
+      stage_2: coachMemoPresetList(
+        '편하게 호흡하며, 몸에 힘 빼고 이완하세요.',
+        '누운 자세에서 골반·어깨 바닥 고정.',
+        '통증 없는 범위, 천천히 반복.',
+        '늘리는 쪽만 움직이고 나머지 고정.',
+        '복부 중심, 허리 꺾이지 않게.',
+        '좌·우 같은 횟수·같은 느낌.',
+        '목 힘 빼고, 턱 살짝 당기기.',
+        'Passive→Active 순서 의식하기.',
+        '끝까지 밀지 말고 컨트롤.',
+        '세트 사이 호흡 정리.'
+      ),
+      stage_3: coachMemoPresetList(
+        '앉은 자세에서 골반·어깨 수평 유지!',
+        '코 호흡, 어깨·턱 힘 빼기.',
+        '늘리는 쪽만 움직이고 나머지 고정!',
+        '척추 중립, 과한 굽힘·신전 주의.',
+        '통증 없는 범위, 천천히!',
+        '좌·우 균형 맞추기.',
+        '발·좌골 지지 느끼며 안정.',
+        '호흡에 맞춰 움직임 이어가기.',
+        '분절 운동은 한 마디씩 천천히.',
+        '마지막은 범위 줄여 마무리.'
+      ),
+      stage_4: coachMemoPresetList(
+        '발바닥 전체로 받치고, 무릎·골반 정렬!',
+        '시선 고정, 몸통 흔들림 최소화.',
+        '서서 할 때 어깨·골반·발목 일직선.',
+        '호흡 유지, 복부·둔근 조이기.',
+        '스쿼트·밸런스는 통증 없는 깊이만.',
+        '좌·우 같은 시간·같은 횟수.',
+        '흔들리면 범위·시간 줄이기.',
+        '무릎이 발끝 안쪽으로 모이지 않게.',
+        '올라올 때 발바닥으로 바닥 밀기.',
+        '끝난 뒤 종아리·발목 풀기.'
+      ),
+      stage_5: coachMemoPresetList(
+        '통증 없는 범위, 호흡 유지하며 천천히!',
+        '코어 조이고, 허리·목 힘 빼기!',
+        '골반·어깨 정렬, 흔들림 없이!',
+        '원위→원심 순으로 힘 주기!',
+        '5~6할 강도, 관절 정렬 우선!',
+        '좌·우 교대, 같은 패턴으로!',
+        '발·손 지지점 고정 후 움직임!',
+        '통증 나면 범위·속도 줄이기!',
+        '세트 사이 호흡으로 이완!',
+        '마지막은 강도 낮춰 마무리!'
+      ),
     };
 
-    function coachMemoPresetsForActiveTab() {
+    function coachMemoContextKeyForItem(item) {
+      if (!item) return 'default';
+      var prog = String(item.program || '');
+      var sec = String(item.uiSection || '');
+      var id = String(item.id || '');
+      if (prog === 'Passive Stretching') return 'passive';
+      if (prog === 'Assisted Active') return 'assisted_active';
+      if (prog === 'Resistive') return 'resistive';
+      if (prog === 'Resistive — Advanced') return 'resistive_advanced';
+      if (isActiveStretchingProgram(prog)) return 'active_stretching';
+      if (prog.indexOf('호흡') >= 0 || prog === '생활습관') return 'breathing_habit';
+      if (prog.indexOf('Superman') >= 0) return 'superman';
+      if (prog.indexOf('Sit-up') >= 0) return 'situp';
+      if (prog === 'Push-up 6단계') return 'pushup';
+      if (prog === 'Plank 6단계') return 'plank';
+      if (prog === 'Side Plank 6단계') return 'side_plank';
+      if (prog.indexOf('분절 운동') >= 0) return 'segmental';
+      if (prog.indexOf('스쿼트') >= 0) return 'squat';
+      if (prog.indexOf('밸런스') >= 0) return 'balance';
+      if (prog.indexOf('마사지볼') >= 0 || sec === 'self_tool') return 'self_tool';
+      if (prog === '기능 운동') return 'func_movement';
+      if (/^hongtaek_/.test(id) || /^hongtaek_/.test(sec)) return 'hongtaek_tab';
+      if (/^injun_/.test(id) || /^injun_/.test(sec)) return 'injun_tab';
+      if (/^func_/.test(id) || /^func_/.test(sec)) return 'func_tab';
+      if (/^face_/.test(id) || sec.indexOf('face_') === 0) {
+        if (sec === 'face_self' || /self/.test(id)) return 'face_self';
+        if (sec === 'face_exercise' || /exercise/.test(id)) return 'face_exercise';
+        return 'face_manual';
+      }
+      return 'default';
+    }
+
+    function coachMemoContextLabelForItem(item) {
+      if (!item) return '기본';
+      var prog = String(item.program || '').trim();
+      var lbl = String(item.label || '').trim();
+      if (prog && lbl) return prog + ' · ' + lbl;
+      if (prog) return prog;
+      if (lbl) return lbl;
+      return 'Movement';
+    }
+
+    function coachMemoContextForCurrentProgress() {
+      var item = bottomMostTodayProgressItem();
+      if (item) {
+        return {
+          key: coachMemoContextKeyForItem(item),
+          label: coachMemoContextLabelForItem(item),
+        };
+      }
       var tab = state.activeProgramTab || 'movement';
-      return COACH_MEMO_PRESETS[tab] || COACH_MEMO_PRESETS.movement;
+      if (tab === 'face') return { key: 'face_manual', label: '작은얼굴' };
+      if (tab === 'func') return { key: 'func_tab', label: '최진옥 · 기능' };
+      if (tab === 'hongtaek') return { key: 'hongtaek_tab', label: '최홍택' };
+      if (tab === 'injun') return { key: 'injun_tab', label: '김인준' };
+      var summary = computeProgramStageSummary();
+      var st = PROGRAM_STAGES.find(function(s) { return s.num === summary.currentStageNum; }) || PROGRAM_STAGES[0];
+      return {
+        key: 'stage_' + st.num,
+        label: st.num + '/5단계 · ' + (st.titleKo || st.title),
+      };
+    }
+
+    function coachMemoPresetsForContext(ctxKey) {
+      var list = COACH_MEMO_PRESETS_BY_CONTEXT[ctxKey] || COACH_MEMO_PRESETS_BY_CONTEXT.default;
+      return list.slice(0, 10);
+    }
+
+    function coachMemoPresetsForCurrentProgress() {
+      var ctx = coachMemoContextForCurrentProgress();
+      return {
+        ctx: ctx,
+        presets: coachMemoPresetsForContext(ctx.key),
+      };
     }
 
     function renderCoachMemoPresetSelect() {
       var sel = document.getElementById('sessionCoachMemoPreset');
       if (!sel) return;
-      var presets = coachMemoPresetsForActiveTab();
-      sel.innerHTML = '<option value="">추천 문구 선택…</option>' +
+      var pack = coachMemoPresetsForCurrentProgress();
+      var ctx = pack.ctx;
+      var presets = pack.presets;
+      sel.innerHTML = '<option value="">' + escapeHtml('추천 문구 — ' + ctx.label + ' (10개)') + '</option>' +
         presets.map(function (text, i) {
-          var preview = text.length > 46 ? text.slice(0, 43) + '…' : text;
-          return '<option value="' + i + '">' + escapeHtml(preview) + '</option>';
+          var prefix = i === 0 ? '★ ' : (i + 1) + '. ';
+          var preview = text.length > 42 ? text.slice(0, 39) + '…' : text;
+          return '<option value="' + i + '">' + escapeHtml(prefix + preview) + '</option>';
         }).join('');
       sel.value = '';
     }
@@ -2183,10 +2562,12 @@
       var sel = document.getElementById('sessionCoachMemoPreset');
       var memoEl = document.getElementById('sessionCoachMemo');
       if (!sel || !memoEl || sel.value === '') return;
-      var presets = coachMemoPresetsForActiveTab();
+      var presets = coachMemoPresetsForCurrentProgress().presets;
       var idx = parseInt(sel.value, 10);
       if (isNaN(idx) || !presets[idx]) return;
+      var ctx = coachMemoContextForCurrentProgress();
       memoEl.value = presets[idx].slice(0, 80);
+      memoEl.dataset.coachMemoContext = ctx.key;
       delete memoEl.dataset.usingDefault;
       memoEl.dataset.touched = '1';
       document.getElementById('sessionMemoCount').textContent = String(memoEl.value.length);
@@ -2249,86 +2630,29 @@
     }
 
     function coachMemoForCatalogItem(item) {
-      if (!item) return DEFAULT_SESSION_COACH_MEMO;
-      var prog = String(item.program || '');
-      if (prog === 'Passive Stretching') {
-        return '편하게 호흡하며, 몸에 힘 빼고 이완하세요.';
-      }
-      if (prog === 'Assisted Active') {
-        return '끝까지 밀지 말고, 통증 없는 범위에서 천천히!';
-      }
-      if (prog === 'Resistive') {
-        return '발끝·손끝부터 순서대로 힘 주고, 등·목은 힘 빼세요.';
-      }
-      if (prog === 'Resistive — Advanced') {
-        return '원위→원심 순으로 힘 주고, 흔들림 없이 컨트롤!';
-      }
-      if (isActiveStretchingProgram(prog)) {
-        return '늘리는 쪽만 움직이고, 나머지는 힘 빼고 유지!';
-      }
-      if (prog.indexOf('호흡') >= 0 || prog === '생활습관') {
-        return '코 호흡, 어깨·턱 힘 빼고 바른 자세 유지!';
-      }
-      if (prog.indexOf('Superman') >= 0) {
-        return '경추→흉→요추 순으로, 통증 나면 범위 줄이기.';
-      }
-      if (prog.indexOf('Sit-up') >= 0) {
-        return '복부 중심, 목 힘 빼고 통증 없는 범위만!';
-      }
-      if (prog === 'Push-up 6단계') {
-        return '몸통→가슴→팔 순 웨이브, 허리 꺾지 않기.';
-      }
-      if (prog === 'Plank 6단계') {
-        return '어깨·골반 일직선, 복부 조이고 허리 꺾지 않기.';
-      }
-      if (prog === 'Side Plank 6단계') {
-        return '골반 들어 올리고 측면 일직선 유지, 천천히 좌·우 교대.';
-      }
-      if (prog.indexOf('분절 운동') >= 0) {
-        return '골반 고정, 척추 한 마디씩 천천히 움직이기.';
-      }
-      if (prog.indexOf('스쿼트') >= 0) {
-        return '발바닥 전체로 받치고, 무릎·골반 정렬 유지!';
-      }
-      if (prog.indexOf('밸런스') >= 0) {
-        return '시선 고정, 발바닥 중심 잡고 천천히 유지!';
-      }
-      if (prog.indexOf('마사지볼') >= 0 || item.uiSection === 'self_tool') {
-        return '호흡하며 가볍게, 통증 부위만 짧게 반복.';
-      }
-      if (prog === '기능 운동') {
-        return '통증 없는 범위, 발·골반 정렬부터 순서대로!';
-      }
-      if (/원장/.test(prog) ||
-          /^func_(core|trunk|hip|shoulder|reformer)/.test(item.uiSection || '') ||
-          /^hongtaek_/.test(item.uiSection || '') || /^injun_/.test(item.uiSection || '')) {
-        return '통증 없는 범위, 호흡 유지하며 천천히!';
-      }
-      if (item.uiSection === 'face_manual') {
-        return '가볍게, 통증·붓기 없는 범위에서!';
-      }
-      if (item.uiSection === 'face_self') {
-        return '거울 보며 가볍게, 과한 압력은 피하기!';
-      }
-      if (item.uiSection === 'face_exercise') {
-        return '턱·어깨 힘 빼고, 천천히 반복!';
-      }
-      return DEFAULT_SESSION_COACH_MEMO;
+      var key = coachMemoContextKeyForItem(item);
+      var presets = coachMemoPresetsForContext(key);
+      return presets[0] || DEFAULT_SESSION_COACH_MEMO;
     }
 
     function computeDefaultCoachMemo() {
-      var item = bottomMostTodayProgressItem();
-      return coachMemoForCatalogItem(item).slice(0, 80);
+      return coachMemoPresetsForCurrentProgress().presets[0].slice(0, 80);
     }
 
     function applyDefaultCoachMemoIfNeeded() {
       var memoEl = document.getElementById('sessionCoachMemo');
       if (!memoEl) return;
       if (memoEl.dataset.touched === '1') return;
+      var ctx = coachMemoContextForCurrentProgress();
+      var next = coachMemoPresetsForContext(ctx.key)[0].slice(0, 80);
       var raw = String(memoEl.value || '').trim();
-      if (memoEl.dataset.usingDefault !== '1' && raw) return;
-      memoEl.value = computeDefaultCoachMemo();
-      memoEl.dataset.usingDefault = '1';
+      var contextChanged = memoEl.dataset.coachMemoContext !== ctx.key;
+      if (memoEl.dataset.usingDefault === '1' || !raw || contextChanged) {
+        memoEl.value = next;
+        memoEl.dataset.usingDefault = '1';
+        memoEl.dataset.coachMemoContext = ctx.key;
+        document.getElementById('sessionMemoCount').textContent = String(next.length);
+      }
     }
 
     function syncCoachMemoFromTodayProgress() {
@@ -2349,9 +2673,13 @@
       var el = document.getElementById('sessionCoachMemo');
       if (!el) return;
       if (String(el.value || '').trim()) return;
-      el.value = computeDefaultCoachMemo();
+      var ctx = coachMemoContextForCurrentProgress();
+      var next = coachMemoPresetsForContext(ctx.key)[0].slice(0, 80);
+      el.value = next;
       el.dataset.usingDefault = '1';
+      el.dataset.coachMemoContext = ctx.key;
       delete el.dataset.touched;
+      document.getElementById('sessionMemoCount').textContent = String(next.length);
       updateSessionWrapPreview();
     }
 
