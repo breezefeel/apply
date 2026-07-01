@@ -3239,18 +3239,28 @@
         clearTimeout(timer);
       }
     }
+    function normalizeMemberNameForKey_(raw) {
+      return String(raw || '').split(/\r?\n/)[0]
+        .replace(/ \/ 출석$/, '')
+        .replace(/ \/ 결석$/, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
     function memberPersonKey(m) {
       var inst = m.instructorIndex != null ? m.instructorIndex : -1;
+      var name = normalizeMemberNameForKey_(m.name);
       var suffix8 = String(m.suffix8 || '').replace(/\D/g, '').slice(-8);
-      if (suffix8.length === 8) return inst + '|' + suffix8;
+      if (suffix8.length === 8) return inst + '|' + suffix8 + '|' + name;
       var phone = String(m.phoneDigits || '').replace(/\D/g, '');
-      if (phone.length >= 10) return inst + '|p:' + phone;
-      var name = String(m.name || '').replace(/\s+/g, ' ').trim();
+      if (phone.length >= 10) return inst + '|p:' + phone + '|' + name;
       return inst + '|n:' + name;
     }
     function memberKey(m) {
-      var name = String(m.name || '').replace(/\s+/g, ' ').trim();
-      return (m.suffix8 || ('n:' + name)) + '|' + (m.instructorIndex != null ? m.instructorIndex : '');
+      var name = normalizeMemberNameForKey_(m.name);
+      var inst = m.instructorIndex != null ? m.instructorIndex : '';
+      var suffix8 = String(m.suffix8 || '').replace(/\D/g, '').slice(-8);
+      if (suffix8.length === 8) return suffix8 + '|' + name + '|' + inst;
+      return 'n:' + name + '|' + inst;
     }
     function mergeTodayMemberSlotFields_(base, add) {
       if (add.time && base._times.indexOf(add.time) === -1) base._times.push(add.time);
@@ -5543,7 +5553,7 @@
       renderEvalHistoryForm();
       clearEvalFormSelections_();
       await loadWellnessIntakePrefill_(info.phone);
-      loadFirstEvalView(info.phone);
+      loadFirstEvalView(info.phone, info.name);
       document.getElementById('evalModal').classList.add('open');
       document.body.style.overflow = 'hidden';
     }
@@ -5558,9 +5568,9 @@
       document.getElementById(paneId).classList.add('on');
     }
 
-    async function loadFirstEvalView(phone) {
+    async function loadFirstEvalView(phone, name) {
       if (!phone) return;
-      const data = await api({ action:'instructorGetFirstEval', phone:phone });
+      const data = await api({ action:'instructorGetFirstEval', phone:phone, name:name || '' });
       const empty = document.getElementById('evalViewEmpty');
       const content = document.getElementById('evalViewContent');
       if (data.ok && data.found && data.eval) {
@@ -5616,7 +5626,7 @@
       if (data.ok) {
         toast('저장 완료');
         renderEvalProgramRecommendation(data.programRecommendation || programRec);
-        await loadFirstEvalView(info.phone);
+        await loadFirstEvalView(info.phone, info.name);
         switchEvalTab('evalView', document.querySelector('.eval-tab[data-pane="evalView"]'));
       } else toast(data.message || '실패');
     }
