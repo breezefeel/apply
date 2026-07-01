@@ -2867,6 +2867,34 @@
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    /** 출석 결과(위로 올리기 버튼)가 화면 하단에 오도록 스크롤 */
+    function scrollToAttendResultBottom() {
+      window.setTimeout(function() {
+        var target =
+          document.getElementById('sessionAttendScrollBtn') ||
+          document.getElementById('sessionAttendResultInline') ||
+          document.getElementById('sessionAlimtalkSection');
+        if (!target) return;
+        target.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 100);
+    }
+
+    function buildBasicAttendAlimtalkPreviewText_(m, data) {
+      var sess = (data && data.sessionDisplay) || (m && m.sessionDisplay) || '';
+      var parts = String(sess).split('/');
+      var attendNow = parseInt(parts[0], 10) || 0;
+      var payTotal = parseInt(parts[1], 10) || 0;
+      var remain = data && data.remaining;
+      if (remain == null && payTotal) remain = Math.max(0, payTotal - attendNow);
+      var sessionLine = payTotal ? attendNow + '회차 / ' + payTotal + '회 중' : '—';
+      var remainLine = remain != null && remain !== '' ? remain + '회' : '—';
+      return (
+        '기본 출석 알림톡\n\n' +
+        '📅 ' + sessionLine + '\n' +
+        '— 남은 회차: ' + remainLine
+      );
+    }
+
     function buildSentAlimtalkText_(m, data, opts) {
       opts = opts || {};
       var previewMember = Object.assign({}, m, {
@@ -2874,7 +2902,7 @@
         name: data.memberName || m.name,
       });
       if (opts.basicAttendOnly) {
-        return buildAttendAlimtalkPreview(previewMember, null, '', [], [], true);
+        return buildBasicAttendAlimtalkPreviewText_(previewMember, data);
       }
       var ata = opts.attendAlimtalk;
       if (!ata) return '';
@@ -2932,6 +2960,7 @@
           resultWrap.hidden = false;
           document.getElementById('sessionAttendResultBody').innerHTML = result.html || '';
         }
+        scrollToAttendResultBottom();
         return;
       }
 
@@ -3166,13 +3195,29 @@
     var BOARD_LOAD_ESTIMATE_SEC = 25;
     var BOARD_AUTO_SYNC_IDLE_MS = 12 * 60 * 1000;
     var _loadCountdownTimer = null;
+    var _loadCountdownStartedAt = 0;
+    var _loadCountdownActive = false;
     var _boardSyncInFlight = false;
 
     function clearLoadCountdown() {
+      _loadCountdownActive = false;
+      _loadCountdownStartedAt = 0;
       if (_loadCountdownTimer) {
         clearInterval(_loadCountdownTimer);
         _loadCountdownTimer = null;
       }
+    }
+
+    /** 백그라운드 탭에서도 경과 시간 기준으로 카운트다운 표시 */
+    function paintMemberLoadCountdown() {
+      if (!_loadCountdownActive || !_loadCountdownStartedAt) return;
+      var elapsed = Math.floor((Date.now() - _loadCountdownStartedAt) / 1000);
+      var left = BOARD_LOAD_ESTIMATE_SEC - elapsed;
+      if (left < 0) {
+        setMemberChipsMessage('불러오는 중… 시간이 길어지고 있습니다. 잠시만 기다려 주세요', null);
+        return;
+      }
+      setMemberChipsMessage('불러오는 중…', left);
     }
 
     function setMemberChipsMessage(msg, countdownSec) {
@@ -3186,16 +3231,10 @@
 
     function startMemberLoadCountdown() {
       clearLoadCountdown();
-      var left = BOARD_LOAD_ESTIMATE_SEC;
-      setMemberChipsMessage('불러오는 중…', left);
-      _loadCountdownTimer = setInterval(function() {
-        left--;
-        if (left < 0) {
-          setMemberChipsMessage('불러오는 중… 시간이 길어지고 있습니다. 잠시만 기다려 주세요', null);
-          return;
-        }
-        setMemberChipsMessage('불러오는 중…', left);
-      }, 1000);
+      _loadCountdownActive = true;
+      _loadCountdownStartedAt = Date.now();
+      paintMemberLoadCountdown();
+      _loadCountdownTimer = setInterval(paintMemberLoadCountdown, 400);
     }
 
     async function api(payload, opts) {
@@ -4621,7 +4660,11 @@
         }
         var ev = data.alimtalk && (data.alimtalk.everyVisit || data.alimtalk);
         if (ev && ev.ok) {
-          html += '<p class="attend-result-status ok">회원 알림톡 발송 완료</p>';
+          if (ev.queued) {
+            html += '<p class="attend-result-status ok">회원 알림톡 발송 예약됨 (잠시 후 전송)</p>';
+          } else {
+            html += '<p class="attend-result-status ok">회원 알림톡 발송 완료</p>';
+          }
         } else if (ev && ev.skipped) {
           var reason = ev.reason === 'no_template' ? '템플릿 미설정'
             : ev.reason === 'solapi' ? 'Solapi 미설정'
@@ -4653,9 +4696,13 @@
 
     function buildAttendAlimtalkResultPreview(m, data, opts) {
       if (!data.completed) return '';
+      opts = opts || {};
       var text = buildSentAlimtalkText_(m, data, opts);
       if (!text && opts.basicAttendOnly) {
-        text = buildSentAlimtalkText_(m, data, { basicAttendOnly: true });
+        text = buildBasicAttendAlimtalkPreviewText_(m, data);
+      }
+      if (!text && opts.attendAlimtalk) {
+        text = buildSentAlimtalkText_(m, data, { attendAlimtalk: opts.attendAlimtalk });
       }
       if (!text) return '';
       return (
@@ -4741,8 +4788,8 @@
         }
         paintAttendProcessingCountdown(sec, false);
       }, 1000);
-      var panel = document.getElementById('sessionWrapPanel');
-      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      var panel = document.getElementById('sessionAlimtalkSection');
+      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
 
     function showAttendResult(m, data, opts) {
@@ -4758,8 +4805,7 @@
           html: '<p class="attend-result-error">❌ ' + escapeHtml(data.message || '저장 실패') + '</p>',
         };
         renderSessionAlimtalkSection();
-        var failPanel = document.getElementById('sessionWrapPanel');
-        if (failPanel) failPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        scrollToAttendResultBottom();
         return;
       }
 
@@ -4773,8 +4819,6 @@
         sentText: data.completed ? buildSentAlimtalkText_(m, data, opts) : '',
       };
       renderSessionAlimtalkSection();
-      var panel = document.getElementById('sessionWrapPanel');
-      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     async function runCompleteSession(m, progress, opts) {
@@ -5639,9 +5683,15 @@
     document.getElementById('phonePickerModal').addEventListener('click', function(e){ if(e.target===this) closePhonePickerModal(); });
     document.getElementById('pinInput').addEventListener('keydown', function(e){ if(e.key==='Enter') submitPin(); });
     document.addEventListener('visibilitychange', function() {
-      if (document.visibilityState === 'visible') tryAutoSyncBoard();
+      if (document.visibilityState === 'visible') {
+        paintMemberLoadCountdown();
+        tryAutoSyncBoard();
+      }
     });
-    window.addEventListener('focus', function() { tryAutoSyncBoard(); });
+    window.addEventListener('focus', function() {
+      paintMemberLoadCountdown();
+      tryAutoSyncBoard();
+    });
     refreshSectionCollapseDefaults();
     renderProgramList();
     renderProgramTabs();
