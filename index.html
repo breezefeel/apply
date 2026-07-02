@@ -308,6 +308,26 @@
     .session-check-chips, .session-check-vas {
       display:flex; flex-wrap:wrap; gap:6px;
     }
+    .session-check-chips {
+      flex-direction:column; align-items:stretch; gap:0;
+    }
+    .session-discomfort-group {
+      display:flex; flex-wrap:wrap; align-items:center; gap:4px 5px;
+      padding:6px 0; border-bottom:1px solid #e8edf2;
+    }
+    .session-discomfort-group:last-child {
+      border-bottom:none; padding-bottom:0;
+    }
+    .session-discomfort-group-label {
+      flex:0 0 100%; font-size:9px; font-weight:800; color:#94a3b8;
+      letter-spacing:0.03em; text-transform:none; margin-bottom:1px;
+    }
+    .session-discomfort-group-chips {
+      display:flex; flex-wrap:wrap; gap:4px 5px; width:100%;
+    }
+    .session-discomfort-group--quick .session-check-chip {
+      font-size:10px; padding:5px 9px;
+    }
     .session-check-chips .session-check-chip,
     .session-check-vas .session-check-chip {
       flex:0 1 auto; padding:6px 10px; font-size:11px; border-radius:999px;
@@ -315,6 +335,13 @@
     }
     .session-check-chips .session-check-chip.on,
     .session-check-vas .session-check-chip.on {
+      background:var(--blue-bg); border-color:var(--blue); color:var(--blue); font-weight:700;
+    }
+    .session-discomfort-group .session-check-chip {
+      flex:0 1 auto; padding:5px 8px; font-size:10px; border-radius:999px;
+      border:1px solid var(--border); background:#fff; cursor:pointer;
+    }
+    .session-discomfort-group .session-check-chip.on {
       background:var(--blue-bg); border-color:var(--blue); color:var(--blue); font-weight:700;
     }
     .session-check-vas .session-check-chip { min-width:34px; text-align:center; padding:6px 0; }
@@ -551,9 +578,35 @@
     .next-booking-pick {
       display:flex; flex-wrap:wrap; align-items:center; gap:6px; width:100%;
     }
+    .next-booking-pick-head {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; flex:1 1 100%; width:100%;
+    }
+    .next-booking-schedule-btn {
+      flex:0 0 auto; padding:5px 10px; font-size:10px; font-weight:800;
+      border-color:#cbd5e1; color:var(--blue); background:#fff; white-space:nowrap;
+    }
     .next-booking-pick input[type="date"],
-    .next-booking-pick select {
+    .next-booking-pick select,
+    .next-booking-date-field {
       flex:1 1 120px; min-width:0;
+    }
+    .next-booking-date-field {
+      position:relative; display:block; cursor:pointer;
+    }
+    .next-booking-date-text {
+      display:block; padding:6px 8px; border:1px solid var(--border); border-radius:8px;
+      font-size:11px; font-family:inherit; background:#fff; color:var(--dim);
+      pointer-events:none;
+    }
+    .next-booking-date-field.has-value .next-booking-date-text {
+      color:#334155; font-weight:700;
+    }
+    .next-booking-date-field input[type="date"] {
+      position:absolute; inset:0; width:100%; height:100%;
+      opacity:0; cursor:pointer; border:none; padding:0; margin:0;
+    }
+    .next-booking-pick select {
       padding:6px 8px; border:1px solid var(--border); border-radius:8px;
       font-size:11px; font-family:inherit; background:#fff;
     }
@@ -572,6 +625,9 @@
     }
     .session-wrap-btns .btn-save-only {
       border-color:#cbd5e1; color:var(--blue); background:#fff;
+    }
+    .session-wrap-btns .btn-attend-silent {
+      border-color:#94a3b8; color:#475569; background:#f8fafc;
     }
     .session-wrap-btns .btn-attend-basic { background:var(--green); color:#fff; border:none; }
     .session-wrap-btns .btn-attend-progress { background:var(--blue); color:#fff; border:none; }
@@ -1130,7 +1186,7 @@
       </div>
       <div class="alimtalk-preview" id="sessionAlimtalkSection">
         <div class="preview-label" id="sessionAlimtalkSectionLabel">알림톡으로 보내질 내용 (출석+진도보내기)</div>
-        <p class="alimtalk-preview-hint" id="sessionAlimtalkHint">출석체크는 진도·출석 저장은 동일하고, 기본 알림톡만 발송됩니다.</p>
+        <p class="alimtalk-preview-hint" id="sessionAlimtalkHint">세 버튼 모두 출석·진도 저장은 동일합니다. 알림톡만 선택에 따라 달라집니다.</p>
         <div id="sessionAttendProcessing" hidden></div>
         <div id="sessionAttendOutcomePreview" class="session-attend-outcome-preview" hidden></div>
         <div id="sessionAlimtalkPreview"></div>
@@ -1146,9 +1202,15 @@
             <span class="next-booking-value" id="nextBookingExistingText"></span>
           </div>
           <div class="next-booking-pick" id="nextBookingPick" hidden>
-            <span class="next-booking-label">다음 예약 잡기</span>
+            <div class="next-booking-pick-head">
+              <span class="next-booking-label">다음 예약 잡기</span>
+              <button type="button" class="btn btn-ghost next-booking-schedule-btn" id="nextBookingScheduleBtn" onclick="openMemberScheduleSheet_()" title="구글 시트 스케줄표 열기">회원 스케줄</button>
+            </div>
             <select id="nextBookingInstructor" aria-label="담당 강사" onchange="onNextBookingInputChange()"></select>
-            <input type="date" id="nextBookingDate" aria-label="다음 예약 날짜" onchange="onNextBookingInputChange()" oninput="onNextBookingInputChange()">
+            <label class="next-booking-date-field" id="nextBookingDateField" onclick="openNextBookingDatePicker_()">
+              <span class="next-booking-date-text" id="nextBookingDateText">날짜 선택</span>
+              <input type="date" id="nextBookingDate" aria-label="다음 예약 날짜" onchange="onNextBookingInputChange()" oninput="onNextBookingInputChange()">
+            </label>
             <select id="nextBookingTime" aria-label="다음 예약 시간" onchange="onNextBookingInputChange()"></select>
             <p class="next-booking-hint">출석·알림톡 발송 시 스케줄표에도 함께 반영됩니다.</p>
           </div>
@@ -1161,9 +1223,9 @@
         </div>
         <p class="session-save-only-hint" id="sessionSaveOnlyHint" hidden></p>
         <div class="session-wrap-btns">
-          <button type="button" class="btn btn-ghost btn-save-only" id="saveProgressOnlyBtn" onclick="saveProgressOnlySession()" disabled title="출석·알림톡 없이 진도만 저장 (이미 n/m 출석 반영된 칸)">진도만 저장</button>
-          <button type="button" class="btn btn-attend-basic" id="attendBasicBtn" onclick="attendBasicSession()" disabled>출석 체크</button>
-          <button type="button" class="btn btn-attend-progress" id="attendProgressBtn" onclick="attendWithProgressSession()" disabled>출석+진도보내기</button>
+          <button type="button" class="btn btn-attend-silent" id="attendSilentBtn" onclick="attendSilentSession()" disabled title="출석·진도 저장 · 알림톡 없음">알림 없음</button>
+          <button type="button" class="btn btn-attend-basic" id="attendBasicBtn" onclick="attendBasicSession()" disabled title="출석·진도 저장 · 기본 알림톡">기본 알림톡</button>
+          <button type="button" class="btn btn-attend-progress" id="attendProgressBtn" onclick="attendWithProgressSession()" disabled title="출석·진도 저장 · 진도 알림톡">출석+진도보내기</button>
         </div>
       </div>
     </section>
@@ -2029,24 +2091,39 @@
       nextBooking: null,
     };
 
+    var SESSION_DISCOMFORT_GROUP_LABELS = {
+      quick: '빠른 선택',
+      head: '머리 · 목',
+      upper: '상지',
+      trunk: '몸통',
+      lower: '하지',
+      misc: '',
+    };
+    var SESSION_DISCOMFORT_GROUP_ORDER = ['quick', 'head', 'upper', 'trunk', 'lower', 'misc'];
+
     var SESSION_DISCOMFORT_AREAS = [
-      { id: 'comfortable', label: '편안함' },
-      { id: 'same', label: '동일 부위' },
-      { id: 'lt', label: 'Lt' },
-      { id: 'rt', label: 'Rt' },
-      { id: 'headache', label: '두통' },
-      { id: 'jaw', label: '턱' },
-      { id: 'neck', label: '목' },
-      { id: 'shoulder', label: '어깨' },
-      { id: 'elbow', label: '팔꿈치' },
-      { id: 'wrist', label: '손목' },
-      { id: 'back', label: '등' },
-      { id: 'waist', label: '허리' },
-      { id: 'abdomen', label: '복부' },
-      { id: 'pelvis', label: '골반' },
-      { id: 'knee', label: '무릎' },
-      { id: 'ankle', label: '발목' },
-      { id: 'other', label: '기타' },
+      { id: 'comfortable', label: '편안함', group: 'quick' },
+      { id: 'same', label: '동일 부위', group: 'quick' },
+      { id: 'lt', label: 'Lt', group: 'quick' },
+      { id: 'rt', label: 'Rt', group: 'quick' },
+      { id: 'headache', label: '두통', group: 'head' },
+      { id: 'jaw', label: '턱', group: 'head' },
+      { id: 'neck', label: '목', group: 'head' },
+      { id: 'shoulder', label: '어깨', group: 'upper' },
+      { id: 'arm', label: '팔', group: 'upper' },
+      { id: 'elbow', label: '팔꿈치', group: 'upper' },
+      { id: 'wrist', label: '손목', group: 'upper' },
+      { id: 'hand', label: '손', group: 'upper' },
+      { id: 'back', label: '등', group: 'trunk' },
+      { id: 'waist', label: '허리', group: 'trunk' },
+      { id: 'abdomen', label: '복부', group: 'trunk' },
+      { id: 'pelvis', label: '골반', group: 'trunk' },
+      { id: 'hip', label: '고관절', group: 'lower' },
+      { id: 'knee', label: '무릎', group: 'lower' },
+      { id: 'calf', label: '종아리', group: 'lower' },
+      { id: 'ankle', label: '발목', group: 'lower' },
+      { id: 'foot', label: '발', group: 'lower' },
+      { id: 'other', label: '기타', group: 'misc' },
     ];
 
     var _sessionCheckSaveTimer = null;
@@ -2877,6 +2954,20 @@
       return y + '-' + m + '-' + day;
     }
 
+    function seoulTomorrowYmd_() {
+      var d = new Date();
+      d.setDate(d.getDate() + 1);
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+
+    function isFutureNextBookingYmd_(ymd) {
+      if (!ymd) return false;
+      return String(ymd).trim() > seoulTodayYmd_();
+    }
+
     function defaultNextBookingInstIdx_(m) {
       if (!m) return 0;
       if (m.instructorIndex != null && !isNaN(parseInt(m.instructorIndex, 10))) {
@@ -2901,6 +2992,9 @@
       return list[n] ? list[n].name : '';
     }
 
+    var SCHEDULE_SPREADSHEET_FALLBACK =
+      'https://docs.google.com/spreadsheets/d/1I8zIUUaP-eIGpB2y4dMgZbDRiBBzjpAGEWU0RD3yk8g/edit';
+
     function resetNextBookingState(m) {
       var defaultInst = defaultNextBookingInstIdx_(m);
       state.nextBooking = {
@@ -2916,6 +3010,7 @@
         instIdx: defaultInst,
         instName: instructorNameByIndex_(defaultInst),
         timeSlots: INSTRUCTOR_TIME_SLOTS.slice(),
+        scheduleSheetUrl: SCHEDULE_SPREADSHEET_FALLBACK,
       };
     }
 
@@ -2947,6 +3042,15 @@
         list.map(function(t) { return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>'; }).join('');
     }
 
+    function formatNextBookingDateOnlyClient_(ymd) {
+      if (!ymd) return '';
+      var parts = String(ymd).split('-');
+      if (parts.length !== 3) return ymd;
+      var dt = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 12, 0, 0, 0);
+      var DAY_KR = ['일', '월', '화', '수', '목', '금', '토'];
+      return parseInt(parts[1], 10) + '월 ' + parts[2] + '일 (' + DAY_KR[dt.getDay()] + ')';
+    }
+
     function formatNextBookingDisplayClient_(ymd, timeStr) {
       if (!ymd || !timeStr) return '';
       var parts = String(ymd).split('-');
@@ -2961,11 +3065,14 @@
     function getNextBookingAlimtalkLine() {
       var nb = state.nextBooking;
       if (!nb) return '';
-      if (nb.line) return nb.line;
-      if (nb.fromSchedule && nb.display) return '📅 다음 예약: ' + nb.display;
-      var ymd = nb.pickedYmd || nb.ymd || '';
+      if (nb.fromSchedule && !isFutureNextBookingYmd_(nb.ymd)) return '';
+      if (nb.line && (!nb.fromSchedule || isFutureNextBookingYmd_(nb.ymd))) return nb.line;
+      if (nb.fromSchedule && nb.display && isFutureNextBookingYmd_(nb.ymd)) {
+        return '📅 다음 예약: ' + nb.display;
+      }
+      var ymd = nb.pickedYmd || '';
       var time = nb.pickedTime || nb.timeStr || '';
-      if (ymd && time) {
+      if (ymd && time && isFutureNextBookingYmd_(ymd)) {
         return '📅 다음 예약: ' + formatNextBookingDisplayClient_(ymd, time);
       }
       return '';
@@ -2974,12 +3081,12 @@
     function getNextBookingServerPayload() {
       var nb = state.nextBooking;
       if (!nb) return null;
-      if (nb.fromSchedule && nb.line) {
+      if (nb.fromSchedule && nb.line && isFutureNextBookingYmd_(nb.ymd)) {
         return { nextBookingLabel: nb.line, useScheduleNextBooking: true };
       }
       var ymd = nb.pickedYmd || '';
       var time = nb.pickedTime || '';
-      if (ymd && time) {
+      if (ymd && time && isFutureNextBookingYmd_(ymd)) {
         return {
           nextBookingYmd: ymd,
           nextBookingTime: time,
@@ -2988,6 +3095,68 @@
         };
       }
       return null;
+    }
+
+    function updateNextBookingDateLabel_() {
+      var dateEl = document.getElementById('nextBookingDate');
+      var textEl = document.getElementById('nextBookingDateText');
+      var wrap = document.getElementById('nextBookingDateField');
+      if (!dateEl || !textEl) return;
+      var val = String(dateEl.value || '').trim();
+      if (val) {
+        textEl.textContent = formatNextBookingDateOnlyClient_(val);
+        if (wrap) wrap.classList.add('has-value');
+      } else {
+        textEl.textContent = '날짜 선택';
+        if (wrap) wrap.classList.remove('has-value');
+      }
+    }
+
+    function openNextBookingDatePicker_() {
+      var dateEl = document.getElementById('nextBookingDate');
+      if (!dateEl) return;
+      try {
+        if (typeof dateEl.showPicker === 'function') {
+          dateEl.showPicker();
+          return;
+        }
+      } catch (err) {}
+      dateEl.focus();
+    }
+
+    async function refreshMemberScheduleSheetUrl_(ymd) {
+      var nb = state.nextBooking;
+      if (!nb) return;
+      var year;
+      var month;
+      if (ymd) {
+        var parts = String(ymd).split('-');
+        if (parts.length === 3) {
+          year = parseInt(parts[0], 10);
+          month = parseInt(parts[1], 10);
+        }
+      }
+      if (!year || !month) {
+        var now = new Date();
+        year = now.getFullYear();
+        month = now.getMonth() + 1;
+      }
+      try {
+        var data = await api({
+          action: 'instructorScheduleSheetUrl',
+          year: year,
+          month: month,
+        }, { timeoutMs: 15000 });
+        if (data.ok && data.url) nb.scheduleSheetUrl = data.url;
+      } catch (err) {}
+    }
+
+    async function openMemberScheduleSheet_() {
+      var nb = state.nextBooking;
+      var ymd = nb && nb.pickedYmd ? nb.pickedYmd : '';
+      if (ymd) await refreshMemberScheduleSheetUrl_(ymd);
+      var url = (nb && nb.scheduleSheetUrl) || SCHEDULE_SPREADSHEET_FALLBACK;
+      window.open(url, '_blank', 'noopener,noreferrer');
     }
 
     function onNextBookingInputChange() {
@@ -3003,13 +3172,24 @@
         nb.instName = instructorNameByIndex_(nb.pickedInstIdx);
       }
       if (nb.pickedYmd && nb.pickedTime) {
-        nb.display = formatNextBookingDisplayClient_(nb.pickedYmd, nb.pickedTime);
-        nb.line = '📅 다음 예약: ' + nb.display;
+        if (isFutureNextBookingYmd_(nb.pickedYmd)) {
+          nb.display = formatNextBookingDisplayClient_(nb.pickedYmd, nb.pickedTime);
+          nb.line = '📅 다음 예약: ' + nb.display;
+        } else {
+          nb.display = '';
+          nb.line = '';
+        }
       } else {
         nb.display = '';
         nb.line = '';
       }
+      updateNextBookingDateLabel_();
+      if (nb.pickedYmd) refreshMemberScheduleSheetUrl_(nb.pickedYmd);
       updateSessionWrapPreview();
+    }
+
+    function hasScheduledNextBooking_(nb) {
+      return !!(nb && nb.fromSchedule && isFutureNextBookingYmd_(nb.ymd));
     }
 
     function renderNextBookingPanel() {
@@ -3024,33 +3204,33 @@
         panel.hidden = true;
         return;
       }
-      panel.hidden = false;
       var nb = state.nextBooking;
-      if (!nb) {
-        panel.classList.add('loading');
+      if (!nb || nb.loading) {
+        panel.hidden = true;
+        panel.classList.toggle('loading', !!(nb && nb.loading));
         if (existingWrap) existingWrap.hidden = true;
         if (pickWrap) pickWrap.hidden = true;
         return;
       }
-      panel.classList.toggle('loading', !!nb.loading);
+      panel.classList.remove('loading');
+      if (hasScheduledNextBooking_(nb)) {
+        panel.hidden = true;
+        if (existingWrap) existingWrap.hidden = true;
+        if (pickWrap) pickWrap.hidden = true;
+        return;
+      }
+      panel.hidden = false;
       ensureNextBookingInstOptions(nb.pickedInstIdx != null ? nb.pickedInstIdx : nb.instIdx);
       ensureNextBookingTimeOptions(nb.timeSlots);
       if (dateEl) {
-        dateEl.min = seoulTodayYmd_();
-        if (!nb.fromSchedule && nb.pickedYmd) dateEl.value = nb.pickedYmd;
+        dateEl.min = seoulTomorrowYmd_();
+        dateEl.value = nb.pickedYmd || '';
+        updateNextBookingDateLabel_();
       }
       var timeEl = document.getElementById('nextBookingTime');
-      if (timeEl && !nb.fromSchedule && nb.pickedTime) timeEl.value = nb.pickedTime;
-      if (nb.fromSchedule && nb.display) {
-        if (existingWrap) existingWrap.hidden = false;
-        var existingLabel = nb.display;
-        if (nb.instName) existingLabel = nb.instName + ' · ' + existingLabel;
-        if (existingText) existingText.textContent = existingLabel;
-        if (pickWrap) pickWrap.hidden = true;
-      } else {
-        if (existingWrap) existingWrap.hidden = true;
-        if (pickWrap) pickWrap.hidden = false;
-      }
+      if (timeEl && nb.pickedTime) timeEl.value = nb.pickedTime;
+      if (existingWrap) existingWrap.hidden = true;
+      if (pickWrap) pickWrap.hidden = false;
     }
 
     var _nextBookingReq = 0;
@@ -3075,17 +3255,20 @@
         }, { timeoutMs: 30000 });
         if (reqId !== _nextBookingReq || state.selectedKey !== selKey) return;
         state.nextBooking.loading = false;
-        if (data.ok && data.booking) {
+        if (data.ok && data.booking && isFutureNextBookingYmd_(data.booking.ymd)) {
           state.nextBooking.fromSchedule = true;
           state.nextBooking.ymd = data.booking.ymd || '';
           state.nextBooking.timeStr = data.booking.timeStr || '';
-          state.nextBooking.display = data.booking.display || '';
-          state.nextBooking.line = data.booking.line || '';
+          state.nextBooking.display = data.booking.display || formatNextBookingDisplayClient_(data.booking.ymd, data.booking.timeStr);
+          state.nextBooking.line = data.booking.line || (state.nextBooking.display ? '📅 다음 예약: ' + state.nextBooking.display : '');
           state.nextBooking.instIdx = data.booking.instIdx != null ? data.booking.instIdx : state.nextBooking.instIdx;
           state.nextBooking.instName = data.booking.instName || instructorNameByIndex_(state.nextBooking.instIdx);
         }
         if (data.ok && data.timeSlots && data.timeSlots.length) {
           state.nextBooking.timeSlots = data.timeSlots;
+        }
+        if (data.ok && data.scheduleSheetUrl) {
+          state.nextBooking.scheduleSheetUrl = data.scheduleSheetUrl;
         }
       } catch (e) {
         if (reqId !== _nextBookingReq || state.selectedKey !== selKey) return;
@@ -3332,6 +3515,7 @@
 
     function buildSentAlimtalkText_(m, data, opts) {
       opts = opts || {};
+      if (opts.skipAttendAlimtalk) return '';
       var previewMember = Object.assign({}, m, {
         sessionDisplay: data.sessionDisplay || m.sessionDisplay,
         name: data.memberName || m.name,
@@ -3390,7 +3574,7 @@
 
       if (showResult) {
         if (label) {
-          label.textContent = result.title || '🌟 출석 체크 완료';
+          label.textContent = result.title || '🌟 출석·진도 저장 완료';
         }
         if (outcomeEl) outcomeEl.hidden = true;
         previewEl.hidden = true;
@@ -3421,15 +3605,34 @@
       return !!(state.progressSavedKeys && state.progressSavedKeys[memberKey(m)]);
     }
 
+    var ATTEND_BTN_PRE_ATTEND = {
+      silent: { text: '알림 없음', title: '출석·진도 저장 · 알림톡 없음', className: 'btn btn-attend-silent' },
+      basic: { text: '기본 알림톡', title: '출석·진도 저장 · 기본 알림톡', className: 'btn btn-attend-basic' },
+      progress: { text: '출석+진도보내기', title: '출석·진도 저장 · 진도 알림톡', className: 'btn btn-attend-progress' },
+    };
+    var ATTEND_BTN_POST_ATTEND = {
+      silent: { text: '진도 수정하기', title: '진도만 수정 (출석·알림 없음)', className: 'btn btn-ghost btn-save-only' },
+      basic: { text: '알림톡 재발송 (기본 템플릿)', title: '기본 출석 알림톡 재발송', className: 'btn btn-attend-basic' },
+      progress: { text: '알림톡 재발송 (진도 템플릿)', title: '진도 포함 알림톡 재발송', className: 'btn btn-attend-progress' },
+    };
+
+    function applyAttendButtonMode_(locked) {
+      var modes = locked ? ATTEND_BTN_POST_ATTEND : ATTEND_BTN_PRE_ATTEND;
+      var silent = document.getElementById('attendSilentBtn');
+      var basic = document.getElementById('attendBasicBtn');
+      var progress = document.getElementById('attendProgressBtn');
+      [['silent', silent], ['basic', basic], ['progress', progress]].forEach(function(pair) {
+        var cfg = modes[pair[0]];
+        var el = pair[1];
+        if (!el || !cfg) return;
+        el.textContent = cfg.text;
+        el.title = cfg.title;
+        el.className = cfg.className;
+      });
+    }
+
     function updateSaveProgressOnlyButtonLabel_(m) {
-      m = m || state.selected;
-      var btn = document.getElementById('saveProgressOnlyBtn');
-      if (!btn) return;
-      var saved = isMemberProgressSaved_(m);
-      btn.textContent = saved ? '진도 수정하기' : '진도만 저장';
-      btn.title = saved
-        ? '저장된 진도를 수정한 뒤 다시 저장합니다 (출석·알림톡 없음)'
-        : '출석·알림톡 없이 진도만 저장 (이미 n/m 출석 반영된 칸)';
+      applyAttendButtonMode_(memberAttendSlotLocked_(m || state.selected));
     }
 
     /** 이 칩(이름·시간·회차칸)에 출석 n/m이 반영됐을 때만 출석 버튼 잠금 — 결석·미처리·다른 가족 출석은 제외 */
@@ -3442,19 +3645,20 @@
     function updateAttendButtonsForFamilyAccount(m) {
       var has = !!(m && m.suffix8);
       var slotLocked = has && memberAttendSlotLocked_(m);
+      var silent = document.getElementById('attendSilentBtn');
       var basic = document.getElementById('attendBasicBtn');
       var progress = document.getElementById('attendProgressBtn');
       var hint = document.getElementById('sessionSaveOnlyHint');
-      if (basic) basic.disabled = !has || slotLocked;
-      if (progress) progress.disabled = !has || slotLocked;
+      applyAttendButtonMode_(slotLocked);
+      if (silent) silent.disabled = !has;
+      if (basic) basic.disabled = !has;
+      if (progress) progress.disabled = !has;
       if (hint) {
         hint.hidden = !slotLocked;
         if (slotLocked) {
-          hint.textContent =
-            '출석이 이미 반영되었습니다. 진도 변경은 「진도 수정하기」를 사용해 주세요.';
+          hint.textContent = '출석이 이미 반영되었습니다. 진도 수정 또는 알림톡 재발송을 선택하세요.';
         }
       }
-      updateSaveProgressOnlyButtonLabel_(m);
       if (slotLocked) {
         var minus = document.getElementById('attendPassMinus');
         var plus = document.getElementById('attendPassPlus');
@@ -3467,17 +3671,29 @@
 
     function setSessionActionButtonsDisabled(disabled) {
       var m = state.selected;
-      var has = !!(m && m.suffix8);
-      var saveOnly = document.getElementById('saveProgressOnlyBtn');
+      var silent = document.getElementById('attendSilentBtn');
       var basic = document.getElementById('attendBasicBtn');
       var progress = document.getElementById('attendProgressBtn');
-      if (saveOnly) saveOnly.disabled = disabled || !has;
       if (disabled) {
+        if (silent) silent.disabled = true;
         if (basic) basic.disabled = true;
         if (progress) progress.disabled = true;
         return;
       }
       updateAttendButtonsForFamilyAccount(m);
+    }
+
+    async function attendSilentSession() {
+      var m = state.selected;
+      if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
+      if (memberAttendSlotLocked_(m)) {
+        await saveProgressOnlySession();
+        return;
+      }
+      syncSessionRecordFieldsFromModal();
+      _pendingAttendAlimtalk = null;
+      var progress = mergedProgressMapForSave();
+      await runCompleteSession(m, progress, { skipAttendAlimtalk: true });
     }
 
     async function saveProgressOnlySession() {
@@ -3491,6 +3707,10 @@
       var m = state.selected;
       if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
       syncSessionRecordFieldsFromModal();
+      if (memberAttendSlotLocked_(m)) {
+        await runResendAttendAlimtalk(m, mergedProgressMapForSave(), { basicAttendOnly: true });
+        return;
+      }
       _pendingAttendAlimtalk = null;
       var progress = mergedProgressMapForSave();
       await runCompleteSession(m, progress, { basicAttendOnly: true });
@@ -3500,6 +3720,11 @@
       var m = state.selected;
       if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
       syncSessionRecordFieldsFromModal();
+      if (memberAttendSlotLocked_(m)) {
+        _pendingAttendAlimtalk = buildAttendAlimtalkPayload();
+        await runResendAttendAlimtalk(m, mergedProgressMapForSave(), { attendAlimtalk: _pendingAttendAlimtalk });
+        return;
+      }
       _pendingAttendAlimtalk = buildAttendAlimtalkPayload();
       var progress = mergedProgressMapForSave();
       await runCompleteSession(m, progress, { attendAlimtalk: _pendingAttendAlimtalk });
@@ -3586,12 +3811,53 @@
           return runSaveSessionOnly(m, progress);
         }
         toast(data.message || '저장 실패');
+        setSessionActionButtonsDisabled(false);
         return false;
       }
       var wasProgressSavedBefore = isMemberProgressSaved_(m);
       applySaveOnlyResult(m, data);
       var toastMsg = wasProgressSavedBefore ? '진도 수정 완료 · 출석·알림 없음' : '진도만 저장 완료 · 출석·알림 없음';
       toast(toastMsg);
+      setSessionActionButtonsDisabled(false);
+      return true;
+    }
+
+    async function runResendAttendAlimtalk(m, progress, opts) {
+      opts = Object.assign({ resendOnly: true }, opts || {});
+      setSessionActionButtonsDisabled(true);
+      showAttendProcessing('알림톡 재발송 중', opts);
+      var payload = completeSessionPayload(m, progress, opts);
+      payload.action = 'instructorResendAttendAlimtalk';
+      payload.resendOnly = true;
+      var nbPayload = getNextBookingServerPayload();
+      if (nbPayload) {
+        if (nbPayload.nextBookingLabel) payload.nextBookingLabel = nbPayload.nextBookingLabel;
+        if (nbPayload.useScheduleNextBooking != null) payload.useScheduleNextBooking = nbPayload.useScheduleNextBooking;
+      } else {
+        payload.useScheduleNextBooking = true;
+      }
+      payload.bookNextSchedule = false;
+      var data = await api(payload, { timeoutMs: 90000 });
+      updateSendBar();
+      if (!data.ok) {
+        showAttendResult(m, data, opts);
+        return false;
+      }
+      if (data.saved) applySaveOnlyResult(m, data);
+      var resultOpts = Object.assign({}, opts, {
+        attendAlimtalk: opts.attendAlimtalk || _pendingAttendAlimtalk,
+        resendOnly: true,
+      });
+      state.attendProcessing = false;
+      state.inlineAttendResult = {
+        memberKey: memberKey(m),
+        title: '📨 알림톡 재발송 완료',
+        html: buildInlineAttendResultHtml(m, data, resultOpts),
+        sentText: buildSentAlimtalkText_(m, data, resultOpts),
+      };
+      setSessionActionButtonsDisabled(false);
+      renderSessionAlimtalkSection();
+      _pendingAttendAlimtalk = null;
       return true;
     }
 
@@ -4557,13 +4823,39 @@
       }).join('');
     }
 
+    function renderSessionDiscomfortChipHtml_(opt) {
+      var idEsc = String(opt.id).replace(/'/g, "\\'");
+      return '<button type="button" class="session-check-chip" data-area="' + escapeHtml(opt.id) +
+        '" onclick="toggleSessionDiscomfort(\'' + idEsc + '\')">' + escapeHtml(opt.label) + '</button>';
+    }
+
     function initSessionCheckPanel() {
       var areaRoot = document.getElementById('sessionDiscomfortChips');
       var vasRoot = document.getElementById('sessionVasChips');
       if (!areaRoot || areaRoot.dataset.ready) return;
-      areaRoot.innerHTML = SESSION_DISCOMFORT_AREAS.map(function (opt) {
-        return '<button type="button" class="session-check-chip" data-area="' + escapeHtml(opt.id) + '" onclick="toggleSessionDiscomfort(\'' + opt.id.replace(/'/g, "\\'") + '\')">' + escapeHtml(opt.label) + '</button>';
-      }).join('');
+      var byGroup = {};
+      SESSION_DISCOMFORT_AREAS.forEach(function (opt) {
+        var g = opt.group || 'misc';
+        if (!byGroup[g]) byGroup[g] = [];
+        byGroup[g].push(opt);
+      });
+      var html = '';
+      SESSION_DISCOMFORT_GROUP_ORDER.forEach(function (gk) {
+        var items = byGroup[gk];
+        if (!items || !items.length) return;
+        var glabel = SESSION_DISCOMFORT_GROUP_LABELS[gk] || '';
+        var groupCls = 'session-discomfort-group' + (gk === 'quick' ? ' session-discomfort-group--quick' : '');
+        html += '<div class="' + groupCls + '">';
+        if (glabel) {
+          html += '<div class="session-discomfort-group-label">' + escapeHtml(glabel) + '</div>';
+        }
+        html += '<div class="session-discomfort-group-chips">';
+        items.forEach(function (opt) {
+          html += renderSessionDiscomfortChipHtml_(opt);
+        });
+        html += '</div></div>';
+      });
+      areaRoot.innerHTML = html;
       if (vasRoot) {
         var vasHtml = '';
         for (var v = 0; v <= 10; v++) {
@@ -5137,7 +5429,8 @@
 
     function completeSessionPayload(m, progress, opts) {
       opts = opts || {};
-      var isBasicAttend = !!opts.basicAttendOnly;
+      var skipAlim = !!opts.skipAttendAlimtalk;
+      var isBasicAttend = !!opts.basicAttendOnly && !skipAlim;
       var extras = getSessionRecordPayloadExtras();
       var payload = {
         action: 'instructorCompleteSession',
@@ -5154,13 +5447,14 @@
         pspProgress: progress,
         sessionProgress: todayProgressMap(),
         confirmExtraPass: !!opts.confirmExtraPass,
+        skipAttendAlimtalk: skipAlim,
         basicAttendOnly: isBasicAttend,
         attendPassCount: opts.attendPassCount != null ? opts.attendPassCount : (state.attendPassCount || 1),
         discomfortAreas: extras.discomfortAreas,
         vas: extras.vas,
         sessionCheckNote: extras.sessionCheckNote,
       };
-      var ata = opts.basicAttendOnly ? null : (opts.attendAlimtalk || _pendingAttendAlimtalk);
+      var ata = skipAlim || isBasicAttend ? null : (opts.attendAlimtalk || _pendingAttendAlimtalk);
       if (ata) {
         payload.attendAlimtalkStage = ata.stage || '';
         if (ata.stageNum) payload.attendAlimtalkStageNum = ata.stageNum;
@@ -5172,18 +5466,22 @@
       }
       var nbPayload = getNextBookingServerPayload();
       if (nbPayload) {
-        if (nbPayload.nextBookingLabel) payload.nextBookingLabel = nbPayload.nextBookingLabel;
         if (nbPayload.nextBookingYmd) payload.nextBookingYmd = nbPayload.nextBookingYmd;
         if (nbPayload.nextBookingTime) payload.nextBookingTime = nbPayload.nextBookingTime;
         if (nbPayload.bookNextSchedule) payload.bookNextSchedule = true;
         if (nbPayload.useScheduleNextBooking != null) payload.useScheduleNextBooking = nbPayload.useScheduleNextBooking;
         if (nbPayload.instructorIndex != null) payload.instructorIndex = nbPayload.instructorIndex;
+        if (nbPayload.nextBookingLabel) payload.nextBookingLabel = nbPayload.nextBookingLabel;
       }
       payload.phoneDigits = m.phoneDigits || '';
       if (payload.instructorIndex == null) payload.instructorIndex = m.instructorIndex;
-      var nbPreviewLine = getNextBookingAlimtalkLine();
-      if (nbPreviewLine && !payload.attendAlimtalkNextBooking && !payload.nextBookingLabel) {
-        payload.attendAlimtalkNextBooking = nbPreviewLine;
+      if (!payload.bookNextSchedule) {
+        var nbPreviewLine = getNextBookingAlimtalkLine();
+        if (nbPreviewLine && !payload.attendAlimtalkNextBooking && !payload.nextBookingLabel) {
+          payload.attendAlimtalkNextBooking = nbPreviewLine;
+        }
+      } else if (payload.attendAlimtalkNextBooking) {
+        delete payload.attendAlimtalkNextBooking;
       }
       return payload;
     }
@@ -5260,9 +5558,11 @@
           '다회차 ' + n + ' — 같은 전화번호 가족 ' + n + '명이 각 1회씩 출석 처리됩니다.' +
           (names ? ' (' + names + ')' : '');
         document.getElementById('multiPassModalHint').textContent =
-          opts && opts.basicAttendOnly
-            ? '스케줄표에도 가족별로 각각 반영됩니다.'
-            : '진도 저장 후 출석·알림톡·스케줄표에 가족 각 1회씩 반영됩니다.';
+          opts && opts.skipAttendAlimtalk
+            ? '진도 저장·출석·스케줄만 반영 (알림톡 없음).'
+            : opts && opts.basicAttendOnly
+            ? '진도 저장·출석·기본 알림톡·스케줄 반영.'
+            : '진도 저장·출석·진도 알림톡·스케줄표에 가족 각 1회씩 반영됩니다.';
       } else {
         document.getElementById('multiPassModalText').textContent =
           '다회차 ' + n + '회 출석을 한 번에 처리합니다. ' +
@@ -5271,9 +5571,11 @@
           (data.remaining != null ? ' (처리 후 남은 ' + data.remaining + '회)' : '') +
           ' 진행할까요?';
         document.getElementById('multiPassModalHint').textContent =
-          opts && opts.basicAttendOnly
-            ? '선택 회원에게 ' + n + '회가 연속 차감되고, 스케줄표에도 반영됩니다.'
-            : '진도 저장 후 출석·알림톡·스케줄표에 ' + n + '회가 반영됩니다.';
+          opts && opts.skipAttendAlimtalk
+            ? '진도 저장·출석·스케줄만 반영 (알림톡 없음).'
+            : opts && opts.basicAttendOnly
+            ? '진도 저장·출석·기본 알림톡·스케줄 반영.'
+            : '진도 저장·출석·진도 알림톡·스케줄표에 ' + n + '회가 반영됩니다.';
       }
       _pendingCompleteSession = { member: member, progress: progress, opts: opts || {} };
       document.getElementById('multiPassModal').classList.add('open');
@@ -5407,15 +5709,44 @@
     function buildAttendStatusFootnotes(data, opts) {
       opts = opts || {};
       var html = '';
+      if (opts.resendOnly && data.completed) {
+        var ev = data.alimtalk;
+        if (ev && ev.ok) {
+          html += '<p class="attend-result-status ok">알림톡 재발송 완료 (' +
+            (opts.basicAttendOnly ? '기본 템플릿' : '진도 템플릿') + ')</p>';
+        } else if (ev && ev.skipped) {
+          var reason = ev.reason === 'no_template' ? '템플릿 미설정'
+            : ev.reason === 'solapi' ? 'Solapi 미설정'
+            : ev.reason === 'no_phone' ? '회원 전화번호 없음'
+            : ev.reason === 'no_config' ? '설정 없음'
+            : '발송 실패';
+          html += '<p class="attend-result-status warn">알림톡 재발송 실패(' + escapeHtml(reason) + ')</p>';
+        } else {
+          html += '<p class="attend-result-status warn">알림톡 재발송 실패</p>';
+        }
+        if (data.saved) {
+          html += '<p class="attend-result-status ok">진도 저장 완료</p>';
+        }
+        return html;
+      }
       if (data.completed) {
+        if (data.nextBookingError) {
+          html += '<p class="attend-result-status warn">다음 예약 반영 실패: ' +
+            escapeHtml(data.nextBookingError) + '</p>';
+        } else if (data.nextBookingBooked && data.nextBookingLine) {
+          html += '<p class="attend-result-status ok">다음 예약 스케줄 반영: ' +
+            escapeHtml(data.nextBookingLine.replace(/^📅\s*다음\s*예약:\s*/i, '')) + '</p>';
+        }
         if (data.scheduleSynced === false) {
           html += '<p class="attend-result-status warn">스케줄표 반영: ' +
             escapeHtml(data.scheduleSyncMessage || '실패') + '</p>';
-        } else         if (data.scheduleSynced === true) {
+        } else if (data.scheduleSynced === true) {
           html += '<p class="attend-result-status ok">스케줄표 출석 반영 완료</p>';
         }
         var ev = data.alimtalk && (data.alimtalk.everyVisit || data.alimtalk);
-        if (ev && ev.ok) {
+        if (opts.skipAttendAlimtalk && data.completed) {
+          html += '<p class="attend-result-status ok">알림톡 미발송 (출석·진도만 저장)</p>';
+        } else if (ev && ev.ok) {
           if (ev.queued) {
             html += '<p class="attend-result-status ok">회원 알림톡 발송 예약됨 (잠시 후 전송)</p>';
           } else {
@@ -5444,16 +5775,18 @@
       if (data.showExtensionModal) {
         html += '<p class="attend-result-extension">잔여 1회 — 회원에게 연장 안내가 필요합니다.</p>';
       }
-      if (opts.basicAttendOnly && data.saved && data.completed) {
-        html += '<p class="attend-result-status ok">출석 처리 완료 (기본 알림톡)</p>';
-      } else if (!opts.basicAttendOnly && data.saved && data.completed) {
-        html += '<p class="attend-result-status ok">진도 저장 + 출석 처리 완료</p>';
+      if (opts.skipAttendAlimtalk && data.saved && data.completed) {
+        html += '<p class="attend-result-status ok">출석·진도 저장 완료 (알림 없음)</p>';
+      } else if (opts.basicAttendOnly && data.saved && data.completed) {
+        html += '<p class="attend-result-status ok">출석·진도 저장 완료 (기본 알림톡)</p>';
+      } else if (!opts.basicAttendOnly && !opts.skipAttendAlimtalk && data.saved && data.completed) {
+        html += '<p class="attend-result-status ok">출석·진도 저장 완료 (진도 알림톡)</p>';
       }
       return html;
     }
 
     function buildAttendAlimtalkResultPreview(m, data, opts) {
-      if (!data.completed) return '';
+      if (!data.completed || (opts && opts.skipAttendAlimtalk)) return '';
       opts = opts || {};
       var text = buildSentAlimtalkText_(m, data, opts);
       if (!text && opts.basicAttendOnly) {
@@ -5549,7 +5882,11 @@
       state.attendProcessingTitle = title || '출석 기록 중';
       state.inlineAttendResult = null;
       renderSessionAlimtalkSection();
-      var estSec = opts.basicAttendOnly ? ATTEND_PROCESS_EST_SEC_BASIC : ATTEND_PROCESS_EST_SEC_FULL;
+      var estSec = opts.skipAttendAlimtalk
+        ? ATTEND_PROCESS_EST_SEC_BASIC
+        : opts.basicAttendOnly
+          ? ATTEND_PROCESS_EST_SEC_BASIC
+          : ATTEND_PROCESS_EST_SEC_FULL;
       var sec = estSec;
       paintAttendProcessingCountdown(sec, false);
       _attendProcessingTimer = setInterval(function() {
@@ -5581,9 +5918,7 @@
         return;
       }
 
-      var title = data.completed
-        ? (opts.basicAttendOnly ? '🌟 출석 체크 완료' : '🌟 저장+출석 완료')
-        : '처리 안내';
+      var title = data.completed ? '🌟 출석·진도 저장 완료' : '처리 안내';
       state.inlineAttendResult = {
         memberKey: memberKey(m),
         title: title,
@@ -5605,10 +5940,10 @@
     async function executeCompleteSession(m, progress, opts) {
       opts = opts || {};
       setSessionActionButtonsDisabled(true);
-      showAttendProcessing(
-        opts.basicAttendOnly ? '출석 처리 중' : '저장+출석 처리 중',
-        { basicAttendOnly: !!opts.basicAttendOnly }
-      );
+      showAttendProcessing('출석·진도 저장 중', {
+        basicAttendOnly: !!opts.basicAttendOnly,
+        skipAttendAlimtalk: !!opts.skipAttendAlimtalk,
+      });
       const data = await api(completeSessionPayload(m, progress, opts), { timeoutMs: 90000 });
       updateSendBar();
       if (!data.ok) {
@@ -5638,7 +5973,7 @@
         state.attendProcessing = false;
         state.inlineAttendResult = {
           memberKey: memberKey(m),
-          title: resultOpts.basicAttendOnly ? '🌟 출석 체크 완료' : '🌟 저장+출석 완료',
+          title: '🌟 출석·진도 저장 완료',
           html: buildInlineAttendResultHtml(m, data, resultOpts),
           sentText: buildSentAlimtalkText_(m, data, resultOpts),
         };
