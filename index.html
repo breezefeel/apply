@@ -914,11 +914,17 @@
     .alimtalk-preview.is-result-mode .preview-label { color:var(--blue); font-size:12px; }
     .session-attend-outcome-preview {
       margin-bottom:12px; padding-bottom:12px;
-      border-bottom:1px solid rgba(148,163,184,.25);
+      border-bottom:1px solid rgba(148,163,184,.35);
       text-align:left;
     }
-    .session-attend-outcome-preview .attend-result-status {
-      margin:6px 0 0; font-size:12px; color:#94a3b8;
+    .alimtalk-preview .session-attend-outcome-preview .attend-result-line1 {
+      font-size:18px; font-weight:800; color:#f8fafc; margin:0 0 4px;
+    }
+    .alimtalk-preview .session-attend-outcome-preview .attend-result-line2 {
+      font-size:13px; font-weight:600; color:#cbd5e1; margin:0;
+    }
+    .alimtalk-preview .session-attend-outcome-preview .attend-result-status {
+      margin:6px 0 0; font-size:12px; color:#86efac;
     }
     .session-attend-result-summary { margin-bottom:10px; text-align:left; }
     .session-attend-result-summary .attend-result-line1 {
@@ -1090,7 +1096,7 @@
         </div>
       </div>
       <div class="session-wrap-actions">
-        <div class="attend-pass-stepper" id="attendPassStepper" title="같은 번호 가족 각 1회 출석">
+        <div class="attend-pass-stepper" id="attendPassStepper" title="한 번에 사용할 회차 수 (본인 연속 사용 · 가족 동시 출석)">
           <span class="pass-caption">다회차</span>
           <button type="button" class="pass-btn" id="attendPassMinus" onclick="changeAttendPassCount(-1)" disabled aria-label="회차 줄이기">−</button>
           <span class="pass-num" id="attendPassCountLabel">1</span>
@@ -1370,11 +1376,11 @@
     /* 서버 연결 전에도 표시 — code.gs PSP_PROGRAM_CATALOG_ 와 동기화 */
     const MOVEMENT_CATALOG_RAW = [
       { id:'tool_list', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'소도구 목록', label:'소도구 목록', linkUrl:'https://blog.naver.com/allenjoy/222657632345' },
-      { id:'ball_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'어깨', linkUrl:'https://www.youtube.com/watch?v=drx2-P2OgpQ', coachingNote:'견갑골 위에 볼을 올리고 통증 없는 범위에서 천천히 원을 그립니다. 호흡을 멈추지 않고 어깨를 들어 올리지 않도록 안내합니다.' },
-      { id:'ball_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'허리', linkUrl:'https://www.youtube.com/watch?v=PgKSRcIW9c4', coachingNote:'요추 양쪽 근육에 볼을 대고 체중을 천천히 실어줍니다. 척추 뼈 위가 아닌 근육 부위에 위치시키는지 확인합니다.' },
-      { id:'ball_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'복부', linkUrl:'https://www.youtube.com/shorts/zjvXLTL9E5A' },
-      { id:'ball_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'엉덩이', linkUrl:'https://m.blog.naver.com/allenjoy/223442108509' },
-      { id:'ball_scapula', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'견갑골', linkUrl:'https://m.blog.naver.com/allenjoy/223449532242' },
+      { id:'ball_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'어깨', alimtalkLabel:'마사지볼 · 어깨', linkUrl:'https://www.youtube.com/watch?v=drx2-P2OgpQ', coachingNote:'견갑골 위에 볼을 올리고 통증 없는 범위에서 천천히 원을 그립니다. 호흡을 멈추지 않고 어깨를 들어 올리지 않도록 안내합니다.' },
+      { id:'ball_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'허리', alimtalkLabel:'마사지볼 · 허리', linkUrl:'https://www.youtube.com/watch?v=PgKSRcIW9c4', coachingNote:'요추 양쪽 근육에 볼을 대고 체중을 천천히 실어줍니다. 척추 뼈 위가 아닌 근육 부위에 위치시키는지 확인합니다.' },
+      { id:'ball_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'복부', alimtalkLabel:'마사지볼 · 복부', linkUrl:'https://www.youtube.com/shorts/zjvXLTL9E5A' },
+      { id:'ball_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'엉덩이', alimtalkLabel:'마사지볼 · 엉덩이', linkUrl:'https://m.blog.naver.com/allenjoy/223442108509' },
+      { id:'ball_scapula', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'견갑골', alimtalkLabel:'마사지볼 · 등(견갑)', linkUrl:'https://m.blog.naver.com/allenjoy/223449532242' },
       { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'① Supine · 하지' },
       { id:'p1_su_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'② Supine · 상지' },
       { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'③ Prone · 하지' },
@@ -1387,81 +1393,73 @@
       { id:'p1_su_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Resistive', label:'② Supine · 상지' },
       { id:'p1_pl_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Resistive', label:'③ Prone · 하지' },
       { id:'p1_pu_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Resistive', label:'④ Prone · 상지' },
-      { id:'post_breath_relax', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'1 · 누워서 호흡 운동', label:'편안한 호흡' },
-      { id:'post_breath', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬' },
-      { id:'post_super_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'① 척추 — 경추→척추분절 순 펴기' },
-      { id:'post_super_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'② 대각선 — 한 손 + 반대 발 동시 들기' },
-      { id:'post_super_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'③ 양손·양발 — 낮게 동시 들기' },
-      { id:'post_super_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'④ 접영 — 양손·양발 들고 접영+발벌림' },
-      { id:'post_super_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'⑤ 팔신전·무릎굴곡 — 견갑모음→무릎밴딩' },
-      { id:'post_super_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'⑥ 팔꿈치·회전 — 좌우 팔꿈치 들며 회전' },
-      { id:'post_situp_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'① 상체 — 분절별 굽힘 0°→45°' },
-      { id:'post_situp_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'② 하체 — 견갑 띄워 다리 1→2쪽' },
-      { id:'post_situp_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'③ 상체 — 90°→45° 하강·복귀' },
-      { id:'post_situp_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'④ 하체 — 등닿고 다리 1→2쪽' },
-      { id:'post_situp_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'⑤ 정식 Sit-up — 통증 없는 범위' },
-      { id:'post_situp_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'⑥ 구르기 — 뒤굴림·복귀, 발끝 닿기' },
-      { id:'p2_pushup_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'① 무릎 네발 — 웨이브 하강·상승' },
-      { id:'p2_pushup_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'② 무릎지지 — 몸통 먼저→웨이브 상승' },
-      { id:'p2_pushup_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'③ 무릎지지 — 몸통+골반 동시 하강·상승' },
-      { id:'p2_pushup_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'④ 무릎 뗀 네발 — 웨이브 하강·상승' },
-      { id:'p2_pushup_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'⑤ 무릎 뗀 — 몸통 먼저→웨이브 상승' },
-      { id:'p2_pushup_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'⑥ 정상 Push-up — 통증 없는 범위' },
-      { id:'p2_plank_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'① 무릎 대고 네발' },
-      { id:'p2_plank_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'② 무릎 떼고 네발' },
-      { id:'p2_plank_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'③ 네발 — 골반 좌우 움직임' },
-      { id:'p2_plank_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'④ 한 팔 앞으로 뻗기 → 복귀' },
-      { id:'p2_plank_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'⑤ 한 손 뒤통수 — 몸통 회전' },
-      { id:'p2_plank_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'⑥ 다리 접기 → 바깥 회전 → 복귀' },
-      { id:'p2_side_plank_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'① 한발 지지 사이드 (좌·우)' },
-      { id:'p2_side_plank_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'② 지지 없이 사이드 (좌·우)' },
-      { id:'p2_side_plank_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'③ 골반 좌우 움직임 (좌·우)' },
-      { id:'p2_side_plank_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'④ 위쪽 다리 벌렸다 모음 (좌·우)' },
-      { id:'p2_side_plank_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'⑤ 위쪽 다리 원그리기 (circumduction)' },
-      { id:'p2_side_plank_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'⑥ 다리 앞·뒤 스윙 (달리기 동작)' },
-      { id:'p2_a_front', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'전방 — 경·흉·고관절 굴곡·발목배굴' },
-      { id:'p2_a_back', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'후방 — 경·흉 신전·햄·발목저굴' },
-      { id:'p2_a_lat', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'측방 — 경·흉 측굴·고관절 외전·발목' },
-      { id:'p2_a_spiral', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'나선 — 경·흉 회전·견갑·GH' },
-      { id:'p2_sit_posture', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'생활습관', label:'바르게 앉는 방법' },
-      { id:'p2_sit_breath', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'생활습관', label:'호흡 운동 + 등척성 정렬' },
-      { id:'p2_seg_1', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'① 골반 전/후방 굴리며 척추 움직임' },
-      { id:'p2_seg_2', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'② + 상지 움직임 추가' },
-      { id:'p2_seg_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'③ 머리→골반 좌우숙임·척추분절' },
-      { id:'p2_seg_4', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'④ + 상지 움직임 추가' },
-      { id:'p2_seg_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'⑤ 머리→골반 회전·척추분절' },
-      { id:'p2_seg_6', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'⑥ + 상지 움직임 추가' },
-      { id:'p3_squat_1', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'① 걸터앉기 — 엉덩 앞으로 떼었다 앉기' },
-      { id:'p3_squat_2', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'② 엉덩 앞으로 뗀 뒤 — 일어섰다 앉기' },
-      { id:'p3_squat_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'③ 일어섰다 깊게 앉았다 앉기' },
-      { id:'p3_squat_4', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'④ 한쪽 다리에 중심 — ①번 동작 (좌·우)' },
-      { id:'p3_squat_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'⑤ 한쪽 다리에 중심 — ②번 동작 (좌·우)' },
-      { id:'p3_squat_6', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'⑥ 한쪽 다리에 중심 — ③번 동작 (좌·우)' },
-      { id:'p3_a_upper_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'① 상지 — 손·손목·팔 연쇄' },
-      { id:'p3_a_upper_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'② 목 — 경추 굴곡·신전·측굴·회전' },
-      { id:'p3_a_upper_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'③ 어깨 — GH·견갑 연쇄' },
-      { id:'p3_a_upper_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'④ 몸통 — 흉·요추 분절 (Roll down/up)' },
-      { id:'p3_a_lower_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'⑤ 고관절 — 굴곡·신전·회전' },
-      { id:'p3_a_lower_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'⑥ 무릎 — 슬관절 가동' },
-      { id:'p3_a_lower_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'⑦ 종아리 — 스트레칭' },
-      { id:'p3_a_lower_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'⑧ 발목 — 발가락·발목 연쇄' },
-      { id:'p3_stand_posture', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 서기' },
-      { id:'p3_stand_breath', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'호흡 정렬 운동' },
-      { id:'p3_stand_walk', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 걷기' },
-      { id:'p3_balance_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'① 일어선 상태 한발 살짝 들고 돌리기 — 30초 유지' },
-      { id:'p3_balance_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'② 무릎 높이까지 들어 올리고 돌리기 — 30초 유지' },
-      { id:'p3_balance_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'③ 한 발 지지 · 반대 다리 뒤로 뻗기(발 미접지) + 후굴' },
-      { id:'p3_balance_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'④ 뒤뻗기(후굴)→무릎들기(전굴) 사이클' },
-      { id:'p3_balance_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑤ 무릎 들고 몸통-골반 회전' },
-      { id:'p3_balance_6', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑥ 뒤뻗기 하며 몸통-골반 회전' },
-      { id:'func_adv_a', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'A' },
-      { id:'func_adv_b', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'B' },
-      { id:'func_adv_c', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'C' },
-      { id:'func_adv_d', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'D' },
-      { id:'func_adv_e', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'E' },
-      { id:'func_adv_f', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'F' },
-      { id:'func_adv_g', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'G' },
-      { id:'func_adv_h', uiSection:'func', sectionTitle:'기능운동', program:'Resistive — Advanced', label:'H' },
+      { id:'post_breath_relax', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'1 · 누워서 호흡 운동', label:'편안한 호흡', alimtalkLabel:'누워서 편안한 호흡' },
+      { id:'post_breath', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬', alimtalkLabel:'누워서 호흡 · 자세 정렬' },
+      { id:'post_super_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'① 척추 — 경추→척추분절 순 펴기', alimtalkLabel:'엎드려서 ① 등 펴기 · 목부터 하나씩' },
+      { id:'post_super_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'② 대각선 — 한 손 + 반대 발 동시 들기', alimtalkLabel:'엎드려서 ② 대각선 · 한 팔·반대 발 들기' },
+      { id:'post_super_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'③ 양손·양발 — 낮게 동시 들기', alimtalkLabel:'엎드려서 ③ 양팔·양발 · 낮게 들기' },
+      { id:'post_super_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'④ 접영 — 양손·양발 들고 접영+발벌림', alimtalkLabel:'엎드려서 ④ 접영 · 팔·다리 들고 접영' },
+      { id:'post_super_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'⑤ 팔신전·무릎굴곡 — 견갑모음→무릎밴딩', alimtalkLabel:'엎드려서 ⑤ 팔 펴기 · 무릎 구부리기' },
+      { id:'post_super_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'⑥ 팔꿈치·회전 — 좌우 팔꿈치 들며 회전', alimtalkLabel:'엎드려서 ⑥ 팔꿈치 들며 좌우 회전' },
+      { id:'post_situp_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'① 상체 — 분절별 굽힘 0°→45°', alimtalkLabel:'누워서 ① 상체 · 천천히 일어나기' },
+      { id:'post_situp_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'② 하체 — 견갑 띄워 다리 1→2쪽', alimtalkLabel:'누워서 ② 다리 · 하나씩 들기' },
+      { id:'post_situp_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'③ 상체 — 90°→45° 하강·복귀', alimtalkLabel:'누워서 ③ 상체 · 반쯤 내렸다 올리기' },
+      { id:'post_situp_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'④ 하체 — 등닿고 다리 1→2쪽', alimtalkLabel:'누워서 ④ 다리 · 등 대고 번갈아 들기' },
+      { id:'post_situp_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'⑤ 정식 Sit-up — 통증 없는 범위', alimtalkLabel:'누워서 ⑤ 복근 · 통증 없는 범위' },
+      { id:'post_situp_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'2 · Supine Sit-up 6단계', label:'⑥ 구르기 — 뒤굴림·복귀, 발끝 닿기', alimtalkLabel:'누워서 ⑥ 구르기 · 뒤로 젖혔다 복귀' },
+      { id:'p2_pushup_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'① 무릎 네발 — 웨이브 하강·상승', alimtalkLabel:'무릎 대고 ① 팔굽혀펴기 · 천천히' },
+      { id:'p2_pushup_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'② 무릎지지 — 몸통 먼저→웨이브 상승', alimtalkLabel:'무릎 대고 ② 몸통 먼저 움직이기' },
+      { id:'p2_pushup_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'③ 무릎지지 — 몸통+골반 동시 하강·상승', alimtalkLabel:'무릎 대고 ③ 몸통·골반 함께' },
+      { id:'p2_pushup_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'④ 무릎 뗀 네발 — 웨이브 하강·상승', alimtalkLabel:'네발 ④ 팔굽혀펴기 · 천천히' },
+      { id:'p2_pushup_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'⑤ 무릎 뗀 — 몸통 먼저→웨이브 상승', alimtalkLabel:'네발 ⑤ 몸통 먼저 움직이기' },
+      { id:'p2_pushup_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'⑥ 정상 Push-up — 통증 없는 범위', alimtalkLabel:'네발 ⑥ 팔굽혀펴기 · 통증 없는 범위' },
+      { id:'p2_plank_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'① 무릎 대고 네발', alimtalkLabel:'플랭크 ① 무릎 대고 버티기' },
+      { id:'p2_plank_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'② 무릎 떼고 네발', alimtalkLabel:'플랭크 ② 무릎 떼고 버티기' },
+      { id:'p2_plank_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'③ 네발 — 골반 좌우 움직임', alimtalkLabel:'플랭크 ③ 골반 좌우 움직이기' },
+      { id:'p2_plank_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'④ 한 팔 앞으로 뻗기 → 복귀', alimtalkLabel:'플랭크 ④ 한 팔 앞으로 뻗기' },
+      { id:'p2_plank_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'⑤ 한 손 뒤통수 — 몸통 회전', alimtalkLabel:'플랭크 ⑤ 손 뒤통수 · 몸통 회전' },
+      { id:'p2_plank_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'⑥ 다리 접기 → 바깥 회전 → 복귀', alimtalkLabel:'플랭크 ⑥ 다리 접어 바깥으로 돌리기' },
+      { id:'p2_side_plank_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'① 한발 지지 사이드 (좌·우)', alimtalkLabel:'옆 플랭크 ① 한 발 지지 (좌·우)' },
+      { id:'p2_side_plank_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'② 지지 없이 사이드 (좌·우)', alimtalkLabel:'옆 플랭크 ② 지지 없이 (좌·우)' },
+      { id:'p2_side_plank_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'③ 골반 좌우 움직임 (좌·우)', alimtalkLabel:'옆 플랭크 ③ 골반 좌우 움직이기' },
+      { id:'p2_side_plank_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'④ 위쪽 다리 벌렸다 모음 (좌·우)', alimtalkLabel:'옆 플랭크 ④ 위쪽 다리 벌렸다 모음' },
+      { id:'p2_side_plank_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'⑤ 위쪽 다리 원그리기 (circumduction)', alimtalkLabel:'옆 플랭크 · 다리 크게 돌리기' },
+      { id:'p2_side_plank_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Side Plank 6단계', label:'⑥ 다리 앞·뒤 스윙 (달리기 동작)', alimtalkLabel:'옆 플랭크 ⑥ 다리 앞·뒤 스윙' },
+      { id:'p2_a_front', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'전방 — 경·흉·고관절 굴곡·발목배굴', alimtalkLabel:'앉아서 앞으로 숙이기 · 고개·등·다리' },
+      { id:'p2_a_back', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'후방 — 경·흉 신전·햄·발목저굴', alimtalkLabel:'앉아서 뒤로 젖히기 · 고개·등·다리' },
+      { id:'p2_a_lat', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'측방 — 경·흉 측굴·고관절 외전·발목', alimtalkLabel:'앉아서 옆으로 기울이기' },
+      { id:'p2_a_spiral', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'Active Stretching', label:'나선 — 경·흉 회전·견갑·GH', alimtalkLabel:'앉아서 몸통 비틀기 · 어깨·등 돌리기' },
+      { id:'p2_sit_posture', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'생활습관', label:'바르게 앉는 방법', alimtalkLabel:'앉아서 바른 자세 연습' },
+      { id:'p2_sit_breath', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'생활습관', label:'호흡 운동 + 등척성 정렬', alimtalkLabel:'앉아서 호흡 · 자세 정렬' },
+      { id:'p2_seg_1', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'① 골반 전/후방 굴리며 척추 움직임', alimtalkLabel:'앉아서 ① 골반 굴리며 척추 움직이기' },
+      { id:'p2_seg_2', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'② + 상지 움직임 추가', alimtalkLabel:'앉아서 ② 척추 + 팔 움직이기' },
+      { id:'p2_seg_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'③ 머리→골반 좌우숙임·척추분절', alimtalkLabel:'앉아서 ③ 좌우로 숙이기 · 척추 하나씩' },
+      { id:'p2_seg_4', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'④ + 상지 움직임 추가', alimtalkLabel:'앉아서 ④ 좌우 숙임 + 팔 움직이기' },
+      { id:'p2_seg_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'⑤ 머리→골반 회전·척추분절', alimtalkLabel:'앉아서 ⑤ 몸통 돌리기 · 척추 하나씩' },
+      { id:'p2_seg_6', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'척추+상지 분절 운동 6단계', label:'⑥ + 상지 움직임 추가', alimtalkLabel:'앉아서 ⑥ 몸통 돌림 + 팔 움직이기' },
+      { id:'p3_squat_1', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'① 걸터앉기 — 엉덩 앞으로 떼었다 앉기', alimtalkLabel:'스쿼트 ① 걸터앉기 · 엉덩 앞으로' },
+      { id:'p3_squat_2', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'② 엉덩 앞으로 뗀 뒤 — 일어섰다 앉기', alimtalkLabel:'스쿼트 ② 일어섰다 앉기' },
+      { id:'p3_squat_3', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'③ 일어섰다 깊게 앉았다 앉기', alimtalkLabel:'스쿼트 ③ 깊게 앉았다 일어서기' },
+      { id:'p3_squat_4', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'④ 한쪽 다리에 중심 — ①번 동작 (좌·우)', alimtalkLabel:'스쿼트 ④ 한쪽 다리 · 걸터앉기 (좌·우)' },
+      { id:'p3_squat_5', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'⑤ 한쪽 다리에 중심 — ②번 동작 (좌·우)', alimtalkLabel:'스쿼트 ⑤ 한쪽 다리 · 일어섰다 앉기 (좌·우)' },
+      { id:'p3_squat_6', uiSection:'pos2', sectionTitle:'Position 2 · Sitting', program:'스쿼트 6단계', label:'⑥ 한쪽 다리에 중심 — ③번 동작 (좌·우)', alimtalkLabel:'스쿼트 ⑥ 한쪽 다리 · 깊게 앉기 (좌·우)' },
+      { id:'p3_a_upper_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'① 상지 — 손·손목·팔 연쇄', alimtalkLabel:'서서 팔·손 스트레칭' },
+      { id:'p3_a_upper_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'② 목 — 경추 굴곡·신전·측굴·회전', alimtalkLabel:'서서 목 스트레칭' },
+      { id:'p3_a_upper_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'③ 어깨 — GH·견갑 연쇄', alimtalkLabel:'서서 어깨·견갑뼈 움직이기' },
+      { id:'p3_a_upper_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 상체', label:'④ 몸통 — 흉·요추 분절 (Roll down/up)', alimtalkLabel:'서서 척추 굽혔다 펴기' },
+      { id:'p3_a_lower_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'⑤ 고관절 — 굴곡·신전·회전', alimtalkLabel:'서서 고관절 스트레칭' },
+      { id:'p3_a_lower_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'⑥ 무릎 — 슬관절 가동', alimtalkLabel:'서서 무릎 스트레칭' },
+      { id:'p3_a_lower_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'⑦ 종아리 — 스트레칭', alimtalkLabel:'서서 종아리 스트레칭' },
+      { id:'p3_a_lower_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'Active Stretching · 하체', label:'⑧ 발목 — 발가락·발목 연쇄', alimtalkLabel:'서서 발·발목 스트레칭' },
+      { id:'p3_stand_posture', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 서기', alimtalkLabel:'서서 바른 자세 연습' },
+      { id:'p3_stand_breath', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'호흡 정렬 운동', alimtalkLabel:'서서 호흡 · 자세 정렬' },
+      { id:'p3_stand_walk', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'생활습관', label:'바르게 걷기', alimtalkLabel:'바르게 걷기 연습' },
+      { id:'p3_balance_1', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'① 일어선 상태 한발 살짝 들고 돌리기 — 30초 유지', alimtalkLabel:'밸런스 ① 한 발 살짝 들고 30초' },
+      { id:'p3_balance_2', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'② 무릎 높이까지 들어 올리고 돌리기 — 30초 유지', alimtalkLabel:'밸런스 ② 무릎 높이 들고 30초' },
+      { id:'p3_balance_3', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'③ 한 발 지지 · 반대 다리 뒤로 뻗기(발 미접지) + 후굴', alimtalkLabel:'밸런스 ③ 한 발 서고 다리 뒤로 뻗기' },
+      { id:'p3_balance_4', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'④ 뒤뻗기(후굴)→무릎들기(전굴) 사이클', alimtalkLabel:'밸런스 ④ 다리 뒤로·무릎 들기 반복' },
+      { id:'p3_balance_5', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑤ 무릎 들고 몸통-골반 회전', alimtalkLabel:'밸런스 ⑤ 무릎 들고 몸통 돌리기' },
+      { id:'p3_balance_6', uiSection:'pos3', sectionTitle:'Position 3 · Standing', program:'밸런스 트레이닝 6단계', label:'⑥ 뒤뻗기 하며 몸통-골반 회전', alimtalkLabel:'밸런스 ⑥ 다리 뒤로 뻗으며 몸통 돌리기' },
     ];
     function buildLocalProgram() {
       return MOVEMENT_CATALOG_RAW.map(function(item) {
@@ -1971,7 +1969,7 @@
 
     var _sessionCheckSaveTimer = null;
 
-    var COLLAPSIBLE_SECTIONS = ['self_tool', 'pos1_par', 'pos2', 'pos3', 'func'];
+    var COLLAPSIBLE_SECTIONS = ['self_tool', 'pos1_par', 'pos2', 'pos3'];
 
     var PROGRAM_STAGES = [
       { num: 1, key: 'self_tool', title: '셀프 통증케어', titleEn: 'Self Tool', titleKo: '소도구 자극', alimtalkLabel: '스스로 통증 관리' },
@@ -2705,15 +2703,13 @@
 
     function projectedAttendStats_(m, passCount) {
       var passN = resolveAttendPassCount_(passCount);
-      var parts = String((m && m.sessionDisplay) || '0/1').split('/');
-      var attendNow = parseInt(parts[0], 10) || 0;
-      var payTotal = parseInt(parts[1], 10) || 1;
-      var attendAfter = attendNow + passN;
+      var counts = parseSessionCountsFromMember_(m);
+      var attendAfter = counts.attend + passN;
       return {
         attendCount: attendAfter,
-        payRounds: payTotal,
-        remaining: Math.max(0, payTotal - attendAfter),
-        sessionDisplay: attendAfter + '/' + payTotal,
+        payRounds: counts.pay,
+        remaining: Math.max(0, counts.pay - attendAfter),
+        sessionDisplay: attendAfter + '/' + counts.pay,
         memberName: m && m.name,
         attendPassCount: passN,
       };
@@ -2722,43 +2718,22 @@
     function buildProjectedAttendOutcomeHtml_(m) {
       if (!m || !m.suffix8) return '';
       var passN = resolveAttendPassCount_();
-      if (passN > 1) {
-        var targets = familyMultiPassTargets_(m, passN);
-        var html = '<div class="session-attend-result-summary">';
-        if (targets.length < passN) {
-          html +=
-            '<p class="attend-result-status warn">출석 가능한 가족 ' +
-            targets.length +
-            '명 (필요 ' +
-            passN +
-            '명)</p>';
-        }
-        targets.forEach(function (t) {
-          var parts = String(t.sessionDisplay || '0/1').split('/');
-          var attAfter = (parseInt(parts[0], 10) || 0) + 1;
-          var payTotal = parseInt(parts[1], 10) || 1;
-          html +=
-            '<p class="attend-result-line2">' +
-            escapeHtml(t.name) +
-            ' → ' +
-            attAfter +
-            '/' +
-            payTotal +
-            '</p>';
-        });
-        html += '</div>';
-        html +=
-          '<p class="attend-result-status ok">다회차 ' +
-          passN +
-          ' — 같은 번호 가족 각 1회 출석 예정</p>';
-        return html;
-      }
       var data = projectedAttendStats_(m, passN);
       var html =
         '<div class="session-attend-result-summary">' +
         '<p class="attend-result-line1">' + escapeHtml(formatAttendResultLine1(data)) + '</p>' +
         '<p class="attend-result-line2">' + escapeHtml(formatAttendMemberRemainLine(data, m.name)) + '</p>' +
         '</div>';
+      if (passN > 1) {
+        var family = familyMultiPassTargets_(m, passN);
+        if (family.length >= passN && family.length > 1) {
+          html +=
+            '<p class="attend-result-status ok">가족 ' + passN + '명 각 1회로 처리될 수 있습니다</p>';
+        } else {
+          html +=
+            '<p class="attend-result-status ok">' + passN + '회 한 번에 사용 예정</p>';
+        }
+      }
       return html;
     }
 
@@ -3636,12 +3611,27 @@
       );
     }
 
+    function parseSessionCountsFromMember_(m) {
+      if (!m) return { attend: 0, pay: 1, remain: 0 };
+      var attend = m.attend;
+      var pay = m.payRounds;
+      var remain = m.remain;
+      var sd = String(m.sessionDisplay || '').match(/^(\d+)\s*\/\s*(\d+)$/);
+      if (sd) {
+        if (attend == null || isNaN(attend)) attend = parseInt(sd[1], 10);
+        if (pay == null || isNaN(pay)) pay = parseInt(sd[2], 10);
+      }
+      attend = parseInt(attend, 10);
+      pay = parseInt(pay, 10);
+      remain = parseInt(remain, 10);
+      if (isNaN(attend)) attend = 0;
+      if (isNaN(pay) || pay <= 0) pay = 1;
+      if (isNaN(remain)) remain = Math.max(0, pay - attend);
+      return { attend: attend, pay: pay, remain: remain };
+    }
+
     function memberRemainSessions(m) {
-      if (!m) return 0;
-      var parts = String(m.sessionDisplay || '0/1').split('/');
-      var att = parseInt(parts[0], 10) || 0;
-      var pay = parseInt(parts[1], 10) || 1;
-      return Math.max(0, pay - att);
+      return parseSessionCountsFromMember_(m).remain;
     }
 
     /** 오늘 보드 — 같은 번호·출석 가능(잔여·미출석 칸) 가족 */
@@ -3682,9 +3672,9 @@
     }
 
     function maxAttendPassCount(m) {
-      var family = familyMembersOnBoard_(m);
-      if (!family.length) return 1;
-      return Math.min(4, family.length);
+      var remain = memberRemainSessions(m);
+      if (remain <= 0) return 1;
+      return Math.min(4, remain);
     }
 
     function changeAttendPassCount(delta) {
@@ -3696,6 +3686,7 @@
       if (next > max) next = max;
       state.attendPassCount = next;
       updateAttendPassStepper();
+      updateSessionWrapPreview();
     }
 
     function resetAttendPassCount(m) {
@@ -4506,7 +4497,7 @@
       }
       const hasMember = !!state.selected;
 
-      const sections = ['self_tool','pos1_par','pos2','pos3','func'];
+      const sections = ['self_tool','pos1_par','pos2','pos3'];
       const grouped = {};
       list.forEach(function(item){
         const sec = item.uiSection || 'other';
@@ -4754,15 +4745,30 @@
     function openMultiPassModal(member, progress, opts) {
       var n = resolveAttendPassCount(opts);
       var m = member || state.selected;
-      var targets = familyMultiPassTargets_(m, n);
-      var names = targets.map(function (t) { return t.name; }).join(', ');
-      document.getElementById('multiPassModalText').textContent =
-        '다회차 ' + n + ' — 같은 전화번호 가족 ' + n + '명이 각 1회씩 출석 처리됩니다.' +
-        (names ? ' (' + names + ')' : '');
-      document.getElementById('multiPassModalHint').textContent =
-        opts && opts.basicAttendOnly
-          ? '스케줄표에도 가족별로 각각 반영됩니다.'
-          : '진도 저장 후 출석·알림톡·스케줄표에 가족 각 1회씩 반영됩니다.';
+      var data = projectedAttendStats_(m, n);
+      var family = familyMultiPassTargets_(m, n);
+      var familyMode = family.length >= n && family.length > 1;
+      if (familyMode) {
+        var names = family.slice(0, n).map(function (t) { return t.name; }).join(', ');
+        document.getElementById('multiPassModalText').textContent =
+          '다회차 ' + n + ' — 같은 전화번호 가족 ' + n + '명이 각 1회씩 출석 처리됩니다.' +
+          (names ? ' (' + names + ')' : '');
+        document.getElementById('multiPassModalHint').textContent =
+          opts && opts.basicAttendOnly
+            ? '스케줄표에도 가족별로 각각 반영됩니다.'
+            : '진도 저장 후 출석·알림톡·스케줄표에 가족 각 1회씩 반영됩니다.';
+      } else {
+        document.getElementById('multiPassModalText').textContent =
+          '다회차 ' + n + '회 출석을 한 번에 처리합니다. ' +
+          (m && m.name ? m.name + '님 ' : '') +
+          '회원권 ' + n + '회가 차감됩니다.' +
+          (data.remaining != null ? ' (처리 후 남은 ' + data.remaining + '회)' : '') +
+          ' 진행할까요?';
+        document.getElementById('multiPassModalHint').textContent =
+          opts && opts.basicAttendOnly
+            ? '선택 회원에게 ' + n + '회가 연속 차감되고, 스케줄표에도 반영됩니다.'
+            : '진도 저장 후 출석·알림톡·스케줄표에 ' + n + '회가 반영됩니다.';
+      }
       _pendingCompleteSession = { member: member, progress: progress, opts: opts || {} };
       document.getElementById('multiPassModal').classList.add('open');
     }
