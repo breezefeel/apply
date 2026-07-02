@@ -535,6 +535,31 @@
       display:flex; flex-direction:column; gap:8px;
       margin-top:8px; padding-top:12px; border-top:1px solid var(--border);
     }
+    .next-booking-panel {
+      display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px;
+      padding:8px 10px; border-radius:10px;
+      background:#f8fafc; border:1px solid var(--border);
+      font-size:11px; line-height:1.4;
+    }
+    .next-booking-panel.loading { opacity:.65; }
+    .next-booking-label {
+      font-weight:800; color:var(--blue); white-space:nowrap;
+    }
+    .next-booking-value {
+      font-weight:700; color:#334155; flex:1 1 auto;
+    }
+    .next-booking-pick {
+      display:flex; flex-wrap:wrap; align-items:center; gap:6px; width:100%;
+    }
+    .next-booking-pick input[type="date"],
+    .next-booking-pick select {
+      flex:1 1 120px; min-width:0;
+      padding:6px 8px; border:1px solid var(--border); border-radius:8px;
+      font-size:11px; font-family:inherit; background:#fff;
+    }
+    .next-booking-hint {
+      flex:1 1 100%; font-size:10px; color:var(--dim); margin:0;
+    }
     .session-wrap-actions .attend-pass-stepper {
       align-self:center;
     }
@@ -1115,6 +1140,19 @@
         </div>
       </div>
       <div class="session-wrap-actions">
+        <div class="next-booking-panel" id="nextBookingPanel" hidden>
+          <div class="next-booking-existing" id="nextBookingExisting" hidden>
+            <span class="next-booking-label">다음 예약</span>
+            <span class="next-booking-value" id="nextBookingExistingText"></span>
+          </div>
+          <div class="next-booking-pick" id="nextBookingPick" hidden>
+            <span class="next-booking-label">다음 예약 잡기</span>
+            <select id="nextBookingInstructor" aria-label="담당 강사" onchange="onNextBookingInputChange()"></select>
+            <input type="date" id="nextBookingDate" aria-label="다음 예약 날짜" onchange="onNextBookingInputChange()" oninput="onNextBookingInputChange()">
+            <select id="nextBookingTime" aria-label="다음 예약 시간" onchange="onNextBookingInputChange()"></select>
+            <p class="next-booking-hint">출석·알림톡 발송 시 스케줄표에도 함께 반영됩니다.</p>
+          </div>
+        </div>
         <div class="attend-pass-stepper" id="attendPassStepper" title="한 번에 사용할 회차 수 (본인 연속 사용 · 가족 동시 출석)">
           <span class="pass-caption">다회차</span>
           <button type="button" class="pass-btn" id="attendPassMinus" onclick="changeAttendPassCount(-1)" disabled aria-label="회차 줄이기">−</button>
@@ -1288,6 +1326,13 @@
       { index:0, name:'박준규', color:'#BDD7EE', lightColor:'#DEEEF7' },
       { index:1, name:'최진옥', color:'#FCE4D6', lightColor:'#FEF2EB' },
       { index:2, name:'이상민', color:'#E2EFDA', lightColor:'#F0F7EB' },
+    ];
+    const INSTRUCTOR_TIME_SLOTS = [
+      '8:00','8:30','9:00','9:30','10:00','10:30','11:00','11:30',
+      '12:00','12:30','13:00','13:30',
+      '14:00','14:30','15:00','15:30',
+      '16:00','16:30','17:00','17:30','18:00','18:30',
+      '19:00','19:30','20:00','20:30','21:00',
     ];
 
     function programCategoryTitle(progName) {
@@ -1981,6 +2026,7 @@
       sessionCheck: { areas: [], vas: null, note: '' },
       attendProcessing: false,
       inlineAttendResult: null,
+      nextBooking: null,
     };
 
     var SESSION_DISCOMFORT_AREAS = [
@@ -2823,6 +2869,241 @@
       return html;
     }
 
+    function seoulTodayYmd_() {
+      var d = new Date();
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+
+    function defaultNextBookingInstIdx_(m) {
+      if (!m) return 0;
+      if (m.instructorIndex != null && !isNaN(parseInt(m.instructorIndex, 10))) {
+        return parseInt(m.instructorIndex, 10);
+      }
+      var instName = String(m.inst || m.instructorName || '').trim();
+      if (instName) {
+        var list = instructorsList();
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].name === instName) return list[i].index;
+        }
+      }
+      return 0;
+    }
+
+    function instructorNameByIndex_(idx) {
+      var list = instructorsList();
+      var n = parseInt(idx, 10);
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].index === n) return list[i].name;
+      }
+      return list[n] ? list[n].name : '';
+    }
+
+    function resetNextBookingState(m) {
+      var defaultInst = defaultNextBookingInstIdx_(m);
+      state.nextBooking = {
+        loading: false,
+        fromSchedule: false,
+        ymd: '',
+        timeStr: '',
+        display: '',
+        line: '',
+        pickedYmd: '',
+        pickedTime: '',
+        pickedInstIdx: defaultInst,
+        instIdx: defaultInst,
+        instName: instructorNameByIndex_(defaultInst),
+        timeSlots: INSTRUCTOR_TIME_SLOTS.slice(),
+      };
+    }
+
+    function ensureNextBookingInstOptions(selectedIdx) {
+      var sel = document.getElementById('nextBookingInstructor');
+      if (!sel) return;
+      var list = instructorsList();
+      var want = selectedIdx != null && !isNaN(parseInt(selectedIdx, 10))
+        ? parseInt(selectedIdx, 10)
+        : defaultNextBookingInstIdx_(state.selected);
+      sel.innerHTML = list.map(function(inst) {
+        return '<option value="' + inst.index + '">' + escapeHtml(inst.name) + '</option>';
+      }).join('');
+      sel.value = String(want);
+    }
+
+    function ensureNextBookingTimeOptions(slots) {
+      var sel = document.getElementById('nextBookingTime');
+      if (!sel) return;
+      var list = slots && slots.length ? slots : INSTRUCTOR_TIME_SLOTS;
+      if (sel.options.length === list.length + 1) {
+        var ok = true;
+        for (var i = 0; i < list.length; i++) {
+          if (sel.options[i + 1].value !== list[i]) { ok = false; break; }
+        }
+        if (ok) return;
+      }
+      sel.innerHTML = '<option value="">시간 선택</option>' +
+        list.map(function(t) { return '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>'; }).join('');
+    }
+
+    function formatNextBookingDisplayClient_(ymd, timeStr) {
+      if (!ymd || !timeStr) return '';
+      var parts = String(ymd).split('-');
+      if (parts.length !== 3) return '';
+      var dt = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 12, 0, 0, 0);
+      var DAY_KR = ['일', '월', '화', '수', '목', '금', '토'];
+      var mm = parseInt(parts[1], 10);
+      var dd = parts[2];
+      return mm + '월 ' + dd + '일 (' + DAY_KR[dt.getDay()] + ') ' + timeStr;
+    }
+
+    function getNextBookingAlimtalkLine() {
+      var nb = state.nextBooking;
+      if (!nb) return '';
+      if (nb.line) return nb.line;
+      if (nb.fromSchedule && nb.display) return '📅 다음 예약: ' + nb.display;
+      var ymd = nb.pickedYmd || nb.ymd || '';
+      var time = nb.pickedTime || nb.timeStr || '';
+      if (ymd && time) {
+        return '📅 다음 예약: ' + formatNextBookingDisplayClient_(ymd, time);
+      }
+      return '';
+    }
+
+    function getNextBookingServerPayload() {
+      var nb = state.nextBooking;
+      if (!nb) return null;
+      if (nb.fromSchedule && nb.line) {
+        return { nextBookingLabel: nb.line, useScheduleNextBooking: true };
+      }
+      var ymd = nb.pickedYmd || '';
+      var time = nb.pickedTime || '';
+      if (ymd && time) {
+        return {
+          nextBookingYmd: ymd,
+          nextBookingTime: time,
+          bookNextSchedule: true,
+          instructorIndex: nb.pickedInstIdx != null ? nb.pickedInstIdx : defaultNextBookingInstIdx_(state.selected),
+        };
+      }
+      return null;
+    }
+
+    function onNextBookingInputChange() {
+      var nb = state.nextBooking;
+      if (!nb || nb.fromSchedule) return;
+      var dateEl = document.getElementById('nextBookingDate');
+      var timeEl = document.getElementById('nextBookingTime');
+      var instEl = document.getElementById('nextBookingInstructor');
+      nb.pickedYmd = dateEl ? String(dateEl.value || '').trim() : '';
+      nb.pickedTime = timeEl ? String(timeEl.value || '').trim() : '';
+      if (instEl && instEl.value !== '') {
+        nb.pickedInstIdx = parseInt(instEl.value, 10);
+        nb.instName = instructorNameByIndex_(nb.pickedInstIdx);
+      }
+      if (nb.pickedYmd && nb.pickedTime) {
+        nb.display = formatNextBookingDisplayClient_(nb.pickedYmd, nb.pickedTime);
+        nb.line = '📅 다음 예약: ' + nb.display;
+      } else {
+        nb.display = '';
+        nb.line = '';
+      }
+      updateSessionWrapPreview();
+    }
+
+    function renderNextBookingPanel() {
+      var panel = document.getElementById('nextBookingPanel');
+      var existingWrap = document.getElementById('nextBookingExisting');
+      var existingText = document.getElementById('nextBookingExistingText');
+      var pickWrap = document.getElementById('nextBookingPick');
+      var dateEl = document.getElementById('nextBookingDate');
+      var m = state.selected;
+      if (!panel) return;
+      if (!m || !m.suffix8) {
+        panel.hidden = true;
+        return;
+      }
+      panel.hidden = false;
+      var nb = state.nextBooking;
+      if (!nb) {
+        panel.classList.add('loading');
+        if (existingWrap) existingWrap.hidden = true;
+        if (pickWrap) pickWrap.hidden = true;
+        return;
+      }
+      panel.classList.toggle('loading', !!nb.loading);
+      ensureNextBookingInstOptions(nb.pickedInstIdx != null ? nb.pickedInstIdx : nb.instIdx);
+      ensureNextBookingTimeOptions(nb.timeSlots);
+      if (dateEl) {
+        dateEl.min = seoulTodayYmd_();
+        if (!nb.fromSchedule && nb.pickedYmd) dateEl.value = nb.pickedYmd;
+      }
+      var timeEl = document.getElementById('nextBookingTime');
+      if (timeEl && !nb.fromSchedule && nb.pickedTime) timeEl.value = nb.pickedTime;
+      if (nb.fromSchedule && nb.display) {
+        if (existingWrap) existingWrap.hidden = false;
+        var existingLabel = nb.display;
+        if (nb.instName) existingLabel = nb.instName + ' · ' + existingLabel;
+        if (existingText) existingText.textContent = existingLabel;
+        if (pickWrap) pickWrap.hidden = true;
+      } else {
+        if (existingWrap) existingWrap.hidden = true;
+        if (pickWrap) pickWrap.hidden = false;
+      }
+    }
+
+    var _nextBookingReq = 0;
+    async function fetchNextBookingForMember_(m) {
+      if (!m || !m.suffix8) {
+        resetNextBookingState(null);
+        renderNextBookingPanel();
+        return;
+      }
+      var reqId = ++_nextBookingReq;
+      var selKey = memberKey(m);
+      resetNextBookingState(m);
+      state.nextBooking.loading = true;
+      renderNextBookingPanel();
+      try {
+        var data = await api({
+          action: 'instructorMemberNextBooking',
+          suffix8: m.suffix8,
+          name: m.name,
+          phoneDigits: m.phoneDigits || '',
+          instructorIndex: m.instructorIndex,
+        }, { timeoutMs: 30000 });
+        if (reqId !== _nextBookingReq || state.selectedKey !== selKey) return;
+        state.nextBooking.loading = false;
+        if (data.ok && data.booking) {
+          state.nextBooking.fromSchedule = true;
+          state.nextBooking.ymd = data.booking.ymd || '';
+          state.nextBooking.timeStr = data.booking.timeStr || '';
+          state.nextBooking.display = data.booking.display || '';
+          state.nextBooking.line = data.booking.line || '';
+          state.nextBooking.instIdx = data.booking.instIdx != null ? data.booking.instIdx : state.nextBooking.instIdx;
+          state.nextBooking.instName = data.booking.instName || instructorNameByIndex_(state.nextBooking.instIdx);
+        }
+        if (data.ok && data.timeSlots && data.timeSlots.length) {
+          state.nextBooking.timeSlots = data.timeSlots;
+        }
+      } catch (e) {
+        if (reqId !== _nextBookingReq || state.selectedKey !== selKey) return;
+        state.nextBooking.loading = false;
+      }
+      renderNextBookingPanel();
+      updateSessionWrapPreview();
+    }
+
+    function appendNextBookingBeforeClosing_(text, nextLine) {
+      if (!nextLine) return text;
+      var closing = '꾸준함이 가장 큰 변화를 만듭니다. 오늘도 잘 하셨어요! 💪';
+      if (text.indexOf(closing) >= 0) {
+        return text.replace(closing, nextLine + '\n\n' + closing);
+      }
+      return text + '\n\n' + nextLine;
+    }
+
     function buildAttendAlimtalkPreview(m, summary, memo, linkIds, includedIds, afterAttend, fixedBlocks, passCount) {
       fixedBlocks = fixedBlocks || {};
       var stageLine = String(fixedBlocks.stageLine != null ? fixedBlocks.stageLine : '').trim();
@@ -2846,15 +3127,15 @@
       var attendDelta = afterAttend ? 0 : (passN > 1 ? 1 : (passN || 1));
       var attendShown = afterAttend ? attendNow : attendNow + attendDelta;
       var remainNext = payTotal ? Math.max(0, payTotal - attendShown) : '—';
-      return (
+      var body =
         '🌟 출석 체크 완료 🌟\n\n' +
         '📅 ' + (payTotal ? attendShown + '회차 / ' + payTotal + '회 중' : '—') + '\n' +
         '— 남은 회차: ' + (remainNext === '—' ? '—' : remainNext + '회') + '\n\n' +
         '📍 ' + stageLine + '\n' +
         '✅ 오늘:\n' + todayBlock + '\n\n' +
-        '💬 오늘의 Key-Point!\n' + memoLine + '\n\n' +
-        '꾸준함이 가장 큰 변화를 만듭니다. 오늘도 잘 하셨어요! 💪'
-      );
+        '💬 오늘의 Key-Point!\n' + memoLine + '\n\n';
+      var nextLine = fixedBlocks.nextBookingLine != null ? fixedBlocks.nextBookingLine : getNextBookingAlimtalkLine();
+      return appendNextBookingBeforeClosing_(body + '꾸준함이 가장 큰 변화를 만듭니다. 오늘도 잘 하셨어요! 💪', nextLine);
     }
 
     function renderSessionWrapPanel() {
@@ -2896,6 +3177,8 @@
       applyDefaultCoachMemoIfNeeded();
       renderCoachMemoPresetSelect();
       renderSessionAlimtalkSection();
+      renderNextBookingPanel();
+      fetchNextBookingForMember_(m);
     }
 
     function normalizeNextProgressText(raw) {
@@ -3038,11 +3321,13 @@
       if (remain == null && payTotal) remain = Math.max(0, payTotal - attendNow);
       var sessionLine = payTotal ? attendNow + '회차 / ' + payTotal + '회 중' : '—';
       var remainLine = remain != null && remain !== '' ? remain + '회' : '—';
-      return (
+      var nextLine = getNextBookingAlimtalkLine();
+      var body =
         '기본 출석 알림톡\n\n' +
         '📅 ' + sessionLine + '\n' +
-        '— 남은 회차: ' + remainLine
-      );
+        '— 남은 회차: ' + remainLine;
+      if (nextLine) body += '\n\n' + nextLine;
+      return body;
     }
 
     function buildSentAlimtalkText_(m, data, opts) {
@@ -3063,7 +3348,7 @@
         [],
         [],
         true,
-        { stageLine: ata.stage || '', todayBlock: ata.today || '' }
+        { stageLine: ata.stage || '', todayBlock: ata.today || '', nextBookingLine: ata.nextBooking || data.nextBookingLine || getNextBookingAlimtalkLine() }
       );
     }
 
@@ -3242,6 +3527,7 @@
         linkIds: linkIds,
         memo: memo || '—',
         stageNum: stageNum,
+        nextBooking: getNextBookingAlimtalkLine(),
       };
     }
 
@@ -4416,6 +4702,7 @@
       m.nextProgress = normalizeNextProgressText((m.memoSummary && m.memoSummary.nextProgress) || m.nextProgress || '');
       clearSessionNextProgressDraft();
       resetSessionCheckState(m);
+      resetNextBookingState(m);
     }
 
     function renderSelectedMemberUi() {
@@ -4881,6 +5168,22 @@
         payload.attendAlimtalkMemo = ata.memo || '';
         if (ata.todayIds && ata.todayIds.length) payload.attendAlimtalkTodayIds = ata.todayIds;
         if (ata.linkIds && ata.linkIds.length) payload.attendAlimtalkLinkIds = ata.linkIds;
+        if (ata.nextBooking) payload.attendAlimtalkNextBooking = ata.nextBooking;
+      }
+      var nbPayload = getNextBookingServerPayload();
+      if (nbPayload) {
+        if (nbPayload.nextBookingLabel) payload.nextBookingLabel = nbPayload.nextBookingLabel;
+        if (nbPayload.nextBookingYmd) payload.nextBookingYmd = nbPayload.nextBookingYmd;
+        if (nbPayload.nextBookingTime) payload.nextBookingTime = nbPayload.nextBookingTime;
+        if (nbPayload.bookNextSchedule) payload.bookNextSchedule = true;
+        if (nbPayload.useScheduleNextBooking != null) payload.useScheduleNextBooking = nbPayload.useScheduleNextBooking;
+        if (nbPayload.instructorIndex != null) payload.instructorIndex = nbPayload.instructorIndex;
+      }
+      payload.phoneDigits = m.phoneDigits || '';
+      if (payload.instructorIndex == null) payload.instructorIndex = m.instructorIndex;
+      var nbPreviewLine = getNextBookingAlimtalkLine();
+      if (nbPreviewLine && !payload.attendAlimtalkNextBooking && !payload.nextBookingLabel) {
+        payload.attendAlimtalkNextBooking = nbPreviewLine;
       }
       return payload;
     }
@@ -4925,6 +5228,9 @@
       if (data.discomfortHistoryLine != null) m.discomfortHistoryLine = data.discomfortHistoryLine;
       if (data.discomfortHistory) m.discomfortHistory = data.discomfortHistory;
       resetAttendPassCount(m);
+      if (data.nextBookingLine || data.nextBookingBooked) {
+        fetchNextBookingForMember_(m);
+      }
       refreshSectionCollapseDefaults();
       renderProgramList();
       renderMemberChips();
