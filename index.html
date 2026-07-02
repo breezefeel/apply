@@ -355,6 +355,25 @@
       border:1px solid var(--border); border-radius:0 0 10px 10px;
       padding:10px; background:#fafbfd;
     }
+    .psp-subsection {
+      margin-bottom:10px; border:1px solid #e2e8f0; border-radius:8px;
+      background:#fff; overflow:hidden;
+    }
+    .psp-subsection:last-child { margin-bottom:0; }
+    .psp-subsection-hd {
+      font-size:11px; font-weight:800; color:#475569;
+      padding:7px 10px; background:#f1f5f9;
+      cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+      gap:8px; user-select:none; border-bottom:1px solid transparent;
+    }
+    .psp-subsection.collapsed .psp-subsection-hd { border-bottom:none; }
+    .psp-subsection-hd::after {
+      content:'▾'; font-size:10px; opacity:.45; flex-shrink:0;
+      transition:transform .15s;
+    }
+    .psp-subsection.collapsed .psp-subsection-hd::after { transform:rotate(-90deg); }
+    .psp-subsection.collapsed .psp-subsection-body { display:none; }
+    .psp-subsection-body { padding:8px 8px 4px; background:#fafbfd; }
     .psp-part-hd {
       display:flex; align-items:center; gap:8px;
       margin:12px 0 6px; font-size:12px; font-weight:700;
@@ -1971,6 +1990,44 @@
 
     var COLLAPSIBLE_SECTIONS = ['self_tool', 'pos1_par', 'pos2', 'pos3'];
 
+    /** Position 1~3 — PAR · 생활습관 · 기능운동 서브 접기 (프로필 STEP03 구조) */
+    var POSITION_SUB_CATEGORIES = {
+      pos1_par: ['par', 'lifestyle', 'func'],
+      pos2: ['par', 'lifestyle', 'func'],
+      pos3: ['par', 'lifestyle', 'func'],
+    };
+    var SUB_CATEGORY_LABELS = {
+      par: 'PAR',
+      lifestyle: '생활습관',
+      func: '기능운동',
+    };
+
+    function positionHasSubCategories(secKey) {
+      return !!(POSITION_SUB_CATEGORIES[secKey] && POSITION_SUB_CATEGORIES[secKey].length);
+    }
+
+    function collapsibleSubKey(secKey, subKey) {
+      return secKey + ':' + subKey;
+    }
+
+    /** PAR / 생활습관 / 기능운동 분류 */
+    function movementSubCategory(item) {
+      if (!item) return 'func';
+      var sec = item.uiSection || '';
+      var prog = String(item.program || '');
+      if (sec === 'pos1_par') {
+        if (isP1ParProgram(prog)) return 'par';
+        if (prog === '생활습관' || /^1\s*·/.test(prog)) return 'lifestyle';
+        return 'func';
+      }
+      if (sec === 'pos2' || sec === 'pos3') {
+        if (isActiveStretchingProgram(prog)) return 'par';
+        if (prog === '생활습관') return 'lifestyle';
+        return 'func';
+      }
+      return '';
+    }
+
     var PROGRAM_STAGES = [
       { num: 1, key: 'self_tool', title: '셀프 통증케어', titleEn: 'Self Tool', titleKo: '소도구 자극', alimtalkLabel: '스스로 통증 관리' },
       { num: 2, key: 'pos1_par', title: '누운 자세', titleEn: 'Lying', titleKo: 'Lying Position', alimtalkLabel: '누워서 기초 운동' },
@@ -3285,8 +3342,11 @@
       return state.program.filter(function(p) { return (p.uiSection || 'other') === secKey; });
     }
 
-    function sectionProgressStats(secKey) {
-      const items = sectionItems(secKey);
+    function subSectionItems(secKey, subKey) {
+      return sectionItems(secKey).filter(function(p) { return movementSubCategory(p) === subKey; });
+    }
+
+    function progressStatsForItems(items) {
       const total = items.length;
       let checked = 0;
       items.forEach(function(item) {
@@ -3300,6 +3360,25 @@
       };
     }
 
+    function sectionProgressStats(secKey) {
+      return progressStatsForItems(sectionItems(secKey));
+    }
+
+    function subSectionProgressStats(secKey, subKey) {
+      return progressStatsForItems(subSectionItems(secKey, subKey));
+    }
+
+    function progressHeaderMeta(stats) {
+      if (!stats.total || !state.selected) return '';
+      if (stats.allComplete) {
+        return ' <span class="section-meta section-meta-done">완료 '+stats.checked+'/'+stats.total+'</span>';
+      }
+      if (stats.partial) {
+        return ' <span class="section-meta section-meta-partial">진행 '+stats.checked+'/'+stats.total+'</span>';
+      }
+      return '';
+    }
+
     function defaultSectionCollapsed(secKey, hasMember) {
       if (COLLAPSIBLE_SECTIONS.indexOf(secKey) < 0) return false;
       if (hasMember) {
@@ -3307,8 +3386,16 @@
         if (stats.allComplete) return true;
         if (stats.partial) return false;
       }
-      if (secKey === 'pos1_par') return false;
       return true;
+    }
+
+    function defaultSubSectionCollapsed(secKey, subKey, hasMember) {
+      if (hasMember) {
+        var stats = subSectionProgressStats(secKey, subKey);
+        if (stats.allComplete) return true;
+        if (stats.partial) return false;
+      }
+      return subKey !== 'par';
     }
 
     function refreshSectionCollapseDefaults() {
@@ -3316,6 +3403,13 @@
       COLLAPSIBLE_SECTIONS.forEach(function(secKey) {
         if (state.sectionCollapsedTouched[secKey]) return;
         state.sectionCollapsed[secKey] = defaultSectionCollapsed(secKey, hasMember);
+      });
+      Object.keys(POSITION_SUB_CATEGORIES).forEach(function(secKey) {
+        POSITION_SUB_CATEGORIES[secKey].forEach(function(subKey) {
+          var k = collapsibleSubKey(secKey, subKey);
+          if (state.sectionCollapsedTouched[k]) return;
+          state.sectionCollapsed[k] = defaultSubSectionCollapsed(secKey, subKey, hasMember);
+        });
       });
     }
 
@@ -3327,16 +3421,20 @@
       return defaultSectionCollapsed(secKey, !!state.selected);
     }
 
+    function isSubSectionCollapsed(secKey, subKey) {
+      var k = collapsibleSubKey(secKey, subKey);
+      if (state.sectionCollapsedTouched[k]) {
+        return !!state.sectionCollapsed[k];
+      }
+      return defaultSubSectionCollapsed(secKey, subKey, !!state.selected);
+    }
+
     function sectionHeaderMeta(secKey) {
-      const stats = sectionProgressStats(secKey);
-      if (!stats.total || !state.selected) return '';
-      if (stats.allComplete) {
-        return ' <span class="section-meta section-meta-done">완료 '+stats.checked+'/'+stats.total+'</span>';
-      }
-      if (stats.partial) {
-        return ' <span class="section-meta section-meta-partial">진행 '+stats.checked+'/'+stats.total+'</span>';
-      }
-      return '';
+      return progressHeaderMeta(sectionProgressStats(secKey));
+    }
+
+    function subSectionHeaderMeta(secKey, subKey) {
+      return progressHeaderMeta(subSectionProgressStats(secKey, subKey));
     }
 
     function toast(msg) {
@@ -4368,6 +4466,50 @@
       renderProgramList();
     }
 
+    function toggleSubSectionCollapse(secKey, subKey) {
+      var k = collapsibleSubKey(secKey, subKey);
+      state.sectionCollapsedTouched[k] = true;
+      state.sectionCollapsed[k] = !isSubSectionCollapsed(secKey, subKey);
+      renderProgramList();
+    }
+
+    function renderProgramGroupsHtml(items, secKey, hasMember) {
+      var html = '';
+      var programsInSection = {};
+      items.forEach(function(item) {
+        if (!programsInSection[item.program]) programsInSection[item.program] = [];
+        programsInSection[item.program].push(item);
+      });
+      var activeStretchingMainShown = false;
+      Object.keys(programsInSection).sort(function(a, b) {
+        var na = programSortKey(a), nb = programSortKey(b);
+        if (na !== nb) return na - nb;
+        return String(a).localeCompare(String(b), 'ko');
+      }).forEach(function(progName) {
+        var progItems = programsInSection[progName];
+        if (isActiveStretchingProgram(progName)) {
+          if (!activeStretchingMainShown) {
+            activeStretchingMainShown = true;
+            html += '<div class="psp-part-hd" style="margin-top:4px;"><span>' + escapeHtml(ACTIVE_STRETCHING_TITLE) + '</span></div>';
+          }
+        } else if (!useFlatCheckboxRows(progName)) {
+          html += '<div class="psp-part-hd" style="margin-top:4px;"><span>' + escapeHtml(programCategoryTitle(progName)) + '</span></div>';
+        }
+        var cardCls = 'psp-part-card';
+        if (secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0) cardCls += ' horizontal';
+        else if (isP1ParProgram(progName)) cardCls += ' p1-kind-card';
+        html += '<div class="' + cardCls + '">';
+        progItems.forEach(function(item) {
+          html += renderMethodRowHtml(
+            item, secKey, hasMember,
+            isP1ParProgram(progName) ? p1CompactLabel(item) : null
+          );
+        });
+        html += '</div>';
+      });
+      return html;
+    }
+
     function renderSimpleProgramList(root, list) {
       const hasMember = !!state.selected;
       var grouped = {};
@@ -4518,38 +4660,22 @@
           html += '<div class="psp-section-hd">'+escapeHtml(g.title)+'</div>';
         }
         html += '<div class="psp-section-body">';
-        let activeStretchingMainShown = false;
-        let programsInSection = {};
-        g.items.forEach(function(item){
-          if (!programsInSection[item.program]) programsInSection[item.program] = [];
-          programsInSection[item.program].push(item);
-        });
-        Object.keys(programsInSection).sort(function(a,b){
-          const na = programSortKey(a), nb = programSortKey(b);
-          if (na !== nb) return na - nb;
-          return String(a).localeCompare(String(b),'ko');
-        }).forEach(function(progName){
-          const items = programsInSection[progName];
-          if (isActiveStretchingProgram(progName)) {
-            if (!activeStretchingMainShown) {
-              activeStretchingMainShown = true;
-              html += '<div class="psp-part-hd" style="margin-top:4px;"><span>' + escapeHtml(ACTIVE_STRETCHING_TITLE) + '</span></div>';
-            }
-          } else if (!useFlatCheckboxRows(progName)) {
-            html += '<div class="psp-part-hd" style="margin-top:4px;"><span>'+escapeHtml(programCategoryTitle(progName))+'</span></div>';
-          }
-          var cardCls = 'psp-part-card';
-          if (secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0) cardCls += ' horizontal';
-          else if (isP1ParProgram(progName)) cardCls += ' p1-kind-card';
-          html += '<div class="' + cardCls + '">';
-          items.forEach(function(item){
-            html += renderMethodRowHtml(
-              item, secKey, hasMember,
-              isP1ParProgram(progName) ? p1CompactLabel(item) : null
-            );
+        if (positionHasSubCategories(secKey)) {
+          POSITION_SUB_CATEGORIES[secKey].forEach(function(subKey) {
+            var subItems = g.items.filter(function(it) { return movementSubCategory(it) === subKey; });
+            if (!subItems.length) return;
+            var subCollapsed = isSubSectionCollapsed(secKey, subKey);
+            html += '<div class="psp-subsection collapsible' + (subCollapsed ? ' collapsed' : '') + '">';
+            html += '<div class="psp-subsection-hd" onclick="toggleSubSectionCollapse(\'' + secKey + '\',\'' + subKey + '\')">';
+            html += escapeHtml(SUB_CATEGORY_LABELS[subKey] || subKey);
+            html += subSectionHeaderMeta(secKey, subKey);
+            html += '</div><div class="psp-subsection-body">';
+            html += renderProgramGroupsHtml(subItems, secKey, hasMember);
+            html += '</div></div>';
           });
-          html += '</div>';
-        });
+        } else {
+          html += renderProgramGroupsHtml(g.items, secKey, hasMember);
+        }
         html += '</div></div>';
       });
       root.innerHTML = html;
