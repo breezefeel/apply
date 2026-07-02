@@ -1857,13 +1857,30 @@
       };
     }
 
-    function distributeServerProgressToStore(m) {
+    function distributeServerProgressToStore(m, opts) {
+      opts = opts || {};
       var prog = m.pspProgress || {};
       var recent = m.previousSessionProgress || {};
-      if (!state.progressByMember[state.selectedKey]) {
-        state.progressByMember[state.selectedKey] = {};
+      var mk = state.selectedKey || memberKey(m);
+      if (!state.progressByMember[mk]) {
+        state.progressByMember[mk] = {};
       }
-      var store = state.progressByMember[state.selectedKey];
+      var store = state.progressByMember[mk];
+      if (opts.resetBaseline) {
+        PROGRAM_TABS.forEach(function (tab) {
+          if (!store[tab.id]) {
+            store[tab.id] = {
+              saved: {},
+              recent: {},
+              today: {},
+              sectionCollapsed: {},
+              sectionCollapsedTouched: {},
+            };
+          }
+          store[tab.id].saved = {};
+          store[tab.id].recent = {};
+        });
+      }
       Object.keys(prog).forEach(function(id) {
         if (!prog[id] || !prog[id].length) return;
         var tab = catalogTabForItemId(id);
@@ -2115,6 +2132,11 @@
       });
     }
 
+    function shouldAutoIncludeSessionLink_(itemId) {
+      var p = state.program.find(function(x) { return x.id === itemId; });
+      return !!(p && p.uiSection === 'self_tool' && p.youtubeUrl);
+    }
+
     function getSessionIncludedIds() {
       var boxes = document.querySelectorAll('#sessionTodayList input[data-include-id]');
       if (!boxes.length) {
@@ -2131,10 +2153,17 @@
       var includeSet = {};
       getSessionIncludedIds().forEach(function(id) { includeSet[id] = true; });
       var out = [];
-      document.querySelectorAll('#sessionTodayList input[data-link-id]').forEach(function(cb) {
-        if (cb.checked && cb.dataset.linkId && includeSet[cb.dataset.linkId]) {
-          out.push(cb.dataset.linkId);
-        }
+      var linkBoxes = document.querySelectorAll('#sessionTodayList input[data-link-id]');
+      if (linkBoxes.length) {
+        linkBoxes.forEach(function(cb) {
+          if (cb.checked && cb.dataset.linkId && includeSet[cb.dataset.linkId]) {
+            out.push(cb.dataset.linkId);
+          }
+        });
+        return out;
+      }
+      todayProgressEntries().forEach(function(ent) {
+        if (includeSet[ent.id] && shouldAutoIncludeSessionLink_(ent.id)) out.push(ent.id);
       });
       return out;
     }
@@ -2843,9 +2872,12 @@
         todayBox.innerHTML = '<p class="stage-today-empty">오늘 체크한 항목이 없습니다. 진도 없이 출석만 처리할 수도 있어요.</p>';
       } else {
         todayBox.innerHTML = entries.map(function(ent) {
+          var autoLink = shouldAutoIncludeSessionLink_(ent.id);
           var linkHtml = ent.hasVideo
             ? '<label class="stage-today-link-check">' +
-              '<input type="checkbox" data-link-id="' + escapeHtml(ent.id) + '" onchange="updateSessionWrapPreview()">URL 함께' +
+              '<input type="checkbox" data-link-id="' + escapeHtml(ent.id) + '"' +
+              (autoLink ? ' checked' : '') +
+              ' onchange="updateSessionWrapPreview()">URL 함께' +
               '</label>'
             : '<span class="stage-today-link-check disabled">URL 없음</span>';
           return '<div class="stage-today-row" data-item-id="' + escapeHtml(ent.id) + '">' +
@@ -3320,6 +3352,12 @@
       }
       if (addRes.phoneDigits) m.phoneDigits = addRes.phoneDigits;
       if (addRes.phoneLast4) m.phoneLast4 = addRes.phoneLast4;
+      if (addRes.suffix8) m.suffix8 = addRes.suffix8;
+      else if (addRes.phoneDigits) {
+        m.suffix8 = String(addRes.phoneDigits).replace(/\D/g, '').slice(-8);
+      }
+      saveProgressToMemberStore();
+      rebindMemberProgressKey_(m, state.selectedKey);
       m.provisional = true;
       if (!m.payRounds) {
         m.payRounds = 1;
@@ -3553,7 +3591,37 @@
       var inst = m.instructorIndex != null ? m.instructorIndex : '';
       var suffix8 = String(m.suffix8 || '').replace(/\D/g, '').slice(-8);
       if (suffix8.length === 8) return suffix8 + '|' + name + '|' + inst;
+      var phone = String(m.phoneDigits || '').replace(/\D/g, '');
+      if (phone.length >= 10) return 'p:' + phone + '|' + name + '|' + inst;
+      var time = String(m.time || '').split(',')[0].trim();
+      if (time) return 't:' + name + '|' + inst + '|' + time;
       return 'n:' + name + '|' + inst;
+    }
+
+    /** 임시등록 등으로 suffix8 생기면 진도·완료 상태 키를 새 memberKey로 이전 */
+    function rebindMemberProgressKey_(m, prevKey) {
+      var nextKey = memberKey(m);
+      if (!prevKey || prevKey === nextKey) {
+        state.selectedKey = nextKey;
+        return nextKey;
+      }
+      if (state.progressByMember[prevKey]) {
+        state.progressByMember[nextKey] = state.progressByMember[prevKey];
+        delete state.progressByMember[prevKey];
+      }
+      if (state.progressSavedKeys && state.progressSavedKeys[prevKey]) {
+        state.progressSavedKeys[nextKey] = state.progressSavedKeys[prevKey];
+        delete state.progressSavedKeys[prevKey];
+      }
+      if (state.completedKeys && state.completedKeys[prevKey]) {
+        state.completedKeys[nextKey] = state.completedKeys[prevKey];
+        delete state.completedKeys[prevKey];
+      }
+      if (state.inlineAttendResult && state.inlineAttendResult.memberKey === prevKey) {
+        state.inlineAttendResult.memberKey = nextKey;
+      }
+      state.selectedKey = nextKey;
+      return nextKey;
     }
     function mergeTodayMemberSlotFields_(base, add) {
       if (add.time && base._times.indexOf(add.time) === -1) base._times.push(add.time);
@@ -4446,7 +4514,9 @@
       resetMemberSessionState(m);
       resetAttendPassCount(m);
       var mk = memberKey(m);
-      if (!state.progressByMember[mk]) {
+      if (m.suffix8 && (Object.keys(m.pspProgress || {}).length || Object.keys(m.previousSessionProgress || {}).length)) {
+        distributeServerProgressToStore(m, { resetBaseline: true });
+      } else if (!state.progressByMember[mk]) {
         distributeServerProgressToStore(m);
       }
       state.program = getProgramCatalog(state.activeProgramTab);
@@ -4742,6 +4812,10 @@
       if (!data.ok) {
         toast(data.message || '진도 저장 실패');
         return;
+      }
+      if (data.pspProgress) {
+        m.pspProgress = data.pspProgress;
+        m.previousSessionProgress = data.previousSessionProgress || m.previousSessionProgress || {};
       }
       markMemberProgressSaved_(m);
     }
