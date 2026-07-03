@@ -383,8 +383,9 @@
     .member-brief .line1 .phone[hidden] { display:none; }
     .member-brief .line1 .phone:active { opacity:.7; }
     .member-brief .line2 { font-size:12px; color:var(--dim); margin-top:8px; white-space:pre-wrap; line-height:1.55; }
-    .member-brief .line2.brief-wellness span:last-child { color:#3a63a8; }
-    .member-brief .brief-label { font-weight:700; color:var(--text); margin-right:6px; display:block; margin-bottom:4px; }
+    .member-brief .line2.brief-eval-notes.is-placeholder .brief-text {
+      color:#94a3b8; font-style:italic;
+    }
     .member-brief .brief-text { display:block; color:var(--dim); }
 
     .member-overview-wrap {
@@ -420,6 +421,18 @@
     }
     .condition-history-empty {
       font-size:11px; color:var(--dim); margin:0; line-height:1.5;
+    }
+    .condition-history-loading {
+      font-size:11px; color:var(--dim); margin:8px 0 0; line-height:1.5;
+    }
+    .condition-history-loading .ch-countdown {
+      font-weight:700; color:var(--blue);
+    }
+    .condition-history-error {
+      font-size:11px; color:#b91c1c; margin:8px 0 0; line-height:1.5;
+    }
+    .condition-history-card .ch-session + .ch-session {
+      margin-top:10px; padding-top:10px; border-top:1px dashed #e2e8f0;
     }
     .condition-history-card {
       padding:10px; border-radius:8px;
@@ -464,12 +477,6 @@
     .condition-history-card .ch-label {
       font-weight:700; color:var(--text); margin-right:4px;
     }
-    .condition-history-current {
-      padding:10px; border-radius:8px; margin-bottom:10px;
-      background:var(--blue-bg); border:1px solid #bfdbfe;
-      font-size:11px; line-height:1.55;
-    }
-    .condition-history-current .ch-label { font-weight:800; color:var(--text); margin-right:6px; }
     @media (min-width:960px) {
       .member-overview-top {
         flex-direction:row;
@@ -1214,10 +1221,6 @@
       font-size:10px; color:#94a3b8;
       margin:0; line-height:1.35;
     }
-    .alimtalk-next-booking-loading {
-      font-size:11px; font-weight:600; color:#fbbf24;
-      margin:4px 0 6px; line-height:1.45;
-    }
     .alimtalk-preview .preview-label + .alimtalk-preview-hint {
       margin-top:2px;
     }
@@ -1352,13 +1355,8 @@
         <div class="member-overview-top">
           <div class="member-brief" id="memberBrief">
             <div class="line1"><span id="briefName">—</span><a class="phone" id="briefPhone" href="#" hidden>전화</a></div>
-            <div class="line2 brief-wellness" id="briefWellnessRow" hidden>
-              <span class="brief-label">사전 문진 · 특이사항</span>
-              <span class="brief-text" id="briefWellness">—</span>
-            </div>
-            <div class="line2" id="briefFirstEvalRow" hidden>
-              <span class="brief-label">초회 평가 · 특이사항</span>
-              <span class="brief-text" id="briefFirstEval">—</span>
+            <div class="line2 brief-eval-notes is-placeholder" id="briefEvalNotesRow">
+              <span class="brief-text" id="briefEvalNotes">사전/초회 평가 시 평가 결과 및 특이사항</span>
             </div>
           </div>
           <aside class="member-condition-history" id="memberConditionHistory">
@@ -1429,7 +1427,6 @@
       <div class="alimtalk-preview" id="sessionAlimtalkSection">
         <div class="preview-label" id="sessionAlimtalkSectionLabel">알림톡으로 보내질 내용 (출석+진도보내기)</div>
         <p class="alimtalk-preview-hint" id="sessionAlimtalkHint">세 버튼 모두 출석·진도 저장은 동일합니다. 알림톡만 선택에 따라 달라집니다.</p>
-        <p class="alimtalk-next-booking-loading" id="sessionAlimtalkNextBookingLoading" hidden aria-live="polite"></p>
         <div id="sessionAttendProcessing" hidden></div>
         <div id="sessionAttendOutcomePreview" class="session-attend-outcome-preview" hidden></div>
         <div id="sessionAlimtalkPreview"></div>
@@ -2339,6 +2336,8 @@
       attendProcessing: false,
       inlineAttendResult: null,
       nextBooking: null,
+      memberDetailLoading: false,
+      memberDetailLoadError: '',
     };
 
     var SESSION_DISCOMFORT_GROUP_LABELS = {
@@ -3366,7 +3365,7 @@
       return '';
     }
 
-    var NEXT_BOOKING_LOAD_EST_SEC = 8;
+    var NEXT_BOOKING_LOAD_EST_SEC = 15;
     var _nextBookingCountdownTimer = null;
     var _nextBookingCountdownSec = 0;
 
@@ -3379,11 +3378,12 @@
     }
 
     function getNextBookingLoadingAlimtalkLine_() {
+      var est = NEXT_BOOKING_LOAD_EST_SEC;
       var sec = _nextBookingCountdownSec;
       if (sec > 0) {
-        return '📅 다음 예약: 회원정보에서 불러오는 중… (예상 ' + sec + '초)';
+        return '📅 다음 예약: 회원정보에서 불러오는 중… (예상 ' + est + '초 · ' + sec + '초 남음)';
       }
-      return '📅 다음 예약: 회원정보에서 불러오는 중… (조금 더 걸리고 있어요)';
+      return '📅 다음 예약: 회원정보에서 불러오는 중… (예상 ' + est + '초 · 조금 더 걸리고 있어요)';
     }
 
     function startNextBookingCountdown() {
@@ -3392,7 +3392,6 @@
       _nextBookingCountdownTimer = setInterval(function() {
         if (_nextBookingCountdownSec > 0) _nextBookingCountdownSec -= 1;
         if (state.nextBooking && state.nextBooking.loading) {
-          syncAlimtalkNextBookingLoadingUi_();
           updateSessionWrapPreview();
         } else {
           stopNextBookingCountdown();
@@ -3958,14 +3957,6 @@
       );
     }
 
-    function syncAlimtalkNextBookingLoadingUi_() {
-      var el = document.getElementById('sessionAlimtalkNextBookingLoading');
-      if (!el) return;
-      var loading = !!(state.nextBooking && state.nextBooking.loading);
-      el.hidden = !loading;
-      el.textContent = loading ? getNextBookingLoadingAlimtalkLine_() : '';
-    }
-
     function renderSessionAlimtalkSection() {
       var section = document.getElementById('sessionAlimtalkSection');
       var label = document.getElementById('sessionAlimtalkSectionLabel');
@@ -3974,8 +3965,6 @@
       var previewEl = document.getElementById('sessionAlimtalkPreview');
       var resultWrap = document.getElementById('sessionAttendResultInline');
       if (!section || !previewEl) return;
-
-      syncAlimtalkNextBookingLoadingUi_();
 
       var isProcessing = !!state.attendProcessing;
       var result = state.inlineAttendResult;
@@ -5331,6 +5320,71 @@
       return parts.join(' · ') || '—';
     }
 
+    var MEMBER_DETAIL_LOAD_EST_SEC = 15;
+    var _memberDetailCountdownTimer = null;
+    var _memberDetailCountdownSec = 0;
+
+    function stopMemberDetailCountdown() {
+      if (_memberDetailCountdownTimer) {
+        clearInterval(_memberDetailCountdownTimer);
+        _memberDetailCountdownTimer = null;
+      }
+      _memberDetailCountdownSec = 0;
+    }
+
+    function getMemberDetailLoadingHtml_() {
+      var est = MEMBER_DETAIL_LOAD_EST_SEC;
+      var sec = _memberDetailCountdownSec;
+      var line = sec > 0
+        ? '회원 히스토리 불러오는 중… <span class="ch-countdown">(예상 ' + est + '초 · ' + sec + '초 남음)</span>'
+        : '회원 히스토리 불러오는 중… <span class="ch-countdown">(예상 ' + est + '초 · 조금 더 걸리고 있어요)</span>';
+      return '<p class="condition-history-loading" aria-live="polite">' + line + '</p>';
+    }
+
+    function startMemberDetailCountdown() {
+      stopMemberDetailCountdown();
+      _memberDetailCountdownSec = MEMBER_DETAIL_LOAD_EST_SEC;
+      _memberDetailCountdownTimer = setInterval(function() {
+        if (_memberDetailCountdownSec > 0) _memberDetailCountdownSec -= 1;
+        if (state.memberDetailLoading) {
+          renderConditionHistory(state.selected);
+        } else {
+          stopMemberDetailCountdown();
+        }
+      }, 1000);
+    }
+
+    function groupConditionHistoryByDate_(list) {
+      var order = [];
+      var byDate = {};
+      (list || []).forEach(function(item) {
+        var d = String(item.dateStr || '—').trim() || '—';
+        if (!byDate[d]) {
+          byDate[d] = [];
+          order.push(d);
+        }
+        byDate[d].push(item);
+      });
+      return order.map(function(d) {
+        return { dateStr: d, items: byDate[d] };
+      });
+    }
+
+    function renderConditionHistorySessionBody_(item) {
+      return '<div class="ch-session">' +
+        '<div class="ch-block"><span class="ch-label">다음 진도</span>' + escapeHtml(normalizeNextProgressText(item.nextProgress) || '—') + '</div>' +
+        '<div class="ch-block"><span class="ch-label">불편 부위 · VAS</span>' + escapeHtml(item.discomfort || '—') + '</div>' +
+        '<div class="ch-block"><span class="ch-label">세션 특이사항</span>' + escapeHtml(item.sessionNote || '—') + '</div>' +
+        '</div>';
+    }
+
+    function conditionHistoryGroupPreviewLine_(group) {
+      var item = group.items[0];
+      var line = conditionHistoryPreviewLine_(item);
+      if (group.items.length > 1) line += ' · 외 ' + (group.items.length - 1) + '건';
+      return line;
+    }
+
     function toggleConditionHistoryCard_(idx) {
       if (idx === 0) return;
       if (!state.historyExpandedKeys) state.historyExpandedKeys = {};
@@ -5342,34 +5396,49 @@
       var root = document.getElementById('conditionHistoryList');
       if (!root) return;
       m = m || state.selected;
+      var html = '';
+
+      if (!m || !m.suffix8) {
+        html += '<p class="condition-history-empty">전화번호가 등록된 회원만 히스토리를 불러올 수 있습니다.</p>';
+        root.innerHTML = html;
+        return;
+      }
+
+      if (state.memberDetailLoading) {
+        html += getMemberDetailLoadingHtml_();
+        root.innerHTML = html;
+        return;
+      }
+
+      if (state.memberDetailLoadError) {
+        html += '<p class="condition-history-error">' + escapeHtml(state.memberDetailLoadError) + '</p>';
+      }
+
       var list = (m && m.conditionHistory) ? m.conditionHistory.slice() : [];
-      var currentNp = normalizeNextProgressText(m && m.nextProgress) || '—';
-      var html =
-        '<div class="condition-history-current">' +
-        '<div><span class="ch-label">다음 진도</span>' + escapeHtml(currentNp) + '</div></div>';
       if (!list.length) {
         html += '<p class="condition-history-empty">이전 세션 기록이 없습니다.</p>';
         root.innerHTML = html;
         return;
       }
-      html += list.map(function (item, idx) {
-        var isLatest = idx === 0;
-        var expanded = isLatest || !!(state.historyExpandedKeys && state.historyExpandedKeys[idx]);
+
+      var groups = groupConditionHistoryByDate_(list);
+      html += groups.map(function(group, gIdx) {
+        var isLatest = gIdx === 0;
+        var expanded = isLatest || !!(state.historyExpandedKeys && state.historyExpandedKeys[gIdx]);
         var cardCls = 'condition-history-card' + (isLatest ? ' is-latest' : '') + (!expanded ? ' is-collapsed' : '');
-        var clickAttr = !expanded && !isLatest
-          ? ' onclick="toggleConditionHistoryCard_(' + idx + ')" role="button" tabindex="0"'
-          : (!isLatest && expanded ? ' onclick="toggleConditionHistoryCard_(' + idx + ')" role="button" tabindex="0"' : '');
+        var clickAttr = !isLatest
+          ? ' onclick="toggleConditionHistoryCard_(' + gIdx + ')" role="button" tabindex="0" aria-expanded="' + (expanded ? 'true' : 'false') + '"'
+          : ' aria-expanded="true"';
         var foldHint = isLatest
           ? ''
           : '<span class="ch-fold-hint">' + (expanded ? '접기' : '펼치기') + '</span>';
+        var bodyHtml = group.items.map(function(item) {
+          return renderConditionHistorySessionBody_(item);
+        }).join('');
         return '<article class="' + cardCls + '"' + clickAttr + '>' +
-          '<div class="ch-date"><span>' + escapeHtml(item.dateStr || '—') + (isLatest ? ' · 최근' : '') + '</span>' + foldHint + '</div>' +
-          '<div class="ch-preview">' + escapeHtml(conditionHistoryPreviewLine_(item)) + '</div>' +
-          '<div class="ch-body">' +
-          '<div class="ch-block"><span class="ch-label">다음 진도</span>' + escapeHtml(normalizeNextProgressText(item.nextProgress) || '—') + '</div>' +
-          '<div class="ch-block"><span class="ch-label">불편 부위 · VAS</span>' + escapeHtml(item.discomfort || '—') + '</div>' +
-          '<div class="ch-block"><span class="ch-label">세션 특이사항</span>' + escapeHtml(item.sessionNote || '—') + '</div>' +
-          '</div></article>';
+          '<div class="ch-date"><span>' + escapeHtml(group.dateStr || '—') + (isLatest ? ' · 최근' : '') + '</span>' + foldHint + '</div>' +
+          '<div class="ch-preview">' + escapeHtml(conditionHistoryGroupPreviewLine_(group)) + '</div>' +
+          '<div class="ch-body">' + bodyHtml + '</div></article>';
       }).join('');
       root.innerHTML = html;
     }
@@ -5538,6 +5607,9 @@
       state.sectionCollapsed = {};
       _pendingAttendAlimtalk = null;
       state.historyExpandedKeys = {};
+      stopMemberDetailCountdown();
+      state.memberDetailLoading = false;
+      state.memberDetailLoadError = '';
       resetInlineAttendResult();
       var memoEl = document.getElementById('sessionCoachMemo');
       if (memoEl) {
@@ -5554,6 +5626,46 @@
       resetNextBookingState(m);
     }
 
+    function buildBriefEvalNotesText_(m) {
+      if (!m) return '';
+      var parts = [];
+      var wi = m.wellnessIntake;
+      if (wi && (wi.summary || wi.referenceNotes || (wi.chipPrefill && wi.chipPrefill.length))) {
+        var wiLabel = wi.intakeType === 'treatment' ? '통증 문진' : '사전 문진';
+        var wiMeta = [];
+        if (wi.submittedAt) wiMeta.push(String(wi.submittedAt).slice(0, 10));
+        if (wi.channel === 'online') wiMeta.push('온라인');
+        else if (wi.channel === 'visit') wiMeta.push('방문');
+        var wiBody = String(wi.summary || '').trim();
+        var wiRef = String(wi.referenceNotes || '').trim();
+        if (wiRef) wiBody = (wiBody ? wiBody + '\n\n' : '') + wiRef;
+        var wiBlock = '[' + wiLabel + (wiMeta.length ? ' · ' + wiMeta.join(' · ') : '') + ']';
+        if (wiBody) wiBlock += '\n' + wiBody;
+        parts.push(wiBlock);
+      }
+      var fe = m.firstEvalBrief;
+      var feText = String((fe && (fe.fullText || fe.summary)) || '').trim();
+      if (fe && fe.has && feText) {
+        if (fe.dateStr) feText = fe.dateStr + '\n' + feText;
+        parts.push('[초회 평가]\n' + feText);
+      }
+      return parts.join('\n\n').slice(0, 1200);
+    }
+
+    function renderBriefEvalNotes_(m) {
+      var row = document.getElementById('briefEvalNotesRow');
+      var el = document.getElementById('briefEvalNotes');
+      if (!row || !el) return;
+      var content = buildBriefEvalNotesText_(m);
+      if (content) {
+        el.textContent = content;
+        row.classList.remove('is-placeholder');
+      } else {
+        el.textContent = '사전/초회 평가 시 평가 결과 및 특이사항';
+        row.classList.add('is-placeholder');
+      }
+    }
+
     function renderSelectedMemberUi() {
       var m = state.selected;
       if (!m) return;
@@ -5564,42 +5676,7 @@
       if (panel) panel.classList.add('show');
       document.getElementById('briefName').textContent = m.name || '—';
       updateBriefPhoneLink(m);
-      var feRow = document.getElementById('briefFirstEvalRow');
-      var feEl = document.getElementById('briefFirstEval');
-      var fe = m.firstEvalBrief;
-      if (feRow && feEl) {
-        var feText = String((fe && (fe.fullText || fe.summary)) || '').trim();
-        if (fe && fe.has && feText) {
-          feRow.hidden = false;
-          if (fe.dateStr) feText = fe.dateStr + '\n' + feText;
-          feEl.textContent = feText.slice(0, 600);
-        } else {
-          feRow.hidden = true;
-          feEl.textContent = '—';
-        }
-      }
-      var wiRow = document.getElementById('briefWellnessRow');
-      var wiEl = document.getElementById('briefWellness');
-      var wi = m.wellnessIntake;
-      if (wiRow && wiEl) {
-        if (wi && (wi.summary || wi.referenceNotes || (wi.chipPrefill && wi.chipPrefill.length))) {
-          wiRow.hidden = false;
-          var wiLabel = wiRow.querySelector('.brief-label');
-          if (wiLabel) wiLabel.textContent = wi.intakeType === 'treatment' ? '통증 문진 · 특이사항' : '사전 문진 · 특이사항';
-          var wiParts = [];
-          if (wi.submittedAt) wiParts.push(String(wi.submittedAt).slice(0, 10));
-          if (wi.channel === 'online') wiParts.push('온라인');
-          else if (wi.channel === 'visit') wiParts.push('방문');
-          var wiBody = String(wi.summary || '').trim();
-          var wiRef = String(wi.referenceNotes || '').trim();
-          if (wiRef) wiBody = (wiBody ? wiBody + '\n\n' : '') + wiRef;
-          if (wiBody) wiParts.push(wiBody);
-          wiEl.textContent = wiParts.join('\n').slice(0, 600);
-        } else {
-          wiRow.hidden = true;
-          wiEl.textContent = '—';
-        }
-      }
+      renderBriefEvalNotes_(m);
       renderConditionHistory(m);
       var wrapPanel = document.getElementById('sessionWrapPanel');
       if (wrapPanel) wrapPanel.classList.add('show');
@@ -5620,10 +5697,15 @@
       try {
         var detail = await api({ action: 'instructorMemberDetail', suffix8: m.suffix8, attendeeName: m.name }, { timeoutMs: 45000 });
         if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
+        state.memberDetailLoading = false;
+        stopMemberDetailCountdown();
         if (!detail.ok || !detail.member) {
+          state.memberDetailLoadError = (detail && detail.message) || '회원 정보를 불러오지 못했습니다.';
           fetchNextBookingForMember_(m);
+          renderConditionHistory(m);
           return;
         }
+        state.memberDetailLoadError = '';
         m.specialNotes = detail.member.specialNotes || m.specialNotes || '';
         m.nextProgress = normalizeNextProgressText(detail.member.nextProgress || m.nextProgress || '');
         m.pspProgress = detail.member.pspProgress || m.pspProgress || {};
@@ -5654,7 +5736,11 @@
         renderSelectedMemberUi();
       } catch (e) {
         if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
+        state.memberDetailLoading = false;
+        stopMemberDetailCountdown();
+        state.memberDetailLoadError = '회원 정보 응답 시간 초과 또는 연결 실패. 잠시 후 다시 선택해 주세요.';
         fetchNextBookingForMember_(m);
+        renderConditionHistory(m);
       }
     }
 
@@ -5673,8 +5759,15 @@
       }
       state.program = getProgramCatalog(state.activeProgramTab);
       loadProgressFromMemberStore(state.activeProgramTab);
-      if (!m.suffix8) {
+      if (m.suffix8) {
+        state.memberDetailLoading = true;
+        state.memberDetailLoadError = '';
+        startMemberDetailCountdown();
+      } else {
         m.specialNotes = m.memo || '';
+        state.memberDetailLoading = false;
+        state.memberDetailLoadError = '';
+        stopMemberDetailCountdown();
       }
       renderSelectedMemberUi();
       if (m.suffix8) {
