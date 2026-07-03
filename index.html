@@ -4381,6 +4381,7 @@
       return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
     var BOARD_LOAD_ESTIMATE_SEC = 25;
+    var BOARD_LOAD_TIMEOUT_MS = 35000;
     var BOARD_AUTO_SYNC_IDLE_MS = 12 * 60 * 1000;
     var _loadCountdownTimer = null;
     var _loadCountdownStartedAt = 0;
@@ -4425,20 +4426,64 @@
       _loadCountdownTimer = setInterval(paintMemberLoadCountdown, 400);
     }
 
+    function apiTimeoutMessage_(payload, timeoutMs) {
+      if (payload && payload.action === 'instructorDayBoard') {
+        return '회원 목록 응답 시간 초과(약 ' + Math.round(timeoutMs / 1000) + '초). ' +
+          'Google Apps Script가 지연 중입니다. 잠시 후 새로고침해 주세요.';
+      }
+      return '서버 응답 시간 초과(약 ' + Math.round(timeoutMs / 1000) + '초). ' +
+        '출석·저장이 이미 반영됐을 수 있으니 새로고침 후 확인해 주세요.';
+    }
+
+    function withApiTimeout_(promise, controller, timeoutMs) {
+      var done = false;
+      var timer = null;
+      return new Promise(function(resolve, reject) {
+        timer = setTimeout(function() {
+          if (done) return;
+          done = true;
+          try { controller.abort(); } catch (e) {}
+          var err = new Error('API timeout');
+          err.name = 'ApiTimeoutError';
+          reject(err);
+        }, timeoutMs);
+        promise.then(function(value) {
+          if (done) return;
+          done = true;
+          clearTimeout(timer);
+          resolve(value);
+        }, function(err) {
+          if (done) return;
+          done = true;
+          clearTimeout(timer);
+          reject(err);
+        });
+      });
+    }
+
     async function api(payload, opts) {
       opts = opts || {};
       var timeoutMs = opts.timeoutMs != null ? opts.timeoutMs : 55000;
       var controller = new AbortController();
-      var timer = setTimeout(function() { controller.abort(); }, timeoutMs);
       try {
         // Apps Script /exec 는 POST 시 302 → GET 으로 바뀌며 doGet(unknown action) 이 됨 → GET ?data= 사용
         var body = JSON.stringify(Object.assign({ pin: state.pin }, payload));
-        var url = API_URL + (API_URL.indexOf('?') >= 0 ? '&' : '?') + 'data=' + encodeURIComponent(body);
-        const res = await fetch(url, {
+        var sep = API_URL.indexOf('?') >= 0 ? '&' : '?';
+        var url = API_URL + sep + 'data=' + encodeURIComponent(body) + '&_ts=' + Date.now();
+        const result = await withApiTimeout_(fetch(url, {
           method: 'GET',
           signal: controller.signal,
-        });
-        const text = await res.text();
+          cache: 'no-store',
+        }).then(function(res) {
+          return res.text().then(function(text) {
+            return { res: res, text: text };
+          });
+        }), controller, timeoutMs);
+        const res = result.res;
+        const text = result.text;
+        if (!res.ok) {
+          return { ok: false, message: '서버 응답 오류(' + res.status + ') — Apps Script 배포 상태 확인' };
+        }
         try {
           var data = JSON.parse(text);
           if (data && data.result === 'error' && data.ok !== true) {
@@ -4449,21 +4494,18 @@
           return { ok: false, message: '서버 응답 형식 오류 — Apps Script 배포·URL 확인' };
         }
       } catch (err) {
-        if (err && err.name === 'AbortError') {
+        if (err && (err.name === 'AbortError' || err.name === 'ApiTimeoutError')) {
           return {
             ok: false,
             offline: true,
-            message:
-              '서버 응답 시간 초과(약 ' + Math.round(timeoutMs / 1000) + '초). ' +
-              '출석·저장이 이미 반영됐을 수 있으니 새로고침 후 확인해 주세요.',
+            timedOut: true,
+            message: apiTimeoutMessage_(payload, timeoutMs),
           };
         }
         var hint = (location.protocol === 'file:')
           ? 'HTML 파일을 직접 열면 안 됩니다 — GitHub Pages 등 HTTPS 주소로 열어 주세요'
           : '인터넷·Apps Script 배포 상태를 확인하고 새로고침해 주세요';
         return { ok: false, offline: true, message: hint };
-      } finally {
-        clearTimeout(timer);
       }
     }
     function normalizeMemberNameForKey_(raw) {
@@ -4878,7 +4920,7 @@
       if (!opts.silent) startMemberLoadCountdown();
       _boardSyncInFlight = true;
       try {
-        const data = await api({ action: 'instructorDayBoard' }, { timeoutMs: 75000 });
+        const data = await api({ action: 'instructorDayBoard' }, { timeoutMs: BOARD_LOAD_TIMEOUT_MS });
 
         if (data.needPin) {
           showPin(true);
@@ -4917,6 +4959,14 @@
           const m = todayMembers().find(function(x) { return memberKey(x) === state.selectedKey; });
           if (m) selectMember(m, false);
         }
+      } catch (err) {
+        state.boardOnline = false;
+        document.getElementById('dateLine').textContent = '오프라인 · 프로그램만 표시';
+        setMemberChipsMessage('회원 목록 처리 중 오류가 발생했습니다. 새로고침해 주세요');
+        if (!state.program.length) state.program = getProgramCatalog(state.activeProgramTab);
+        renderProgramTabs();
+        renderProgramList();
+        if (!opts.silent) toast('회원 목록 불러오기 실패');
       } finally {
         clearLoadCountdown();
         _boardSyncInFlight = false;
