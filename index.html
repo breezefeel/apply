@@ -1214,6 +1214,10 @@
       font-size:10px; color:#94a3b8;
       margin:0; line-height:1.35;
     }
+    .alimtalk-next-booking-loading {
+      font-size:11px; font-weight:600; color:#fbbf24;
+      margin:4px 0 6px; line-height:1.45;
+    }
     .alimtalk-preview .preview-label + .alimtalk-preview-hint {
       margin-top:2px;
     }
@@ -1425,6 +1429,7 @@
       <div class="alimtalk-preview" id="sessionAlimtalkSection">
         <div class="preview-label" id="sessionAlimtalkSectionLabel">알림톡으로 보내질 내용 (출석+진도보내기)</div>
         <p class="alimtalk-preview-hint" id="sessionAlimtalkHint">세 버튼 모두 출석·진도 저장은 동일합니다. 알림톡만 선택에 따라 달라집니다.</p>
+        <p class="alimtalk-next-booking-loading" id="sessionAlimtalkNextBookingLoading" hidden aria-live="polite"></p>
         <div id="sessionAttendProcessing" hidden></div>
         <div id="sessionAttendOutcomePreview" class="session-attend-outcome-preview" hidden></div>
         <div id="sessionAlimtalkPreview"></div>
@@ -2321,6 +2326,7 @@
       progressOrigin: {},
       evalReportText: '',
       completedKeys: {},
+      completedPersonKeys: {},
       progressSavedKeys: {},
       attendPassCount: 1,
       sectionCollapsed: {},
@@ -3382,6 +3388,7 @@
       _nextBookingCountdownTimer = setInterval(function() {
         if (_nextBookingCountdownSec > 0) _nextBookingCountdownSec -= 1;
         if (state.nextBooking && state.nextBooking.loading) {
+          syncAlimtalkNextBookingLoadingUi_();
           updateSessionWrapPreview();
         } else {
           stopNextBookingCountdown();
@@ -3615,7 +3622,7 @@
       }
       state.nextBooking.loadedKey = memberKey(m);
       renderNextBookingPanel();
-      updateSessionWrapPreview();
+      renderSessionAlimtalkSection();
     }
 
     var _nextBookingReq = 0;
@@ -3631,7 +3638,7 @@
       state.nextBooking.loading = true;
       startNextBookingCountdown();
       renderNextBookingPanel();
-      updateSessionWrapPreview();
+      renderSessionAlimtalkSection();
       try {
         var data = await api({
           action: 'instructorMemberNextBooking',
@@ -3647,7 +3654,7 @@
         state.nextBooking.loading = false;
         stopNextBookingCountdown();
         renderNextBookingPanel();
-        updateSessionWrapPreview();
+        renderSessionAlimtalkSection();
       }
     }
 
@@ -3947,6 +3954,14 @@
       );
     }
 
+    function syncAlimtalkNextBookingLoadingUi_() {
+      var el = document.getElementById('sessionAlimtalkNextBookingLoading');
+      if (!el) return;
+      var loading = !!(state.nextBooking && state.nextBooking.loading);
+      el.hidden = !loading;
+      el.textContent = loading ? getNextBookingLoadingAlimtalkLine_() : '';
+    }
+
     function renderSessionAlimtalkSection() {
       var section = document.getElementById('sessionAlimtalkSection');
       var label = document.getElementById('sessionAlimtalkSectionLabel');
@@ -3955,6 +3970,8 @@
       var previewEl = document.getElementById('sessionAlimtalkPreview');
       var resultWrap = document.getElementById('sessionAttendResultInline');
       if (!section || !previewEl) return;
+
+      syncAlimtalkNextBookingLoadingUi_();
 
       var isProcessing = !!state.attendProcessing;
       var result = state.inlineAttendResult;
@@ -4475,7 +4492,7 @@
     function escapeHtml(s) {
       return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
-    var BOARD_LOAD_ESTIMATE_SEC = 25;
+    var BOARD_LOAD_ESTIMATE_SEC = 90;
     var BOARD_AUTO_SYNC_IDLE_MS = 12 * 60 * 1000;
     var _loadCountdownTimer = null;
     var _loadCountdownStartedAt = 0;
@@ -4607,6 +4624,7 @@
       if (state.completedKeys && state.completedKeys[prevKey]) {
         state.completedKeys[nextKey] = state.completedKeys[prevKey];
         delete state.completedKeys[prevKey];
+        if (state.completedPersonKeys) state.completedPersonKeys[memberPersonKey(m)] = true;
       }
       if (state.inlineAttendResult && state.inlineAttendResult.memberKey === prevKey) {
         state.inlineAttendResult.memberKey = nextKey;
@@ -4624,6 +4642,8 @@
         base.todayAttendCount = add.todayAttendCount;
       }
       base.attendedToday = !!base.attendedToday || !!add.attendedToday;
+      if (base.attendedToday || add.attendedToday) base.absentToday = false;
+      else if (add.absentToday === false) base.absentToday = false;
       base.usesDualSlot = !!base.usesDualSlot || !!add.usesDualSlot;
     }
     function finalizeMergedTodayMember_(item) {
@@ -4645,6 +4665,9 @@
         item.absentToday = allAbsent && !anyAttend && !item.attendedToday;
         item.sessionCompleted =
           allResolved || (item.usesDualSlot ? (item.todayAttendCount || 0) >= 2 : anyAttend);
+      }
+      if (item.attendedToday || (item.todayAttendCount || 0) > 0) {
+        item.absentToday = false;
       }
       delete item._times;
       delete item._slotSessions;
@@ -4710,9 +4733,11 @@
 
     function memberHasTodayAttendanceClient_(m) {
       if (!m) return false;
+      if (state.completedPersonKeys && state.completedPersonKeys[memberPersonKey(m)]) return true;
       if (state.completedKeys[memberKey(m)]) return true;
       if (m.attendedToday) return true;
       if (typeof m.todayAttendCount === 'number' && m.todayAttendCount > 0) return true;
+      if (m.sessionCompleted && !isScheduleSessionAbsentClient(m.scheduleSession)) return true;
       return scheduleSessionShowsAttendanceClient(m.scheduleSession);
     }
 
@@ -4990,7 +5015,7 @@
       if (!opts.silent) startMemberLoadCountdown();
       _boardSyncInFlight = true;
       try {
-        const data = await api({ action: 'instructorDayBoard' }, { timeoutMs: 75000 });
+        const data = await api({ action: 'instructorDayBoard' }, { timeoutMs: 90000 });
 
         if (data.needPin) {
           showPin(true);
@@ -5640,6 +5665,7 @@
       if (m.suffix8) {
         if (state.nextBooking) state.nextBooking.loading = true;
         renderNextBookingPanel();
+        renderSessionAlimtalkSection();
         enrichMemberDetailInBackground(m);
       }
     }
@@ -6016,6 +6042,33 @@
       return payload;
     }
 
+    function markInstructorAttendComplete_(m, data) {
+      if (!m || !data || !data.completed) return;
+      var pk = memberPersonKey(m);
+      var patch = {
+        sessionCompleted: true,
+        attendedToday: true,
+        absentToday: false,
+        scheduleResolvedToday: true,
+      };
+      if (data.sessionDisplay) patch.sessionDisplay = data.sessionDisplay;
+      if (state.board && state.board.members) {
+        state.board.members.forEach(function (bm) {
+          if (memberPersonKey(bm) !== pk) return;
+          Object.assign(bm, patch);
+          if (data.sessionDisplay && isScheduleSessionAbsentClient(bm.scheduleSession)) {
+            bm.scheduleSession = data.sessionDisplay;
+          }
+        });
+      }
+      Object.assign(m, patch);
+      if (data.sessionDisplay && isScheduleSessionAbsentClient(m.scheduleSession)) {
+        m.scheduleSession = data.sessionDisplay;
+      }
+      state.completedPersonKeys[pk] = true;
+      state.completedKeys[memberKey(m)] = true;
+    }
+
     function applyCompleteSessionResult(m, data) {
       syncMemberProgressFromServer(m, data);
       if (data && data.saved) markMemberProgressSaved_(m);
@@ -6028,11 +6081,10 @@
             if (bmSuf !== suf8) return;
             if (normalizeMemberNameForKey_(bm.name) !== frName) return;
             if (data.completed) {
-              state.completedKeys[memberKey(bm)] = true;
-              bm.sessionCompleted = true;
-              bm.attendedToday = true;
-              bm.absentToday = false;
-              bm.scheduleResolvedToday = true;
+              markInstructorAttendComplete_(bm, {
+                completed: true,
+                sessionDisplay: fr.sessionDisplay || data.sessionDisplay,
+              });
               if (fr.sessionDisplay) bm.scheduleSession = fr.sessionDisplay;
             }
             if (fr.sessionDisplay) bm.sessionDisplay = fr.sessionDisplay;
@@ -6040,12 +6092,7 @@
         });
       }
       if (data.completed) {
-        state.completedKeys[memberKey(m)] = true;
-        m.sessionCompleted = true;
-        m.attendedToday = true;
-        m.absentToday = false;
-        m.scheduleResolvedToday = true;
-        if (data.sessionDisplay) m.scheduleSession = data.sessionDisplay;
+        markInstructorAttendComplete_(m, data);
       }
       if (typeof data.todayAttendCount === 'number') {
         m.todayAttendCount = data.todayAttendCount;
@@ -6389,8 +6436,8 @@
       document.body.style.overflow = '';
     }
 
-    /** 출석 3버튼별 Apps Script 왕복 예상 시간(초) */
-    var ATTEND_PROCESS_EST = { silent: 6, basic: 8, progress: 12 };
+    /** 출석 처리 Apps Script 왕복 예상 시간(초) — UI 카운트다운 */
+    var ATTEND_PROCESS_EST_SEC = 35;
     var ATTEND_PROCESS_MODE_LABEL = {
       silent: '알림 없음',
       basic: '기본 알림톡',
@@ -6445,8 +6492,7 @@
       state.attendProcessingMode = resolveAttendProcessMode_(opts);
       state.inlineAttendResult = null;
       renderSessionAlimtalkSection();
-      var estSec = ATTEND_PROCESS_EST[state.attendProcessingMode] || ATTEND_PROCESS_EST.progress;
-      var sec = estSec;
+      var sec = ATTEND_PROCESS_EST_SEC;
       paintAttendProcessingCountdown(sec, false, state.attendProcessingMode);
       _attendProcessingTimer = setInterval(function() {
         sec -= 1;
