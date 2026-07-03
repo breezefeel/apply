@@ -370,11 +370,11 @@
 
     /* 선택 회원 2줄 */
     .member-brief {
-      margin-top:12px; padding:12px; border-radius:10px;
+      padding:12px; border-radius:10px;
       background:var(--blue-bg); border:1px solid #bfdbfe;
       display:none;
     }
-    .member-brief.show { display:block; }
+    .member-brief.show { display:flex; flex-direction:column; }
     .member-brief .line1 { font-size:14px; font-weight:700; }
     .member-brief .line1 .phone {
       font-weight:600; color:var(--blue-mid); margin-left:8px; font-size:13px;
@@ -382,10 +382,10 @@
     }
     .member-brief .line1 .phone[hidden] { display:none; }
     .member-brief .line1 .phone:active { opacity:.7; }
-    .member-brief .line2 { font-size:12px; color:var(--dim); margin-top:6px; white-space:pre-wrap; line-height:1.5; }
+    .member-brief .line2 { font-size:12px; color:var(--dim); margin-top:8px; white-space:pre-wrap; line-height:1.55; }
     .member-brief .line2.brief-wellness span:last-child { color:#3a63a8; }
-    .member-brief .line3 { font-size:12px; color:var(--dim); margin-top:6px; white-space:pre-wrap; line-height:1.5; }
-    .member-brief .brief-label { font-weight:700; color:var(--text); margin-right:6px; }
+    .member-brief .brief-label { font-weight:700; color:var(--text); margin-right:6px; display:block; margin-bottom:4px; }
+    .member-brief .brief-text { display:block; color:var(--dim); }
 
     .member-overview-wrap {
       margin-top:12px;
@@ -393,19 +393,30 @@
       gap:12px;
     }
     .member-overview-wrap.show { display:flex; flex-direction:column; }
-    .member-overview-main { flex:1; min-width:0; }
+    .member-overview-top {
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
     .member-condition-history {
       padding:12px;
       border-radius:10px;
       background:#fff;
       border:1px solid var(--border);
+      display:flex;
+      flex-direction:column;
+      min-height:0;
     }
     .condition-history-title {
       font-size:12px; font-weight:800; color:var(--text); margin-bottom:10px;
+      flex-shrink:0;
     }
     .condition-history-list {
       display:flex; flex-direction:column; gap:10px;
-      max-height:420px; overflow-y:auto;
+      flex:1;
+      min-height:0;
+      max-height:420px;
+      overflow-y:auto;
     }
     .condition-history-empty {
       font-size:11px; color:var(--dim); margin:0; line-height:1.5;
@@ -418,9 +429,31 @@
     .condition-history-card.is-latest {
       border-color:#bfdbfe; background:var(--blue-bg);
     }
-    .condition-history-card .ch-date {
-      font-size:10px; font-weight:700; color:var(--blue); margin-bottom:6px;
+    .condition-history-card.is-collapsed {
+      cursor:pointer;
+      padding:8px 10px;
     }
+    .condition-history-card.is-collapsed:hover {
+      border-color:#cbd5e1;
+      background:#f1f5f9;
+    }
+    .condition-history-card .ch-date {
+      font-size:10px; font-weight:700; color:var(--blue); margin-bottom:0;
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+    }
+    .condition-history-card.is-latest .ch-date { margin-bottom:6px; }
+    .condition-history-card.is-collapsed .ch-date { margin-bottom:4px; }
+    .condition-history-card .ch-fold-hint {
+      font-size:9px; font-weight:600; color:#94a3b8; flex-shrink:0;
+    }
+    .condition-history-card .ch-preview {
+      display:none;
+      font-size:11px; color:var(--dim); line-height:1.45;
+      -webkit-line-clamp:2; -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .condition-history-card.is-collapsed .ch-preview { display:-webkit-box; }
+    .condition-history-card.is-collapsed .ch-body { display:none; }
     .condition-history-card .ch-name {
       font-size:12px; font-weight:700; color:var(--text);
     }
@@ -431,13 +464,32 @@
     .condition-history-card .ch-label {
       font-weight:700; color:var(--text); margin-right:4px;
     }
+    .condition-history-current {
+      padding:10px; border-radius:8px; margin-bottom:10px;
+      background:var(--blue-bg); border:1px solid #bfdbfe;
+      font-size:11px; line-height:1.55;
+    }
+    .condition-history-current .ch-label { font-weight:800; color:var(--text); margin-right:6px; }
     @media (min-width:960px) {
-      .member-overview-wrap.show { flex-direction:row; align-items:flex-start; }
-      .member-condition-history { width:min(300px, 34vw); flex-shrink:0; }
+      .member-overview-top {
+        flex-direction:row;
+        align-items:stretch;
+      }
+      .member-brief {
+        flex:1;
+        min-width:0;
+      }
+      .member-condition-history {
+        width:min(300px, 34vw);
+        flex-shrink:0;
+      }
+      .condition-history-list {
+        max-height:none;
+      }
     }
 
     .session-check-panel {
-      margin-top:10px; padding:12px; border-radius:10px;
+      margin-top:0; padding:12px; border-radius:10px;
       background:#f8fafc; border:1px solid var(--border);
       display:none;
     }
@@ -1263,21 +1315,26 @@
       </div>
       <div class="member-chips" id="memberChips"><span class="empty-hint">불러오는 중…</span></div>
       <div class="member-overview-wrap" id="memberOverviewWrap">
-        <div class="member-overview-main">
+        <div class="member-overview-top">
           <div class="member-brief" id="memberBrief">
             <div class="line1"><span id="briefName">—</span><a class="phone" id="briefPhone" href="#" hidden>전화</a></div>
-            <div class="line2" id="briefFirstEvalRow" hidden>
-              <span class="brief-label">초회 평가</span><span id="briefFirstEval">—</span>
-            </div>
             <div class="line2 brief-wellness" id="briefWellnessRow" hidden>
-              <span class="brief-label">사전 문진</span><span id="briefWellness">—</span>
+              <span class="brief-label">사전 문진 · 특이사항</span>
+              <span class="brief-text" id="briefWellness">—</span>
             </div>
-            <div class="line3"><span class="brief-label">다음 진도</span><span id="briefNextProgress">없음</span></div>
-            <div class="line3" id="briefNextBookingRow" hidden>
-              <span class="brief-label">다음 예약</span><span id="briefNextBooking">—</span>
+            <div class="line2" id="briefFirstEvalRow" hidden>
+              <span class="brief-label">초회 평가 · 특이사항</span>
+              <span class="brief-text" id="briefFirstEval">—</span>
             </div>
           </div>
-          <div class="session-check-panel" id="sessionCheckPanel">
+          <aside class="member-condition-history" id="memberConditionHistory">
+            <div class="condition-history-title">회원 히스토리</div>
+            <div class="condition-history-list" id="conditionHistoryList">
+              <p class="condition-history-empty">회원을 선택하면 이전 기록이 표시됩니다.</p>
+            </div>
+          </aside>
+        </div>
+        <div class="session-check-panel" id="sessionCheckPanel">
             <div class="session-check-title">불편한 부위 · VAS</div>
             <div class="session-check-row">
               <div class="session-check-chips" id="sessionDiscomfortChips"></div>
@@ -1291,13 +1348,6 @@
               <textarea id="sessionCheckNote" rows="4" placeholder="-부위 VAS 점수 후 : 뒤에 특이사항을 적을 수 있습니다" oninput="onSessionCheckNoteInput()"></textarea>
             </div>
           </div>
-        </div>
-        <aside class="member-condition-history" id="memberConditionHistory">
-          <div class="condition-history-title">회원 상태 히스토리</div>
-          <div class="condition-history-list" id="conditionHistoryList">
-            <p class="condition-history-empty">회원을 선택하면 이전 기록이 표시됩니다.</p>
-          </div>
-        </aside>
       </div>
     </section>
 
@@ -3158,6 +3208,7 @@
       'https://docs.google.com/spreadsheets/d/1I8zIUUaP-eIGpB2y4dMgZbDRiBBzjpAGEWU0RD3yk8g/edit';
 
     function resetNextBookingState(m) {
+      stopNextBookingCountdown();
       var defaultInst = defaultNextBookingInstIdx_(m);
       state.nextBooking = {
         loading: false,
@@ -3264,6 +3315,7 @@
     function getNextBookingAlimtalkLine() {
       var nb = state.nextBooking;
       if (!nb) return '';
+      if (nb.loading) return getNextBookingLoadingAlimtalkLine_();
       syncNextBookingLineFromPicker_(nb);
       if (nb.line) {
         if (nb.rescheduleActive && nb.pickedYmd && !isFutureNextBookingYmd_(nb.pickedYmd)) return '';
@@ -3271,6 +3323,39 @@
         return nb.line;
       }
       return '';
+    }
+
+    var NEXT_BOOKING_LOAD_EST_SEC = 8;
+    var _nextBookingCountdownTimer = null;
+    var _nextBookingCountdownSec = 0;
+
+    function stopNextBookingCountdown() {
+      if (_nextBookingCountdownTimer) {
+        clearInterval(_nextBookingCountdownTimer);
+        _nextBookingCountdownTimer = null;
+      }
+      _nextBookingCountdownSec = 0;
+    }
+
+    function getNextBookingLoadingAlimtalkLine_() {
+      var sec = _nextBookingCountdownSec;
+      if (sec > 0) {
+        return '📅 다음 예약: 회원정보에서 불러오는 중… (예상 ' + sec + '초)';
+      }
+      return '📅 다음 예약: 회원정보에서 불러오는 중… (조금 더 걸리고 있어요)';
+    }
+
+    function startNextBookingCountdown() {
+      stopNextBookingCountdown();
+      _nextBookingCountdownSec = NEXT_BOOKING_LOAD_EST_SEC;
+      _nextBookingCountdownTimer = setInterval(function() {
+        if (_nextBookingCountdownSec > 0) _nextBookingCountdownSec -= 1;
+        if (state.nextBooking && state.nextBooking.loading) {
+          updateSessionWrapPreview();
+        } else {
+          stopNextBookingCountdown();
+        }
+      }, 1000);
     }
 
     function getNextBookingServerPayload() {
@@ -3460,11 +3545,11 @@
       if (!m || !m.suffix8) {
         resetNextBookingState(null);
         renderNextBookingPanel();
-        updateBriefNextBooking(m);
         return;
       }
       if (!state.nextBooking) resetNextBookingState(m);
       state.nextBooking.loading = false;
+      stopNextBookingCountdown();
       if (data && data.booking && isFutureNextBookingYmd_(data.booking.ymd)) {
         state.nextBooking.fromSchedule = true;
         state.nextBooking.previousBooking = {
@@ -3502,35 +3587,8 @@
         state.nextBooking.scheduleSheetUrl = data.scheduleSheetUrl;
       }
       state.nextBooking.loadedKey = memberKey(m);
-      updateBriefNextBooking(m);
       renderNextBookingPanel();
       updateSessionWrapPreview();
-    }
-
-    function updateBriefNextBooking(m) {
-      var row = document.getElementById('briefNextBookingRow');
-      var el = document.getElementById('briefNextBooking');
-      if (!row || !el) return;
-      var nb = state.nextBooking;
-      if (!m || !m.suffix8) {
-        row.hidden = true;
-        el.textContent = '—';
-        return;
-      }
-      if (nb && nb.loading) {
-        row.hidden = false;
-        el.textContent = '불러오는 중…';
-        return;
-      }
-      if (hasScheduledNextBooking_(nb)) {
-        row.hidden = false;
-        var label = nb.display || '';
-        if (nb.instName) label = nb.instName + ' · ' + label;
-        el.textContent = label || '—';
-        return;
-      }
-      row.hidden = true;
-      el.textContent = '—';
     }
 
     var _nextBookingReq = 0;
@@ -3538,15 +3596,15 @@
       if (!m || !m.suffix8) {
         resetNextBookingState(null);
         renderNextBookingPanel();
-        updateBriefNextBooking(m);
         return;
       }
       var reqId = ++_nextBookingReq;
       var selKey = memberKey(m);
       resetNextBookingState(m);
       state.nextBooking.loading = true;
-      updateBriefNextBooking(m);
+      startNextBookingCountdown();
       renderNextBookingPanel();
+      updateSessionWrapPreview();
       try {
         var data = await api({
           action: 'instructorMemberNextBooking',
@@ -3560,8 +3618,9 @@
       } catch (e) {
         if (reqId !== _nextBookingReq || state.selectedKey !== selKey) return;
         state.nextBooking.loading = false;
-        updateBriefNextBooking(m);
+        stopNextBookingCountdown();
         renderNextBookingPanel();
+        updateSessionWrapPreview();
       }
     }
 
@@ -3688,13 +3747,6 @@
       return v.slice(0, 500);
     }
 
-    function updateBriefNextProgress(m) {
-      var briefNext = document.getElementById('briefNextProgress');
-      if (!briefNext || !m) return;
-      var saved = normalizeNextProgressText(m.nextProgress);
-      briefNext.textContent = saved || '없음';
-    }
-
     function clearSessionNextProgressDraft() {
       var nextEl = document.getElementById('sessionNextProgress');
       if (!nextEl) return;
@@ -3705,8 +3757,8 @@
     function applySavedNextProgress(m, raw) {
       if (!m) return;
       m.nextProgress = normalizeNextProgressText(raw);
-      updateBriefNextProgress(m);
       clearSessionNextProgressDraft();
+      renderConditionHistory(m);
     }
 
     function getSessionSpecialNotesNew() {
@@ -4381,7 +4433,6 @@
       return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
     var BOARD_LOAD_ESTIMATE_SEC = 25;
-    var BOARD_LOAD_TIMEOUT_MS = 35000;
     var BOARD_AUTO_SYNC_IDLE_MS = 12 * 60 * 1000;
     var _loadCountdownTimer = null;
     var _loadCountdownStartedAt = 0;
@@ -4426,64 +4477,20 @@
       _loadCountdownTimer = setInterval(paintMemberLoadCountdown, 400);
     }
 
-    function apiTimeoutMessage_(payload, timeoutMs) {
-      if (payload && payload.action === 'instructorDayBoard') {
-        return '회원 목록 응답 시간 초과(약 ' + Math.round(timeoutMs / 1000) + '초). ' +
-          'Google Apps Script가 지연 중입니다. 잠시 후 새로고침해 주세요.';
-      }
-      return '서버 응답 시간 초과(약 ' + Math.round(timeoutMs / 1000) + '초). ' +
-        '출석·저장이 이미 반영됐을 수 있으니 새로고침 후 확인해 주세요.';
-    }
-
-    function withApiTimeout_(promise, controller, timeoutMs) {
-      var done = false;
-      var timer = null;
-      return new Promise(function(resolve, reject) {
-        timer = setTimeout(function() {
-          if (done) return;
-          done = true;
-          try { controller.abort(); } catch (e) {}
-          var err = new Error('API timeout');
-          err.name = 'ApiTimeoutError';
-          reject(err);
-        }, timeoutMs);
-        promise.then(function(value) {
-          if (done) return;
-          done = true;
-          clearTimeout(timer);
-          resolve(value);
-        }, function(err) {
-          if (done) return;
-          done = true;
-          clearTimeout(timer);
-          reject(err);
-        });
-      });
-    }
-
     async function api(payload, opts) {
       opts = opts || {};
       var timeoutMs = opts.timeoutMs != null ? opts.timeoutMs : 55000;
       var controller = new AbortController();
+      var timer = setTimeout(function() { controller.abort(); }, timeoutMs);
       try {
         // Apps Script /exec 는 POST 시 302 → GET 으로 바뀌며 doGet(unknown action) 이 됨 → GET ?data= 사용
         var body = JSON.stringify(Object.assign({ pin: state.pin }, payload));
-        var sep = API_URL.indexOf('?') >= 0 ? '&' : '?';
-        var url = API_URL + sep + 'data=' + encodeURIComponent(body) + '&_ts=' + Date.now();
-        const result = await withApiTimeout_(fetch(url, {
+        var url = API_URL + (API_URL.indexOf('?') >= 0 ? '&' : '?') + 'data=' + encodeURIComponent(body);
+        const res = await fetch(url, {
           method: 'GET',
           signal: controller.signal,
-          cache: 'no-store',
-        }).then(function(res) {
-          return res.text().then(function(text) {
-            return { res: res, text: text };
-          });
-        }), controller, timeoutMs);
-        const res = result.res;
-        const text = result.text;
-        if (!res.ok) {
-          return { ok: false, message: '서버 응답 오류(' + res.status + ') — Apps Script 배포 상태 확인' };
-        }
+        });
+        const text = await res.text();
         try {
           var data = JSON.parse(text);
           if (data && data.result === 'error' && data.ok !== true) {
@@ -4494,18 +4501,21 @@
           return { ok: false, message: '서버 응답 형식 오류 — Apps Script 배포·URL 확인' };
         }
       } catch (err) {
-        if (err && (err.name === 'AbortError' || err.name === 'ApiTimeoutError')) {
+        if (err && err.name === 'AbortError') {
           return {
             ok: false,
             offline: true,
-            timedOut: true,
-            message: apiTimeoutMessage_(payload, timeoutMs),
+            message:
+              '서버 응답 시간 초과(약 ' + Math.round(timeoutMs / 1000) + '초). ' +
+              '출석·저장이 이미 반영됐을 수 있으니 새로고침 후 확인해 주세요.',
           };
         }
         var hint = (location.protocol === 'file:')
           ? 'HTML 파일을 직접 열면 안 됩니다 — GitHub Pages 등 HTTPS 주소로 열어 주세요'
           : '인터넷·Apps Script 배포 상태를 확인하고 새로고침해 주세요';
         return { ok: false, offline: true, message: hint };
+      } finally {
+        clearTimeout(timer);
       }
     }
     function normalizeMemberNameForKey_(raw) {
@@ -4920,7 +4930,7 @@
       if (!opts.silent) startMemberLoadCountdown();
       _boardSyncInFlight = true;
       try {
-        const data = await api({ action: 'instructorDayBoard' }, { timeoutMs: BOARD_LOAD_TIMEOUT_MS });
+        const data = await api({ action: 'instructorDayBoard' }, { timeoutMs: 75000 });
 
         if (data.needPin) {
           showPin(true);
@@ -4959,14 +4969,6 @@
           const m = todayMembers().find(function(x) { return memberKey(x) === state.selectedKey; });
           if (m) selectMember(m, false);
         }
-      } catch (err) {
-        state.boardOnline = false;
-        document.getElementById('dateLine').textContent = '오프라인 · 프로그램만 표시';
-        setMemberChipsMessage('회원 목록 처리 중 오류가 발생했습니다. 새로고침해 주세요');
-        if (!state.program.length) state.program = getProgramCatalog(state.activeProgramTab);
-        renderProgramTabs();
-        renderProgramList();
-        if (!opts.silent) toast('회원 목록 불러오기 실패');
       } finally {
         clearLoadCountdown();
         _boardSyncInFlight = false;
@@ -5216,26 +5218,60 @@
       return d || '—';
     }
 
+    function conditionHistoryPreviewLine_(item) {
+      var parts = [];
+      var np = normalizeNextProgressText(item.nextProgress);
+      if (np && np !== '—') parts.push(np);
+      var d = String(item.discomfort || '').trim();
+      if (d && d !== '—') parts.push(d);
+      var n = String(item.sessionNote || '').trim().replace(/\s+/g, ' ');
+      if (n && n !== '—') {
+        parts.push(n.length > 48 ? n.slice(0, 45) + '…' : n);
+      }
+      return parts.join(' · ') || '—';
+    }
+
+    function toggleConditionHistoryCard_(idx) {
+      if (idx === 0) return;
+      if (!state.historyExpandedKeys) state.historyExpandedKeys = {};
+      state.historyExpandedKeys[idx] = !state.historyExpandedKeys[idx];
+      renderConditionHistory(state.selected);
+    }
+
     function renderConditionHistory(m) {
       var root = document.getElementById('conditionHistoryList');
       if (!root) return;
       m = m || state.selected;
       var list = (m && m.conditionHistory) ? m.conditionHistory.slice() : [];
+      var currentNp = normalizeNextProgressText(m && m.nextProgress) || '—';
+      var html =
+        '<div class="condition-history-current">' +
+        '<div><span class="ch-label">다음 진도</span>' + escapeHtml(currentNp) + '</div></div>';
       if (!list.length) {
-        root.innerHTML = '<p class="condition-history-empty">이전 컨디션 기록이 없습니다.</p>';
+        html += '<p class="condition-history-empty">이전 세션 기록이 없습니다.</p>';
+        root.innerHTML = html;
         return;
       }
-      root.innerHTML = list.map(function (item, idx) {
-        var phone = item.phone || formatMemberPhoneDisplay_(m && m.phoneDigits);
-        return '<article class="condition-history-card' + (idx === 0 ? ' is-latest' : '') + '">' +
-          '<div class="ch-date">' + escapeHtml(item.dateStr || '—') + (idx === 0 ? ' · 최근' : '') + '</div>' +
-          '<div><span class="ch-name">' + escapeHtml(item.name || (m && m.name) || '—') + '</span>' +
-          (phone ? '<span class="ch-phone">' + escapeHtml(phone) + '</span>' : '') +
-          '</div>' +
-          '<div class="ch-block"><span class="ch-label">오늘의 컨디션</span>' + escapeHtml(item.condition || '—') + '</div>' +
+      html += list.map(function (item, idx) {
+        var isLatest = idx === 0;
+        var expanded = isLatest || !!(state.historyExpandedKeys && state.historyExpandedKeys[idx]);
+        var cardCls = 'condition-history-card' + (isLatest ? ' is-latest' : '') + (!expanded ? ' is-collapsed' : '');
+        var clickAttr = !expanded && !isLatest
+          ? ' onclick="toggleConditionHistoryCard_(' + idx + ')" role="button" tabindex="0"'
+          : (!isLatest && expanded ? ' onclick="toggleConditionHistoryCard_(' + idx + ')" role="button" tabindex="0"' : '');
+        var foldHint = isLatest
+          ? ''
+          : '<span class="ch-fold-hint">' + (expanded ? '접기' : '펼치기') + '</span>';
+        return '<article class="' + cardCls + '"' + clickAttr + '>' +
+          '<div class="ch-date"><span>' + escapeHtml(item.dateStr || '—') + (isLatest ? ' · 최근' : '') + '</span>' + foldHint + '</div>' +
+          '<div class="ch-preview">' + escapeHtml(conditionHistoryPreviewLine_(item)) + '</div>' +
+          '<div class="ch-body">' +
           '<div class="ch-block"><span class="ch-label">다음 진도</span>' + escapeHtml(normalizeNextProgressText(item.nextProgress) || '—') + '</div>' +
-          '</article>';
+          '<div class="ch-block"><span class="ch-label">불편 부위 · VAS</span>' + escapeHtml(item.discomfort || '—') + '</div>' +
+          '<div class="ch-block"><span class="ch-label">세션 특이사항</span>' + escapeHtml(item.sessionNote || '—') + '</div>' +
+          '</div></article>';
       }).join('');
+      root.innerHTML = html;
     }
 
     function renderSessionDiscomfortChipHtml_(opt) {
@@ -5380,7 +5416,7 @@
       if (!m || !data) return;
       if (data.discomfortHistory) m.discomfortHistory = data.discomfortHistory;
       if (data.discomfortHistoryLine != null) m.discomfortHistoryLine = data.discomfortHistoryLine;
-      if (data.conditionHistory) m.conditionHistory = data.conditionHistory;
+      if (data.conditionHistory != null) m.conditionHistory = data.conditionHistory;
       if (data.currentSessionCheck) {
         m.currentSessionCheck = data.currentSessionCheck;
         state.sessionCheck.areas = (data.currentSessionCheck.areas || []).slice();
@@ -5401,6 +5437,7 @@
       state.sectionCollapsedTouched = {};
       state.sectionCollapsed = {};
       _pendingAttendAlimtalk = null;
+      state.historyExpandedKeys = {};
       resetInlineAttendResult();
       var memoEl = document.getElementById('sessionCoachMemo');
       if (memoEl) {
@@ -5431,11 +5468,11 @@
       var feEl = document.getElementById('briefFirstEval');
       var fe = m.firstEvalBrief;
       if (feRow && feEl) {
-        if (fe && fe.has && fe.summary) {
+        var feText = String((fe && (fe.fullText || fe.summary)) || '').trim();
+        if (fe && fe.has && feText) {
           feRow.hidden = false;
-          var feText = fe.summary;
-          if (fe.dateStr) feText = fe.dateStr + ' · ' + feText;
-          feEl.textContent = feText;
+          if (fe.dateStr) feText = fe.dateStr + '\n' + feText;
+          feEl.textContent = feText.slice(0, 600);
         } else {
           feRow.hidden = true;
           feEl.textContent = '—';
@@ -5445,24 +5482,24 @@
       var wiEl = document.getElementById('briefWellness');
       var wi = m.wellnessIntake;
       if (wiRow && wiEl) {
-        if (wi && (wi.summary || (wi.chipPrefill && wi.chipPrefill.length))) {
+        if (wi && (wi.summary || wi.referenceNotes || (wi.chipPrefill && wi.chipPrefill.length))) {
           wiRow.hidden = false;
           var wiLabel = wiRow.querySelector('.brief-label');
-          if (wiLabel) wiLabel.textContent = wi.intakeType === 'treatment' ? '통증 문진' : '사전 문진';
+          if (wiLabel) wiLabel.textContent = wi.intakeType === 'treatment' ? '통증 문진 · 특이사항' : '사전 문진 · 특이사항';
           var wiParts = [];
           if (wi.submittedAt) wiParts.push(String(wi.submittedAt).slice(0, 10));
           if (wi.channel === 'online') wiParts.push('온라인');
           else if (wi.channel === 'visit') wiParts.push('방문');
-          var wiText = String(wi.summary || '').trim().split('\n')[0];
-          if (wiText) wiParts.push(wiText);
-          wiEl.textContent = wiParts.join(' · ').slice(0, 200);
+          var wiBody = String(wi.summary || '').trim();
+          var wiRef = String(wi.referenceNotes || '').trim();
+          if (wiRef) wiBody = (wiBody ? wiBody + '\n\n' : '') + wiRef;
+          if (wiBody) wiParts.push(wiBody);
+          wiEl.textContent = wiParts.join('\n').slice(0, 600);
         } else {
           wiRow.hidden = true;
           wiEl.textContent = '—';
         }
       }
-      updateBriefNextProgress(m);
-      updateBriefNextBooking(m);
       renderConditionHistory(m);
       var wrapPanel = document.getElementById('sessionWrapPanel');
       if (wrapPanel) wrapPanel.classList.add('show');
@@ -5493,7 +5530,7 @@
         m.previousSessionProgress = detail.member.previousSessionProgress || m.previousSessionProgress || {};
         m.discomfortHistory = detail.member.discomfortHistory || m.discomfortHistory || [];
         m.discomfortHistoryLine = detail.member.discomfortHistoryLine || m.discomfortHistoryLine || '';
-        m.conditionHistory = detail.member.conditionHistory || m.conditionHistory || [];
+        m.conditionHistory = detail.member.conditionHistory != null ? detail.member.conditionHistory : (m.conditionHistory || []);
         m.firstEvalBrief = detail.member.firstEvalBrief || m.firstEvalBrief || null;
         if (detail.member.currentSessionCheck) {
           m.currentSessionCheck = detail.member.currentSessionCheck;
@@ -5542,7 +5579,6 @@
       renderSelectedMemberUi();
       if (m.suffix8) {
         if (state.nextBooking) state.nextBooking.loading = true;
-        updateBriefNextBooking(m);
         renderNextBookingPanel();
         enrichMemberDetailInBackground(m);
       }
