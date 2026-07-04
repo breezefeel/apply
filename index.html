@@ -3439,6 +3439,8 @@
       if (!m || !m.suffix8) return;
       onNextBookingInputChange();
       if (userPickedNewNextBooking_()) return;
+      var nb = state.nextBooking;
+      if (nb && nb.loadedKey === memberKey(m) && !nb.loading) return;
       await fetchNextBookingForMember_(m);
     }
 
@@ -4530,19 +4532,32 @@
       _loadCountdownTimer = setInterval(paintMemberLoadCountdown, 400);
     }
 
+    var API_GET_BODY_MAX = 1200;
+
     async function api(payload, opts) {
       opts = opts || {};
       var timeoutMs = opts.timeoutMs != null ? opts.timeoutMs : 55000;
       var controller = new AbortController();
       var timer = setTimeout(function() { controller.abort(); }, timeoutMs);
+      var body = JSON.stringify(Object.assign({ pin: state.pin }, payload));
+      var usePost = body.length > API_GET_BODY_MAX || !!opts.preferPost;
       try {
-        // Apps Script /exec 는 POST 시 302 → GET 으로 바뀌며 doGet(unknown action) 이 됨 → GET ?data= 사용
-        var body = JSON.stringify(Object.assign({ pin: state.pin }, payload));
-        var url = API_URL + (API_URL.indexOf('?') >= 0 ? '&' : '?') + 'data=' + encodeURIComponent(body);
-        const res = await fetch(url, {
-          method: 'GET',
-          signal: controller.signal,
-        });
+        var res;
+        if (usePost) {
+          // 진도·출석 payload는 URL 길이 한도를 넘기 쉬움 → POST 본문으로 전송 (doPost → routeInstructorApi_)
+          res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: body,
+            signal: controller.signal,
+          });
+        } else {
+          var url = API_URL + (API_URL.indexOf('?') >= 0 ? '&' : '?') + 'data=' + encodeURIComponent(body);
+          res = await fetch(url, {
+            method: 'GET',
+            signal: controller.signal,
+          });
+        }
         const text = await res.text();
         try {
           var data = JSON.parse(text);
@@ -4561,7 +4576,7 @@
             offline: true,
             message: opts.timeoutMessage ||
               ('서버 응답 시간 초과(약 ' + sec + '초). ' +
-              '출석·저장이 이미 반영됐을 수 있으니 새로고침 후 확인해 주세요.'),
+              '저장·출석이 반영되지 않았을 수 있으니 새로고침 후 확인해 주세요.'),
           };
         }
         var hint = (location.protocol === 'file:')
@@ -6655,7 +6670,7 @@
     async function executeCompleteSession(m, progress, opts) {
       opts = opts || {};
       setSessionActionButtonsDisabled(true);
-      if (!opts.skipAttendAlimtalk) {
+      if (!opts.skipAttendAlimtalk && !opts.basicAttendOnly) {
         await refreshNextBookingBeforeAttendAlimtalk_(m);
         if (opts.attendAlimtalk || _pendingAttendAlimtalk) {
           opts = Object.assign({}, opts, { attendAlimtalk: buildAttendAlimtalkPayload() });
