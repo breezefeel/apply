@@ -1568,6 +1568,24 @@
     </div>
   </div>
 
+  <!-- 같은 번호 · 다른 이름 가족 출석 확인 -->
+  <div class="modal-overlay" id="samePhoneFamilyModal">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-hd">
+        <h2>가족 출석 확인</h2>
+        <button type="button" class="modal-close" onclick="closeSamePhoneFamilyModal()">×</button>
+      </div>
+      <p style="font-size:13px;line-height:1.55;margin-bottom:8px;">같은 전화번호에 다른 이름 예약이 있습니다.</p>
+      <ul id="samePhoneFamilyList" style="font-size:12px;line-height:1.5;margin:0 0 12px 18px;color:var(--text);"></ul>
+      <p id="samePhoneFamilyModalText" style="font-size:14px;line-height:1.55;margin-bottom:8px;">모두 출석 처리할까요?</p>
+      <p class="attend-result-partial" style="margin-bottom:16px;text-align:left;">「모두 출석」은 인원 수만큼 회차가 차감되고, 스케줄표에도 각각 반영됩니다.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button type="button" class="btn btn-primary" style="width:100%;" id="samePhoneFamilyAllBtn" onclick="confirmSamePhoneFamilyAttend(true)">모두 출석</button>
+        <button type="button" class="btn btn-ghost" style="width:100%;" onclick="confirmSamePhoneFamilyAttend(false)">아니요, 선택한 이름만</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 출석 확인 (출석부와 동일) -->
   <div class="modal-overlay" id="extraPassModal">
     <div class="modal" style="max-width:400px;">
@@ -1625,7 +1643,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-07-03-90s';
+    const INSTRUCTOR_HTML_BUILD = '2026-07-04-family-prompt-v2';
     const BOARD_LOAD_TIMEOUT_MS = 90000;
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
     const PIN_KEY = 'real_instructor_pin_v1';
@@ -4842,16 +4860,77 @@
       return parseSessionCountsFromMember_(m).remain;
     }
 
+    var ROLLBOOK_FAMILY_SUFFIX_RE =
+      /\s+(엄마|아빠|사모님|어머님|아버님|형|누나|언니|오빠|동생|할머님|할아버님)$/;
+
+    function rollbookFamilyNameBaseClient_(raw) {
+      return String(normalizeMemberNameForKey_(raw) || '')
+        .replace(ROLLBOOK_FAMILY_SUFFIX_RE, '')
+        .trim();
+    }
+
+    /** 같은 전화(끝8자리·전체)로 보드 회원 묶기 */
+    function memberPhoneMatchKey_(m) {
+      if (!m) return '';
+      var suf = String(m.suffix8 || '').replace(/\D/g, '').slice(-8);
+      if (suf.length === 8) return 's:' + suf;
+      var phone = String(m.phoneDigits || '').replace(/\D/g, '');
+      if (phone.length >= 10) return 'p:' + phone;
+      return '';
+    }
+
+    /** 가족 그룹 중 가장 큰 잔여 회차(엄마·아빠 이름만 스케줄에 있을 때 0으로 오는 경우 보정) */
+    function effectiveMemberRemainSessions_(m) {
+      var own = memberRemainSessions(m);
+      if (own > 0) return own;
+      var key = memberPhoneMatchKey_(m);
+      if (!key || !state.board || !state.board.members) return own;
+      var max = 0;
+      state.board.members.forEach(function (x) {
+        if (memberPhoneMatchKey_(x) !== key) return;
+        var r = memberRemainSessions(x);
+        if (r > max) max = r;
+      });
+      return max || own;
+    }
+
+    /** 모달용 — 같은 번호·다른 이름(결석·잔여 0 포함, 이미 출석된 칸만 제외) */
+    function samePhoneFamilyCandidatesOnBoard_(m) {
+      if (!m || !state.board || !state.board.members) return [];
+      var key = memberPhoneMatchKey_(m);
+      if (!key) return [];
+      return state.board.members.filter(function (x) {
+        if (memberPhoneMatchKey_(x) !== key) return false;
+        if (memberAttendSlotLocked_(x)) return false;
+        return true;
+      });
+    }
+
+    function dedupeFamilyByPerson_(list) {
+      var seen = {};
+      var distinct = [];
+      (list || []).forEach(function (x) {
+        var k = memberPersonKey(x);
+        if (seen[k]) return;
+        seen[k] = true;
+        distinct.push(x);
+      });
+      distinct.sort(function (a, b) {
+        return parseTime(String((a.time || '').split(',')[0] || '').trim()) -
+          parseTime(String((b.time || '').split(',')[0] || '').trim());
+      });
+      return distinct;
+    }
+
     /** 오늘 보드 — 같은 번호·출석 가능(잔여·미출석 칸) 가족 */
     function familyMembersOnBoard_(m) {
       if (!m || !state.board || !state.board.members) return m ? [m] : [];
-      var suf = String(m.suffix8 || '').replace(/\D/g, '').slice(-8);
-      if (suf.length !== 8) return [m];
+      var key = memberPhoneMatchKey_(m);
+      if (!key) return [m];
       return state.board.members.filter(function (x) {
-        var xs = String(x.suffix8 || '').replace(/\D/g, '').slice(-8);
-        if (xs !== suf) return false;
+        if (memberPhoneMatchKey_(x) !== key) return false;
         if (memberAttendSlotLocked_(x)) return false;
-        if (memberRemainSessions(x) <= 0) return false;
+        if (effectiveMemberRemainSessions_(x) <= 0) return false;
         return true;
       });
     }
@@ -4880,9 +4959,73 @@
     }
 
     function maxAttendPassCount(m) {
+      var family = familyMembersOnBoard_(m);
+      if (family.length >= 2) return Math.min(4, family.length);
       var remain = memberRemainSessions(m);
       if (remain <= 0) return 1;
       return Math.min(4, remain);
+    }
+
+    function samePhoneFamilyOnBoard_(m) {
+      var distinct = dedupeFamilyByPerson_(samePhoneFamilyCandidatesOnBoard_(m));
+      return distinct.length >= 2 ? distinct : [];
+    }
+
+    function shouldPromptSamePhoneFamilyAttend_(m, opts) {
+      opts = opts || {};
+      if (!m || !memberPhoneMatchKey_(m)) return false;
+      if (opts.confirmFamilyAll || opts.confirmFamilySingle) return false;
+      if (resolveAttendPassCount(opts) > 1) return false;
+      return samePhoneFamilyOnBoard_(m).length >= 2;
+    }
+
+    function closeSamePhoneFamilyModal(dismissOnly) {
+      document.getElementById('samePhoneFamilyModal').classList.remove('open');
+      if (!dismissOnly) _pendingCompleteSession = null;
+    }
+
+    function openSamePhoneFamilyModal(member, progress, opts) {
+      var family = samePhoneFamilyOnBoard_(member);
+      var listEl = document.getElementById('samePhoneFamilyList');
+      if (listEl) {
+        listEl.innerHTML = family.map(function (x) {
+          var line = escapeHtml(x.name || '—');
+          if (x.time) line += ' · ' + escapeHtml(String(x.time).split(',')[0].trim());
+          return '<li>' + line + '</li>';
+        }).join('');
+      }
+      var textEl = document.getElementById('samePhoneFamilyModalText');
+      if (textEl) {
+        textEl.textContent =
+          '총 ' + family.length + '명 모두 출석 처리할까요? (각 1회차 차감)';
+      }
+      var allBtn = document.getElementById('samePhoneFamilyAllBtn');
+      if (allBtn) allBtn.textContent = '모두 출석 (' + family.length + '명)';
+      _pendingCompleteSession = { member: member, progress: progress, opts: opts || {} };
+      document.getElementById('samePhoneFamilyModal').classList.add('open');
+    }
+
+    async function confirmSamePhoneFamilyAttend(allFamily) {
+      var pending = _pendingCompleteSession;
+      closeSamePhoneFamilyModal(true);
+      if (!pending) return;
+      var family = familyMembersOnBoard_(pending.member);
+      if (allFamily && family.length >= 2) {
+        state.attendPassCount = family.length;
+        updateAttendPassStepper(pending.member);
+        await runCompleteSession(pending.member, pending.progress, Object.assign({}, pending.opts || {}, {
+          confirmFamilyAll: true,
+          confirmMultiPass: true,
+          attendPassCount: family.length,
+        }));
+        return;
+      }
+      state.attendPassCount = 1;
+      updateAttendPassStepper(pending.member);
+      await runCompleteSession(pending.member, pending.progress, Object.assign({}, pending.opts || {}, {
+        confirmFamilySingle: true,
+        attendPassCount: 1,
+      }));
     }
 
     function changeAttendPassCount(delta) {
@@ -5080,7 +5223,7 @@
     }
 
     function isSyncBlockingModalOpen() {
-      return ['evalModal', 'attendResultModal', 'extraPassModal', 'multiPassModal', 'phonePickerModal'].some(function(id) {
+      return ['evalModal', 'attendResultModal', 'extraPassModal', 'multiPassModal', 'samePhoneFamilyModal', 'phonePickerModal'].some(function(id) {
         var el = document.getElementById(id);
         return el && el.classList.contains('open');
       });
@@ -6660,7 +6803,11 @@
 
     async function runCompleteSession(m, progress, opts) {
       opts = opts || {};
-      if (!opts.confirmMultiPass && resolveAttendPassCount(opts) > 1) {
+      if (shouldPromptSamePhoneFamilyAttend_(m, opts)) {
+        openSamePhoneFamilyModal(m, progress, opts);
+        return;
+      }
+      if (!opts.confirmMultiPass && !opts.confirmFamilyAll && resolveAttendPassCount(opts) > 1) {
         openMultiPassModal(m, progress, opts);
         return;
       }
@@ -7529,6 +7676,7 @@
     document.getElementById('attendResultModal').addEventListener('click', function(e){ if(e.target===this) closeAttendResultModal(); });
     document.getElementById('extraPassModal').addEventListener('click', function(e){ if(e.target===this) closeExtraPassModal(); });
     document.getElementById('multiPassModal').addEventListener('click', function(e){ if(e.target===this) closeMultiPassModal(); });
+    document.getElementById('samePhoneFamilyModal').addEventListener('click', function(e){ if(e.target===this) closeSamePhoneFamilyModal(); });
     document.getElementById('phonePickerModal').addEventListener('click', function(e){ if(e.target===this) closePhonePickerModal(); });
     document.getElementById('pinInput').addEventListener('keydown', function(e){ if(e.key==='Enter') submitPin(); });
     document.addEventListener('visibilitychange', function() {
