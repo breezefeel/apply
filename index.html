@@ -5606,6 +5606,7 @@
     }
 
     function conditionHistoryPreviewLine_(item) {
+      item = normalizeConditionHistoryItem_(item);
       var parts = [];
       var np = normalizeNextProgressText(item.nextProgress);
       if (np && np !== '—') parts.push(np);
@@ -5668,7 +5669,44 @@
       });
     }
 
+    function normalizeConditionHistoryItem_(item) {
+      if (!item) return item;
+      var d = String(item.discomfort || '').trim();
+      if (d && d !== '—') return item;
+      var note = String(item.sessionNote || '').trim();
+      if (!note || note === '—') return item;
+      var conditions = [];
+      var freeLines = [];
+      note.split('\n').forEach(function (ln) {
+        var t = String(ln || '').trim();
+        if (!t) return;
+        var parsed = parseConditionLine_(t);
+        if (parsed) {
+          conditions.push(parsed);
+        } else {
+          freeLines.push(t);
+        }
+      });
+      if (!conditions.length) return item;
+      var discomfort = conditions
+        .map(function (c) {
+          return c.label + (c.vas ? ' · VAS ' + c.vas : '');
+        })
+        .join(' / ');
+      var specialParts = freeLines.slice();
+      conditions.forEach(function (c) {
+        if (c.suffix) specialParts.push(String(c.suffix).trim());
+      });
+      return {
+        dateStr: item.dateStr,
+        nextProgress: item.nextProgress,
+        discomfort: discomfort,
+        sessionNote: specialParts.join('\n').trim() || '—',
+      };
+    }
+
     function renderConditionHistorySessionBody_(item) {
+      item = normalizeConditionHistoryItem_(item);
       return '<div class="ch-session">' +
         '<div class="ch-block"><span class="ch-label">다음 진도</span>' + escapeHtml(normalizeNextProgressText(item.nextProgress) || '—') + '</div>' +
         '<div class="ch-block"><span class="ch-label">불편 부위 · VAS</span>' + escapeHtml(item.discomfort || '—') + '</div>' +
