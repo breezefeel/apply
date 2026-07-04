@@ -886,6 +886,17 @@
     .attend-result-status.ok { color:#047857; }
     .attend-result-status.warn { color:#b45309; }
     .attend-result-status.err { color:#b91c1c; }
+    .attend-result-sub { margin:4px 0 0; font-size:13px; color:#374151; }
+    .co-attend-pick { margin-bottom:14px; text-align:left; }
+    .co-attend-pick-hd { font-size:13px; font-weight:600; margin:0 0 8px; color:var(--text); }
+    .co-attend-option {
+      display:flex; align-items:flex-start; gap:8px;
+      padding:10px 12px; margin-bottom:6px;
+      border:1px solid var(--border,#e5e7eb); border-radius:8px;
+      font-size:13px; line-height:1.45; cursor:pointer;
+    }
+    .co-attend-option:has(input:checked) { border-color:#2563eb; background:#eff6ff; }
+    .co-attend-rec { font-size:12px; color:#047857; }
     .attend-result-loading {
       font-size:18px; font-weight:800; color:var(--blue); margin-bottom:8px;
     }
@@ -1560,6 +1571,10 @@
         <button type="button" class="modal-close" onclick="closeMultiPassModal()">×</button>
       </div>
       <p id="multiPassModalText" style="font-size:14px;line-height:1.55;margin-bottom:8px;">다회차 출석을 진행할까요?</p>
+      <div id="multiPassCoAttendPick" class="co-attend-pick" hidden>
+        <p class="co-attend-pick-hd">함께 출석할 회원 (기본: 가장 가까운 시간)</p>
+        <div id="multiPassCoAttendOptions"></div>
+      </div>
       <p id="multiPassModalHint" class="attend-result-partial" style="margin-bottom:16px;text-align:left;">선택한 회차만큼 회원권이 차감되고, 스케줄표에도 같은 횟수만큼 반영됩니다.</p>
       <div style="display:flex;gap:8px;">
         <button type="button" class="btn btn-primary" style="flex:1;" onclick="confirmMultiPassAttend(true)">네, 진행할게요</button>
@@ -2348,6 +2363,7 @@
       completedPersonKeys: {},
       progressSavedKeys: {},
       attendPassCount: 1,
+      familyCoAttendNames: null,
       sectionCollapsed: {},
       sectionCollapsedTouched: {},
       sessionCheck: { areas: [], vas: null, note: '' },
@@ -3208,6 +3224,15 @@
         if (family.length >= passN && family.length > 1) {
           html +=
             '<p class="attend-result-status ok">가족 ' + passN + '명 각 1회로 처리될 수 있습니다</p>';
+          family.slice(0, passN).forEach(function (fm) {
+            var fd = projectedAttendStats_(fm, 1);
+            html +=
+              '<p class="attend-result-sub">' +
+              escapeHtml(fm.name) +
+              ' · ' +
+              escapeHtml(formatAttendMemberRemainLine(fd, fm.name)) +
+              '</p>';
+          });
         } else {
           html +=
             '<p class="attend-result-status ok">' + passN + '회 한 번에 사용 예정</p>';
@@ -3284,6 +3309,8 @@
         scheduleSheetUrl: SCHEDULE_SPREADSHEET_FALLBACK,
         previousBooking: null,
         rescheduleActive: false,
+        familyBookings: [],
+        combinedNextBookingLine: '',
       };
     }
 
@@ -3375,6 +3402,13 @@
       if (!nb) return '';
       if (nb.loading) return getNextBookingLoadingAlimtalkLine_();
       syncNextBookingLineFromPicker_(nb);
+      var passN = resolveAttendPassCount_();
+      if (passN > 1 && nb.combinedNextBookingLine) {
+        if (nb.rescheduleActive && nb.pickedYmd && isFutureNextBookingYmd_(nb.pickedYmd) && nb.line) {
+          return nb.line;
+        }
+        if (!nb.rescheduleActive) return nb.combinedNextBookingLine;
+      }
       if (nb.line) {
         if (nb.rescheduleActive && nb.pickedYmd && !isFutureNextBookingYmd_(nb.pickedYmd)) return '';
         if (!nb.rescheduleActive && nb.fromSchedule && nb.ymd && !isFutureNextBookingYmd_(nb.ymd)) return '';
@@ -3643,6 +3677,18 @@
       if (data && data.scheduleSheetUrl) {
         state.nextBooking.scheduleSheetUrl = data.scheduleSheetUrl;
       }
+      state.nextBooking.familyBookings =
+        data && data.familyBookings && data.familyBookings.length ? data.familyBookings.slice() : [];
+      state.nextBooking.combinedNextBookingLine =
+        (data && data.combinedNextBookingLine) ||
+        (state.nextBooking.familyBookings.length
+          ? state.nextBooking.familyBookings
+              .map(function (b) {
+                return b.line || '';
+              })
+              .filter(Boolean)
+              .join('\n')
+          : '');
       state.nextBooking.loadedKey = memberKey(m);
       renderNextBookingPanel();
       renderSessionAlimtalkSection();
@@ -4861,7 +4907,7 @@
     }
 
     var ROLLBOOK_FAMILY_SUFFIX_RE =
-      /\s+(엄마|아빠|사모님|어머님|아버님|형|누나|언니|오빠|동생|할머님|할아버님)$/;
+      /\s+(엄마|아빠|사모님|어머님|아버님|형|누나|언니|오빠|동생|할머님|할아버님|남편|아내|남편님|아내님)$/;
 
     function rollbookFamilyNameBaseClient_(raw) {
       return String(normalizeMemberNameForKey_(raw) || '')
@@ -4935,9 +4981,95 @@
       });
     }
 
-    function orderFamilyForMultiPass_(m, family) {
-      if (!m || !family || !family.length) return family || [];
+    function memberBoardTimeMins_(m) {
+      return parseTime(String((m && m.time || '').split(',')[0] || '').trim());
+    }
+
+    function timeDistanceMins_(anchorMins, otherMins) {
+      if (anchorMins >= 9999 || otherMins >= 9999) return 9999;
+      return Math.abs(anchorMins - otherMins);
+    }
+
+    /** 다회차 — 선택 회원(anchor) 제외, 함께 출석 후보 */
+    function familyCoAttendCandidates_(m, passCount) {
+      passCount = Math.max(1, parseInt(passCount, 10) || 1);
+      var family = familyMembersOnBoard_(m);
+      if (family.length < 2 || passCount < 2) {
+        return { anchor: m, coChoices: [], slots: 0 };
+      }
       var anchorKey = memberPersonKey(m);
+      var anchorMins = memberBoardTimeMins_(m);
+      var coChoices = family
+        .filter(function (x) {
+          return memberPersonKey(x) !== anchorKey;
+        })
+        .map(function (x) {
+          var tm = memberBoardTimeMins_(x);
+          return {
+            member: x,
+            name: x.name,
+            time: String((x.time || '').split(',')[0] || '').trim(),
+            timeMins: tm,
+            distance: timeDistanceMins_(anchorMins, tm),
+            personKey: memberPersonKey(x),
+          };
+        })
+        .sort(function (a, b) {
+          return a.distance - b.distance || a.timeMins - b.timeMins;
+        });
+      return {
+        anchor: m,
+        coChoices: coChoices,
+        slots: passCount - 1,
+      };
+    }
+
+    function defaultFamilyCoAttendNames_(m, passCount) {
+      var info = familyCoAttendCandidates_(m, passCount);
+      var names = [info.anchor.name];
+      info.coChoices.slice(0, info.slots).forEach(function (c) {
+        names.push(c.name);
+      });
+      return names;
+    }
+
+    function needsFamilyCoAttendPick_(m, passCount) {
+      var passN = passCount != null ? passCount : resolveAttendPassCount_();
+      if (passN <= 1) return false;
+      var info = familyCoAttendCandidates_(m, passN);
+      return info.coChoices.length > info.slots;
+    }
+
+    function resolveFamilyCoAttendNames_(m, opts) {
+      opts = opts || {};
+      if (opts.familyCoAttendNames && opts.familyCoAttendNames.length) {
+        return opts.familyCoAttendNames.slice();
+      }
+      if (state.familyCoAttendNames && state.familyCoAttendNames.length) {
+        return state.familyCoAttendNames.slice();
+      }
+      return defaultFamilyCoAttendNames_(m, resolveAttendPassCount_(opts));
+    }
+
+    function orderFamilyForMultiPass_(m, family, coAttendNames) {
+      if (!m || !family || !family.length) return family || [];
+      if (coAttendNames && coAttendNames.length) {
+        var byNorm = {};
+        family.forEach(function (x) {
+          byNorm[normalizeMemberNameForKey_(x.name)] = x;
+        });
+        var ordered = [];
+        coAttendNames.forEach(function (n) {
+          var hit = byNorm[normalizeMemberNameForKey_(n)];
+          if (hit && ordered.indexOf(hit) < 0) ordered.push(hit);
+        });
+        family.forEach(function (x) {
+          if (ordered.indexOf(x) < 0) ordered.push(x);
+        });
+        return ordered;
+      }
+      var anchorKey = memberPersonKey(m);
+      var anchorMins = memberBoardTimeMins_(m);
       var anchor = family.filter(function (x) {
         return memberPersonKey(x) === anchorKey;
       });
@@ -4945,16 +5077,17 @@
         return memberPersonKey(x) !== anchorKey;
       });
       rest.sort(function (a, b) {
-        var ta = parseTime(String((a.time || '').split(',')[0] || '').trim());
-        var tb = parseTime(String((b.time || '').split(',')[0] || '').trim());
-        return ta - tb;
+        var da = timeDistanceMins_(anchorMins, memberBoardTimeMins_(a));
+        var db = timeDistanceMins_(anchorMins, memberBoardTimeMins_(b));
+        return da - db || memberBoardTimeMins_(a) - memberBoardTimeMins_(b);
       });
       return anchor.concat(rest);
     }
 
-    function familyMultiPassTargets_(m, passCount) {
+    function familyMultiPassTargets_(m, passCount, coAttendNames) {
+      var names = coAttendNames || resolveFamilyCoAttendNames_(m, { attendPassCount: passCount });
       var family = familyMembersOnBoard_(m);
-      var ordered = orderFamilyForMultiPass_(m, family);
+      var ordered = orderFamilyForMultiPass_(m, family, names);
       return ordered.slice(0, Math.max(1, parseInt(passCount, 10) || 1));
     }
 
@@ -5036,12 +5169,14 @@
       if (next < 1) next = 1;
       if (next > max) next = max;
       state.attendPassCount = next;
+      state.familyCoAttendNames = defaultFamilyCoAttendNames_(m, next);
       updateAttendPassStepper();
       updateSessionWrapPreview();
     }
 
     function resetAttendPassCount(m) {
       state.attendPassCount = 1;
+      state.familyCoAttendNames = null;
       updateAttendPassStepper(m);
     }
 
@@ -5066,6 +5201,11 @@
       if (minus) minus.disabled = !has || n <= 1;
       if (plus) plus.disabled = !has || n >= max;
       if (stepper) stepper.style.opacity = has ? '1' : '.45';
+      if (has && n > 1) {
+        state.familyCoAttendNames = defaultFamilyCoAttendNames_(m, n);
+      } else if (n <= 1) {
+        state.familyCoAttendNames = null;
+      }
       if (!state.attendProcessing && !(state.inlineAttendResult && state.inlineAttendResult.memberKey === state.selectedKey)) {
         updateSessionWrapPreview();
       }
@@ -5885,6 +6025,8 @@
         if (detail.nextBooking !== undefined || detail.timeSlots) {
           applyNextBookingApiData_({
             booking: detail.nextBooking,
+            familyBookings: detail.familyBookings,
+            combinedNextBookingLine: detail.combinedNextBookingLine,
             timeSlots: detail.timeSlots,
             scheduleSheetUrl: detail.scheduleSheetUrl,
           }, m);
@@ -6305,6 +6447,10 @@
       if (nextAlimtalkLine && !payload.bookNextSchedule) {
         payload.attendAlimtalkNextBooking = nextAlimtalkLine;
       }
+      var coNames = resolveFamilyCoAttendNames_(m, opts);
+      if (coNames && coNames.length > 1 && resolveAttendPassCount_(opts) > 1) {
+        payload.familyCoAttendNames = coNames;
+      }
       return payload;
     }
 
@@ -6384,6 +6530,83 @@
       return opts.attendPassCount != null ? opts.attendPassCount : (state.attendPassCount || 1);
     }
 
+    function renderMultiPassCoAttendPick_(m, passCount) {
+      var wrap = document.getElementById('multiPassCoAttendPick');
+      var optsEl = document.getElementById('multiPassCoAttendOptions');
+      if (!wrap || !optsEl) return;
+      var info = familyCoAttendCandidates_(m, passCount);
+      if (info.coChoices.length <= info.slots) {
+        wrap.hidden = true;
+        optsEl.innerHTML = '';
+        state.familyCoAttendNames = defaultFamilyCoAttendNames_(m, passCount);
+        return;
+      }
+      wrap.hidden = false;
+      var slots = info.slots;
+      var inputType = slots === 1 ? 'radio' : 'checkbox';
+      var defaultKeys = info.coChoices.slice(0, slots).map(function (c) {
+        return c.personKey;
+      });
+      optsEl.innerHTML = info.coChoices
+        .map(function (c, idx) {
+          var checked = defaultKeys.indexOf(c.personKey) >= 0;
+          var rec =
+            idx === 0
+              ? ' <span class="co-attend-rec">(추천 · 가장 가까운 시간)</span>'
+              : '';
+          return (
+            '<label class="co-attend-option">' +
+            '<input type="' +
+            inputType +
+            '" name="familyCoAttendPick" value="' +
+            escapeHtml(c.personKey) +
+            '"' +
+            (checked ? ' checked' : '') +
+            ' data-name="' +
+            escapeHtml(c.name) +
+            '">' +
+            '<span>' +
+            escapeHtml(c.name) +
+            (c.time ? ' · ' + escapeHtml(c.time) : '') +
+            rec +
+            '</span></label>'
+          );
+        })
+        .join('');
+      state.familyCoAttendNames = defaultFamilyCoAttendNames_(m, passCount);
+    }
+
+    function readFamilyCoAttendNamesFromModal_(m, passCount) {
+      var info = familyCoAttendCandidates_(m, passCount);
+      if (info.coChoices.length <= info.slots) {
+        return defaultFamilyCoAttendNames_(m, passCount);
+      }
+      var slots = info.slots;
+      var inputs = document.querySelectorAll('#multiPassCoAttendOptions input:checked');
+      var coNames = [];
+      inputs.forEach(function (inp) {
+        var n = inp.getAttribute('data-name') || '';
+        if (n) coNames.push(n);
+      });
+      if (coNames.length !== slots) {
+        return defaultFamilyCoAttendNames_(m, passCount);
+      }
+      return [info.anchor.name].concat(coNames);
+    }
+
+    function formatFamilyCoAttendSummary_(m, passCount, coNames) {
+      coNames = coNames || defaultFamilyCoAttendNames_(m, passCount);
+      return coNames
+        .map(function (n) {
+          var fam = familyMembersOnBoard_(m).find(function (x) {
+            return normalizeMemberNameForKey_(x.name) === normalizeMemberNameForKey_(n);
+          });
+          var t = fam && fam.time ? String(fam.time).split(',')[0].trim() : '';
+          return t ? n + ' · ' + t : n;
+        })
+        .join(', ');
+    }
+
     function closeMultiPassModal(dismissOnly) {
       document.getElementById('multiPassModal').classList.remove('open');
       if (!dismissOnly) _pendingCompleteSession = null;
@@ -6392,21 +6615,29 @@
     function openMultiPassModal(member, progress, opts) {
       var n = resolveAttendPassCount(opts);
       var m = member || state.selected;
-      var data = projectedAttendStats_(m, n);
-      var family = familyMultiPassTargets_(m, n);
+      var coNames = resolveFamilyCoAttendNames_(m, opts);
+      var family = familyMultiPassTargets_(m, n, coNames);
       var familyMode = family.length >= n && family.length > 1;
+      renderMultiPassCoAttendPick_(m, n);
       if (familyMode) {
-        var names = family.slice(0, n).map(function (t) { return t.name; }).join(', ');
+        var summary = formatFamilyCoAttendSummary_(m, n, coNames);
         document.getElementById('multiPassModalText').textContent =
-          '다회차 ' + n + ' — 같은 전화번호 가족 ' + n + '명이 각 1회씩 출석 처리됩니다.' +
-          (names ? ' (' + names + ')' : '');
+          '다회차 ' +
+          n +
+          ' — 같은 전화번호 가족 ' +
+          n +
+          '명이 각 1회씩 출석 처리됩니다.' +
+          (summary ? ' (' + summary + ')' : '');
         document.getElementById('multiPassModalHint').textContent =
-          opts && opts.skipAttendAlimtalk
+          needsFamilyCoAttendPick_(m, n)
+            ? '아래에서 함께 출석할 회원을 고를 수 있습니다. 기본값은 선택 회원과 가장 가까운 시간입니다.'
+            : opts && opts.skipAttendAlimtalk
             ? '진도 저장·출석·스케줄만 반영 (알림톡 없음).'
             : opts && opts.basicAttendOnly
             ? '진도 저장·출석·기본 알림톡·스케줄 반영.'
             : '진도 저장·출석·진도 알림톡·스케줄표에 가족 각 1회씩 반영됩니다.';
       } else {
+        var data = projectedAttendStats_(m, n);
         document.getElementById('multiPassModalText').textContent =
           '다회차 ' + n + '회 출석을 한 번에 처리합니다. ' +
           (m && m.name ? m.name + '님 ' : '') +
@@ -6428,8 +6659,12 @@
       var pending = _pendingCompleteSession;
       closeMultiPassModal(true);
       if (!pending || !proceed) return;
+      var passN = resolveAttendPassCount(pending.opts);
+      var coNames = readFamilyCoAttendNamesFromModal_(pending.member, passN);
+      state.familyCoAttendNames = coNames;
       await executeCompleteSession(pending.member, pending.progress, Object.assign({}, pending.opts || {}, {
         confirmMultiPass: true,
+        familyCoAttendNames: coNames,
       }));
     }
 
