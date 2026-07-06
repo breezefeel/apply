@@ -1681,6 +1681,8 @@
     const INSTRUCTOR_HTML_BUILD = '2026-07-05-final-v1';
     const BOARD_LOAD_TIMEOUT_MS = 90000;
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
+    /** 회원 목록 UI 카운트다운용 예상 시간(초) — 실제 API 타임아웃과 별도 */
+    const BOARD_LOAD_ESTIMATE_SEC = 35;
     const PIN_KEY = 'real_instructor_pin_v1';
     const INSTRUCTORS_FALLBACK = [
       { index:0, name:'박준규', color:'#BDD7EE', lightColor:'#DEEEF7' },
@@ -3979,15 +3981,15 @@
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    /** 출석 결과(위로 올리기 버튼)가 화면 하단에 오도록 스크롤 */
-    function scrollToAttendResultBottom() {
+    /** 출석 결과·처리 중 패널이 화면 상단에 오도록 스크롤 */
+    function scrollToAttendResultTop() {
       window.setTimeout(function() {
         var target =
-          document.getElementById('sessionAttendScrollBtn') ||
+          document.getElementById('sessionAlimtalkSectionLabel') ||
           document.getElementById('sessionAttendResultInline') ||
           document.getElementById('sessionAlimtalkSection');
         if (!target) return;
-        target.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     }
 
@@ -4110,7 +4112,7 @@
           resultWrap.hidden = false;
           document.getElementById('sessionAttendResultBody').innerHTML = result.html || '';
         }
-        scrollToAttendResultBottom();
+        scrollToAttendResultTop();
         return;
       }
 
@@ -4703,7 +4705,6 @@
     function escapeHtml(s) {
       return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
-    var BOARD_LOAD_ESTIMATE_SEC = BOARD_LOAD_TIMEOUT_SEC;
     var BOARD_AUTO_SYNC_IDLE_MS = 12 * 60 * 1000;
     var _loadCountdownTimer = null;
     var _loadCountdownStartedAt = 0;
@@ -7396,9 +7397,10 @@
         paintAttendProcessingCountdown(sec, false, state.attendProcessingMode);
       }, 1000);
       var panel =
+        document.getElementById('sessionAlimtalkSectionLabel') ||
         document.getElementById('sessionAttendCountdownBar') ||
         document.getElementById('sessionAlimtalkSection');
-      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function showAttendResult(m, data, opts) {
@@ -7414,7 +7416,7 @@
           html: '<p class="attend-result-error">❌ ' + escapeHtml(data.message || '저장 실패') + '</p>',
         };
         renderSessionAlimtalkSection();
-        scrollToAttendResultBottom();
+        scrollToAttendResultTop();
         return;
       }
 
