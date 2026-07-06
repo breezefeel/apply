@@ -386,7 +386,24 @@
     .member-brief .line2.brief-eval-notes.is-placeholder .brief-text {
       color:#94a3b8; font-style:italic;
     }
+    .member-brief .brief-ref {
+      display:block; color:var(--dim); margin-bottom:8px; padding-bottom:8px;
+      border-bottom:1px dashed #bfdbfe;
+    }
+    .member-brief .brief-ref[hidden] { display:none !important; }
+    .member-brief .brief-editable-wrap {
+      display:block; cursor:text; border-radius:6px; padding:2px 0;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .member-brief .brief-editable-wrap:hover { background:rgba(255,255,255,.45); }
+    .member-brief .brief-editable-wrap.is-editing { background:#fff; padding:6px 8px; border:1px solid #93c5fd; }
+    .member-brief .brief-editable-wrap.is-editing:hover { background:#fff; }
     .member-brief .brief-text { display:block; color:var(--dim); }
+    .member-brief .brief-editable-wrap textarea {
+      width:100%; min-height:72px; border:none; background:transparent; resize:vertical;
+      font:inherit; color:var(--text); line-height:1.55; padding:0; outline:none;
+    }
+    .member-brief .brief-editable-wrap textarea[hidden] { display:none; }
 
     .member-overview-wrap {
       margin-top:12px;
@@ -782,6 +799,9 @@
     }
     .next-booking-existing .next-booking-value {
       font-weight:700; color:#334155;
+    }
+    .next-booking-existing.is-empty .next-booking-value {
+      font-weight:600; color:#94a3b8;
     }
     .next-booking-pick {
       display:flex; flex-wrap:wrap; align-items:center; gap:6px; width:100%;
@@ -1370,7 +1390,11 @@
           <div class="member-brief" id="memberBrief">
             <div class="line1"><span id="briefName">—</span><a class="phone" id="briefPhone" href="#" hidden>전화</a></div>
             <div class="line2 brief-eval-notes is-placeholder" id="briefEvalNotesRow">
-              <span class="brief-text" id="briefEvalNotes">사전/초회 평가 시 평가 결과 및 특이사항</span>
+              <div class="brief-ref" id="briefEvalRef" hidden></div>
+              <div class="brief-editable-wrap" id="briefEvalEditableWrap" onclick="startBriefEvalNotesEdit(event)" title="클릭하여 특이사항 수정">
+                <span class="brief-text" id="briefEvalNotes">사전/초회 평가 시 평가 결과 및 특이사항</span>
+                <textarea id="briefEvalNotesInput" rows="4" hidden placeholder="평가 결과 및 특이사항을 입력하세요" onblur="finishBriefEvalNotesEdit()"></textarea>
+              </div>
             </div>
           </div>
           <aside class="member-condition-history" id="memberConditionHistory">
@@ -1678,7 +1702,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-07-05-final-v1';
+    const INSTRUCTOR_HTML_BUILD = '2026-07-06-member-load-fix';
     const BOARD_LOAD_TIMEOUT_MS = 90000;
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
     /** 회원 목록 UI 카운트다운용 예상 시간(초) — 실제 API 타임아웃과 별도 */
@@ -3339,6 +3363,7 @@
         rescheduleActive: false,
         familyBookings: [],
         combinedNextBookingLine: '',
+        noBookingMessage: '',
       };
     }
 
@@ -3646,11 +3671,16 @@
         }
       }
       if (existingWrap && existingText) {
+        existingWrap.classList.remove('is-empty');
         if (hasScheduledNextBooking_(nb)) {
           existingWrap.hidden = false;
           var existLabel = nb.display || '';
           if (nb.instName) existLabel = nb.instName + ' · ' + existLabel;
           existingText.textContent = '현재 예약: ' + (existLabel || '—');
+        } else if (String(nb.noBookingMessage || '').trim()) {
+          existingWrap.hidden = false;
+          existingWrap.classList.add('is-empty');
+          existingText.textContent = nb.noBookingMessage;
         } else {
           existingWrap.hidden = true;
           existingText.textContent = '';
@@ -3690,6 +3720,7 @@
         state.nextBooking.pickedTime = data.booking.timeStr || '';
         state.nextBooking.pickedYmd = '';
         state.nextBooking.rescheduleActive = false;
+        state.nextBooking.noBookingMessage = '';
       } else {
         state.nextBooking.fromSchedule = false;
         state.nextBooking.previousBooking = null;
@@ -3698,6 +3729,9 @@
         state.nextBooking.display = '';
         state.nextBooking.line = '';
         state.nextBooking.rescheduleActive = false;
+        state.nextBooking.noBookingMessage = String(
+          (data && data.noBookingMessage) || '두 달 이내 예약된 일정이 없습니다.'
+        ).trim();
       }
       if (data && data.timeSlots && data.timeSlots.length) {
         state.nextBooking.timeSlots = data.timeSlots;
@@ -3745,6 +3779,14 @@
           instructorIndex: m.instructorIndex,
         }, { timeoutMs: 30000 });
         if (reqId !== _nextBookingReq || state.selectedKey !== selKey) return;
+        if (!data || data.ok === false) {
+          state.nextBooking.loading = false;
+          stopNextBookingCountdown();
+          state.nextBooking.noBookingMessage = '';
+          renderNextBookingPanel();
+          renderSessionAlimtalkSection();
+          return;
+        }
         applyNextBookingApiData_(data, m);
       } catch (e) {
         if (reqId !== _nextBookingReq || state.selectedKey !== selKey) return;
@@ -6162,6 +6204,7 @@
       }
       var sessionNotesNew = document.getElementById('sessionSpecialNotesNew');
       if (sessionNotesNew) sessionNotesNew.value = '';
+      cancelBriefEvalNotesEdit_();
       m.specialNotes = (m.memoSummary && m.memoSummary.specialNotes) || m.specialNotes || '';
       m.nextProgress = normalizeNextProgressText((m.memoSummary && m.memoSummary.nextProgress) || m.nextProgress || '');
       clearSessionNextProgressDraft();
@@ -6195,17 +6238,101 @@
       return parts.join('\n\n').slice(0, 1200);
     }
 
+    var _briefEvalNotesSaving = false;
+
     function renderBriefEvalNotes_(m) {
       var row = document.getElementById('briefEvalNotesRow');
+      var refEl = document.getElementById('briefEvalRef');
+      var wrap = document.getElementById('briefEvalEditableWrap');
       var el = document.getElementById('briefEvalNotes');
-      if (!row || !el) return;
-      var content = buildBriefEvalNotesText_(m);
-      if (content) {
-        el.textContent = content;
+      var input = document.getElementById('briefEvalNotesInput');
+      if (!row || !el || !wrap) return;
+      if (wrap.classList.contains('is-editing')) return;
+
+      var refContent = buildBriefEvalNotesText_(m);
+      if (refEl) {
+        if (refContent) {
+          refEl.textContent = refContent;
+          refEl.hidden = false;
+        } else {
+          refEl.textContent = '';
+          refEl.hidden = true;
+        }
+      }
+
+      var notes = String((m && m.memberBriefNotes) || '').trim();
+      if (notes) {
+        el.textContent = notes;
         row.classList.remove('is-placeholder');
       } else {
         el.textContent = '사전/초회 평가 시 평가 결과 및 특이사항';
         row.classList.add('is-placeholder');
+      }
+      if (input) input.value = notes;
+    }
+
+    function startBriefEvalNotesEdit(ev) {
+      var m = state.selected;
+      if (!m || !m.suffix8) return;
+      var wrap = document.getElementById('briefEvalEditableWrap');
+      var el = document.getElementById('briefEvalNotes');
+      var input = document.getElementById('briefEvalNotesInput');
+      if (!wrap || !el || !input || wrap.classList.contains('is-editing')) return;
+      if (ev && ev.target === input) return;
+      wrap.classList.add('is-editing');
+      el.hidden = true;
+      input.hidden = false;
+      input.value = String(m.memberBriefNotes || '').trim();
+      input.focus();
+      try { input.setSelectionRange(input.value.length, input.value.length); } catch (e) {}
+    }
+
+    function cancelBriefEvalNotesEdit_() {
+      var wrap = document.getElementById('briefEvalEditableWrap');
+      var el = document.getElementById('briefEvalNotes');
+      var input = document.getElementById('briefEvalNotesInput');
+      if (!wrap || !el || !input) return;
+      wrap.classList.remove('is-editing');
+      el.hidden = false;
+      input.hidden = true;
+    }
+
+    async function finishBriefEvalNotesEdit() {
+      var m = state.selected;
+      var wrap = document.getElementById('briefEvalEditableWrap');
+      var input = document.getElementById('briefEvalNotesInput');
+      if (!m || !wrap || !input || !wrap.classList.contains('is-editing')) return;
+      if (_briefEvalNotesSaving) return;
+
+      var next = String(input.value || '').trim();
+      var prev = String(m.memberBriefNotes || '').trim();
+      cancelBriefEvalNotesEdit_();
+      m.memberBriefNotes = next;
+      renderBriefEvalNotes_(m);
+      if (next === prev) return;
+
+      _briefEvalNotesSaving = true;
+      try {
+        var res = await api({
+          action: 'instructorSaveMemberBriefNotes',
+          suffix8: m.suffix8,
+          name: m.name,
+          memberBriefNotes: next,
+        }, { timeoutMs: 20000 });
+        if (!res || !res.ok) {
+          m.memberBriefNotes = prev;
+          renderBriefEvalNotes_(m);
+          toast((res && res.message) || '특이사항 저장에 실패했습니다.');
+          return;
+        }
+        m.memberBriefNotes = String(res.memberBriefNotes != null ? res.memberBriefNotes : next).trim();
+        renderBriefEvalNotes_(m);
+      } catch (e) {
+        m.memberBriefNotes = prev;
+        renderBriefEvalNotes_(m);
+        toast('특이사항 저장 중 오류가 발생했습니다.');
+      } finally {
+        _briefEvalNotesSaving = false;
       }
     }
 
@@ -6238,18 +6365,24 @@
       var reqId = ++_memberDetailReq;
       var selKey = memberKey(m);
       try {
-        var detail = await api({ action: 'instructorMemberDetail', suffix8: m.suffix8, attendeeName: m.name }, { timeoutMs: 45000 });
+        var detail = await api({ action: 'instructorMemberDetail', suffix8: m.suffix8, attendeeName: m.name }, {
+          timeoutMs: 60000,
+          timeoutMessage:
+            '회원 히스토리 응답 시간 초과(약 60초). Apps Script 배포·새로고침 후 다시 선택해 주세요.',
+        });
         if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
         state.memberDetailLoading = false;
         stopMemberDetailCountdown();
         if (!detail.ok || !detail.member) {
           state.memberDetailLoadError = (detail && detail.message) || '회원 정보를 불러오지 못했습니다.';
-          fetchNextBookingForMember_(m);
           renderConditionHistory(m);
           return;
         }
         state.memberDetailLoadError = '';
         m.specialNotes = detail.member.specialNotes || m.specialNotes || '';
+        m.memberBriefNotes = detail.member.memberBriefNotes != null
+          ? String(detail.member.memberBriefNotes || '').trim()
+          : (m.memberBriefNotes || '');
         m.nextProgress = normalizeNextProgressText(detail.member.nextProgress || m.nextProgress || '');
         m.pspProgress = detail.member.pspProgress || m.pspProgress || {};
         m.previousSessionProgress = detail.member.previousSessionProgress || m.previousSessionProgress || {};
@@ -6267,24 +6400,12 @@
         distributeServerProgressToStore(m);
         loadProgressFromMemberStore(state.activeProgramTab);
         saveProgressToMemberStore();
-        if (detail.nextBooking !== undefined || detail.timeSlots) {
-          applyNextBookingApiData_({
-            booking: detail.nextBooking,
-            familyBookings: detail.familyBookings,
-            combinedNextBookingLine: detail.combinedNextBookingLine,
-            timeSlots: detail.timeSlots,
-            scheduleSheetUrl: detail.scheduleSheetUrl,
-          }, m);
-        } else if (state.nextBooking && state.nextBooking.loading) {
-          fetchNextBookingForMember_(m);
-        }
         renderSelectedMemberUi();
       } catch (e) {
         if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
         state.memberDetailLoading = false;
         stopMemberDetailCountdown();
         state.memberDetailLoadError = '회원 정보 응답 시간 초과 또는 연결 실패. 잠시 후 다시 선택해 주세요.';
-        fetchNextBookingForMember_(m);
         renderConditionHistory(m);
       }
     }
@@ -6317,9 +6438,7 @@
       }
       renderSelectedMemberUi();
       if (m.suffix8) {
-        if (state.nextBooking) state.nextBooking.loading = true;
-        renderNextBookingPanel();
-        renderSessionAlimtalkSection();
+        fetchNextBookingForMember_(m);
         enrichMemberDetailInBackground(m);
       }
     }
