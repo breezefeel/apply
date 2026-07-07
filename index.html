@@ -1717,7 +1717,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-07-07-attend-improve';
+    const INSTRUCTOR_HTML_BUILD = '2026-07-07-attend-timeout2';
     const BOARD_LOAD_TIMEOUT_MS = 90000;
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
     /** 회원 목록 UI 카운트다운용 예상 시간(초) — 실제 API 타임아웃과 별도 */
@@ -4700,7 +4700,12 @@
           mode: 'retry',
           retryOpts: Object.assign({}, opts, {
             skipSessionSave: true,
+            attendRetryOnly: true,
             clientVisitKey: visitKey,
+            bookNextSchedule: false,
+            cancelPreviousBookingYmd: '',
+            cancelPreviousBookingTime: '',
+            cancelPreviousInstIdx: null,
           }),
         };
       }
@@ -6938,6 +6943,7 @@
         confirmExtraPass: !!opts.confirmExtraPass,
         confirmProceedWithoutNextBooking: !!opts.confirmProceedWithoutNextBooking,
         skipSessionSave: !!opts.skipSessionSave,
+        attendRetryOnly: !!opts.attendRetryOnly,
         clientVisitKey: opts.clientVisitKey || state.activeCompleteVisitKey || '',
         skipAttendAlimtalk: skipAlim,
         basicAttendOnly: isBasicAttend,
@@ -6956,14 +6962,22 @@
         if (ata.linkIds && ata.linkIds.length) payload.attendAlimtalkLinkIds = ata.linkIds;
       }
       var nbPayload = getNextBookingServerPayload();
-      if (nbPayload.nextBookingYmd) payload.nextBookingYmd = nbPayload.nextBookingYmd;
-      if (nbPayload.nextBookingTime) payload.nextBookingTime = nbPayload.nextBookingTime;
-      if (nbPayload.bookNextSchedule) payload.bookNextSchedule = true;
-      if (nbPayload.useScheduleNextBooking != null) payload.useScheduleNextBooking = nbPayload.useScheduleNextBooking;
-      if (nbPayload.instructorIndex != null) payload.instructorIndex = nbPayload.instructorIndex;
-      if (nbPayload.cancelPreviousBookingYmd) payload.cancelPreviousBookingYmd = nbPayload.cancelPreviousBookingYmd;
-      if (nbPayload.cancelPreviousBookingTime) payload.cancelPreviousBookingTime = nbPayload.cancelPreviousBookingTime;
-      if (nbPayload.cancelPreviousInstIdx != null) payload.cancelPreviousInstIdx = nbPayload.cancelPreviousInstIdx;
+      if (opts.attendRetryOnly) {
+        payload.bookNextSchedule = false;
+        payload.cancelPreviousBookingYmd = '';
+        payload.cancelPreviousBookingTime = '';
+        payload.cancelPreviousInstIdx = null;
+        payload.useScheduleNextBooking = true;
+      } else {
+        if (nbPayload.nextBookingYmd) payload.nextBookingYmd = nbPayload.nextBookingYmd;
+        if (nbPayload.nextBookingTime) payload.nextBookingTime = nbPayload.nextBookingTime;
+        if (nbPayload.bookNextSchedule) payload.bookNextSchedule = true;
+        if (nbPayload.useScheduleNextBooking != null) payload.useScheduleNextBooking = nbPayload.useScheduleNextBooking;
+        if (nbPayload.instructorIndex != null) payload.instructorIndex = nbPayload.instructorIndex;
+        if (nbPayload.cancelPreviousBookingYmd) payload.cancelPreviousBookingYmd = nbPayload.cancelPreviousBookingYmd;
+        if (nbPayload.cancelPreviousBookingTime) payload.cancelPreviousBookingTime = nbPayload.cancelPreviousBookingTime;
+        if (nbPayload.cancelPreviousInstIdx != null) payload.cancelPreviousInstIdx = nbPayload.cancelPreviousInstIdx;
+      }
       payload.phoneDigits = m.phoneDigits || '';
       if (payload.instructorIndex == null) payload.instructorIndex = m.instructorIndex;
       var nextAlimtalkLine = getNextBookingAlimtalkLine();
@@ -7670,8 +7684,37 @@
     var ATTEND_PROCESS_EST_SEC = 35;
     /** 타임아웃 후 서버 상태 복구 재시도 최대 횟수 (무한 루프 방지) */
     var ATTEND_PROCESS_MAX_RECOVER_ATTEMPTS = 2;
+    var ATTEND_FLOW_MAX_MS = 150000;
+    var ATTEND_RECOVER_POLL_MS = 40000;
     var _completeSessionInFlight = false;
     var _resendAlimtalkInFlight = false;
+
+    var _attendFlowStartedAt = 0;
+
+    function beginAttendFlowIfNeeded_(recoverAttempt) {
+      if (!recoverAttempt) _attendFlowStartedAt = Date.now();
+    }
+
+    function isAttendFlowOverDeadline_() {
+      return _attendFlowStartedAt > 0 && (Date.now() - _attendFlowStartedAt) >= ATTEND_FLOW_MAX_MS;
+    }
+
+    function attendApiTimeoutMs_(recoverAttempt) {
+      return recoverAttempt > 0 ? 55000 : 90000;
+    }
+
+    async function pollRecoverUntilAttendDone_(m, opts, myGen) {
+      var deadline = Date.now() + ATTEND_RECOVER_POLL_MS;
+      while (Date.now() < deadline) {
+        if (!isAttendRequestActive_(myGen)) return null;
+        var rec = await fetchCompleteSessionRecoverState_(m, opts);
+        if (rec && rec.ok && rec.recovered && rec.attendCompletedToday) {
+          return { mode: 'done', data: buildRecoveredCompleteData_(rec) };
+        }
+        await new Promise(function (resolve) { setTimeout(resolve, 3000); });
+      }
+      return null;
+    }
 
     function releaseCompleteSessionInFlight_() {
       _completeSessionInFlight = false;
@@ -7777,6 +7820,7 @@
 
     function cancelAttendProcessing_() {
       _attendRequestGen += 1;
+      _attendFlowStartedAt = 0;
       releaseCompleteSessionInFlight_();
       stopAttendAlimtalkPoll_();
       state.attendRecoverAttempt = 0;
@@ -7791,6 +7835,8 @@
       stopAttendProcessingCountdown();
       state.attendProcessing = false;
       state.attendRecoverAttempt = 0;
+      _attendFlowStartedAt = 0;
+      releaseCompleteSessionInFlight_();
       setSessionActionButtonsDisabled(false);
 
       if (rec && rec.ok && rec.recovered && rec.attendCompletedToday) {
@@ -7855,6 +7901,10 @@
       if (overdue && state.attendRecoverAttempt > 0) {
         retryNote = ' (서버 재시도 ' + state.attendRecoverAttempt + '/' + ATTEND_PROCESS_MAX_RECOVER_ATTEMPTS + ')';
       }
+      if (overdue && _attendFlowStartedAt > 0) {
+        var totalSec = Math.floor((Date.now() - _attendFlowStartedAt) / 1000);
+        retryNote += ' · 경과 ' + totalSec + '초';
+      }
       if (overdue) {
         bar.innerHTML =
           '<span class="session-attend-countdown-label">[' + escapeHtml(modeLabel) + ']</span>' +
@@ -7912,6 +7962,7 @@
       opts = opts || {};
       stopAttendProcessingCountdown();
       state.attendProcessing = false;
+      _attendFlowStartedAt = 0;
       releaseCompleteSessionInFlight_();
       setSessionActionButtonsDisabled(false);
       var mk = memberKey(m);
@@ -7963,6 +8014,16 @@
     async function executeCompleteSession(m, progress, opts) {
       opts = opts || {};
       var recoverAttempt = opts._recoverAttempt || 0;
+      beginAttendFlowIfNeeded_(recoverAttempt);
+      if (isAttendFlowOverDeadline_()) {
+        var deadlineRec = await fetchCompleteSessionRecoverState_(m, opts);
+        await showAttendRecoverGiveUpResult_(m, opts, deadlineRec, {
+          ok: false,
+          message: '처리 시간이 너무 오래 걸려 중단했습니다. 시트·회원 칩에서 반영 여부를 확인해 주세요.',
+        });
+        state.activeCompleteVisitKey = '';
+        return;
+      }
       if (recoverAttempt === 0) {
         if (_completeSessionInFlight) {
           toast('이미 출석 처리 중입니다. 완료될 때까지 기다려 주세요.');
@@ -8018,7 +8079,10 @@
           }
         }
       }
-      const data = await api(completeSessionPayload(m, progress, opts), { timeoutMs: 90000 });
+      const data = await api(completeSessionPayload(m, progress, opts), {
+        timeoutMs: attendApiTimeoutMs_(recoverAttempt),
+        preferPost: true,
+      });
       if (!isAttendRequestActive_(myGen)) {
         releaseCompleteSessionInFlight_();
         return;
@@ -8032,13 +8096,24 @@
             return;
           }
           if (recovery && recovery.mode === 'retry') {
-            if (recoverAttempt >= ATTEND_PROCESS_MAX_RECOVER_ATTEMPTS) {
+            if (recoverAttempt >= ATTEND_PROCESS_MAX_RECOVER_ATTEMPTS || isAttendFlowOverDeadline_()) {
               var recState = await fetchCompleteSessionRecoverState_(m, opts);
               if (!isAttendRequestActive_(myGen)) {
                 releaseCompleteSessionInFlight_();
                 return;
               }
               await showAttendRecoverGiveUpResult_(m, opts, recState, data);
+              state.activeCompleteVisitKey = '';
+              return;
+            }
+            var polled = await pollRecoverUntilAttendDone_(m, Object.assign({}, opts, recovery.retryOpts), myGen);
+            if (!isAttendRequestActive_(myGen)) {
+              releaseCompleteSessionInFlight_();
+              return;
+            }
+            if (polled && polled.mode === 'done' && polled.data) {
+              applyCompleteSessionResult(m, polled.data);
+              showAttendResult(m, polled.data, opts);
               state.activeCompleteVisitKey = '';
               return;
             }
@@ -8074,18 +8149,21 @@
         return;
       }
       if (data.needPhoneSelect && (data.candidates || []).length) {
+        releaseCompleteSessionInFlight_();
         resetInlineAttendResult();
         applyCompleteSessionResult(m, data);
         openPhonePickerModal(data.candidates, m, progress, data, opts);
         return;
       }
       if (data.needExtraPassConfirm) {
+        releaseCompleteSessionInFlight_();
         resetInlineAttendResult();
         applyCompleteSessionResult(m, data);
         openExtraPassModal(data.attendMessage, m, progress, data, opts);
         return;
       }
       if (data.needNextBookingConfirm) {
+        releaseCompleteSessionInFlight_();
         resetInlineAttendResult();
         applyCompleteSessionResult(m, data);
         openNextBookingFailModal(data.nextBookingError, m, progress, data, opts);
