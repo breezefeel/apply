@@ -909,6 +909,11 @@
     .attend-result-status.ok { color:#047857; }
     .attend-result-status.warn { color:#b45309; }
     .attend-result-status.err { color:#b91c1c; }
+    .attend-solapi-log-link {
+      color: inherit; text-decoration: underline; font-weight: 800;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .attend-solapi-log-link:hover { opacity: .85; }
     .attend-result-sub { margin:4px 0 0; font-size:13px; color:#374151; }
     .co-attend-pick { margin-bottom:14px; text-align:left; }
     .co-attend-pick-hd { font-size:13px; font-weight:600; margin:0 0 8px; color:var(--text); }
@@ -1300,6 +1305,13 @@
     .session-attend-countdown-bar .attend-process-sec {
       font-weight:800; color:#f8fafc; font-size:15px;
     }
+    .session-attend-countdown-cancel {
+      display:inline-block; margin-left:10px; padding:2px 8px;
+      font-size:10px; font-weight:700; color:#fca5a5;
+      background:transparent; border:1px solid rgba(248,113,113,.45);
+      border-radius:6px; cursor:pointer; vertical-align:middle;
+    }
+    .session-attend-countdown-cancel:hover { background:rgba(248,113,113,.12); }
     .alimtalk-preview.is-result-mode {
       background:transparent; color:inherit; padding:0;
     }
@@ -1315,6 +1327,9 @@
       font-size:12px; line-height:1.6; white-space:pre-wrap;
       background:#1e293b; color:#f1f5f9; border-radius:10px;
       padding:12px 14px; margin-top:8px;
+    }
+    .session-attend-not-sent-box {
+      background:#f8fafc; color:#475569; border:1px solid #e2e8f0;
     }
     .session-attend-sent-label {
       font-size:10px; font-weight:700; color:#94a3b8; margin-bottom:6px;
@@ -1391,9 +1406,9 @@
             <div class="line1"><span id="briefName">—</span><a class="phone" id="briefPhone" href="#" hidden>전화</a></div>
             <div class="line2 brief-eval-notes is-placeholder" id="briefEvalNotesRow">
               <div class="brief-ref" id="briefEvalRef" hidden></div>
-              <div class="brief-editable-wrap" id="briefEvalEditableWrap" onclick="startBriefEvalNotesEdit(event)" title="클릭하여 특이사항 수정">
-                <span class="brief-text" id="briefEvalNotes">사전/초회 평가 시 평가 결과 및 특이사항</span>
-                <textarea id="briefEvalNotesInput" rows="4" hidden placeholder="평가 결과 및 특이사항을 입력하세요" onblur="finishBriefEvalNotesEdit()"></textarea>
+              <div class="brief-editable-wrap" id="briefEvalEditableWrap" onclick="startBriefEvalNotesEdit(event)" title="클릭 후 수정 가능">
+                <span class="brief-text" id="briefEvalNotes">사전/초회 평가 시 결과 및 특이사항 (클릭 후 수정 가능)</span>
+                <textarea id="briefEvalNotesInput" rows="4" hidden placeholder="결과 및 특이사항을 입력하세요 (클릭 후 수정)" onblur="finishBriefEvalNotesEdit()"></textarea>
               </div>
             </div>
           </div>
@@ -1702,7 +1717,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-07-06-member-load-fix';
+    const INSTRUCTOR_HTML_BUILD = '2026-07-07-attend-improve';
     const BOARD_LOAD_TIMEOUT_MS = 90000;
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
     /** 회원 목록 UI 카운트다운용 예상 시간(초) — 실제 API 타임아웃과 별도 */
@@ -2420,7 +2435,9 @@
       sectionCollapsedTouched: {},
       sessionCheck: { areas: [], vas: null, note: '' },
       attendProcessing: false,
+      attendRecoverAttempt: 0,
       inlineAttendResult: null,
+      attendResultByMember: {},
       nextBooking: null,
       memberDetailLoading: false,
       memberDetailLoadError: '',
@@ -2449,9 +2466,11 @@
       { id: 'shoulder', label: '어깨', group: 'upper' },
       { id: 'arm', label: '팔', group: 'upper' },
       { id: 'elbow', label: '팔꿈치', group: 'upper' },
+      { id: 'forearm', label: '팔뚝', group: 'upper' },
       { id: 'wrist', label: '손목', group: 'upper' },
       { id: 'hand', label: '손', group: 'upper' },
       { id: 'hip', label: '고관절', group: 'lower' },
+      { id: 'thigh', label: '허벅지', group: 'lower' },
       { id: 'knee', label: '무릎', group: 'lower' },
       { id: 'calf', label: '종아리', group: 'lower' },
       { id: 'ankle', label: '발목', group: 'lower' },
@@ -4010,11 +4029,53 @@
     }
 
     function resetInlineAttendResult() {
+      stopAttendAlimtalkPoll_();
       state.inlineAttendResult = null;
       state.attendProcessing = false;
+      state.lastAttendResultData = null;
+      state.lastAttendResultOpts = null;
+      if (state.selectedKey && state.attendResultByMember) {
+        delete state.attendResultByMember[state.selectedKey];
+      }
       stopAttendProcessingCountdown();
       setSessionActionButtonsDisabled(false);
       renderSessionAlimtalkSection();
+    }
+
+    function saveMemberAttendResult_(mk, resultOverride) {
+      if (!mk) return;
+      var source = resultOverride || state.inlineAttendResult;
+      if (!source || source.memberKey !== mk) return;
+      if (!state.attendResultByMember) state.attendResultByMember = {};
+      state.attendResultByMember[mk] = {
+        inlineAttendResult: source,
+        lastAttendResultData: state.lastAttendResultData,
+        lastAttendResultOpts: state.lastAttendResultOpts,
+      };
+    }
+
+    function restoreMemberAttendResult_(mk) {
+      var cached = state.attendResultByMember && state.attendResultByMember[mk];
+      if (cached && cached.inlineAttendResult) {
+        state.inlineAttendResult = cached.inlineAttendResult;
+        state.lastAttendResultData = cached.lastAttendResultData;
+        state.lastAttendResultOpts = cached.lastAttendResultOpts;
+        if (
+          state.selected && memberKey(state.selected) === mk &&
+          cached.lastAttendResultData && cached.lastAttendResultOpts &&
+          !cached.lastAttendResultData.alimtalkPollPending
+        ) {
+          var ev = resolveAttendAlimtalkEvent_(cached.lastAttendResultData);
+          if (ev && ev.queued && !ev.sent) {
+            startAttendAlimtalkPoll_(state.selected, cached.lastAttendResultData, cached.lastAttendResultOpts);
+          }
+        }
+        return true;
+      }
+      state.inlineAttendResult = null;
+      state.lastAttendResultData = null;
+      state.lastAttendResultOpts = null;
+      return false;
     }
 
     function scrollToMemberSection() {
@@ -4358,7 +4419,8 @@
       updateSendBar();
     }
 
-    async function runSaveSessionOnly(m, progress) {
+    async function runSaveSessionOnly(m, progress, recoverAttempt) {
+      recoverAttempt = recoverAttempt || 0;
       setSessionActionButtonsDisabled(true);
       var extras = getSessionRecordPayloadExtras();
       var data = await api({
@@ -4380,7 +4442,12 @@
       updateSendBar();
       if (!data.ok) {
         if (await tryRecoverMissingMemberSession_(m, data)) {
-          return runSaveSessionOnly(m, progress);
+          if (recoverAttempt >= ATTEND_PROCESS_MAX_RECOVER_ATTEMPTS) {
+            toast(data.message || '저장 실패');
+            setSessionActionButtonsDisabled(false);
+            return false;
+          }
+          return runSaveSessionOnly(m, progress, recoverAttempt + 1);
         }
         toast(data.message || '저장 실패');
         setSessionActionButtonsDisabled(false);
@@ -4395,6 +4462,12 @@
     }
 
     async function runResendAttendAlimtalk(m, progress, opts) {
+      if (_resendAlimtalkInFlight) {
+        toast('알림톡 재발송이 이미 진행 중입니다.');
+        return false;
+      }
+      _resendAlimtalkInFlight = true;
+      try {
       opts = Object.assign({ resendOnly: true }, opts || {});
       setSessionActionButtonsDisabled(true);
       await refreshNextBookingBeforeAttendAlimtalk_(m);
@@ -4440,16 +4513,21 @@
         resendOnly: true,
       });
       state.attendProcessing = false;
+      var resendAlimtalkOk = !!(data.alimtalk && data.alimtalk.ok);
       state.inlineAttendResult = {
         memberKey: memberKey(m),
-        title: '📨 알림톡 재발송 완료',
+        title: resendAlimtalkOk ? '📨 알림톡 재발송 완료' : '⚠️ 알림톡 재발송 실패',
         html: buildInlineAttendResultHtml(m, data, resultOpts),
         sentText: buildSentAlimtalkText_(m, data, resultOpts),
       };
+      saveMemberAttendResult_(memberKey(m));
       setSessionActionButtonsDisabled(false);
       renderSessionAlimtalkSection();
       _pendingAttendAlimtalk = null;
       return true;
+      } finally {
+        _resendAlimtalkInFlight = false;
+      }
     }
 
     function memberNeedsSheetRow_(m) {
@@ -4591,41 +4669,46 @@
       return !msg;
     }
 
-    async function tryRecoverCompleteSessionAfterFailure_(m, opts) {
+    async function fetchCompleteSessionRecoverState_(m, opts) {
       if (!m || !m.suffix8) return null;
       var visitKey = opts.clientVisitKey || state.activeCompleteVisitKey || '';
       try {
-        var rec = await api({
+        return await api({
           action: 'instructorCompleteSessionRecover',
           suffix8: m.suffix8,
           name: opts.memberName || m.name,
           rowKey: opts.rowKey != null ? opts.rowKey : (m.rowKey || m.rowIndex),
           clientVisitKey: visitKey,
         }, { timeoutMs: 30000, preferPost: true });
-        if (!rec || !rec.ok || !rec.recovered) return null;
-        if (rec.attendCompletedToday && rec.sessionSavedToday) {
-          return {
-            mode: 'done',
-            data: buildRecoveredCompleteData_(rec),
-          };
-        }
-        if (rec.sessionSavedToday) {
-          return {
-            mode: 'retry',
-            retryOpts: Object.assign({}, opts, {
-              skipSessionSave: true,
-              clientVisitKey: visitKey,
-            }),
-          };
-        }
-        if (rec.attendCompletedToday) {
-          return {
-            mode: 'done',
-            data: buildRecoveredCompleteData_(rec),
-          };
-        }
       } catch (e) {
         return null;
+      }
+    }
+
+    async function tryRecoverCompleteSessionAfterFailure_(m, opts) {
+      var rec = await fetchCompleteSessionRecoverState_(m, opts);
+      if (!rec || !rec.ok || !rec.recovered) return null;
+      var visitKey = opts.clientVisitKey || state.activeCompleteVisitKey || '';
+      if (rec.attendCompletedToday && rec.sessionSavedToday) {
+        return {
+          mode: 'done',
+          data: buildRecoveredCompleteData_(rec),
+        };
+      }
+      if (rec.sessionSavedToday) {
+        return {
+          mode: 'retry',
+          retryOpts: Object.assign({}, opts, {
+            skipSessionSave: true,
+            clientVisitKey: visitKey,
+          }),
+        };
+      }
+      if (rec.attendCompletedToday) {
+        return {
+          mode: 'done',
+          data: buildRecoveredCompleteData_(rec),
+        };
       }
       return null;
     }
@@ -4799,7 +4882,7 @@
       var controller = new AbortController();
       var timer = setTimeout(function() { controller.abort(); }, timeoutMs);
       var body = JSON.stringify(Object.assign({ pin: state.pin }, payload));
-      var usePost = body.length > API_GET_BODY_MAX || !!opts.preferPost;
+      var usePost = true;
       try {
         var res;
         if (usePost) {
@@ -4907,6 +4990,10 @@
       }
       if (state.inlineAttendResult && state.inlineAttendResult.memberKey === prevKey) {
         state.inlineAttendResult.memberKey = nextKey;
+      }
+      if (state.attendResultByMember && state.attendResultByMember[prevKey]) {
+        state.attendResultByMember[nextKey] = state.attendResultByMember[prevKey];
+        delete state.attendResultByMember[prevKey];
       }
       state.selectedKey = nextKey;
       return nextKey;
@@ -5572,7 +5659,15 @@
         renderProgramList();
         if (state.selectedKey) {
           const m = todayMembers().find(function(x) { return memberKey(x) === state.selectedKey; });
-          if (m) selectMember(m, false);
+          if (m) {
+            if (opts.silent && state.selected && memberKey(state.selected) === state.selectedKey) {
+              refreshSelectedMemberFromBoard_(m);
+            } else {
+              selectMember(m, false);
+            }
+          } else {
+            clearSelectedMember_();
+          }
         }
       } finally {
         clearLoadCountdown();
@@ -5587,10 +5682,25 @@
       });
     }
 
+    function hasUnsavedSessionEdits_() {
+      if (Object.keys(state.todayProgress || {}).length > 0) return true;
+      if (state.attendProcessing) return true;
+      if (state.inlineAttendResult && state.inlineAttendResult.memberKey === state.selectedKey) return true;
+      var memoEl = document.getElementById('sessionCoachMemo');
+      if (memoEl && memoEl.dataset.touched === '1') return true;
+      var notesEl = document.getElementById('sessionSpecialNotesNew');
+      if (notesEl && String(notesEl.value || '').trim()) return true;
+      var nextEl = document.getElementById('sessionNextProgress');
+      if (nextEl && nextEl.dataset.touched === '1') return true;
+      var sc = state.sessionCheck || {};
+      if ((sc.areas && sc.areas.length) || sc.vas != null || String(sc.note || '').trim()) return true;
+      return false;
+    }
+
     function canAutoSyncBoard() {
       if (!state.pin) return false;
       if (document.getElementById('pinOverlay').classList.contains('open')) return false;
-      if (Object.keys(state.todayProgress || {}).length > 0) return false;
+      if (hasUnsavedSessionEdits_()) return false;
       if (isSyncBlockingModalOpen()) return false;
       if (_boardSyncInFlight) return false;
       return true;
@@ -6136,16 +6246,17 @@
     }
 
     async function flushPendingSessionSavesBeforeAttend_(m) {
-      if (!m || !m.suffix8) return;
+      if (!m || !m.suffix8) return true;
       if (_sessionCheckSaveTimer) {
         clearTimeout(_sessionCheckSaveTimer);
         _sessionCheckSaveTimer = null;
       }
       syncSessionRecordFieldsFromModal();
-      await autoSaveProgress();
+      return await autoSaveProgress() !== false;
     }
 
-    function dismissPendingCompleteSessionModals_() {
+    function dismissPendingCompleteSessionModals_(opts) {
+      opts = opts || {};
       ['extraPassModal', 'nextBookingFailModal', 'multiPassModal', 'samePhoneFamilyModal', 'phonePickerModal'].forEach(
         function (id) {
           var el = document.getElementById(id);
@@ -6153,7 +6264,7 @@
         }
       );
       _pendingCompleteSession = null;
-      state.activeCompleteVisitKey = '';
+      if (!opts.keepVisitKey) state.activeCompleteVisitKey = '';
       document.body.style.overflow = '';
     }
 
@@ -6186,7 +6297,7 @@
       stopMemberDetailCountdown();
       state.memberDetailLoading = false;
       state.memberDetailLoadError = '';
-      resetInlineAttendResult();
+      restoreMemberAttendResult_(memberKey(m));
       if (_sessionCheckSaveTimer) {
         clearTimeout(_sessionCheckSaveTimer);
         _sessionCheckSaveTimer = null;
@@ -6194,8 +6305,6 @@
       state.sessionDraftVisitKey = '';
       state.sessionDraftVisitKeyMemberKey = '';
       state.pendingScheduleSync = null;
-      state.lastAttendResultData = null;
-      state.lastAttendResultOpts = null;
       var memoEl = document.getElementById('sessionCoachMemo');
       if (memoEl) {
         memoEl.value = '';
@@ -6265,7 +6374,7 @@
         el.textContent = notes;
         row.classList.remove('is-placeholder');
       } else {
-        el.textContent = '사전/초회 평가 시 평가 결과 및 특이사항';
+        el.textContent = '사전/초회 평가 시 결과 및 특이사항 (클릭 후 수정 가능)';
         row.classList.add('is-placeholder');
       }
       if (input) input.value = notes;
@@ -6358,6 +6467,40 @@
       updateSendBar();
     }
 
+    function refreshSelectedMemberFromBoard_(fresh) {
+      if (!fresh || !state.selected) return;
+      var cur = state.selected;
+      [
+        'time', 'scheduleSession', 'attendedToday', 'absentToday', 'todayAttendCount',
+        'sessionCompleted', 'sessionDisplay', 'scheduleResolvedToday', 'usesDualSlot',
+        'rowIndex', 'rowKey', 'phoneDigits', 'phoneLast4', 'suffix8', 'instructorIndex',
+        'instructorName', 'program', 'branch', 'memo', 'dayKr', 'name',
+      ].forEach(function(k) {
+        if (fresh[k] !== undefined) cur[k] = fresh[k];
+      });
+      state.selected = cur;
+      renderMemberChips();
+      updateAttendButtonsForFamilyAccount(cur);
+      renderSessionWrapPanel();
+      updateSendBar();
+    }
+
+    function clearSelectedMember_() {
+      state.selected = null;
+      state.selectedKey = '';
+      renderMemberChips();
+      var overview = document.getElementById('memberOverviewWrap');
+      if (overview) overview.classList.remove('show');
+      var brief = document.getElementById('memberBrief');
+      if (brief) brief.classList.remove('show');
+      var panel = document.getElementById('sessionCheckPanel');
+      if (panel) panel.classList.remove('show');
+      var wrapPanel = document.getElementById('sessionWrapPanel');
+      if (wrapPanel) wrapPanel.classList.remove('show');
+      renderProgramList();
+      updateSendBar();
+    }
+
     var _memberDetailReq = 0;
 
     async function enrichMemberDetailInBackground(m) {
@@ -6373,6 +6516,12 @@
         if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
         state.memberDetailLoading = false;
         stopMemberDetailCountdown();
+        if (detail.needPin) {
+          showPin(true);
+          state.memberDetailLoadError = 'PIN 입력이 필요합니다.';
+          renderConditionHistory(m);
+          return;
+        }
         if (!detail.ok || !detail.member) {
           state.memberDetailLoadError = (detail && detail.message) || '회원 정보를 불러오지 못했습니다.';
           renderConditionHistory(m);
@@ -6413,6 +6562,10 @@
     function selectMember(m, fromUser) {
       if (state.selectedKey && state.selectedKey !== memberKey(m)) {
         saveProgressToMemberStore();
+        saveMemberAttendResult_(state.selectedKey);
+        if (state.attendProcessing || _completeSessionInFlight) {
+          cancelAttendProcessing_();
+        }
         dismissPendingCompleteSessionModals_();
       }
       if (fromUser) state.activeProgramTab = resolveDefaultProgramTab(m);
@@ -6704,7 +6857,7 @@
 
     async function autoSaveProgress() {
       const m = state.selected;
-      if (!m || !m.suffix8) return;
+      if (!m || !m.suffix8) return true;
       const todayLabels = Object.keys(state.todayProgress).map(function(id){
         const p = state.program.find(function(x){ return x.id===id; });
         return p ? methodDisplayLabel(p) : id;
@@ -6725,13 +6878,14 @@
       });
       if (!data.ok) {
         toast(data.message || '진도 저장 실패');
-        return;
+        return false;
       }
       if (data.pspProgress) {
         m.pspProgress = data.pspProgress;
         m.previousSessionProgress = data.previousSessionProgress || m.previousSessionProgress || {};
       }
       markMemberProgressSaved_(m);
+      return true;
     }
 
     function updateSendBar() {
@@ -7236,6 +7390,7 @@
       var m = state.selected;
       var opts = state.lastAttendResultOpts || {};
       state.inlineAttendResult.html = buildInlineAttendResultHtml(m, state.lastAttendResultData, opts);
+      saveMemberAttendResult_(state.selectedKey);
       renderSessionAlimtalkSection();
     }
 
@@ -7294,6 +7449,40 @@
       return html;
     }
 
+    function alimtalkSkipReasonLabel_(reason) {
+      if (reason === 'no_template') return '템플릿 미설정';
+      if (reason === 'solapi') return 'Solapi 미설정';
+      if (reason === 'no_phone') return '회원 전화번호 없음';
+      if (reason === 'no_config') return '설정 없음';
+      if (reason === 'duplicate_enqueue') return '이미 발송 대기 중';
+      if (reason === 'deduped') return '이미 발송 대기 중';
+      return '발송 실패';
+    }
+
+    function resolveAttendAlimtalkEvent_(data) {
+      if (!data || !data.alimtalk) return null;
+      return data.alimtalk.everyVisit || data.alimtalk;
+    }
+
+    var SOLAPI_MESSAGE_LOG_URL = 'https://console.solapi.com/message-log';
+
+    function buildSolapiMessageLogLink_(label) {
+      label = label || '발송 확인';
+      return (
+        '<a href="' + SOLAPI_MESSAGE_LOG_URL + '" target="_blank" rel="noopener noreferrer" class="attend-solapi-log-link">' +
+        escapeHtml(label) +
+        '</a>'
+      );
+    }
+
+    function buildAlimtalkQueuedStatusHtml_(linkLabel) {
+      return (
+        '<p class="attend-result-status ok">회원 알림톡 발송 예약됨 (' +
+        buildSolapiMessageLogLink_(linkLabel || '발송 확인') +
+        ')</p>'
+      );
+    }
+
     function buildAttendStatusFootnotes(data, opts) {
       opts = opts || {};
       var html = '';
@@ -7303,12 +7492,8 @@
           html += '<p class="attend-result-status ok">알림톡 재발송 완료 (' +
             (opts.basicAttendOnly ? '기본 템플릿' : '진도 템플릿') + ')</p>';
         } else if (ev && ev.skipped) {
-          var reason = ev.reason === 'no_template' ? '템플릿 미설정'
-            : ev.reason === 'solapi' ? 'Solapi 미설정'
-            : ev.reason === 'no_phone' ? '회원 전화번호 없음'
-            : ev.reason === 'no_config' ? '설정 없음'
-            : '발송 실패';
-          html += '<p class="attend-result-status warn">알림톡 재발송 실패(' + escapeHtml(reason) + ')</p>';
+          html += '<p class="attend-result-status warn">알림톡 재발송 실패(' +
+            escapeHtml(alimtalkSkipReasonLabel_(ev.reason)) + ')</p>';
         } else {
           html += '<p class="attend-result-status warn">알림톡 재발송 실패</p>';
         }
@@ -7332,22 +7517,31 @@
           html += '<p class="attend-result-status ok">기존 예약 스케줄 삭제 완료</p>';
         }
         html += buildScheduleSyncFootnotesHtml_(data);
-        var ev = data.alimtalk && (data.alimtalk.everyVisit || data.alimtalk);
+        var ev = resolveAttendAlimtalkEvent_(data);
         if (opts.skipAttendAlimtalk && data.completed) {
           html += '<p class="attend-result-status ok">알림톡 미발송 (출석·진도만 저장)</p>';
         } else if (ev && ev.ok) {
           if (ev.queued) {
-            html += '<p class="attend-result-status ok">회원 알림톡 발송 예약됨 (잠시 후 전송)</p>';
+            if (ev.deduped) {
+              html += '<p class="attend-result-status ok">회원 알림톡 발송 대기 중 (이미 큐에 등록됨 · ' +
+                buildSolapiMessageLogLink_('발송 확인') + ')</p>';
+            } else if (data.alimtalkPollPending) {
+              html += buildAlimtalkQueuedStatusHtml_('발송 확인');
+            } else {
+              html += '<p class="attend-result-status ok">회원 알림톡 발송 예약됨 (잠시 후 전송 · ' +
+                buildSolapiMessageLogLink_('발송 확인') + ')</p>';
+            }
           } else {
             html += '<p class="attend-result-status ok">회원 알림톡 발송 완료</p>';
           }
+        } else if (data.alimtalkPollFailed) {
+          html += '<p class="attend-result-status warn">알림톡 발송 실패 — 아래 재발송 버튼으로 다시 시도해 주세요</p>';
+        } else if (data.alimtalkPollPending) {
+          html += '<p class="attend-result-status warn">알림톡 발송이 지연 중입니다. (' +
+            buildSolapiMessageLogLink_('발송 확인') + ')</p>';
         } else if (ev && ev.skipped) {
-          var reason = ev.reason === 'no_template' ? '템플릿 미설정'
-            : ev.reason === 'solapi' ? 'Solapi 미설정'
-            : ev.reason === 'no_phone' ? '회원 전화번호 없음'
-            : ev.reason === 'no_config' ? '설정 없음'
-            : '발송 실패';
-          html += '<p class="attend-result-status warn">알림톡 미발송(' + escapeHtml(reason) + ')</p>';
+          html += '<p class="attend-result-status warn">알림톡 미발송(' +
+            escapeHtml(alimtalkSkipReasonLabel_(ev.reason)) + ')</p>';
         } else if (data.alimtalk) {
           html += '<p class="attend-result-status warn">알림톡 미발송</p>';
         }
@@ -7376,8 +7570,21 @@
     }
 
     function buildAttendAlimtalkResultPreview(m, data, opts) {
-      if (!data.completed || (opts && opts.skipAttendAlimtalk)) return '';
       opts = opts || {};
+      if (!data.completed) return '';
+
+      if (opts.skipAttendAlimtalk) {
+        return (
+          '<div class="session-attend-sent-label">알림톡 미발송 안내</div>' +
+          '<div class="session-attend-sent-box session-attend-not-sent-box">' +
+          escapeHtml(
+            '출석·진도는 저장되었고, 회원에게 알림톡은 보내지 않았습니다.\n' +
+            '필요하면 아래 「알림톡 재발송」 버튼으로 보낼 수 있습니다.'
+          ) +
+          '</div>'
+        );
+      }
+
       var text = buildSentAlimtalkText_(m, data, opts);
       if (!text && opts.basicAttendOnly) {
         text = buildBasicAttendAlimtalkPreviewText_(m, data);
@@ -7386,8 +7593,12 @@
         text = buildSentAlimtalkText_(m, data, { attendAlimtalk: opts.attendAlimtalk });
       }
       if (!text) return '';
+
+      var label = opts.basicAttendOnly
+        ? '회원에게 발송된 알림톡 (기본 템플릿)'
+        : (opts.resendOnly ? '재발송된 알림톡' : '회원에게 발송된 알림톡');
       return (
-        '<div class="session-attend-sent-label">회원에게 발송된 알림톡</div>' +
+        '<div class="session-attend-sent-label">' + escapeHtml(label) + '</div>' +
         '<div class="session-attend-sent-box">' + escapeHtml(text) + '</div>'
       );
     }
@@ -7399,6 +7610,12 @@
         html +=
           '<p class="attend-result-status ok">' +
           escapeHtml(data.attendMessage || '서버에는 이미 반영되어 있었습니다.') +
+          '</p>';
+      }
+      if (data.giveUpRetry && data.attendMessage) {
+        html +=
+          '<p class="attend-result-status warn">' +
+          escapeHtml(data.attendMessage) +
           '</p>';
       }
       if (data.completed) {
@@ -7451,12 +7668,158 @@
 
     /** 출석 처리 Apps Script 왕복 예상 시간(초) — UI 카운트다운 */
     var ATTEND_PROCESS_EST_SEC = 35;
+    /** 타임아웃 후 서버 상태 복구 재시도 최대 횟수 (무한 루프 방지) */
+    var ATTEND_PROCESS_MAX_RECOVER_ATTEMPTS = 2;
+    var _completeSessionInFlight = false;
+    var _resendAlimtalkInFlight = false;
+
+    function releaseCompleteSessionInFlight_() {
+      _completeSessionInFlight = false;
+    }
     var ATTEND_PROCESS_MODE_LABEL = {
       silent: '알림 없음',
       basic: '기본 알림톡',
       progress: '출석+진도보내기',
     };
     var _attendProcessingTimer = null;
+    var _attendProcessingStartedAt = 0;
+    var _attendRequestGen = 0;
+    var _alimtalkPollTimer = null;
+    var _alimtalkPollGen = 0;
+
+    function stopAttendAlimtalkPoll_() {
+      _alimtalkPollGen += 1;
+      if (_alimtalkPollTimer) {
+        clearTimeout(_alimtalkPollTimer);
+        _alimtalkPollTimer = null;
+      }
+    }
+
+    function refreshAttendResultAlimtalkStatus_(m, opts, patch) {
+      if (!state.lastAttendResultData || !state.inlineAttendResult) return;
+      patch = patch || {};
+      if (patch.sent) {
+        var ev = resolveAttendAlimtalkEvent_(state.lastAttendResultData);
+        if (ev) {
+          ev.queued = false;
+          ev.ok = true;
+          delete ev.deduped;
+        }
+        state.lastAttendResultData.alimtalkPollSent = true;
+        delete state.lastAttendResultData.alimtalkPollFailed;
+        delete state.lastAttendResultData.alimtalkPollPending;
+      }
+      if (patch.sendFailed) {
+        state.lastAttendResultData.alimtalkPollFailed = true;
+        delete state.lastAttendResultData.alimtalkPollPending;
+      }
+      if (patch.pollTimedOut) {
+        state.lastAttendResultData.alimtalkPollPending = true;
+      }
+      state.inlineAttendResult.html = buildInlineAttendResultHtml(m, state.lastAttendResultData, opts);
+      saveMemberAttendResult_(memberKey(m));
+      renderSessionAlimtalkSection();
+    }
+
+    function startAttendAlimtalkPoll_(m, data, opts) {
+      var ev = resolveAttendAlimtalkEvent_(data);
+      if (!ev || !ev.queued || (opts && opts.skipAttendAlimtalk)) return;
+      if (!m || !m.suffix8) return;
+      stopAttendAlimtalkPoll_();
+      var pollGen = _alimtalkPollGen;
+      var attempts = 0;
+      var maxAttempts = 12;
+
+      async function tick() {
+        if (pollGen !== _alimtalkPollGen) return;
+        if (!state.selected || memberKey(state.selected) !== memberKey(m)) {
+          stopAttendAlimtalkPoll_();
+          return;
+        }
+        if (attempts >= maxAttempts) {
+          refreshAttendResultAlimtalkStatus_(m, opts, { pollTimedOut: true });
+          stopAttendAlimtalkPoll_();
+          return;
+        }
+        attempts += 1;
+        try {
+          var st = await api({
+            action: 'instructorAttendAlimtalkStatus',
+            suffix8: m.suffix8,
+            name: m.name,
+          }, { timeoutMs: 15000 });
+          if (pollGen !== _alimtalkPollGen) return;
+          if (!state.selected || memberKey(state.selected) !== memberKey(m)) {
+            stopAttendAlimtalkPoll_();
+            return;
+          }
+          if (st.ok && st.sent) {
+            refreshAttendResultAlimtalkStatus_(m, opts, { sent: true });
+            stopAttendAlimtalkPoll_();
+            return;
+          }
+          if (st.ok && !st.queued && !st.sent && attempts >= 3) {
+            refreshAttendResultAlimtalkStatus_(m, opts, { sendFailed: true });
+            stopAttendAlimtalkPoll_();
+            return;
+          }
+        } catch (e) {}
+        if (pollGen !== _alimtalkPollGen) return;
+        _alimtalkPollTimer = setTimeout(tick, 5000);
+      }
+
+      _alimtalkPollTimer = setTimeout(tick, 5000);
+    }
+
+    function isAttendRequestActive_(gen) {
+      return gen === _attendRequestGen;
+    }
+
+    function cancelAttendProcessing_() {
+      _attendRequestGen += 1;
+      releaseCompleteSessionInFlight_();
+      stopAttendAlimtalkPoll_();
+      state.attendRecoverAttempt = 0;
+      stopAttendProcessingCountdown();
+      state.attendProcessing = false;
+      setSessionActionButtonsDisabled(false);
+      renderSessionAlimtalkSection();
+      toast('출석 처리를 중단했습니다. 회원 칩·시트에서 반영 여부를 확인한 뒤 필요하면 다시 시도해 주세요.');
+    }
+
+    async function showAttendRecoverGiveUpResult_(m, opts, rec, lastErr) {
+      stopAttendProcessingCountdown();
+      state.attendProcessing = false;
+      state.attendRecoverAttempt = 0;
+      setSessionActionButtonsDisabled(false);
+
+      if (rec && rec.ok && rec.recovered && rec.attendCompletedToday) {
+        var doneData = buildRecoveredCompleteData_(rec);
+        applyCompleteSessionResult(m, doneData);
+        doneData.giveUpRetry = true;
+        doneData.attendMessage = '서버 응답이 지연되었으나 출석은 반영된 것으로 확인됩니다.';
+        showAttendResult(m, Object.assign({ ok: true }, doneData), opts);
+        return;
+      }
+
+      if (rec && rec.ok && rec.recovered && rec.sessionSavedToday) {
+        var partial = buildRecoveredCompleteData_(rec);
+        partial.ok = true;
+        partial.completed = false;
+        partial.giveUpRetry = true;
+        partial.attendMessage =
+          '서버 응답이 지연되어 자동 재시도를 중단했습니다. ' +
+          '진도는 저장된 것으로 확인됩니다. 출석·알림톡이 아직이면 아래 버튼으로 다시 시도해 주세요.';
+        applyCompleteSessionResult(m, partial);
+        showAttendResult(m, partial, opts);
+        return;
+      }
+
+      showAttendResult(m, lastErr || {
+        ok: false,
+        message: '서버 응답이 지연되어 처리를 중단했습니다. 새로고침 후 회원 칩·시트에서 반영 여부를 확인해 주세요.',
+      }, opts);
+    }
 
     function resolveAttendProcessMode_(opts) {
       opts = opts || {};
@@ -7474,6 +7837,8 @@
     }
 
     function stopAttendProcessingCountdown() {
+      _attendProcessingStartedAt = 0;
+      state.attendRecoverAttempt = 0;
       if (_attendProcessingTimer) {
         clearInterval(_attendProcessingTimer);
         _attendProcessingTimer = null;
@@ -7486,10 +7851,15 @@
       if (!bar) return;
       bar.hidden = false;
       var modeLabel = ATTEND_PROCESS_MODE_LABEL[mode] || '처리 중';
+      var retryNote = '';
+      if (overdue && state.attendRecoverAttempt > 0) {
+        retryNote = ' (서버 재시도 ' + state.attendRecoverAttempt + '/' + ATTEND_PROCESS_MAX_RECOVER_ATTEMPTS + ')';
+      }
       if (overdue) {
         bar.innerHTML =
           '<span class="session-attend-countdown-label">[' + escapeHtml(modeLabel) + ']</span>' +
-          ' 평소보다 조금 더 걸리고 있어요…';
+          escapeHtml(' 평소보다 조금 더 걸리고 있어요…' + retryNote) +
+          '<button type="button" class="session-attend-countdown-cancel" onclick="cancelAttendProcessing_()">중단</button>';
         return;
       }
       bar.innerHTML =
@@ -7497,43 +7867,64 @@
         '예상 <span class="attend-process-sec">' + sec + '</span>초 남음';
     }
 
+    /** 백그라운드 탭·서버 재시도 시에도 경과 시간 기준으로 카운트다운 표시 */
+    function tickAttendProcessingCountdown_() {
+      if (!_attendProcessingStartedAt || !state.attendProcessing) return;
+      var elapsed = Math.floor((Date.now() - _attendProcessingStartedAt) / 1000);
+      var left = ATTEND_PROCESS_EST_SEC - elapsed;
+      if (left <= 0) {
+        paintAttendProcessingCountdown(0, true, state.attendProcessingMode);
+        return;
+      }
+      paintAttendProcessingCountdown(left, false, state.attendProcessingMode);
+    }
+
+    function startAttendProcessingCountdown_() {
+      if (_attendProcessingTimer) return;
+      _attendProcessingStartedAt = Date.now();
+      tickAttendProcessingCountdown_();
+      _attendProcessingTimer = setInterval(tickAttendProcessingCountdown_, 400);
+    }
+
     function showAttendProcessing(title, opts) {
       opts = opts || {};
-      stopAttendProcessingCountdown();
+      var alreadyProcessing = !!state.attendProcessing;
       state.attendProcessing = true;
       state.attendProcessingTitle = title || '출석 기록 중';
       state.attendProcessingMode = resolveAttendProcessMode_(opts);
-      state.inlineAttendResult = null;
-      renderSessionAlimtalkSection();
-      var sec = ATTEND_PROCESS_EST_SEC;
-      paintAttendProcessingCountdown(sec, false, state.attendProcessingMode);
-      _attendProcessingTimer = setInterval(function() {
-        sec -= 1;
-        if (sec <= 0) {
-          paintAttendProcessingCountdown(0, true, state.attendProcessingMode);
-          return;
-        }
-        paintAttendProcessingCountdown(sec, false, state.attendProcessingMode);
-      }, 1000);
-      var panel =
-        document.getElementById('sessionAlimtalkSectionLabel') ||
-        document.getElementById('sessionAttendCountdownBar') ||
-        document.getElementById('sessionAlimtalkSection');
-      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (!alreadyProcessing) {
+        stopAttendProcessingCountdown();
+        state.inlineAttendResult = null;
+        renderSessionAlimtalkSection();
+        startAttendProcessingCountdown_();
+        var panel =
+          document.getElementById('sessionAlimtalkSectionLabel') ||
+          document.getElementById('sessionAttendCountdownBar') ||
+          document.getElementById('sessionAlimtalkSection');
+        if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        renderSessionAlimtalkSection();
+        tickAttendProcessingCountdown_();
+      }
     }
 
     function showAttendResult(m, data, opts) {
       opts = opts || {};
       stopAttendProcessingCountdown();
       state.attendProcessing = false;
+      releaseCompleteSessionInFlight_();
       setSessionActionButtonsDisabled(false);
+      var mk = memberKey(m);
 
       if (!data.ok) {
-        state.inlineAttendResult = {
-          memberKey: memberKey(m),
+        stopAttendAlimtalkPoll_();
+        var failResult = {
+          memberKey: mk,
           title: '처리 실패',
           html: '<p class="attend-result-error">❌ ' + escapeHtml(data.message || '저장 실패') + '</p>',
         };
+        if (mk === state.selectedKey) state.inlineAttendResult = failResult;
+        saveMemberAttendResult_(mk, failResult);
         renderSessionAlimtalkSection();
         scrollToAttendResultTop();
         return;
@@ -7542,13 +7933,18 @@
       var title = data.completed ? '🌟 출석·진도 저장 완료' : '처리 안내';
       state.lastAttendResultData = data;
       state.lastAttendResultOpts = opts;
-      state.inlineAttendResult = {
-        memberKey: memberKey(m),
+      var okResult = {
+        memberKey: mk,
         title: title,
         html: buildInlineAttendResultHtml(m, data, opts),
         sentText: data.completed ? buildSentAlimtalkText_(m, data, opts) : '',
       };
+      if (mk === state.selectedKey) state.inlineAttendResult = okResult;
+      saveMemberAttendResult_(mk, okResult);
       renderSessionAlimtalkSection();
+      if (data.completed && !opts.skipAttendAlimtalk) {
+        startAttendAlimtalkPoll_(m, data, opts);
+      }
     }
 
     async function runCompleteSession(m, progress, opts) {
@@ -7566,6 +7962,16 @@
 
     async function executeCompleteSession(m, progress, opts) {
       opts = opts || {};
+      var recoverAttempt = opts._recoverAttempt || 0;
+      if (recoverAttempt === 0) {
+        if (_completeSessionInFlight) {
+          toast('이미 출석 처리 중입니다. 완료될 때까지 기다려 주세요.');
+          return;
+        }
+        _completeSessionInFlight = true;
+      }
+      var myGen = ++_attendRequestGen;
+      state.attendRecoverAttempt = recoverAttempt;
       if (!opts.clientVisitKey) {
         var draftKey = state.sessionDraftVisitKey;
         var draftMk = state.sessionDraftVisitKeyMemberKey;
@@ -7577,30 +7983,68 @@
       }
       state.activeCompleteVisitKey = opts.clientVisitKey;
       setSessionActionButtonsDisabled(true);
-      await flushPendingSessionSavesBeforeAttend_(m);
-      if (!opts.skipAttendAlimtalk && !opts.basicAttendOnly) {
-        await refreshNextBookingBeforeAttendAlimtalk_(m);
-        if (opts.attendAlimtalk || _pendingAttendAlimtalk) {
-          opts = Object.assign({}, opts, { attendAlimtalk: buildAttendAlimtalkPayload() });
-          _pendingAttendAlimtalk = opts.attendAlimtalk;
+      if (!state.attendProcessing) {
+        showAttendProcessing('출석·진도 저장 중', {
+          attendMode: opts.skipAttendAlimtalk ? 'silent' : opts.basicAttendOnly ? 'basic' : 'progress',
+          skipAttendAlimtalk: !!opts.skipAttendAlimtalk,
+          basicAttendOnly: !!opts.basicAttendOnly,
+        });
+      } else {
+        tickAttendProcessingCountdown_();
+      }
+      if (recoverAttempt === 0) {
+        var flushed = await flushPendingSessionSavesBeforeAttend_(m);
+        if (!isAttendRequestActive_(myGen)) {
+          releaseCompleteSessionInFlight_();
+          return;
+        }
+        if (flushed === false) {
+          state.attendProcessing = false;
+          releaseCompleteSessionInFlight_();
+          setSessionActionButtonsDisabled(false);
+          renderSessionAlimtalkSection();
+          toast('진도 저장에 실패해 출석을 중단했습니다. 다시 시도해 주세요.');
+          return;
+        }
+        if (!opts.skipAttendAlimtalk && !opts.basicAttendOnly) {
+          await refreshNextBookingBeforeAttendAlimtalk_(m);
+          if (!isAttendRequestActive_(myGen)) {
+            releaseCompleteSessionInFlight_();
+            return;
+          }
+          if (opts.attendAlimtalk || _pendingAttendAlimtalk) {
+            opts = Object.assign({}, opts, { attendAlimtalk: buildAttendAlimtalkPayload() });
+            _pendingAttendAlimtalk = opts.attendAlimtalk;
+          }
         }
       }
-      showAttendProcessing('출석·진도 저장 중', {
-        attendMode: opts.skipAttendAlimtalk ? 'silent' : opts.basicAttendOnly ? 'basic' : 'progress',
-        skipAttendAlimtalk: !!opts.skipAttendAlimtalk,
-        basicAttendOnly: !!opts.basicAttendOnly,
-      });
       const data = await api(completeSessionPayload(m, progress, opts), { timeoutMs: 90000 });
+      if (!isAttendRequestActive_(myGen)) {
+        releaseCompleteSessionInFlight_();
+        return;
+      }
       updateSendBar();
       if (!data.ok) {
         if (isAmbiguousCompleteSessionFailure_(data)) {
           var recovery = await tryRecoverCompleteSessionAfterFailure_(m, opts);
-          if (recovery && recovery.mode === 'retry') {
-            await executeCompleteSession(m, progress, recovery.retryOpts);
+          if (!isAttendRequestActive_(myGen)) {
+            releaseCompleteSessionInFlight_();
             return;
           }
-          if (recovery && recovery.mode === 'resume') {
-            await executeCompleteSession(m, progress, recovery.retryOpts);
+          if (recovery && recovery.mode === 'retry') {
+            if (recoverAttempt >= ATTEND_PROCESS_MAX_RECOVER_ATTEMPTS) {
+              var recState = await fetchCompleteSessionRecoverState_(m, opts);
+              if (!isAttendRequestActive_(myGen)) {
+                releaseCompleteSessionInFlight_();
+                return;
+              }
+              await showAttendRecoverGiveUpResult_(m, opts, recState, data);
+              state.activeCompleteVisitKey = '';
+              return;
+            }
+            await executeCompleteSession(m, progress, Object.assign({}, recovery.retryOpts, {
+              _recoverAttempt: recoverAttempt + 1,
+            }));
             return;
           }
           if (recovery && recovery.mode === 'done' && recovery.data) {
@@ -7611,7 +8055,18 @@
           }
         }
         if (await tryRecoverMissingMemberSession_(m, data)) {
-          await executeCompleteSession(m, progress, opts);
+          if (!isAttendRequestActive_(myGen)) {
+            releaseCompleteSessionInFlight_();
+            return;
+          }
+          if (recoverAttempt >= ATTEND_PROCESS_MAX_RECOVER_ATTEMPTS) {
+            showAttendResult(m, data, opts);
+            state.activeCompleteVisitKey = '';
+            return;
+          }
+          await executeCompleteSession(m, progress, Object.assign({}, opts, {
+            _recoverAttempt: recoverAttempt + 1,
+          }));
           return;
         }
         showAttendResult(m, data, opts);
@@ -8469,11 +8924,13 @@
     document.addEventListener('visibilitychange', function() {
       if (document.visibilityState === 'visible') {
         paintMemberLoadCountdown();
+        tickAttendProcessingCountdown_();
         tryAutoSyncBoard();
       }
     });
     window.addEventListener('focus', function() {
       paintMemberLoadCountdown();
+      tickAttendProcessingCountdown_();
       tryAutoSyncBoard();
     });
     refreshSectionCollapseDefaults();
