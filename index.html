@@ -297,6 +297,19 @@
       font-weight: 800;
       color: var(--blue);
     }
+    .member-chip .sess.sess-note {
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      text-decoration-skip-ink: none;
+      -webkit-text-decoration-skip: none;
+      opacity: 0.9;
+      font-weight: 700;
+    }
+    .member-chip.done .sess.sess-note {
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      text-decoration-color: currentColor;
+    }
     .member-chip.absent {
       background:#fee2e2 !important;
       border-color:#fca5a5 !important;
@@ -548,6 +561,39 @@
     }
     .session-discomfort-group--quick .session-check-chip {
       font-size:10px; padding:5px 9px;
+    }
+    .session-discomfort-dropdowns {
+      display:flex; flex-wrap:wrap; gap:8px; width:100%;
+      padding:8px 0 4px; border-bottom:1px solid #e8edf2;
+    }
+    .session-body-area-dd {
+      flex:1 1 0; min-width:96px; display:flex; flex-direction:column; gap:3px;
+    }
+    .session-body-area-dd-label {
+      font-size:9px; font-weight:800; color:#94a3b8; letter-spacing:0.03em;
+    }
+    .session-body-area-select,
+    .eval-body-area-select {
+      width:100%; padding:6px 8px; font-size:11px; font-weight:600;
+      border:1px solid var(--border); border-radius:8px; background:#fff; color:var(--text);
+      cursor:pointer;
+    }
+    .session-body-area-select:focus,
+    .eval-body-area-select:focus {
+      outline:none; border-color:var(--blue); box-shadow:0 0 0 2px rgba(30,58,110,0.12);
+    }
+    .session-body-area-select.has-value,
+    .eval-body-area-select.has-value {
+      border-color:var(--blue); background:var(--blue-bg); color:var(--blue);
+    }
+    .eval-body-area-dropdowns {
+      display:flex; flex-wrap:wrap; gap:8px; width:100%; margin-top:6px;
+    }
+    .eval-body-area-dd {
+      flex:1 1 0; min-width:96px; display:flex; flex-direction:column; gap:3px;
+    }
+    .eval-body-area-dd-label {
+      font-size:9px; font-weight:800; color:#94a3b8; letter-spacing:0.03em;
     }
     .session-check-chips .session-check-chip,
     .session-check-vas .session-check-chip {
@@ -1396,6 +1442,7 @@
       <div class="card-title">오늘 예약 회원</div>      
       <div class="toolbar">
         <button type="button" class="btn btn-ghost" onclick="loadBoard()">새로고침</button>
+        <button type="button" class="btn btn-ghost" onclick="sendWellnessIntakeSms_()">사전 평가</button>
         <button type="button" class="btn btn-eval" onclick="openEvalModal()">초회 평가</button>
         <a class="btn btn-ghost" href="#" onclick="openApplicationForm_(event)">회원등록</a>
       </div>
@@ -1717,7 +1764,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-07-07-attend-timeout2';
+    const INSTRUCTOR_HTML_BUILD = '2026-07-07-attend-lastsession1';
     const BOARD_LOAD_TIMEOUT_MS = 90000;
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
     /** 회원 목록 UI 카운트다운용 예상 시간(초) — 실제 API 타임아웃과 별도 */
@@ -1879,8 +1926,8 @@
       { id:'p2_pushup_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'④ 무릎 뗀 네발 — 웨이브 하강·상승', alimtalkLabel:'네발 ④ 팔굽혀펴기 · 천천히' },
       { id:'p2_pushup_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'⑤ 무릎 뗀 — 몸통 먼저→웨이브 상승', alimtalkLabel:'네발 ⑤ 몸통 먼저 움직이기' },
       { id:'p2_pushup_6', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Push-up 6단계', label:'⑥ 정상 Push-up — 통증 없는 범위', alimtalkLabel:'네발 ⑥ 팔굽혀펴기 · 통증 없는 범위' },
-      { id:'p2_plank_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'① 무릎 대고 네발', alimtalkLabel:'플랭크 ① 무릎 대고 버티기' },
-      { id:'p2_plank_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'② 무릎 떼고 네발', alimtalkLabel:'플랭크 ② 무릎 떼고 버티기' },
+      { id:'p2_plank_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'① 무릎 대고 네발 — 머리 회전', alimtalkLabel:'플랭크 ① 무릎 대고 · 머리 회전' },
+      { id:'p2_plank_2', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'② 무릎 떼고 네발 — 머리 회전', alimtalkLabel:'플랭크 ② 무릎 떼고 · 머리 회전' },
       { id:'p2_plank_3', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'③ 네발 — 골반 좌우 움직임', alimtalkLabel:'플랭크 ③ 골반 좌우 움직이기' },
       { id:'p2_plank_4', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'④ 한 팔 앞으로 뻗기 → 복귀', alimtalkLabel:'플랭크 ④ 한 팔 앞으로 뻗기' },
       { id:'p2_plank_5', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Plank 6단계', label:'⑤ 한 손 뒤통수 — 몸통 회전', alimtalkLabel:'플랭크 ⑤ 손 뒤통수 · 몸통 회전' },
@@ -2449,11 +2496,13 @@
       upper: '상지',
       lower: '하지',
     };
-    var SESSION_DISCOMFORT_GROUP_ORDER = ['quick', 'head_spine', 'upper', 'lower'];
+    var SESSION_DISCOMFORT_GROUP_ORDER = ['quick'];
+    var SESSION_BODY_AREA_GROUPS = ['head_spine', 'upper', 'lower'];
 
     var SESSION_DISCOMFORT_AREAS = [
       { id: 'comfortable', label: '편안함', group: 'quick' },
       { id: 'same', label: '동일 부위', group: 'quick' },
+      { id: 'both', label: 'Both', group: 'quick' },
       { id: 'lt', label: 'Lt', group: 'quick' },
       { id: 'rt', label: 'Rt', group: 'quick' },
       { id: 'headache', label: '두통', group: 'head_spine' },
@@ -2476,6 +2525,70 @@
       { id: 'ankle', label: '발목', group: 'lower' },
       { id: 'foot', label: '발', group: 'lower' },
     ];
+
+    function sessionBodyAreasInGroup_(groupKey) {
+      return SESSION_DISCOMFORT_AREAS.filter(function (o) { return o.group === groupKey; });
+    }
+
+    function sessionBodyAreaIdInGroup_(areas, groupKey) {
+      areas = areas || [];
+      var hit = areas.filter(isSessionBodyAreaId_).find(function (id) {
+        var opt = SESSION_DISCOMFORT_AREAS.find(function (o) { return o.id === id; });
+        return opt && opt.group === groupKey;
+      });
+      return hit || '';
+    }
+
+    function renderBodyAreaDropdownsHtml_(opts) {
+      opts = opts || {};
+      var prefix = opts.prefix || 'session';
+      var secId = opts.secId || '';
+      var secAttr = secId ? ' data-sec="' + escapeHtml(secId) + '"' : '';
+      var onChange = opts.onChange || 'onSessionDiscomfortDropdown_(this)';
+      var wrapCls = prefix === 'eval' ? 'eval-body-area-dropdowns' : 'session-discomfort-dropdowns';
+      var ddCls = prefix === 'eval' ? 'eval-body-area-dd' : 'session-body-area-dd';
+      var labelCls = prefix === 'eval' ? 'eval-body-area-dd-label' : 'session-body-area-dd-label';
+      var selectCls = prefix === 'eval' ? 'eval-body-area-select' : 'session-body-area-select';
+      var getSelected = opts.getSelected || function () { return ''; };
+      var html = '<div class="' + wrapCls + '"' + (opts.rootId ? ' id="' + escapeHtml(opts.rootId) + '"' : '') + '>';
+      SESSION_BODY_AREA_GROUPS.forEach(function (gk) {
+        var glabel = SESSION_DISCOMFORT_GROUP_LABELS[gk] || gk;
+        var selectedId = getSelected(gk) || '';
+        html += '<label class="' + ddCls + '">';
+        html += '<span class="' + labelCls + '">' + escapeHtml(glabel) + '</span>';
+        html += '<select class="' + selectCls + (selectedId ? ' has-value' : '') + '" data-group="' + escapeHtml(gk) + '"' + secAttr +
+          ' onchange="' + onChange + '">';
+        html += '<option value="">선택</option>';
+        sessionBodyAreasInGroup_(gk).forEach(function (opt) {
+          html += '<option value="' + escapeHtml(opt.id) + '"' + (opt.id === selectedId ? ' selected' : '') + '>' +
+            escapeHtml(opt.label) + '</option>';
+        });
+        html += '</select></label>';
+      });
+      html += '</div>';
+      return html;
+    }
+
+    function onSessionDiscomfortDropdown_(selectEl) {
+      if (!selectEl) return;
+      var id = selectEl.value;
+      var groupKey = selectEl.getAttribute('data-group');
+      var areas = (state.sessionCheck.areas || []).slice();
+      var mods = sessionCheckSideModifiers_(areas);
+      var bodies = areas.filter(isSessionBodyAreaId_);
+      if (!id) {
+        bodies = bodies.filter(function (a) {
+          var opt = SESSION_DISCOMFORT_AREAS.find(function (o) { return o.id === a; });
+          return !opt || opt.group !== groupKey;
+        });
+        state.sessionCheck.areas = mods.concat(bodies);
+      } else {
+        state.sessionCheck.areas = mods.concat([id]);
+      }
+      renderSessionCheckPanel();
+      tryCommitSessionCheckSelection_();
+      if (!sessionCheckRequiredFieldsReady_(state.sessionCheck)) scheduleSessionCheckAutoSave();
+    }
 
     var SESSION_VAS_RANGES = [
       { key: '1-3', label: 'VAS 1~3', store: 2 },
@@ -3523,13 +3636,18 @@
       }, 1000);
     }
 
-    function getNextBookingServerPayload() {
+    function getNextBookingServerPayload(m) {
+      m = m || state.selected;
       var nb = state.nextBooking;
       if (!nb) return { useScheduleNextBooking: true };
       syncNextBookingLineFromPicker_(nb);
       var ymd = String(nb.pickedYmd || '').trim();
       var time = String(nb.pickedTime || '').trim();
       if (!ymd || !time || !isFutureNextBookingYmd_(ymd)) {
+        var mk = m ? memberKey(m) : state.selectedKey;
+        if (mk && nb.loadedKey === mk && !nb.loading) {
+          return { useScheduleNextBooking: false, nextBookingLookupDone: true };
+        }
         return { useScheduleNextBooking: true };
       }
       var instIdx = nb.pickedInstIdx != null ? nb.pickedInstIdx : defaultNextBookingInstIdx_(state.selected);
@@ -4481,13 +4599,14 @@
       var payload = completeSessionPayload(m, progress, opts);
       payload.action = 'instructorResendAttendAlimtalk';
       payload.resendOnly = true;
-      var nbPayload = getNextBookingServerPayload();
+      var nbPayload = getNextBookingServerPayload(m);
       if (nbPayload) {
         if (nbPayload.nextBookingYmd) payload.nextBookingYmd = nbPayload.nextBookingYmd;
         if (nbPayload.nextBookingTime) payload.nextBookingTime = nbPayload.nextBookingTime;
         if (nbPayload.bookNextSchedule) payload.bookNextSchedule = true;
         if (nbPayload.instructorIndex != null) payload.instructorIndex = nbPayload.instructorIndex;
         if (nbPayload.useScheduleNextBooking != null) payload.useScheduleNextBooking = nbPayload.useScheduleNextBooking;
+        if (nbPayload.nextBookingLookupDone) payload.nextBookingLookupDone = true;
         if (nbPayload.cancelPreviousBookingYmd) payload.cancelPreviousBookingYmd = nbPayload.cancelPreviousBookingYmd;
         if (nbPayload.cancelPreviousBookingTime) payload.cancelPreviousBookingTime = nbPayload.cancelPreviousBookingTime;
         if (nbPayload.cancelPreviousInstIdx != null) payload.cancelPreviousInstIdx = nbPayload.cancelPreviousInstIdx;
@@ -5162,12 +5281,14 @@
       var on = state.selectedKey === key ? ' on' : '';
       var nameColor = memberProgramColor(m);
       var sessRaw = String(m.sessionDisplay || '').trim();
+      var sessClass = 'sess';
+      if (isNonAttendStatusLabel_(sessRaw)) sessClass += ' sess-note';
       var chipName = String(m.name || '').trim();
       var timeTag = m.time
         ? '<span class="time-tag">' + escapeHtml(m.time) + '</span>'
         : '<span class="time-tag time-tag-ph" aria-hidden="true">00:00</span>';
       var sessHtml = sessRaw
-        ? '<span class="sess">' + escapeHtml(sessRaw) + '</span>'
+        ? '<span class="' + sessClass + '">' + escapeHtml(sessRaw) + '</span>'
         : '<span class="sess sess-ph" aria-hidden="true">00/00</span>';
       var titleAttr = ' title="' + escapeHtml(memberChipTitleText_(m)) + '"';
       var styleAttr = opts.withInstructorStyle ? memberChipInlineStyle(m, opts.bg, opts.border) : '';
@@ -5179,6 +5300,13 @@
         '<span class="chip-name" style="color:' + escapeHtml(nameColor) + '">' + escapeHtml(chipName) + '</span>' +
         sessHtml + '</span></button>'
       );
+    }
+    function isNonAttendStatusLabel_(raw) {
+      var s = String(raw || '').trim();
+      if (!s) return false;
+      if (/^\d+\s*\/\s*\d+$/.test(s)) return false;
+      if (/결석|출석/.test(s)) return false;
+      return /(상담|체험|완료|취소|보류|연기|노쇼|대기)/.test(s);
     }
 
     function parseSessionCountsFromMember_(m) {
@@ -5777,7 +5905,7 @@
       return m.discomfortHistory[m.discomfortHistory.length - 1];
     }
 
-    var SESSION_SIDE_MODIFIER_IDS = ['lt', 'rt'];
+    var SESSION_SIDE_MODIFIER_IDS = ['both', 'lt', 'rt'];
     var SESSION_SPECIAL_AREA_IDS = ['comfortable', 'same'];
 
     function isSessionSideModifierId_(id) {
@@ -5804,6 +5932,7 @@
 
     function sessionCheckSideLabel_(areas) {
       areas = areas || [];
+      if (areas.indexOf('both') >= 0) return 'Both';
       if (areas.indexOf('lt') >= 0) return 'Lt';
       if (areas.indexOf('rt') >= 0) return 'Rt';
       return '';
@@ -5811,6 +5940,7 @@
 
     function parseSideFromConditionLabel_(label) {
       var s = String(label || '').trim();
+      if (/^Both\s+/i.test(s)) return { side: 'Both', rest: s.replace(/^Both\s+/i, '').trim() };
       if (/^Lt\s+/i.test(s)) return { side: 'Lt', rest: s.replace(/^Lt\s+/i, '').trim() };
       if (/^Rt\s+/i.test(s)) return { side: 'Rt', rest: s.replace(/^Rt\s+/i, '').trim() };
       return { side: '', rest: s };
@@ -5897,7 +6027,7 @@
         var parsed = parseConditionLine_(lines[i]);
         if (parsed && parsed.label) {
           var id = sessionDiscomfortIdByLabel_(parsed.label);
-          if (id && id !== 'same' && id !== 'lt' && id !== 'rt') return id;
+          if (id && id !== 'same' && !isSessionSideModifierId_(id)) return id;
         }
       }
       var last = getLastDiscomfortFromMember();
@@ -6144,6 +6274,13 @@
         });
         html += '</div></div>';
       });
+      html += renderBodyAreaDropdownsHtml_({
+        prefix: 'session',
+        rootId: 'sessionDiscomfortDropdowns',
+        getSelected: function (gk) {
+          return sessionBodyAreaIdInGroup_((state.sessionCheck || {}).areas, gk);
+        },
+      });
       areaRoot.innerHTML = html;
       if (vasRoot) {
         var vasHtml = '';
@@ -6175,6 +6312,12 @@
         var id = btn.getAttribute('data-area');
         btn.classList.toggle('on', sc.areas.indexOf(id) >= 0);
       });
+      document.querySelectorAll('#sessionDiscomfortDropdowns .session-body-area-select').forEach(function (sel) {
+        var gk = sel.getAttribute('data-group');
+        var selectedId = sessionBodyAreaIdInGroup_(sc.areas, gk);
+        sel.value = selectedId || '';
+        sel.classList.toggle('has-value', !!selectedId);
+      });
       var activeVasRange = sessionVasRangeKeyFromValue_(sc.vas);
       document.querySelectorAll('#sessionVasChips .session-check-chip').forEach(function (btn) {
         var rangeKey = btn.getAttribute('data-vas-range');
@@ -6188,7 +6331,7 @@
 
     function toggleSessionDiscomfort(id) {
       var areas = (state.sessionCheck.areas || []).slice();
-      if (id === 'lt' || id === 'rt') {
+      if (isSessionSideModifierId_(id)) {
         var rest = areas.filter(function (a) { return !isSessionSideModifierId_(a); });
         if (areas.indexOf(id) >= 0) {
           state.sessionCheck.areas = rest;
@@ -6961,7 +7104,7 @@
         if (ata.todayIds && ata.todayIds.length) payload.attendAlimtalkTodayIds = ata.todayIds;
         if (ata.linkIds && ata.linkIds.length) payload.attendAlimtalkLinkIds = ata.linkIds;
       }
-      var nbPayload = getNextBookingServerPayload();
+      var nbPayload = getNextBookingServerPayload(m);
       if (opts.attendRetryOnly) {
         payload.bookNextSchedule = false;
         payload.cancelPreviousBookingYmd = '';
@@ -6972,6 +7115,7 @@
         if (nbPayload.nextBookingYmd) payload.nextBookingYmd = nbPayload.nextBookingYmd;
         if (nbPayload.nextBookingTime) payload.nextBookingTime = nbPayload.nextBookingTime;
         if (nbPayload.bookNextSchedule) payload.bookNextSchedule = true;
+        if (nbPayload.nextBookingLookupDone) payload.nextBookingLookupDone = true;
         if (nbPayload.useScheduleNextBooking != null) payload.useScheduleNextBooking = nbPayload.useScheduleNextBooking;
         if (nbPayload.instructorIndex != null) payload.instructorIndex = nbPayload.instructorIndex;
         if (nbPayload.cancelPreviousBookingYmd) payload.cancelPreviousBookingYmd = nbPayload.cancelPreviousBookingYmd;
@@ -8068,13 +8212,13 @@
           toast('진도 저장에 실패해 출석을 중단했습니다. 다시 시도해 주세요.');
           return;
         }
-        if (!opts.skipAttendAlimtalk && !opts.basicAttendOnly) {
+        if (!opts.skipAttendAlimtalk) {
           await refreshNextBookingBeforeAttendAlimtalk_(m);
           if (!isAttendRequestActive_(myGen)) {
             releaseCompleteSessionInFlight_();
             return;
           }
-          if (opts.attendAlimtalk || _pendingAttendAlimtalk) {
+          if (!opts.basicAttendOnly && (opts.attendAlimtalk || _pendingAttendAlimtalk)) {
             opts = Object.assign({}, opts, { attendAlimtalk: buildAttendAlimtalkPayload() });
             _pendingAttendAlimtalk = opts.attendAlimtalk;
           }
@@ -8245,24 +8389,27 @@
         toast('연락처가 없습니다. 회원 시트에 번호를 등록해 주세요.');
         return;
       }
-      if (!confirm(name + '님에게 사전 문진 링크를 문자로 보낼까요?')) return;
+      if (!confirm(name + '님에게 사전 평가(문진) 링크를 문자로 보낼까요?')) return;
       const data = await api({
         action: 'instructorSendWellnessIntake',
         name: name,
         phone: phone,
         suffix8: m.suffix8 || '',
       });
-      if (data.ok) toast('사전 문진 문자 발송 완료');
+      if (data.ok) toast('사전 평가 안내 문자 발송 완료');
       else toast(data.message || data.error || '발송 실패');
     }
 
     /** History Taking — 내원 목적(항상) → 목적별 세부 · 통증 → OPQRST */
-    function evalHistItem(id, title, hint, options, multi) {
+    function evalHistItem(id, title, hint, options, multi, extra) {
+      extra = extra || {};
       return {
         id: id,
         title: title || '',
         hint: hint || '',
         multi: multi !== false,
+        bodyDropdowns: !!extra.bodyDropdowns,
+        areaSecId: extra.areaSecId || (id + '_area'),
         options: (options || []).map(function(x) {
           return typeof x === 'string' ? { id: x, label: x } : x;
         }),
@@ -8408,9 +8555,9 @@
           items: [
             evalHistItem('cc', 'C/C — Chief Complaint', '', [
               '정확히 짚음 (국소)', '애매·넓은 범위 (방사·연관 의심)',
-            ], true),
+            ], true, { bodyDropdowns: true, areaSecId: 'cc_area' }),
             evalHistItem('onset', 'O — Onset', '', [
-              '급성', '만성', '외상·사건 있음', '외상 없음 → 자세·습관 의심',
+              '2주 미만', '2주 이상', '외상·사건 있음', '외상 없음 → 자세·습관 의심',
             ], true),
             evalHistItem('provocation', 'P — Provocation', '', [
               '힘 쓸 때 악화', '패시브 늘릴 때 악화', '특정 자세·동작', '안정 시에도',
@@ -8419,16 +8566,13 @@
               '쉬면 나아짐', '움직이면 나아짐', '열에 좋아짐', '냉에 좋아짐',
             ], true),
             evalHistItem('quality', 'Q — Quality', '', [
-              '전기·찌릿 (신경)', '한 점 날카로움 (관절)', '뻐근·쥐어짜는 (근육)',
-              '당기는·뻣뻣 (Fascia)', '찢어지는', '욱씬거림', '저림·타는',
+              '뻐근', '당김', '날카로움', '욱씬', '찢어지는', '전기', '저림',
             ], true),
             evalHistItem('region', 'R — Region / Radiation', '', [
               '국소·한 부위', '경로를 따라 방사', '여러 부위',
             ], true),
             evalHistItem('severity', 'S — Severity', '', [
               'VAS 0~3 경증', 'VAS 4~6 중등도', 'VAS 7~10 중증',
-              '도움 불필요', '도움 가끔 필요', '도움 항상 필요',
-              '안정 시 통증 없음', '안정 시 약간 불편', '안정 시에도 통증',
             ], true),
             evalHistItem('timing', 'T — Timing', '', [
               '쉬면 나아짐', '특정 자세·시간대 악화', '아침에 심함', '안정 시에도 지속',
@@ -8491,6 +8635,44 @@
       return flat;
     }
 
+    function getEvalBodyAreaDropdownSecs() {
+      var out = [];
+      EVAL_HISTORY_GROUPS.forEach(function (grp) {
+        (grp.items || []).forEach(function (sec) {
+          if (sec.bodyDropdowns && sec.areaSecId) {
+            out.push({ id: sec.areaSecId, parentId: sec.id, parentTitle: sec.title });
+          }
+        });
+      });
+      return out;
+    }
+
+    function evalDropdownSelectionsForSec(secId) {
+      var selected = [];
+      document.querySelectorAll('.eval-body-area-select[data-sec="' + secId + '"]').forEach(function (sel) {
+        if (!sel.value) return;
+        var label = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].textContent.trim() : '';
+        if (label && label !== '선택') selected.push(label);
+      });
+      return selected;
+    }
+
+    function onEvalBodyAreaDropdown_(selectEl) {
+      if (!selectEl) return;
+      var secId = selectEl.getAttribute('data-sec');
+      if (selectEl.value) {
+        document.querySelectorAll('.eval-body-area-select[data-sec="' + secId + '"]').forEach(function (sel) {
+          if (sel !== selectEl) sel.value = '';
+          sel.classList.toggle('has-value', !!sel.value);
+        });
+      } else {
+        document.querySelectorAll('.eval-body-area-select[data-sec="' + secId + '"]').forEach(function (sel) {
+          sel.classList.toggle('has-value', !!sel.value);
+        });
+      }
+      selectEl.classList.toggle('has-value', !!selectEl.value);
+    }
+
     function renderEvalHistoryChipRow(sec) {
       var chips = (sec.options || []).map(function (opt) {
         var goalAttr = sec.id === 'goal' && opt.id ? ' data-goal-id="' + escapeHtml(opt.id) + '"' : '';
@@ -8499,6 +8681,14 @@
           goalAttr + ' data-val="' + escapeHtml(opt.label) + '" onclick="toggleEvalHistChip(this)">' +
           escapeHtml(opt.label) + '</button>';
       }).join('');
+      var dropdownHtml = sec.bodyDropdowns
+        ? renderBodyAreaDropdownsHtml_({
+            prefix: 'eval',
+            secId: sec.areaSecId,
+            onChange: 'onEvalBodyAreaDropdown_(this)',
+            getSelected: function () { return ''; },
+          })
+        : '';
       var titleHtml = sec.title
         ? '<div class="eval-hist-subtitle">' + escapeHtml(sec.title) + '</div>'
         : '';
@@ -8507,6 +8697,7 @@
           titleHtml +
           (sec.hint ? '<p class="eval-hist-hint">' + escapeHtml(sec.hint) + '</p>' : '') +
           '<div class="eval-hist-chips">' + chips + '</div>' +
+          dropdownHtml +
         '</div>'
       );
     }
@@ -8553,6 +8744,10 @@
 
     function clearEvalFormSelections_() {
       document.querySelectorAll('.eval-hist-chip.on').forEach(function (el) { el.classList.remove('on'); });
+      document.querySelectorAll('.eval-body-area-select').forEach(function (sel) {
+        sel.value = '';
+        sel.classList.remove('has-value');
+      });
       ['evalHistoryExtraMemo', 'evalInspectionExtra', 'evalMovementExtra', 'evalPalpationExtra', 'evalMemo'].forEach(function (id) {
         var el = document.getElementById(id);
         if (el) el.value = '';
@@ -8575,6 +8770,20 @@
             btn.classList.add('on');
             applied++;
           }
+        });
+        document.querySelectorAll('.eval-body-area-select[data-sec="' + item.sec + '"]').forEach(function (sel) {
+          var matchVal = '';
+          Array.prototype.forEach.call(sel.options, function (opt) {
+            if (!matchVal && opt.value && opt.textContent.trim() === item.val) matchVal = opt.value;
+          });
+          if (!matchVal) return;
+          document.querySelectorAll('.eval-body-area-select[data-sec="' + item.sec + '"]').forEach(function (other) {
+            other.value = '';
+            other.classList.remove('has-value');
+          });
+          sel.value = matchVal;
+          sel.classList.add('has-value');
+          applied++;
         });
       });
       updateEvalFormVisibility();
@@ -8707,6 +8916,10 @@
         var rows = [];
         (grp.items || []).forEach(function (sec) {
           var selected = evalChipSelectionsForSec(sec.id);
+          if (sec.bodyDropdowns && sec.areaSecId) {
+            var areaSelected = evalDropdownSelectionsForSec(sec.areaSecId);
+            if (areaSelected.length) selected = selected.concat(areaSelected);
+          }
           if (!selected.length) return;
           if (sec.title) rows.push('  · ' + sec.title + ': ' + selected.join(' / '));
           else rows.push('  · ' + selected.join(' / '));
@@ -8789,6 +9002,9 @@
         });
         out[sec.id] = selected;
       });
+      getEvalBodyAreaDropdownSecs().forEach(function (sec) {
+        out[sec.id] = evalDropdownSelectionsForSec(sec.id);
+      });
       var extra = document.getElementById('evalHistoryExtraMemo');
       out.extraMemo = extra ? String(extra.value || '').trim() : '';
       return out;
@@ -8814,9 +9030,9 @@
       }
 
       var careStep = 'active';
-      if (histHasAny(histState, 'severity', [/7~10|중증|항상 필요|안정 시에도 통증/])) careStep = 'invasive';
+      if (histHasAny(histState, 'severity', [/7~10|중증/])) careStep = 'invasive';
       else if (histHasAny(histState, 'severity', [/4~6|중등도/])) careStep = 'manual';
-      else if (histHasAny(histState, 'quality', [/전기|한 점|찢어|욱씬/])) careStep = 'manual';
+      else if (histHasAny(histState, 'quality', [/전기|날카로움|찢어|욱씬/])) careStep = 'manual';
       else if (histHasAny(histState, 'goal', [/통증/]) && careStep === 'active') careStep = 'manual';
       else if (goalId === 'stretch' || goalId === 'prevention') careStep = 'pstr';
       else if (goalId === 'fitness') {
