@@ -398,39 +398,61 @@
     }
     .member-brief .line1 .phone[hidden] { display:none; }
     .member-brief .line1 .phone:active { opacity:.7; }
-    .member-brief .line2 { font-size:12px; color:var(--dim); margin-top:8px; white-space:pre-wrap; line-height:1.55; flex-shrink:0; }
-    .member-brief .line2.brief-eval-notes.is-placeholder .brief-text {
+    .member-brief .line2 {
+      margin-top:8px; flex-shrink:0;
+    }
+    .member-brief .brief-eval-box {
+      display:block;
+      width:100%;
+      box-sizing:border-box;
+      background:#fff;
+      border:1px solid #bfdbfe;
+      border-radius:8px;
+      padding:10px 12px;
+      cursor:text;
+      -webkit-tap-highlight-color:transparent;
+      transition:border-color .15s ease, box-shadow .15s ease;
+    }
+    .member-brief .brief-eval-box:hover { border-color:#93c5fd; }
+    .member-brief .brief-eval-box.is-editing {
+      border-color:#3b82f6;
+      box-shadow:0 0 0 2px rgba(59,130,246,.15);
+    }
+    .member-brief .brief-eval-box.is-placeholder .brief-text {
       color:#94a3b8; font-style:italic;
     }
-    .member-brief .brief-ref {
-      display:block; color:var(--dim); margin-bottom:8px; padding-bottom:8px;
-      border-bottom:1px dashed #bfdbfe;
-      white-space:pre-wrap; word-break:break-word; line-height:1.55;
-    }
-    .member-brief .brief-ref[hidden] { display:none !important; }
-    .member-brief .brief-editable-wrap {
-      display:block; cursor:text; border-radius:6px; padding:2px 0;
-      -webkit-tap-highlight-color:transparent;
-    }
-    .member-brief .brief-editable-wrap:hover { background:rgba(255,255,255,.45); }
-    .member-brief .brief-editable-wrap.is-editing { background:#fff; padding:6px 8px; border:1px solid #93c5fd; }
-    .member-brief .brief-editable-wrap.is-editing:hover { background:#fff; }
-    .member-brief .brief-text { display:block; color:var(--dim); white-space:pre-wrap; word-break:break-word; }
-    .member-brief .line2,
-    .member-brief .brief-text,
-    .member-brief .brief-ref {
+    .member-brief .brief-text {
       display:-webkit-box;
+      font-size:12px;
+      color:var(--dim);
+      white-space:pre-wrap;
+      word-break:break-word;
+      line-height:1.55;
       line-clamp:5;
       -webkit-line-clamp:5;
       -webkit-box-orient:vertical;
       overflow:hidden;
       text-overflow:ellipsis;
     }
-    .member-brief .brief-editable-wrap textarea {
-      width:100%; min-height:72px; border:none; background:transparent; resize:vertical;
-      font:inherit; color:var(--text); line-height:1.55; padding:0; outline:none;
+    .member-brief .brief-eval-box textarea {
+      display:block;
+      width:100%;
+      min-height:72px;
+      max-height:160px;
+      border:none;
+      background:transparent;
+      resize:vertical;
+      font:inherit;
+      font-size:12px;
+      color:var(--text);
+      line-height:1.55;
+      padding:0;
+      outline:none;
+      white-space:pre-wrap;
+      word-break:break-word;
     }
-    .member-brief .brief-editable-wrap textarea[hidden] { display:none; }
+    .member-brief .brief-eval-box textarea[hidden],
+    .member-brief .brief-eval-box .brief-text[hidden] { display:none !important; }
 
     .member-overview-wrap {
       margin-top:12px;
@@ -1523,11 +1545,21 @@
         <div class="member-overview-top">
           <div class="member-brief" id="memberBrief">
             <div class="line1"><span id="briefName">—</span><a class="phone" id="briefPhone" href="#" hidden>전화</a></div>
-            <div class="line2 brief-eval-notes is-placeholder" id="briefEvalNotesRow">
-              <div class="brief-ref" id="briefEvalRef" hidden></div>
-              <div class="brief-editable-wrap" id="briefEvalEditableWrap" onclick="startBriefEvalNotesEdit(event)" title="클릭 후 수정 가능">
+            <div class="line2 brief-eval-notes" id="briefEvalNotesRow">
+              <div
+                class="brief-eval-box is-placeholder"
+                id="briefEvalEditableWrap"
+                onclick="startBriefEvalNotesEdit(event)"
+                title="클릭 후 수정 가능"
+              >
                 <span class="brief-text" id="briefEvalNotes">사전/초회 평가 시 결과 및 특이사항 (클릭 후 수정 가능)</span>
-                <textarea id="briefEvalNotesInput" rows="4" hidden placeholder="결과 및 특이사항을 입력하세요 (클릭 후 수정)" onblur="finishBriefEvalNotesEdit()"></textarea>
+                <textarea
+                  id="briefEvalNotesInput"
+                  rows="4"
+                  hidden
+                  placeholder="사전/초회 평가 시 결과 및 특이사항 (클릭 후 수정 가능)"
+                  onblur="finishBriefEvalNotesEdit()"
+                ></textarea>
               </div>
             </div>
           </div>
@@ -6633,34 +6665,25 @@
     var _briefEvalNotesSaving = false;
 
     function renderBriefEvalNotes_(m) {
-      var row = document.getElementById('briefEvalNotesRow');
-      var refEl = document.getElementById('briefEvalRef');
       var wrap = document.getElementById('briefEvalEditableWrap');
       var el = document.getElementById('briefEvalNotes');
       var input = document.getElementById('briefEvalNotesInput');
-      if (!row || !el || !wrap) return;
+      if (!el || !wrap) return;
       if (wrap.classList.contains('is-editing')) return;
-
-      var refContent = buildBriefEvalNotesText_(m);
-      if (refEl) {
-        if (refContent) {
-          refEl.textContent = refContent;
-          refEl.hidden = false;
-        } else {
-          refEl.textContent = '';
-          refEl.hidden = true;
-        }
-      }
 
       var notes = String((m && m.memberBriefNotes) || '').trim();
       if (notes) {
         el.textContent = notes;
-        row.classList.remove('is-placeholder');
+        wrap.classList.remove('is-placeholder');
       } else {
         el.textContent = '사전/초회 평가 시 결과 및 특이사항 (클릭 후 수정 가능)';
-        row.classList.add('is-placeholder');
+        wrap.classList.add('is-placeholder');
       }
-      if (input) input.value = notes;
+      el.hidden = false;
+      if (input) {
+        input.value = notes;
+        input.hidden = true;
+      }
     }
 
     function startBriefEvalNotesEdit(ev) {
@@ -6672,6 +6695,7 @@
       if (!wrap || !el || !input || wrap.classList.contains('is-editing')) return;
       if (ev && ev.target === input) return;
       wrap.classList.add('is-editing');
+      wrap.classList.remove('is-placeholder');
       el.hidden = true;
       input.hidden = false;
       input.value = String(m.memberBriefNotes || '').trim();
