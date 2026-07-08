@@ -386,8 +386,11 @@
       padding:12px; border-radius:10px;
       background:var(--blue-bg); border:1px solid #bfdbfe;
       display:none;
+      height:auto;
+      min-height:0;
+      overflow:visible;
     }
-    .member-brief.show { display:flex; flex-direction:column; }
+    .member-brief.show { display:flex; flex-direction:column; align-items:stretch; }
     .member-brief .line1 { font-size:14px; font-weight:700; }
     .member-brief .line1 .phone {
       font-weight:600; color:var(--blue-mid); margin-left:8px; font-size:13px;
@@ -395,13 +398,14 @@
     }
     .member-brief .line1 .phone[hidden] { display:none; }
     .member-brief .line1 .phone:active { opacity:.7; }
-    .member-brief .line2 { font-size:12px; color:var(--dim); margin-top:8px; white-space:pre-wrap; line-height:1.55; }
+    .member-brief .line2 { font-size:12px; color:var(--dim); margin-top:8px; white-space:pre-wrap; line-height:1.55; flex-shrink:0; }
     .member-brief .line2.brief-eval-notes.is-placeholder .brief-text {
       color:#94a3b8; font-style:italic;
     }
     .member-brief .brief-ref {
       display:block; color:var(--dim); margin-bottom:8px; padding-bottom:8px;
       border-bottom:1px dashed #bfdbfe;
+      white-space:pre-wrap; word-break:break-word; line-height:1.55;
     }
     .member-brief .brief-ref[hidden] { display:none !important; }
     .member-brief .brief-editable-wrap {
@@ -411,7 +415,7 @@
     .member-brief .brief-editable-wrap:hover { background:rgba(255,255,255,.45); }
     .member-brief .brief-editable-wrap.is-editing { background:#fff; padding:6px 8px; border:1px solid #93c5fd; }
     .member-brief .brief-editable-wrap.is-editing:hover { background:#fff; }
-    .member-brief .brief-text { display:block; color:var(--dim); }
+    .member-brief .brief-text { display:block; color:var(--dim); white-space:pre-wrap; word-break:break-word; }
     .member-brief .brief-editable-wrap textarea {
       width:100%; min-height:72px; border:none; background:transparent; resize:vertical;
       font:inherit; color:var(--text); line-height:1.55; padding:0; outline:none;
@@ -446,8 +450,12 @@
       display:flex; flex-direction:column; gap:10px;
       flex:1;
       min-height:0;
-      max-height:420px;
+      max-height:min(440px, 52vh);
       overflow-y:auto;
+      overflow-x:hidden;
+      padding-right:2px;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-gutter:stable;
     }
     .condition-history-empty {
       font-size:11px; color:var(--dim); margin:0; line-height:1.5;
@@ -480,9 +488,13 @@
       border-color:#cbd5e1;
       background:#f1f5f9;
     }
+    .condition-history-card.is-latest {
+      flex-shrink:0;
+    }
     .condition-history-card .ch-date {
       font-size:10px; font-weight:700; color:var(--blue); margin-bottom:0;
       display:flex; align-items:center; justify-content:space-between; gap:8px;
+      flex-shrink:0;
     }
     .condition-history-card.is-latest .ch-date { margin-bottom:6px; }
     .condition-history-card.is-collapsed .ch-date { margin-bottom:4px; }
@@ -491,12 +503,45 @@
     }
     .condition-history-card .ch-preview {
       display:none;
+      margin-top:5px;
+      padding:7px 9px;
+      border-radius:8px;
+      background:rgba(255,255,255,.62);
+      border:1px solid #e2e8f0;
       font-size:11px; color:var(--dim); line-height:1.45;
-      -webkit-line-clamp:2; -webkit-box-orient:vertical;
+      word-break:break-word;
+      -webkit-line-clamp:3; -webkit-box-orient:vertical;
       overflow:hidden;
     }
     .condition-history-card.is-collapsed .ch-preview { display:-webkit-box; }
     .condition-history-card.is-collapsed .ch-body { display:none; }
+    .condition-history-card.is-latest .ch-body {
+      display:block;
+    }
+    .condition-history-card:not(.is-latest):not(.is-collapsed) .ch-body.ch-body-scroll {
+      display:block;
+      max-height:min(200px, 32vh);
+      overflow-y:auto;
+      overflow-x:hidden;
+      margin-top:6px;
+      padding:8px 10px;
+      border-radius:8px;
+      background:rgba(255,255,255,.78);
+      border:1px solid #e2e8f0;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-gutter:stable;
+    }
+    .condition-history-card .ch-session {
+      padding:7px 9px;
+      border-radius:8px;
+      background:rgba(255,255,255,.55);
+    }
+    .condition-history-card.is-latest .ch-session {
+      background:rgba(255,255,255,.42);
+    }
+    .condition-history-card:not(.is-latest) .ch-session {
+      background:rgba(248,250,252,.92);
+    }
     .condition-history-card .ch-name {
       font-size:12px; font-weight:700; color:var(--text);
     }
@@ -510,18 +555,20 @@
     @media (min-width:960px) {
       .member-overview-top {
         flex-direction:row;
-        align-items:stretch;
+        align-items:flex-start;
       }
       .member-brief {
-        flex:1;
+        flex:1 1 auto;
         min-width:0;
+        align-self:flex-start;
       }
       .member-condition-history {
         width:min(300px, 34vw);
         flex-shrink:0;
+        min-height:0;
       }
       .condition-history-list {
-        max-height:none;
+        max-height:min(480px, 56vh);
       }
     }
 
@@ -594,6 +641,22 @@
     }
     .eval-body-area-dd-label {
       font-size:9px; font-weight:800; color:#94a3b8; letter-spacing:0.03em;
+    }
+    @media (max-width:480px) {
+      .session-discomfort-dropdowns,
+      .eval-body-area-dropdowns {
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+      }
+      .session-discomfort-dropdowns .session-body-area-dd:first-child,
+      .eval-body-area-dropdowns .eval-body-area-dd:first-child {
+        grid-column:1 / -1;
+      }
+      .session-body-area-dd,
+      .eval-body-area-dd {
+        min-width:0;
+      }
     }
     .session-check-chips .session-check-chip,
     .session-check-vas .session-check-chip {
@@ -1442,7 +1505,7 @@
       <div class="card-title">오늘 예약 회원</div>      
       <div class="toolbar">
         <button type="button" class="btn btn-ghost" onclick="loadBoard()">새로고침</button>
-        <button type="button" class="btn btn-ghost" onclick="sendWellnessIntakeSms_()">사전 평가</button>
+        <button type="button" class="btn btn-ghost" style="margin-left:auto;" onclick="sendWellnessIntakeSms_()">사전 평가</button>
         <button type="button" class="btn btn-eval" onclick="openEvalModal()">초회 평가</button>
         <a class="btn btn-ghost" href="#" onclick="openApplicationForm_(event)">회원등록</a>
       </div>
@@ -6112,9 +6175,35 @@
       if (d && d !== '—') parts.push(d);
       var n = String(item.sessionNote || '').trim().replace(/\s+/g, ' ');
       if (n && n !== '—') {
-        parts.push(n.length > 48 ? n.slice(0, 45) + '…' : n);
+        parts.push(n.length > 56 ? n.slice(0, 53) + '…' : n);
       }
       return parts.join(' · ') || '—';
+    }
+
+    function pickConditionHistoryPreviewItem_(items) {
+      if (!items || !items.length) return null;
+      for (var i = 0; i < items.length; i++) {
+        if (conditionHistoryPreviewLine_(items[i]) !== '—') return items[i];
+      }
+      return items[0];
+    }
+
+    function dedupeConditionHistoryList_(list) {
+      var seen = Object.create(null);
+      var out = [];
+      (list || []).forEach(function (raw) {
+        var item = normalizeConditionHistoryItem_(raw);
+        var key = [
+          String(item.dateStr || '').trim(),
+          normalizeNextProgressText(item.nextProgress) || '—',
+          String(item.discomfort || '').trim() || '—',
+          String(item.sessionNote || '').trim() || '—',
+        ].join('\u0001');
+        if (seen[key]) return;
+        seen[key] = true;
+        out.push(raw);
+      });
+      return out;
     }
 
     var MEMBER_DETAIL_LOAD_EST_SEC = 15;
@@ -6213,7 +6302,8 @@
     }
 
     function conditionHistoryGroupPreviewLine_(group) {
-      var item = group.items[0];
+      var item = pickConditionHistoryPreviewItem_(group.items);
+      if (!item) return '—';
       var line = conditionHistoryPreviewLine_(item);
       if (group.items.length > 1) line += ' · 외 ' + (group.items.length - 1) + '건';
       return line;
@@ -6248,7 +6338,7 @@
         html += '<p class="condition-history-error">' + escapeHtml(state.memberDetailLoadError) + '</p>';
       }
 
-      var list = (m && m.conditionHistory) ? m.conditionHistory.slice() : [];
+      var list = dedupeConditionHistoryList_((m && m.conditionHistory) ? m.conditionHistory.slice() : []);
       if (!list.length) {
         html += '<p class="condition-history-empty">이전 세션 기록이 없습니다.</p>';
         root.innerHTML = html;
@@ -6269,10 +6359,11 @@
         var bodyHtml = group.items.map(function(item) {
           return renderConditionHistorySessionBody_(item);
         }).join('');
+        var bodyCls = 'ch-body' + (!isLatest && expanded ? ' ch-body-scroll' : '');
         return '<article class="' + cardCls + '"' + clickAttr + '>' +
           '<div class="ch-date"><span>' + escapeHtml(group.dateStr || '—') + (isLatest ? ' · 최근' : '') + '</span>' + foldHint + '</div>' +
           '<div class="ch-preview">' + escapeHtml(conditionHistoryGroupPreviewLine_(group)) + '</div>' +
-          '<div class="ch-body">' + bodyHtml + '</div></article>';
+          '<div class="' + bodyCls + '">' + bodyHtml + '</div></article>';
       }).join('');
       root.innerHTML = html;
     }
@@ -6527,7 +6618,7 @@
         if (fe.dateStr) feText = fe.dateStr + '\n' + feText;
         parts.push('[초회 평가]\n' + feText);
       }
-      return parts.join('\n\n').slice(0, 1200);
+      return parts.join('\n\n');
     }
 
     var _briefEvalNotesSaving = false;
@@ -6729,6 +6820,7 @@
           state.sessionCheck.note = detail.member.currentSessionCheck.note || '';
         }
         m.wellnessIntake = detail.member.wellnessIntake || detail.wellnessIntake || null;
+        mergeMemberApplicationPrefill_(m, detail.member);
         distributeServerProgressToStore(m);
         loadProgressFromMemberStore(state.activeProgramTab);
         saveProgressToMemberStore();
@@ -8373,24 +8465,110 @@
 
     const APPLICATION_FORM_URL = 'https://breezefeel.github.io/yaksu/';
 
-    function openApplicationForm_(ev) {
-      if (ev) ev.preventDefault();
-      const m = state.selected;
-      let url = APPLICATION_FORM_URL;
-      if (m && String(m.name || '').trim()) {
-        const params = new URLSearchParams();
-        params.set('name', String(m.name).trim());
-        const phone = String(m.phoneDigits || '').replace(/\D/g, '');
-        if (phone.length >= 10) params.set('phone', phone);
-        const prog = String(m.program || '').trim();
-        if (prog) params.set('program', prog);
-        const branch = String(m.branch || '').trim();
-        if (/인천|작전/.test(branch)) params.set('branch', '인천');
-        else if (/약수/.test(branch)) params.set('branch', '약수');
-        const inst = String(m.instructorName || '').trim();
-        if (inst) params.set('instructor', inst);
-        url += '?' + params.toString();
+    function parseSessionsPassFromLabelClient_(sessionsLabel) {
+      var s = String(sessionsLabel || '').trim();
+      if (!s) return '';
+      var known = [
+        '3개월 패키지(+근막이완)',
+        '3개월 패키지',
+        '주2회 패키지(+근막이완)',
+        '주2회 패키지',
+        '1회(근막이완)',
+        '1회',
+      ];
+      for (var i = 0; i < known.length; i++) {
+        if (s.indexOf(known[i]) >= 0) return known[i];
       }
+      var parts = s.split('·').map(function (x) { return String(x || '').trim(); }).filter(Boolean);
+      if (parts.length) {
+        var last = parts[parts.length - 1];
+        if (/회|패키지/.test(last)) return last;
+      }
+      var m = s.match(/(\d+\s*회)/);
+      return m ? m[1].replace(/\s+/g, '') : '';
+    }
+
+    function mergeMemberApplicationPrefill_(m, source) {
+      if (!m || !source) return;
+      if (source.applicationPrefill) m.applicationPrefill = source.applicationPrefill;
+      if (source.sessionsLabel) m.sessionsLabel = source.sessionsLabel;
+      if (source.timeInfo) m.timeInfo = source.timeInfo;
+      if (source.manageDays && source.manageDays.length) m.manageDays = source.manageDays.slice();
+      if (source.memberInstructor) m.memberInstructor = source.memberInstructor;
+      if (source.inst) m.inst = source.inst;
+      if (source.program) m.program = source.program;
+      if (source.branch) m.branch = source.branch;
+    }
+
+    function buildApplicationFormParamsFromMember_(m) {
+      if (!m || !String(m.name || '').trim()) return null;
+      var pre = m.applicationPrefill || {};
+      var params = new URLSearchParams();
+      params.set('name', String(m.name).trim());
+      var phone = String(m.phoneDigits || '').replace(/\D/g, '');
+      if (phone.length >= 10) params.set('phone', phone);
+
+      var branch = String(pre.branch || m.branch || '').trim();
+      if (/인천|작전/.test(branch)) params.set('branch', '인천');
+      else if (/약수/.test(branch)) params.set('branch', '약수');
+
+      var prog = String(pre.program || m.program || '').trim();
+      if (prog) params.set('program', normalizeProgramKeyClient(prog));
+
+      var inst = String(pre.instructor || m.memberInstructor || m.inst || m.instructorName || '').trim();
+      if (inst) params.set('instructor', inst);
+
+      var days = pre.days || m.manageDays || [];
+      if (typeof days === 'string') {
+        days = days.split(/[,，、/·\s]+/).map(function (d) { return d.trim(); }).filter(Boolean);
+      }
+      if (days && days.length) params.set('days', days.join(','));
+
+      var schedule = String(pre.schedule || '').trim();
+      if (!schedule && m.timeInfo) {
+        schedule = String(m.timeInfo).split(/\s*\/\s*/).map(function (chunk) {
+          return String(chunk || '').replace(/\s+/g, '').trim();
+        }).filter(Boolean).join('/');
+      }
+      if (schedule) params.set('schedule', schedule);
+
+      var sessions = String(pre.sessions || '').trim();
+      if (!sessions) sessions = parseSessionsPassFromLabelClient_(m.sessionsLabel || '');
+      if (sessions) params.set('sessions', sessions);
+
+      var careDur = String(pre.careDuration || '').trim();
+      if (!careDur && m.sessionsLabel) {
+        var dm = String(m.sessionsLabel).match(/(\d+)\s*분/);
+        if (dm) careDur = dm[1];
+      }
+      if (careDur) params.set('careDuration', careDur);
+
+      return params;
+    }
+
+    async function openApplicationForm_(ev) {
+      if (ev) ev.preventDefault();
+      var m = state.selected;
+      var url = APPLICATION_FORM_URL;
+      if (!m || !String(m.name || '').trim()) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+        return;
+      }
+      if (m.suffix8 && !m.applicationPrefill) {
+        try {
+          var detail = await api({
+            action: 'instructorMemberDetail',
+            suffix8: m.suffix8,
+            attendeeName: m.name,
+          }, { timeoutMs: 15000 });
+          if (detail && detail.ok && detail.member) {
+            mergeMemberApplicationPrefill_(m, detail.member);
+            if (detail.member.phoneDigits) m.phoneDigits = detail.member.phoneDigits;
+          }
+        } catch (e) { /* ignore */ }
+      }
+      var params = buildApplicationFormParamsFromMember_(m);
+      if (params && params.toString()) url += '?' + params.toString();
       window.open(url, '_blank', 'noopener,noreferrer');
     }
 
