@@ -416,6 +416,16 @@
     .member-brief .brief-editable-wrap.is-editing { background:#fff; padding:6px 8px; border:1px solid #93c5fd; }
     .member-brief .brief-editable-wrap.is-editing:hover { background:#fff; }
     .member-brief .brief-text { display:block; color:var(--dim); white-space:pre-wrap; word-break:break-word; }
+    .member-brief .line2,
+    .member-brief .brief-text,
+    .member-brief .brief-ref {
+      display:-webkit-box;
+      line-clamp:5;
+      -webkit-line-clamp:5;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
     .member-brief .brief-editable-wrap textarea {
       width:100%; min-height:72px; border:none; background:transparent; resize:vertical;
       font:inherit; color:var(--text); line-height:1.55; padding:0; outline:none;
@@ -432,6 +442,7 @@
       display:flex;
       flex-direction:column;
       gap:12px;
+      align-items:flex-start;
     }
     .member-condition-history {
       padding:12px;
@@ -441,6 +452,7 @@
       display:flex;
       flex-direction:column;
       min-height:0;
+      height:auto;
     }
     .condition-history-title {
       font-size:12px; font-weight:800; color:var(--text); margin-bottom:10px;
@@ -448,14 +460,11 @@
     }
     .condition-history-list {
       display:flex; flex-direction:column; gap:10px;
-      flex:1;
+      flex:0 0 auto;
       min-height:0;
-      max-height:min(440px, 52vh);
-      overflow-y:auto;
-      overflow-x:hidden;
+      max-height:none;
+      overflow:visible;
       padding-right:2px;
-      -webkit-overflow-scrolling:touch;
-      scrollbar-gutter:stable;
     }
     .condition-history-empty {
       font-size:11px; color:var(--dim); margin:0; line-height:1.5;
@@ -510,7 +519,7 @@
       border:1px solid #e2e8f0;
       font-size:11px; color:var(--dim); line-height:1.45;
       word-break:break-word;
-      -webkit-line-clamp:3; -webkit-box-orient:vertical;
+      line-clamp:3; -webkit-line-clamp:3; -webkit-box-orient:vertical;
       overflow:hidden;
     }
     .condition-history-card.is-collapsed .ch-preview { display:-webkit-box; }
@@ -568,7 +577,7 @@
         min-height:0;
       }
       .condition-history-list {
-        max-height:min(480px, 56vh);
+        max-height:none;
       }
     }
 
