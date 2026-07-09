@@ -1868,7 +1868,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-07-07-schedule-status-chip';
+    const INSTRUCTOR_HTML_BUILD = '2026-07-09-last-session-attend';
     const BOARD_LOAD_TIMEOUT_MS = 90000;
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
     /** 회원 목록 UI 카운트다운용 예상 시간(초) — 실제 API 타임아웃과 별도 */
@@ -3745,6 +3745,13 @@
       var nb = state.nextBooking;
       if (!nb) return { useScheduleNextBooking: true };
       syncNextBookingLineFromPicker_(nb);
+      if (!userPickedNewNextBooking_()) {
+        var mkNoPick = m ? memberKey(m) : state.selectedKey;
+        if (mkNoPick && nb.loadedKey === mkNoPick && !nb.loading) {
+          return { useScheduleNextBooking: false, nextBookingLookupDone: true };
+        }
+        return { useScheduleNextBooking: true };
+      }
       var ymd = String(nb.pickedYmd || '').trim();
       var time = String(nb.pickedTime || '').trim();
       if (!ymd || !time || !isFutureNextBookingYmd_(ymd)) {
@@ -3906,10 +3913,7 @@
       }
       var timeEl = document.getElementById('nextBookingTime');
       if (timeEl) {
-        timeEl.value = nb.pickedTime || nb.timeStr || '';
-        if (!timeEl.value && nb.previousBooking && nb.previousBooking.timeStr) {
-          timeEl.value = nb.previousBooking.timeStr;
-        }
+        timeEl.value = nb.pickedTime || '';
       }
       if (existingWrap && existingText) {
         existingWrap.classList.remove('is-empty');
@@ -3958,7 +3962,7 @@
         state.nextBooking.instName =
           data.booking.instName || instructorNameByIndex_(state.nextBooking.instIdx);
         state.nextBooking.pickedInstIdx = state.nextBooking.instIdx;
-        state.nextBooking.pickedTime = data.booking.timeStr || '';
+        state.nextBooking.pickedTime = '';
         state.nextBooking.pickedYmd = '';
         state.nextBooking.rescheduleActive = false;
         state.nextBooking.noBookingMessage = '';
