@@ -504,9 +504,10 @@
       margin-top:10px; padding-top:10px; border-top:1px dashed #e2e8f0;
     }
     .condition-history-card {
-      padding:10px; border-radius:8px;
+      padding:10px 12px; border-radius:10px;
       background:#f8fafc; border:1px solid #e2e8f0;
       font-size:11px; line-height:1.55; color:var(--dim);
+      width:100%; box-sizing:border-box;
     }
     .condition-history-card.is-latest {
       border-color:#bfdbfe; background:var(--blue-bg);
@@ -535,9 +536,10 @@
     .condition-history-card .ch-preview {
       display:none;
       margin-top:5px;
-      padding:7px 9px;
+      padding:8px 10px;
+      min-height:2.75em;
       border-radius:8px;
-      background:rgba(255,255,255,.62);
+      background:rgba(255,255,255,.72);
       border:1px solid #e2e8f0;
       font-size:11px; color:var(--dim); line-height:1.45;
       word-break:break-word;
@@ -563,15 +565,18 @@
       scrollbar-gutter:stable;
     }
     .condition-history-card .ch-session {
-      padding:7px 9px;
+      padding:8px 10px;
       border-radius:8px;
-      background:rgba(255,255,255,.55);
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(226,232,240,.95);
     }
-    .condition-history-card.is-latest .ch-session {
-      background:rgba(255,255,255,.42);
-    }
+    .condition-history-card.is-latest .ch-session,
     .condition-history-card:not(.is-latest) .ch-session {
-      background:rgba(248,250,252,.92);
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(226,232,240,.95);
+    }
+    .condition-history-card .ch-session--empty {
+      text-align:center; color:#94a3b8; font-size:10px; padding:10px 8px;
     }
     .condition-history-card .ch-name {
       font-size:12px; font-weight:700; color:var(--text);
@@ -579,9 +584,22 @@
     .condition-history-card .ch-phone {
       font-size:11px; color:var(--blue-mid); margin-left:6px; font-weight:600;
     }
-    .condition-history-card .ch-block { margin-top:6px; white-space:pre-wrap; }
+    .condition-history-card .ch-block { margin-top:6px; white-space:pre-wrap; word-break:break-word; }
+    .condition-history-card .ch-block:first-child { margin-top:0; }
     .condition-history-card .ch-label {
       font-weight:700; color:var(--text); margin-right:4px;
+    }
+    @media (max-width: 959px) {
+      .member-condition-history {
+        width:100%;
+        flex:1 1 auto;
+      }
+      .condition-history-list {
+        width:100%;
+      }
+      .condition-history-card.is-collapsed {
+        padding:9px 12px;
+      }
     }
     @media (min-width:960px) {
       .member-overview-top {
@@ -1868,7 +1886,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-07-09-last-session-attend';
+    const INSTRUCTOR_HTML_BUILD = '2026-07-10-condition-history-ui';
     const BOARD_LOAD_TIMEOUT_MS = 90000;
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
     /** 회원 목록 UI 카운트다운용 예상 시간(초) — 실제 API 타임아웃과 별도 */
@@ -6215,20 +6233,20 @@
       item = normalizeConditionHistoryItem_(item);
       var parts = [];
       var np = normalizeNextProgressText(item.nextProgress);
-      if (np && np !== '—') parts.push(np);
-      var d = String(item.discomfort || '').trim();
-      if (d && d !== '—') parts.push(d);
+      if (np) parts.push(np);
+      var d = formatHistoryDiscomfortDisplay_(item.discomfort);
+      if (d) parts.push(d);
       var n = String(item.sessionNote || '').trim().replace(/\s+/g, ' ');
-      if (n && n !== '—') {
+      if (!isHistoryPlaceholder_(n)) {
         parts.push(n.length > 56 ? n.slice(0, 53) + '…' : n);
       }
-      return parts.join(' · ') || '—';
+      return parts.join(' · ') || '기록 없음';
     }
 
     function pickConditionHistoryPreviewItem_(items) {
       if (!items || !items.length) return null;
       for (var i = 0; i < items.length; i++) {
-        if (conditionHistoryPreviewLine_(items[i]) !== '—') return items[i];
+        if (conditionHistoryPreviewLine_(items[i]) !== '기록 없음') return items[i];
       }
       return items[0];
     }
@@ -6240,9 +6258,9 @@
         var item = normalizeConditionHistoryItem_(raw);
         var key = [
           String(item.dateStr || '').trim(),
-          normalizeNextProgressText(item.nextProgress) || '—',
-          String(item.discomfort || '').trim() || '—',
-          String(item.sessionNote || '').trim() || '—',
+          normalizeNextProgressText(item.nextProgress) || '',
+          formatHistoryDiscomfortDisplay_(item.discomfort) || '',
+          String(item.sessionNote || '').trim() || '',
         ].join('\u0001');
         if (seen[key]) return;
         seen[key] = true;
@@ -6301,49 +6319,91 @@
       });
     }
 
+    function isHistoryPlaceholder_(v) {
+      var s = String(v != null ? v : '').trim();
+      return !s || s === '—';
+    }
+
+    function formatHistoryDiscomfortDisplay_(raw) {
+      var s = String(raw || '').trim();
+      if (isHistoryPlaceholder_(s)) return '';
+      s = s.replace(/\bVAS\s+VAS\s+/gi, 'VAS ');
+      s = s.replace(/(\s*\/\s*)+/g, ' / ').replace(/\s{2,}/g, ' ').trim();
+      if (/^VAS\s+[\d?~]+$/i.test(s)) return '';
+      return s;
+    }
+
+    function formatHistoryConditionPart_(label, vas) {
+      var lab = String(label || '').trim();
+      var v = String(vas || '').trim().replace(/^VAS\s+/i, '');
+      if (!lab && !v) return '';
+      if (lab && v) return lab + ' · VAS ' + v;
+      if (lab) return lab;
+      return '';
+    }
+
     function normalizeConditionHistoryItem_(item) {
       if (!item) return item;
-      var d = String(item.discomfort || '').trim();
-      if (d && d !== '—') return item;
+      var discomfort = formatHistoryDiscomfortDisplay_(item.discomfort);
       var note = String(item.sessionNote || '').trim();
-      if (!note || note === '—') return item;
+      if (isHistoryPlaceholder_(note)) note = '';
+
       var conditions = [];
       var freeLines = [];
-      note.split('\n').forEach(function (ln) {
-        var t = String(ln || '').trim();
-        if (!t) return;
-        var parsed = parseConditionLine_(t);
-        if (parsed) {
-          conditions.push(parsed);
-        } else {
-          freeLines.push(t);
-        }
-      });
-      if (!conditions.length) return item;
-      var discomfort = conditions
-        .map(function (c) {
-          return c.label + (c.vas ? ' · VAS ' + c.vas : '');
-        })
-        .join(' / ');
-      var specialParts = freeLines.slice();
-      conditions.forEach(function (c) {
-        if (c.suffix) specialParts.push(String(c.suffix).trim());
-      });
+      if (note) {
+        note.split('\n').forEach(function (ln) {
+          var t = String(ln || '').trim();
+          if (!t) return;
+          var parsed = parseConditionLine_(t);
+          if (parsed) conditions.push(parsed);
+          else freeLines.push(t);
+        });
+      }
+
+      if (!discomfort && conditions.length) {
+        var seenCond = Object.create(null);
+        discomfort = conditions
+          .map(function (c) { return formatHistoryConditionPart_(c.label, c.vas); })
+          .filter(function (part) {
+            if (!part || seenCond[part]) return false;
+            seenCond[part] = true;
+            return true;
+          })
+          .join(' / ');
+        var specialParts = freeLines.slice();
+        conditions.forEach(function (c) {
+          if (c.suffix) specialParts.push(String(c.suffix).trim());
+        });
+        note = specialParts.join('\n').trim();
+      }
+
       return {
         dateStr: item.dateStr,
         nextProgress: item.nextProgress,
         discomfort: discomfort,
-        sessionNote: specialParts.join('\n').trim() || '—',
+        sessionNote: note,
       };
     }
 
     function renderConditionHistorySessionBody_(item) {
       item = normalizeConditionHistoryItem_(item);
-      return '<div class="ch-session">' +
-        '<div class="ch-block"><span class="ch-label">다음 진도</span>' + escapeHtml(normalizeNextProgressText(item.nextProgress) || '—') + '</div>' +
-        '<div class="ch-block"><span class="ch-label">불편 부위 · VAS</span>' + escapeHtml(item.discomfort || '—') + '</div>' +
-        '<div class="ch-block"><span class="ch-label">세션 특이사항</span>' + escapeHtml(item.sessionNote || '—') + '</div>' +
-        '</div>';
+      var blocks = [];
+      var np = normalizeNextProgressText(item.nextProgress);
+      if (np) {
+        blocks.push('<div class="ch-block"><span class="ch-label">다음 진도</span>' + escapeHtml(np) + '</div>');
+      }
+      var discomfort = formatHistoryDiscomfortDisplay_(item.discomfort);
+      if (discomfort) {
+        blocks.push('<div class="ch-block"><span class="ch-label">불편 부위 · VAS</span>' + escapeHtml(discomfort) + '</div>');
+      }
+      var note = String(item.sessionNote || '').trim();
+      if (!isHistoryPlaceholder_(note)) {
+        blocks.push('<div class="ch-block"><span class="ch-label">세션 특이사항</span>' + escapeHtml(note) + '</div>');
+      }
+      if (!blocks.length) {
+        return '<div class="ch-session ch-session--empty"><span class="ch-empty-note">기록 없음</span></div>';
+      }
+      return '<div class="ch-session">' + blocks.join('') + '</div>';
     }
 
     function conditionHistoryGroupPreviewLine_(group) {
@@ -6549,9 +6609,10 @@
 
     function getSessionCheckPayload() {
       var sc = state.sessionCheck || {};
+      var hasArea = !!sessionCheckPrimaryAreaId_(sc.areas);
       return {
         discomfortAreas: (sc.areas || []).slice(),
-        vas: sc.vas != null ? sc.vas : '',
+        vas: hasArea && sc.vas != null ? sc.vas : '',
         sessionCheckNote: String(sc.note || '').trim(),
       };
     }
