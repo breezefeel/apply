@@ -3993,7 +3993,7 @@
         state.nextBooking.line = '';
         state.nextBooking.rescheduleActive = false;
         state.nextBooking.noBookingMessage = String(
-          (data && data.noBookingMessage) || '두 달 이내 예약된 일정이 없습니다.'
+          (data && data.noBookingMessage) || '한 달 이내 예약된 일정이 없습니다.'
         ).trim();
       }
       if (data && data.timeSlots && data.timeSlots.length) {
