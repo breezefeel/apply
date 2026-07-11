@@ -5596,7 +5596,7 @@
       return distinct;
     }
 
-    /** 오늘 보드 — 같은 번호·출석 가능(잔여·미출석 칸) 가족 */
+    /** 오늘 보드 — 같은 번호·출석 가능(이미 출석된 칸만 제외, 잔여 0도 포함) */
     function familyMembersOnBoard_(m) {
       if (!m || !state.board || !state.board.members) return m ? [m] : [];
       var key = memberPhoneMatchKey_(m);
@@ -5604,7 +5604,6 @@
       return state.board.members.filter(function (x) {
         if (memberPhoneMatchKey_(x) !== key) return false;
         if (memberAttendSlotLocked_(x)) return false;
-        if (effectiveMemberRemainSessions_(x) <= 0) return false;
         return true;
       });
     }
@@ -5721,13 +5720,8 @@
 
     function maxAttendPassCount(m) {
       var family = familyMembersOnBoard_(m);
-      if (family.length >= 2) {
-        var sharedRemain = parseFamilySharedCountsFromBoard_(m).remain;
-        return Math.min(4, family.length, Math.max(1, sharedRemain));
-      }
-      var remain = memberRemainSessions(m);
-      if (remain <= 0) return 1;
-      return Math.min(4, remain);
+      if (family.length >= 2) return Math.min(4, family.length);
+      return 4;
     }
 
     function samePhoneFamilyOnBoard_(m) {
