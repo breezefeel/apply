@@ -3504,7 +3504,15 @@
 
     function projectedAttendStats_(m, passCount) {
       var passN = resolveAttendPassCount_(passCount);
-      var counts = parseSessionCountsFromMember_(m);
+      var key = memberPhoneMatchKey_(m);
+      var familySize = 0;
+      if (key && state.board && state.board.members) {
+        state.board.members.forEach(function (x) {
+          if (memberPhoneMatchKey_(x) === key) familySize++;
+        });
+      }
+      var counts =
+        familySize > 1 ? parseFamilySharedCountsFromBoard_(m) : parseSessionCountsFromMember_(m);
       var attendAfter = counts.attend + passN;
       return {
         attendCount: attendAfter,
@@ -3513,6 +3521,18 @@
         sessionDisplay: attendAfter + '/' + counts.pay,
         memberName: m && m.name,
         attendPassCount: passN,
+      };
+    }
+
+    function projectedAttendStatsForFamilyMember_(anchorMember, memberIndex) {
+      var idx = Math.max(0, parseInt(memberIndex, 10) || 0);
+      var counts = parseFamilySharedCountsFromBoard_(anchorMember);
+      var attendAfter = counts.attend + idx + 1;
+      return {
+        attendCount: attendAfter,
+        payRounds: counts.pay,
+        remaining: Math.max(0, counts.pay - attendAfter),
+        sessionDisplay: attendAfter + '/' + counts.pay,
       };
     }
 
@@ -3529,9 +3549,9 @@
         var family = familyMultiPassTargets_(m, passN);
         if (family.length >= passN && family.length > 1) {
           html +=
-            '<p class="attend-result-status ok">가족 ' + passN + '명 각 1회로 처리될 수 있습니다</p>';
-          family.slice(0, passN).forEach(function (fm) {
-            var fd = projectedAttendStats_(fm, 1);
+            '<p class="attend-result-status ok">가족 ' + passN + '명 · 공유 수강권 ' + passN + '회 사용</p>';
+          family.slice(0, passN).forEach(function (fm, fi) {
+            var fd = projectedAttendStatsForFamilyMember_(m, fi);
             html +=
               '<p class="attend-result-sub">' +
               escapeHtml(fm.name) +
@@ -4075,7 +4095,7 @@
       m = m || state.selected;
       var family = familyMultiPassTargets_(m, passN);
       if (family.length >= passN && family.length > 1) {
-        return '📌 가족 ' + passN + '명 각 1회 출석';
+        return '📌 가족 ' + passN + '명 · 공유 수강권 ' + passN + '회';
       }
       return '📌 오늘 ' + passN + '회 사용 (다회차)';
     }
@@ -4086,7 +4106,7 @@
       n = parseInt(n, 10) || 0;
       if (n <= 1) return '';
       if (data.familyMultiPass && data.familyResults && data.familyResults.length > 1) {
-        return '📌 가족 ' + n + '명 각 1회 출석';
+        return '📌 가족 ' + n + '명 · 공유 수강권 ' + n + '회';
       }
       return '📌 오늘 ' + n + '회 사용 (다회차)';
     }
@@ -4114,8 +4134,9 @@
       var familyPreview =
         !afterAttend && passN > 1 ? familyMultiPassTargets_(m, passN) : [];
       var familyPreviewMode = familyPreview.length >= passN && familyPreview.length > 1;
-      var attendDelta = afterAttend ? 0 : familyPreviewMode ? 1 : passN;
-      var attendShown = afterAttend ? attendNow : attendNow + attendDelta;
+      var attendDelta = afterAttend ? 0 : passN;
+      var attendBase = familyPreviewMode ? parseFamilySharedCountsFromBoard_(m).attend : attendNow;
+      var attendShown = afterAttend ? attendNow : attendBase + attendDelta;
       var remainNext = payTotal ? Math.max(0, payTotal - attendShown) : '—';
       var multiLine = afterAttend
         ? formatMultiPassAlimtalkLineFromData_(fixedBlocks.resultData)
@@ -5489,7 +5510,37 @@
       return { attend: attend, pay: pay, remain: remain };
     }
 
+    /** 같은 번호 가족 — 공유 수강권 (max 출석 = 누적 사용) */
+    function parseFamilySharedCountsFromBoard_(m) {
+      var key = memberPhoneMatchKey_(m);
+      if (!key || !state.board || !state.board.members) return parseSessionCountsFromMember_(m);
+      var sharedAttend = 0;
+      var pay = 1;
+      var found = false;
+      state.board.members.forEach(function (x) {
+        if (memberPhoneMatchKey_(x) !== key) return;
+        found = true;
+        var c = parseSessionCountsFromMember_(x);
+        if (c.attend > sharedAttend) sharedAttend = c.attend;
+        if (c.pay > pay) pay = c.pay;
+      });
+      if (!found) return parseSessionCountsFromMember_(m);
+      return {
+        attend: sharedAttend,
+        pay: pay,
+        remain: Math.max(0, pay - sharedAttend),
+      };
+    }
+
     function memberRemainSessions(m) {
+      var key = memberPhoneMatchKey_(m);
+      if (key && state.board && state.board.members) {
+        var familyCount = 0;
+        state.board.members.forEach(function (x) {
+          if (memberPhoneMatchKey_(x) === key) familyCount++;
+        });
+        if (familyCount > 1) return parseFamilySharedCountsFromBoard_(m).remain;
+      }
       return parseSessionCountsFromMember_(m).remain;
     }
 
@@ -5512,19 +5563,9 @@
       return '';
     }
 
-    /** 가족 그룹 중 가장 큰 잔여 회차(엄마·아빠 이름만 스케줄에 있을 때 0으로 오는 경우 보정) */
+    /** 가족 그룹 — 공유 수강권 잔여 (행마다 max가 아닌 공유 풀 기준) */
     function effectiveMemberRemainSessions_(m) {
-      var own = memberRemainSessions(m);
-      if (own > 0) return own;
-      var key = memberPhoneMatchKey_(m);
-      if (!key || !state.board || !state.board.members) return own;
-      var max = 0;
-      state.board.members.forEach(function (x) {
-        if (memberPhoneMatchKey_(x) !== key) return;
-        var r = memberRemainSessions(x);
-        if (r > max) max = r;
-      });
-      return max || own;
+      return memberRemainSessions(m);
     }
 
     /** 모달용 — 같은 번호·다른 이름(결석·잔여 0 포함, 이미 출석된 칸만 제외) */
@@ -5680,7 +5721,10 @@
 
     function maxAttendPassCount(m) {
       var family = familyMembersOnBoard_(m);
-      if (family.length >= 2) return Math.min(4, family.length);
+      if (family.length >= 2) {
+        var sharedRemain = parseFamilySharedCountsFromBoard_(m).remain;
+        return Math.min(4, family.length, Math.max(1, sharedRemain));
+      }
       var remain = memberRemainSessions(m);
       if (remain <= 0) return 1;
       return Math.min(4, remain);
@@ -5717,7 +5761,7 @@
       var textEl = document.getElementById('samePhoneFamilyModalText');
       if (textEl) {
         textEl.textContent =
-          '총 ' + family.length + '명 모두 출석 처리할까요? (각 1회차 차감)';
+          '총 ' + family.length + '명 모두 출석 처리할까요? (공유 수강권 ' + family.length + '회 사용)';
       }
       var allBtn = document.getElementById('samePhoneFamilyAllBtn');
       if (allBtn) allBtn.textContent = '모두 출석 (' + family.length + '명)';
@@ -7390,6 +7434,24 @@
       state.completedKeys[memberKey(m)] = true;
     }
 
+    function syncSharedFamilySessionOnBoard_(anchorMember, data) {
+      if (!data || !data.sessionDisplay || !state.board || !state.board.members) return;
+      var key = memberPhoneMatchKey_(anchorMember);
+      if (!key) return;
+      var sd = String(data.sessionDisplay);
+      var parts = sd.match(/^(\d+)\s*\/\s*(\d+)$/);
+      state.board.members.forEach(function (bm) {
+        if (memberPhoneMatchKey_(bm) !== key) return;
+        bm.sessionDisplay = sd;
+        if (parts) {
+          bm.attend = parseInt(parts[1], 10);
+          bm.payRounds = parseInt(parts[2], 10);
+          bm.remain = Math.max(0, bm.payRounds - bm.attend);
+        }
+        if (data.remaining != null) bm.remain = data.remaining;
+      });
+    }
+
     function applyCompleteSessionResult(m, data) {
       syncMemberProgressFromServer(m, data);
       if (data && data.saved) markMemberProgressSaved_(m);
@@ -7414,6 +7476,12 @@
       }
       if (data.completed) {
         markInstructorAttendComplete_(m, data);
+      }
+      if (
+        data.completed &&
+        (data.familyMultiPass || data.familySharedPool || (data.familyResults && data.familyResults.length > 1))
+      ) {
+        syncSharedFamilySessionOnBoard_(m, data);
       }
       if (typeof data.todayAttendCount === 'number') {
         m.todayAttendCount = data.todayAttendCount;
@@ -7537,7 +7605,9 @@
           n +
           ' — 같은 전화번호 가족 ' +
           n +
-          '명이 각 1회씩 출석 처리됩니다.' +
+          '명 · 공유 수강권 ' +
+          n +
+          '회 사용.' +
           (summary ? ' (' + summary + ')' : '');
         document.getElementById('multiPassModalHint').textContent =
           needsFamilyCoAttendPick_(m, n)
@@ -7546,7 +7616,7 @@
             ? '진도 저장·출석·스케줄만 반영 (알림톡 없음).'
             : opts && opts.basicAttendOnly
             ? '진도 저장·출석·기본 알림톡·스케줄 반영.'
-            : '진도 저장·출석·진도 알림톡·스케줄표에 가족 각 1회씩 반영됩니다.';
+            : '진도·히스토리는 각자, 회차는 공유 수강권에서 ' + n + '회 차감됩니다.';
       } else {
         var data = projectedAttendStats_(m, n);
         document.getElementById('multiPassModalText').textContent =
@@ -7931,7 +8001,7 @@
       }
       var passN = data.passesApplied || data.attendPassCount || 1;
       if (passN > 1 && data.familyResults && data.familyResults.length) {
-        html += '<p class="attend-result-status ok">가족 ' + data.familyResults.length + '명 각 1회 출석 처리됨</p>';
+        html += '<p class="attend-result-status ok">가족 ' + data.familyResults.length + '명 · 공유 수강권 ' + data.familyResults.length + '회 처리됨</p>';
       } else if (passN > 1) {
         html += '<p class="attend-result-status ok">' + passN + '회차 사용 처리됨</p>';
       }
