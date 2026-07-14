@@ -1910,7 +1910,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-07-14-member-history-done';
+    const INSTRUCTOR_HTML_BUILD = '2026-07-14-refresh-clear-selection';
     const BOARD_LOAD_TIMEOUT_MS = 90000;
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
     /** 회원 목록 UI 카운트다운용 예상 시간(초) — 실제 API 타임아웃과 별도 */
@@ -5969,6 +5969,26 @@
       el.textContent = '앱 빌드 ' + INSTRUCTOR_HTML_BUILD + ' · GAS 배포 후에도 오류면 HTML·스크립트 버전을 함께 확인하세요';
     }
 
+    /** 수동 새로고침 — 회원 선택·출석 결과 UI 초기화 (하단 스크롤·이전 결과 재표시 방지) */
+    function clearUiAfterManualBoardRefresh_() {
+      stopAttendAlimtalkPoll_();
+      stopAttendProcessingCountdown();
+      state.inlineAttendResult = null;
+      state.attendProcessing = false;
+      state.lastAttendResultData = null;
+      state.lastAttendResultOpts = null;
+      state.attendResultByMember = {};
+      state.activeCompleteVisitKey = '';
+      try {
+        closeAttendResultModal();
+      } catch (ignoreClose) {}
+      setSessionActionButtonsDisabled(false);
+      clearSelectedMember_();
+      try {
+        scrollToMemberSection();
+      } catch (ignoreScroll) {}
+    }
+
     async function loadBoard(opts) {
       opts = opts || {};
       if (_boardSyncInFlight) {
@@ -5977,6 +5997,8 @@
       }
       if (!opts.silent) startMemberLoadCountdown();
       _boardSyncInFlight = true;
+      // 버튼 「새로고침」만 선택·결과 초기화. silent(백그라운드 동기화)는 선택 유지
+      var clearSelectionOnLoad = !opts.silent && !opts.keepSelection;
       try {
         const data = await api({ action: 'instructorDayBoard' }, {
           timeoutMs: BOARD_LOAD_TIMEOUT_MS,
@@ -6016,9 +6038,12 @@
         document.getElementById('dateLine').textContent =
           (data.date || '') + ' (' + (data.dayKr || '') + ') · 예약 ' + (data.members || []).length + '명';
         renderProgramTabs();
+        if (clearSelectionOnLoad) {
+          clearUiAfterManualBoardRefresh_();
+        }
         renderMemberChips();
         renderProgramList();
-        if (state.selectedKey) {
+        if (!clearSelectionOnLoad && state.selectedKey) {
           const m = todayMembers().find(function(x) { return memberKey(x) === state.selectedKey; });
           if (m) {
             if (opts.silent && state.selected && memberKey(state.selected) === state.selectedKey) {
