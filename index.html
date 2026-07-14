@@ -1853,6 +1853,22 @@
     </div>
   </div>
 
+  <!-- 같은 이름 연속 2칸(인천 50분 연장 등) — 2회차 소모 확인 -->
+  <div class="modal-overlay" id="sameMemberTwoSlotModal">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-hd">
+        <h2>연속 2칸 · 회차 확인</h2>
+        <button type="button" class="modal-close" onclick="closeSameMemberTwoSlotModal()">×</button>
+      </div>
+      <p id="sameMemberTwoSlotModalText" style="font-size:14px;line-height:1.55;margin-bottom:8px;white-space:pre-line;">같은 이름·전화로 연속 2칸이 있습니다. 2회차를 소모할까요?</p>
+      <p class="attend-result-partial" style="margin-bottom:16px;text-align:left;">2회 소모 시 스케줄에 3/5 → 4/5처럼 연속 회차가 찍힙니다. 1회만이면 가까운 칸에만 반영됩니다.</p>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="btn btn-primary" style="flex:1;" onclick="confirmSameMemberTwoSlotSave(true)">2회 소모</button>
+        <button type="button" class="btn btn-ghost" style="flex:1;" onclick="confirmSameMemberTwoSlotSave(false)">1회만</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 출석 결과 (출석체크.html과 동일 형식) -->
   <div class="modal-overlay" id="attendResultModal">
     <div class="modal attend-result-modal">
@@ -1894,7 +1910,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-07-10-condition-history-ui';
+    const INSTRUCTOR_HTML_BUILD = '2026-07-14-member-history-done';
     const BOARD_LOAD_TIMEOUT_MS = 90000;
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
     /** 회원 목록 UI 카운트다운용 예상 시간(초) — 실제 API 타임아웃과 별도 */
@@ -4939,7 +4955,7 @@
     function isAmbiguousCompleteSessionFailure_(data) {
       if (!data || data.ok) return false;
       if (data.offline || data.recoverable) return true;
-      if (data.needPin || data.needExtraPassConfirm || data.needNextBookingConfirm || data.needPhoneSelect) return false;
+      if (data.needPin || data.needExtraPassConfirm || data.needSameMemberTwoSlotConfirm || data.needNextBookingConfirm || data.needPhoneSelect) return false;
       if (data.needProvisionalMember) return false;
       var msg = String(data.message || '');
       if (/회원 없음|전화번호|8자리|핀|PIN|잔여 회차|needPin/i.test(msg)) return false;
@@ -5311,9 +5327,11 @@
           if (!isScheduleSessionAbsentClient(s)) allAbsent = false;
         });
         item.scheduleResolvedToday = allResolved;
-        item.absentToday = allAbsent && !anyAttend && !item.attendedToday;
+        item.absentToday = allAbsent && !anyAttend && !item.attendedToday && !(item.todayAttendCount > 0);
         item.sessionCompleted =
-          allResolved || (item.usesDualSlot ? (item.todayAttendCount || 0) >= 2 : anyAttend);
+          !!item.attendedToday ||
+          (item.todayAttendCount || 0) > 0 ||
+          (item.usesDualSlot && (item.todayAttendCount || 0) >= 2);
       }
       if (item.attendedToday || (item.todayAttendCount || 0) > 0) {
         item.absentToday = false;
@@ -5416,8 +5434,8 @@
       if (state.completedKeys[memberKey(m)]) return true;
       if (m.attendedToday) return true;
       if (typeof m.todayAttendCount === 'number' && m.todayAttendCount > 0) return true;
-      if (m.sessionCompleted && !isScheduleSessionAbsentClient(m.scheduleSession)) return true;
-      return scheduleSessionShowsAttendanceClient(m.scheduleSession);
+      // 스케줄 N/M만으로는 출석 완료로 보지 않음 (회원정보 히스토리 우선)
+      return false;
     }
 
     function isMemberAbsent(m) {
@@ -5437,11 +5455,12 @@
 
     function isMemberCompleted(m) {
       if (state.completedKeys[memberKey(m)]) return true;
-      if (m && m.sessionCompleted) return true;
-      if (m && memberHasTodayAttendanceClient_(m)) return true;
+      if (state.completedPersonKeys && state.completedPersonKeys[memberPersonKey(m)]) return true;
+      if (m && m.attendedToday) return true;
+      if (m && typeof m.todayAttendCount === 'number' && m.todayAttendCount > 0) return true;
+      // 상담·완료 등 상태 문구만 스케줄로 완료 표시 — N/M 단독은 회원정보 확인 후
       if (m && scheduleSessionStatusLabelForChipClient_(m.scheduleSession)) return true;
-      if (m && m.scheduleResolvedToday) return !isMemberAbsent(m);
-      return scheduleSessionShowsAttendanceClient(m && m.scheduleSession);
+      return false;
     }
 
     function memberChipExtraClass(m) {
@@ -6018,7 +6037,7 @@
     }
 
     function isSyncBlockingModalOpen() {
-      return ['evalModal', 'attendResultModal', 'extraPassModal', 'nextBookingFailModal', 'multiPassModal', 'samePhoneFamilyModal', 'phonePickerModal'].some(function(id) {
+      return ['evalModal', 'attendResultModal', 'extraPassModal', 'sameMemberTwoSlotModal', 'nextBookingFailModal', 'multiPassModal', 'samePhoneFamilyModal', 'phonePickerModal'].some(function(id) {
         var el = document.getElementById(id);
         return el && el.classList.contains('open');
       });
@@ -6685,7 +6704,7 @@
 
     function dismissPendingCompleteSessionModals_(opts) {
       opts = opts || {};
-      ['extraPassModal', 'nextBookingFailModal', 'multiPassModal', 'samePhoneFamilyModal', 'phonePickerModal'].forEach(
+      ['extraPassModal', 'sameMemberTwoSlotModal', 'nextBookingFailModal', 'multiPassModal', 'samePhoneFamilyModal', 'phonePickerModal'].forEach(
         function (id) {
           var el = document.getElementById(id);
           if (el && el.classList.contains('open')) el.classList.remove('open');
@@ -7357,6 +7376,8 @@
         pspProgress: progress,
         sessionProgress: todayProgressMap(),
         confirmExtraPass: !!opts.confirmExtraPass,
+        confirmSameMemberTwoSlots: !!opts.confirmSameMemberTwoSlots,
+        declineSameMemberTwoSlots: !!opts.declineSameMemberTwoSlots,
         confirmProceedWithoutNextBooking: !!opts.confirmProceedWithoutNextBooking,
         skipSessionSave: !!opts.skipSessionSave,
         attendRetryOnly: !!opts.attendRetryOnly,
@@ -7698,6 +7719,64 @@
       }
       await runCompleteSession(pending.member, mergedProgressMapForSave(), Object.assign({}, pending.opts || {}, {
         confirmExtraPass: true,
+        skipSessionSave: true,
+        rowKey: pending.opts && pending.opts.rowKey,
+        phoneLast4: pending.opts && pending.opts.phoneLast4,
+        attendAlimtalk: pending.opts && pending.opts.attendAlimtalk,
+      }));
+    }
+
+    function closeSameMemberTwoSlotModal(dismissOnly) {
+      var pending = dismissOnly ? null : _pendingCompleteSession;
+      document.getElementById('sameMemberTwoSlotModal').classList.remove('open');
+      _pendingCompleteSession = null;
+      if (pending && pending.data) {
+        applyCompleteSessionResult(pending.member, pending.data);
+        showAttendResult(pending.member, Object.assign({}, pending.data, {
+          completed: false,
+          attendMessage: pending.data.attendMessage || '출석·알림톡은 처리되지 않았습니다',
+        }), pending.opts || {});
+      }
+    }
+
+    function openSameMemberTwoSlotModal(message, member, progress, data, opts) {
+      opts = opts || {};
+      var pendingOpts = Object.assign({}, opts, {
+        attendAlimtalk: opts.attendAlimtalk || _pendingAttendAlimtalk,
+        clientVisitKey: opts.clientVisitKey || state.activeCompleteVisitKey || '',
+      });
+      _pendingCompleteSession = {
+        member: member,
+        progress: progress,
+        data: data,
+        opts: pendingOpts,
+      };
+      document.getElementById('sameMemberTwoSlotModalText').textContent =
+        message ||
+        '같은 이름·전화로 연속 2칸이 있습니다. 2회차를 소모할까요?';
+      document.getElementById('sameMemberTwoSlotModal').classList.add('open');
+    }
+
+    async function confirmSameMemberTwoSlotSave(useTwo) {
+      var pending = _pendingCompleteSession;
+      closeSameMemberTwoSlotModal(true);
+      if (!pending) return;
+      if (useTwo) {
+        state.attendPassCount = 2;
+        updateAttendPassStepper(pending.member);
+        await runCompleteSession(pending.member, mergedProgressMapForSave(), Object.assign({}, pending.opts || {}, {
+          confirmSameMemberTwoSlots: true,
+          attendPassCount: 2,
+          skipSessionSave: true,
+          rowKey: pending.opts && pending.opts.rowKey,
+          phoneLast4: pending.opts && pending.opts.phoneLast4,
+          attendAlimtalk: pending.opts && pending.opts.attendAlimtalk,
+        }));
+        return;
+      }
+      await runCompleteSession(pending.member, mergedProgressMapForSave(), Object.assign({}, pending.opts || {}, {
+        declineSameMemberTwoSlots: true,
+        attendPassCount: 1,
         skipSessionSave: true,
         rowKey: pending.opts && pending.opts.rowKey,
         phoneLast4: pending.opts && pending.opts.phoneLast4,
@@ -8604,6 +8683,13 @@
         resetInlineAttendResult();
         applyCompleteSessionResult(m, data);
         openExtraPassModal(data.attendMessage, m, progress, data, opts);
+        return;
+      }
+      if (data.needSameMemberTwoSlotConfirm) {
+        releaseCompleteSessionInFlight_();
+        resetInlineAttendResult();
+        applyCompleteSessionResult(m, data);
+        openSameMemberTwoSlotModal(data.attendMessage, m, progress, data, opts);
         return;
       }
       if (data.needNextBookingConfirm) {
@@ -9642,6 +9728,7 @@
     document.getElementById('coachNoteModal').addEventListener('click', function(e){ if(e.target===this) closeCoachingNoteModal(); });
     document.getElementById('attendResultModal').addEventListener('click', function(e){ if(e.target===this) closeAttendResultModal(); });
     document.getElementById('extraPassModal').addEventListener('click', function(e){ if(e.target===this) closeExtraPassModal(); });
+    document.getElementById('sameMemberTwoSlotModal').addEventListener('click', function(e){ if(e.target===this) closeSameMemberTwoSlotModal(); });
     document.getElementById('nextBookingFailModal').addEventListener('click', function(e){ if(e.target===this) closeNextBookingFailModal(); });
     document.getElementById('multiPassModal').addEventListener('click', function(e){ if(e.target===this) closeMultiPassModal(); });
     document.getElementById('samePhoneFamilyModal').addEventListener('click', function(e){ if(e.target===this) closeSamePhoneFamilyModal(); });
