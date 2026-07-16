@@ -5365,9 +5365,10 @@
         var allAbsent = true;
         item._times.forEach(function (t) {
           var s = item._slotSessions[t] || '';
-          if (scheduleSessionShowsAttendanceClient(s)) anyAttend = true;
+          // 〃만으로는 출석으로 보지 않음 (위 결석+아래 〃 자동결석 오인 방지)
+          if (scheduleSessionShowsRealAttendCountClient_(s)) anyAttend = true;
           if (!isScheduleSlotResolvedClient_(s)) allResolved = false;
-          if (!isScheduleSessionAbsentClient(s)) allAbsent = false;
+          if (!isScheduleSessionAbsentClient(s) && String(s || '').trim() !== '〃') allAbsent = false;
         });
         item.scheduleResolvedToday = allResolved;
         item.absentToday = allAbsent && !anyAttend && !item.attendedToday && !(item.todayAttendCount > 0);
@@ -5456,7 +5457,8 @@
       return String(m.sessionDisplay || '').trim();
     }
 
-    function scheduleSessionShowsAttendanceClient(val) {
+    /** 실제 N/M 출석만 (결석·〃 제외) — 결석 후 출석 재동기화 판별용 */
+    function scheduleSessionShowsRealAttendCountClient_(val) {
       var raw = String(val || '').trim();
       if (!raw) return false;
       var lines = raw.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
@@ -5464,11 +5466,30 @@
       var i;
       for (i = 0; i < lines.length; i++) {
         var first = lines[i];
-        if (!first || first === '결석') continue;
-        if (first === '〃') return true;
+        if (!first || first === '〃' || isScheduleSessionAbsentClient(first)) continue;
         if (/\d+\s*\/\s*\d+/.test(first)) return true;
       }
       return false;
+    }
+
+    function scheduleSessionShowsAttendanceClient(val) {
+      var raw = String(val || '').trim();
+      if (!raw) return false;
+      // 실제 N/M이 있으면 true. 〃만 있고 결석이 섞인 경우는 출석으로 보지 않음
+      if (scheduleSessionShowsRealAttendCountClient_(val)) return true;
+      var lines = raw.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
+      if (!lines.length) lines = [raw];
+      var hasDitto = false;
+      var hasAbsent = false;
+      var i;
+      for (i = 0; i < lines.length; i++) {
+        var first = lines[i];
+        if (!first) continue;
+        if (isScheduleSessionAbsentClient(first)) hasAbsent = true;
+        else if (first === '〃') hasDitto = true;
+      }
+      // 순수 〃만(동반 칸 단독)은 표시상 출석으로 취급, 결석+〃는 결석 유지
+      return hasDitto && !hasAbsent;
     }
 
     function memberHasTodayAttendanceClient_(m) {
@@ -5485,7 +5506,13 @@
       if (!m) return false;
       if (memberHasTodayAttendanceClient_(m)) return false;
       if (m.absentToday) return true;
-      return isScheduleSessionAbsentClient(m.scheduleSession);
+      var raw = String(m.scheduleSession || '').trim();
+      if (!raw) return false;
+      // 결석+〃 병합 문자열도 결석으로 인식
+      var lines = raw.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
+      var hasAbsent = lines.some(function (ln) { return isScheduleSessionAbsentClient(ln); });
+      var hasRealAttend = scheduleSessionShowsRealAttendCountClient_(raw);
+      return hasAbsent && !hasRealAttend;
     }
 
     function isMemberScheduleResolved(m) {
@@ -7514,13 +7541,21 @@
         state.board.members.forEach(function (bm) {
           if (memberPersonKey(bm) !== pk) return;
           Object.assign(bm, patch);
-          if (data.sessionDisplay && isScheduleSessionAbsentClient(bm.scheduleSession)) {
+          if (data.sessionDisplay && (
+            isScheduleSessionAbsentClient(bm.scheduleSession) ||
+            (String(bm.scheduleSession || '').indexOf('〃') !== -1 &&
+              !scheduleSessionShowsRealAttendCountClient_(bm.scheduleSession))
+          )) {
             bm.scheduleSession = data.sessionDisplay;
           }
         });
       }
       Object.assign(m, patch);
-      if (data.sessionDisplay && isScheduleSessionAbsentClient(m.scheduleSession)) {
+      if (data.sessionDisplay && (
+        isScheduleSessionAbsentClient(m.scheduleSession) ||
+        (String(m.scheduleSession || '').indexOf('〃') !== -1 &&
+          !scheduleSessionShowsRealAttendCountClient_(m.scheduleSession))
+      )) {
         m.scheduleSession = data.sessionDisplay;
       }
       state.completedPersonKeys[pk] = true;
@@ -8175,7 +8210,14 @@
         html += '<p class="attend-result-status ok">' + passN + '회차 사용 처리됨</p>';
       }
       if (data.partialPass) {
-        html += '<p class="attend-result-status warn">' + (data.passesApplied || 1) + '회만 출석 처리됨</p>';
+        html += '<p class="attend-result-status warn">' + (data.passesApplied || 1) + '회만 출석 처리됨' +
+          (data.passesRequested ? ' (요청 ' + data.passesRequested + '회)' : '') + '</p>';
+        if (data.failedFamilyName) {
+          html +=
+            '<p class="attend-result-status warn">' +
+            escapeHtml(data.failedFamilyName) +
+            '님은 반영되지 않았습니다. 같은 번호로 「모두 출석」을 다시 누르면 남은 분만 이어서 처리됩니다.</p>';
+        }
         html += buildScheduleSyncFootnotesHtml_(data);
       }
       if (data.showExtensionModal) {
@@ -8193,7 +8235,8 @@
 
     function buildAttendAlimtalkResultPreview(m, data, opts) {
       opts = opts || {};
-      if (!data.completed) return '';
+      // 가족 부분 성공 시에도 알림톡이 나갔으면 미리보기·솔라피 링크 표시
+      if (!data.completed && !(data.partialPass && data.alimtalk && data.alimtalk.ok)) return '';
 
       if (opts.skipAttendAlimtalk) {
         return (
@@ -8319,8 +8362,11 @@
       return _attendFlowStartedAt > 0 && (Date.now() - _attendFlowStartedAt) >= ATTEND_FLOW_MAX_MS;
     }
 
-    function attendApiTimeoutMs_(recoverAttempt) {
-      return recoverAttempt > 0 ? 90000 : 150000;
+    function attendApiTimeoutMs_(recoverAttempt, opts) {
+      var passN = resolveAttendPassCount_(opts && opts.attendPassCount);
+      var familyBoost = passN > 1 || !!(opts && (opts.confirmFamilyAll || opts.familyCoAttendNames)) ? 60000 : 0;
+      if (recoverAttempt > 0) return 90000 + familyBoost;
+      return 150000 + familyBoost;
     }
 
     async function pollRecoverUntilAttendDone_(m, opts, myGen) {
@@ -8601,19 +8647,26 @@
         return;
       }
 
-      var title = data.completed ? '🌟 출석·진도 저장 완료' : '처리 안내';
+      var title = data.completed
+        ? '🌟 출석·진도 저장 완료'
+        : data.partialPass
+          ? '⚠️ 일부만 출석 처리됨'
+          : '처리 안내';
       state.lastAttendResultData = data;
       state.lastAttendResultOpts = opts;
+      var showAlimtalkUi =
+        !opts.skipAttendAlimtalk &&
+        (data.completed || (data.partialPass && data.alimtalk && data.alimtalk.ok));
       var okResult = {
         memberKey: mk,
         title: title,
         html: buildInlineAttendResultHtml(m, data, opts),
-        sentText: data.completed ? buildSentAlimtalkText_(m, data, opts) : '',
+        sentText: showAlimtalkUi ? buildSentAlimtalkText_(m, data, opts) : '',
       };
       if (mk === state.selectedKey) state.inlineAttendResult = okResult;
       saveMemberAttendResult_(mk, okResult);
       renderSessionAlimtalkSection();
-      if (data.completed && !opts.skipAttendAlimtalk) {
+      if (showAlimtalkUi) {
         startAttendAlimtalkPoll_(m, data, opts);
       }
     }
@@ -8700,7 +8753,7 @@
         }
       }
       const data = await api(completeSessionPayload(m, progress, opts), {
-        timeoutMs: attendApiTimeoutMs_(recoverAttempt),
+        timeoutMs: attendApiTimeoutMs_(recoverAttempt, opts),
         preferPost: true,
       });
       if (!isAttendRequestActive_(myGen)) {
