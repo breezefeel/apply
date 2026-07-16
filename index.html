@@ -1133,6 +1133,22 @@
     .eval-send-row { margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
     .eval-send-btns { display:flex; gap:8px; }
     .eval-send-btns .btn { flex:1; }
+    .eval-submit-status {
+      margin:8px 0 0;
+      font-size:12px;
+      font-weight:600;
+      color:#64748b;
+      line-height:1.45;
+      text-align:center;
+      min-height:1.2em;
+    }
+    .eval-submit-status .eval-countdown {
+      color:#2563eb;
+      font-variant-numeric:tabular-nums;
+    }
+    .eval-submit-status.is-over {
+      color:#b45309;
+    }
     .eval-member-hint { font-size:12px; font-weight:700; color:var(--blue); margin-bottom:12px; padding:8px 10px; background:var(--blue-bg); border-radius:8px; }
     #evalModal .modal { max-width:680px; }
     .eval-hist-lead { font-size:11px; color:var(--dim); margin:0 0 8px; line-height:1.45; }
@@ -1786,6 +1802,7 @@
         <div class="field"><label>추가 메모</label><textarea id="evalMemo" rows="2"></textarea></div>
         <label class="check-inline"><input type="checkbox" id="evalSendMember"> 저장 후 회원에게 발송 (AI 리포트 요약)</label>
         <button type="button" class="btn btn-primary" style="width:100%;margin-top:8px;" id="evalSubmitBtn" onclick="submitFirstEval()">AI 리포트 생성 · 저장</button>
+        <p class="eval-submit-status" id="evalSubmitStatus" hidden aria-live="polite"></p>
       </div>
       <div class="eval-pane" id="evalView">
         <p id="evalViewEmpty" class="empty-hint">저장된 초회 평가가 없습니다.</p>
@@ -1796,8 +1813,8 @@
           <div class="report-box" id="evalReportBody"></div>
           <div class="eval-send-row">
             <p style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.5;">
-              <strong>저장</strong> — 회원정보에 주증상·주의사항 요약을 남깁니다.<br>
-              <strong>보내기</strong> — AI 리포트 요약만 문자·알림톡으로 발송합니다 (LMS 2,000byte 이내).
+              <strong>저장</strong> — 주증상·주의사항 요약을 회원정보·오늘의 컨디션에 반영하고 창을 닫습니다.<br>
+              <strong>보내기</strong> — 위 요약 저장 + AI 리포트 문자·알림톡 발송 후 창을 닫습니다.
             </p>
             <div class="eval-send-btns">
               <button type="button" class="btn btn-primary" id="evalSaveBtn" onclick="saveEvalToMemberBrief()">저장</button>
@@ -3899,7 +3916,10 @@
       onNextBookingInputChange();
       if (userPickedNewNextBooking_()) return;
       var nb = state.nextBooking;
-      if (nb && nb.loadedKey === memberKey(m) && !nb.loading) return;
+      var mk = memberKey(m);
+      // 이미 조회 완료(예약 없음 포함) → 재조회하지 않음
+      if (nb && nb.loadedKey === mk && !nb.loading) return;
+      // 로딩 중이면 새 요청을 또 보내지 말고 진행 중인 조회만 기다림
       await fetchNextBookingForMember_(m);
     }
 
@@ -4108,43 +4128,96 @@
     }
 
     var _nextBookingReq = 0;
+    var _nextBookingInflight = null; // { key, promise }
+
+    function markNextBookingLookupSettled_(m, opts) {
+      opts = opts || {};
+      m = m || state.selected;
+      if (!m || !m.suffix8) return;
+      if (!state.nextBooking) resetNextBookingState(m);
+      state.nextBooking.loading = false;
+      stopNextBookingCountdown();
+      if (opts.clearBooking) {
+        state.nextBooking.fromSchedule = false;
+        state.nextBooking.previousBooking = null;
+        state.nextBooking.ymd = '';
+        state.nextBooking.timeStr = '';
+        state.nextBooking.display = '';
+        state.nextBooking.line = '';
+        state.nextBooking.rescheduleActive = false;
+        state.nextBooking.familyBookings = [];
+        state.nextBooking.combinedNextBookingLine = '';
+      }
+      if (opts.noBookingMessage != null) {
+        state.nextBooking.noBookingMessage = String(opts.noBookingMessage || '').trim();
+      }
+      // 예약 없음·조회 실패여도 loadedKey를 남겨 출석 시 서버 재스캔을 막음
+      state.nextBooking.loadedKey = memberKey(m);
+      renderNextBookingPanel();
+      renderSessionAlimtalkSection();
+    }
+
     async function fetchNextBookingForMember_(m) {
       if (!m || !m.suffix8) {
         resetNextBookingState(null);
         renderNextBookingPanel();
         return;
       }
-      var reqId = ++_nextBookingReq;
       var selKey = memberKey(m);
+      // 같은 회원 조회가 이미 돌고 있으면 중복 API 호출하지 않음
+      if (_nextBookingInflight && _nextBookingInflight.key === selKey && _nextBookingInflight.promise) {
+        return _nextBookingInflight.promise;
+      }
+      // 이미 이 회원 조회가 끝났으면(예약 없음 포함) 재호출하지 않음 — 선택 직후 출석 연타·미리보기 갱신 대비
+      if (
+        state.nextBooking &&
+        state.nextBooking.loadedKey === selKey &&
+        !state.nextBooking.loading &&
+        !state.nextBooking.forceReload
+      ) {
+        return;
+      }
+      var reqId = ++_nextBookingReq;
       resetNextBookingState(m);
       state.nextBooking.loading = true;
+      state.nextBooking.forceReload = false;
       startNextBookingCountdown();
       renderNextBookingPanel();
       renderSessionAlimtalkSection();
-      try {
-        var data = await api({
-          action: 'instructorMemberNextBooking',
-          suffix8: m.suffix8,
-          name: m.name,
-          phoneDigits: m.phoneDigits || '',
-          instructorIndex: m.instructorIndex,
-        }, { timeoutMs: 30000 });
-        if (reqId !== _nextBookingReq || state.selectedKey !== selKey) return;
-        if (!data || data.ok === false) {
-          state.nextBooking.loading = false;
-          stopNextBookingCountdown();
-          state.nextBooking.noBookingMessage = '';
-          renderNextBookingPanel();
-          renderSessionAlimtalkSection();
-          return;
+      var run = (async function () {
+        try {
+          var data = await api({
+            action: 'instructorMemberNextBooking',
+            suffix8: m.suffix8,
+            name: m.name,
+            phoneDigits: m.phoneDigits || '',
+            instructorIndex: m.instructorIndex,
+          }, { timeoutMs: 25000 });
+          if (reqId !== _nextBookingReq || state.selectedKey !== selKey) return;
+          if (!data || data.ok === false) {
+            markNextBookingLookupSettled_(m, {
+              clearBooking: true,
+              noBookingMessage: (data && data.message) || '한 달 이내 예약된 일정이 없습니다.',
+            });
+            return;
+          }
+          applyNextBookingApiData_(data, m);
+        } catch (e) {
+          if (reqId !== _nextBookingReq || state.selectedKey !== selKey) return;
+          // 타임아웃·오류여도 조회 완료로 처리 → 출석 때 30일 스캔을 다시 돌리지 않음
+          markNextBookingLookupSettled_(m, {
+            clearBooking: true,
+            noBookingMessage: '다음 예약 조회가 지연되어 건너뜁니다. 필요하면 아래에서 직접 잡아 주세요.',
+          });
         }
-        applyNextBookingApiData_(data, m);
-      } catch (e) {
-        if (reqId !== _nextBookingReq || state.selectedKey !== selKey) return;
-        state.nextBooking.loading = false;
-        stopNextBookingCountdown();
-        renderNextBookingPanel();
-        renderSessionAlimtalkSection();
+      })();
+      _nextBookingInflight = { key: selKey, promise: run };
+      try {
+        await run;
+      } finally {
+        if (_nextBookingInflight && _nextBookingInflight.key === selKey) {
+          _nextBookingInflight = null;
+        }
       }
     }
 
@@ -6889,6 +6962,84 @@
       return parts.join('\n\n');
     }
 
+    /** 초회평가 요약(주증상/주의) 텍스트 — 회원정보·오늘의 컨디션 공통 */
+    function resolveFirstEvalBriefText_(m) {
+      if (!m) return '';
+      var fe = m.firstEvalBrief;
+      var fromFe = String((fe && (fe.conciseBrief || fe.fullText || fe.summary)) || '').trim();
+      if (fromFe) return fromFe;
+      var notes = String(m.memberBriefNotes || state.evalConciseBrief || '').trim();
+      if (notes && (/주증상\s*:/.test(notes) || /주의\s*:/.test(notes))) return notes;
+      return '';
+    }
+
+    function formatFirstEvalConditionNote_(brief) {
+      var text = String(brief || '').trim();
+      if (!text) return '';
+      var symptom = '';
+      var caution = '';
+      text.split('\n').forEach(function (line) {
+        line = String(line || '').trim();
+        if (!line) return;
+        var mCc = line.match(/^주증상\s*:\s*(.+)$/);
+        if (mCc) { symptom = mCc[1].trim(); return; }
+        var mCa = line.match(/^주의\s*:\s*(.+)$/);
+        if (mCa) { caution = mCa[1].trim(); return; }
+      });
+      if (!symptom && !caution) return text.slice(0, 500);
+
+      var label = symptom || '초회평가';
+      var vasMatch = label.match(/VAS\s*(\d+(?:~\d+)?)/i);
+      var vas = vasMatch ? vasMatch[1] : '';
+      var labelClean = label
+        .replace(/\s*[·∙]\s*VAS\s*\d+(?:~\d+)?/i, '')
+        .replace(/\s*VAS\s*\d+(?:~\d+)?/i, '')
+        .trim() || '초회평가';
+      var suffix = caution || '';
+      if (vas) return '-' + labelClean + ' ' + vas + ':' + (suffix ? ' ' + suffix : '');
+      if (suffix) return '-' + labelClean + ': ' + suffix;
+      return '-' + labelClean;
+    }
+
+    function applyFirstEvalToSessionCheckNote_(brief, opts) {
+      opts = opts || {};
+      var note = formatFirstEvalConditionNote_(brief);
+      if (!note) return false;
+      if (!state.sessionCheck) state.sessionCheck = { areas: [], vas: null, note: '' };
+      var cur = String(state.sessionCheck.note || '').trim();
+      if (!opts.force && cur) return false;
+      state.sessionCheck.note = note;
+      if (state.selected) {
+        if (!state.selected.currentSessionCheck) {
+          state.selected.currentSessionCheck = { areas: [], vas: null, note: '' };
+        }
+        state.selected.currentSessionCheck.note = note;
+      }
+      renderSessionCheckPanel();
+      if (opts.persist !== false) scheduleSessionCheckAutoSave();
+      return true;
+    }
+
+    function applyFirstEvalBriefToMemberUi_(m, brief, opts) {
+      opts = opts || {};
+      brief = String(brief || '').trim();
+      if (!m || !brief) return;
+      m.memberBriefNotes = brief;
+      var headline = brief.split('\n')[0] || brief;
+      if (headline.length > 160) headline = headline.slice(0, 157) + '…';
+      var prev = m.firstEvalBrief || {};
+      m.firstEvalBrief = {
+        has: true,
+        summary: headline,
+        fullText: brief,
+        conciseBrief: brief,
+        dateStr: prev.dateStr || '',
+      };
+      cancelBriefEvalNotesEdit_();
+      renderBriefEvalNotes_(m);
+      applyFirstEvalToSessionCheckNote_(brief, { force: !!opts.forceSessionNote });
+    }
+
     var _briefEvalNotesSaving = false;
 
     function renderBriefEvalNotes_(m) {
@@ -6899,6 +7050,11 @@
       if (wrap.classList.contains('is-editing')) return;
 
       var notes = String((m && m.memberBriefNotes) || '').trim();
+      if (!notes) notes = resolveFirstEvalBriefText_(m);
+      if (!notes) {
+        var built = String(buildBriefEvalNotesText_(m) || '').trim();
+        if (built) notes = built;
+      }
       if (notes) {
         el.textContent = notes;
         wrap.classList.remove('is-placeholder');
@@ -6908,7 +7064,7 @@
       }
       el.hidden = false;
       if (input) {
-        input.value = notes;
+        input.value = String((m && m.memberBriefNotes) || notes || '').trim();
         input.hidden = true;
       }
     }
@@ -6925,7 +7081,7 @@
       wrap.classList.remove('is-placeholder');
       el.hidden = true;
       input.hidden = false;
-      input.value = String(m.memberBriefNotes || '').trim();
+      input.value = String(m.memberBriefNotes || resolveFirstEvalBriefText_(m) || '').trim();
       input.focus();
       try { input.setSelectionRange(input.value.length, input.value.length); } catch (e) {}
     }
@@ -7084,6 +7240,8 @@
         distributeServerProgressToStore(m);
         loadProgressFromMemberStore(state.activeProgramTab);
         saveProgressToMemberStore();
+        // 오늘의 컨디션이 비어 있으면 초회평가 요약으로 채움
+        applyFirstEvalToSessionCheckNote_(resolveFirstEvalBriefText_(m), { force: false });
         renderSelectedMemberUi();
       } catch (e) {
         if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
@@ -7126,6 +7284,7 @@
       }
       renderSelectedMemberUi();
       if (m.suffix8) {
+        if (state.nextBooking) state.nextBooking.forceReload = true;
         fetchNextBookingForMember_(m);
         enrichMemberDetailInBackground(m);
       }
@@ -7624,6 +7783,7 @@
       if (data.discomfortHistory) m.discomfortHistory = data.discomfortHistory;
       if (data.completed) resetAttendPassCount(m);
       if (data.nextBookingLine || data.nextBookingBooked || data.nextBookingCancelled) {
+        if (state.nextBooking) state.nextBooking.forceReload = true;
         fetchNextBookingForMember_(m);
       }
       storePendingScheduleSync_(m, data);
@@ -9810,10 +9970,10 @@
           return;
         }
         const brief = String(data.memberBriefNotes || data.conciseBrief || state.evalConciseBrief || '').trim();
-        m.memberBriefNotes = brief;
         state.evalConciseBrief = brief;
-        renderBriefEvalNotes_(m);
+        applyFirstEvalBriefToMemberUi_(m, brief, { forceSessionNote: true });
         toast('회원 정보에 저장되었습니다');
+        closeEvalModal();
       } catch (e) {
         toast('저장 중 오류가 발생했습니다.');
       } finally {
@@ -9823,55 +9983,163 @@
 
     async function sendEvalSms() {
       const info = evalMemberInfo();
+      const m = state.selected;
       const phone = info.phone;
       const text = state.evalAiReport || state.evalReportText || document.getElementById('evalReportBody').textContent;
       if (phone.length < 10) { toast('회원을 선택해 주세요'); return; }
       if (!text || text === '(내용 없음)') { toast('보낼 리포트 없음'); return; }
-      const data = await api({
-        action:'instructorSendEvalSms',
-        phone:phone,
-        name: info.name,
-        text:text,
-        report: state.evalAiReport || text,
-      });
-      if (data.ok) {
-        var via = data.channel === 'alimtalk' ? '알림톡' : '문자';
-        toast(via + ' 발송 완료');
-      } else {
-        toast(data.message || '발송 실패');
+
+      var sendBtns = document.querySelectorAll('#evalView .eval-send-btns .btn');
+      sendBtns.forEach(function (b) { b.disabled = true; });
+      var briefSaved = false;
+      try {
+        // 보내기 전에 회원정보 요약도 함께 저장
+        if (m && m.suffix8) {
+          try {
+            const saveData = await api({
+              action: 'instructorSaveFirstEvalBrief',
+              phone: info.phone,
+              name: info.name,
+              suffix8: m.suffix8,
+            });
+            if (saveData && saveData.ok) {
+              const brief = String(
+                saveData.memberBriefNotes || saveData.conciseBrief || state.evalConciseBrief || ''
+              ).trim();
+              state.evalConciseBrief = brief || state.evalConciseBrief;
+              applyFirstEvalBriefToMemberUi_(m, brief || state.evalConciseBrief, { forceSessionNote: true });
+              briefSaved = !!brief;
+            }
+          } catch (saveErr) { /* 발송은 계속 시도 */ }
+        }
+
+        const data = await api({
+          action: 'instructorSendEvalSms',
+          phone: phone,
+          name: info.name,
+          text: text,
+          report: state.evalAiReport || text,
+        });
+        if (data.ok) {
+          var via = data.channel === 'alimtalk' ? '알림톡' : '문자';
+          toast(via + ' 발송 완료' + (briefSaved ? ' · 회원정보에 저장됨' : ''));
+          closeEvalModal();
+        } else {
+          toast(data.message || '발송 실패');
+          if (briefSaved) closeEvalModal();
+        }
+      } catch (e) {
+        toast('발송 중 오류가 발생했습니다.');
+        if (briefSaved) closeEvalModal();
+      } finally {
+        sendBtns.forEach(function (b) { b.disabled = false; });
       }
+    }
+
+    /** AI 리포트 생성(Claude + 시트 저장) 예상 소요 — UI 카운트다운용 */
+    var EVAL_AI_REPORT_EST_SEC = 45;
+    var EVAL_AI_REPORT_TIMEOUT_MS = 120000;
+    var _evalSubmitCountdownTimer = null;
+    var _evalSubmitCountdownStartedAt = 0;
+
+    function stopEvalSubmitCountdown_() {
+      if (_evalSubmitCountdownTimer) {
+        clearInterval(_evalSubmitCountdownTimer);
+        _evalSubmitCountdownTimer = null;
+      }
+      _evalSubmitCountdownStartedAt = 0;
+      var statusEl = document.getElementById('evalSubmitStatus');
+      if (statusEl) {
+        statusEl.hidden = true;
+        statusEl.classList.remove('is-over');
+        statusEl.textContent = '';
+      }
+      var btn = document.getElementById('evalSubmitBtn');
+      if (btn && btn.dataset.idleLabel) {
+        btn.textContent = btn.dataset.idleLabel;
+        delete btn.dataset.idleLabel;
+      }
+    }
+
+    function paintEvalSubmitCountdown_() {
+      if (!_evalSubmitCountdownStartedAt) return;
+      var statusEl = document.getElementById('evalSubmitStatus');
+      var btn = document.getElementById('evalSubmitBtn');
+      if (!statusEl) return;
+      var est = EVAL_AI_REPORT_EST_SEC;
+      var elapsed = Math.floor((Date.now() - _evalSubmitCountdownStartedAt) / 1000);
+      var left = Math.max(0, est - elapsed);
+      statusEl.hidden = false;
+      if (left > 0) {
+        statusEl.classList.remove('is-over');
+        statusEl.innerHTML =
+          'AI 리포트 작성 중… <span class="eval-countdown">예상 ' +
+          est +
+          '초 · ' +
+          left +
+          '초 남음</span>';
+        if (btn) btn.textContent = 'AI 리포트 생성 중… (' + left + '초)';
+      } else {
+        statusEl.classList.add('is-over');
+        statusEl.innerHTML =
+          'AI 리포트 작성 중… <span class="eval-countdown">예상 ' +
+          est +
+          '초 · 조금 더 걸리고 있어요</span>';
+        if (btn) btn.textContent = 'AI 리포트 생성 중…';
+      }
+    }
+
+    function startEvalSubmitCountdown_() {
+      stopEvalSubmitCountdown_();
+      var btn = document.getElementById('evalSubmitBtn');
+      if (btn && !btn.dataset.idleLabel) {
+        btn.dataset.idleLabel = btn.textContent || 'AI 리포트 생성 · 저장';
+      }
+      _evalSubmitCountdownStartedAt = Date.now();
+      paintEvalSubmitCountdown_();
+      _evalSubmitCountdownTimer = setInterval(paintEvalSubmitCountdown_, 1000);
     }
 
     async function submitFirstEval() {
       const info = evalMemberInfo();
       if (!info.name || info.phone.length < 10) { toast('회원을 선택해 주세요'); return; }
-      document.getElementById('evalSubmitBtn').disabled = true;
+      var btn = document.getElementById('evalSubmitBtn');
+      if (btn) btn.disabled = true;
+      startEvalSubmitCountdown_();
       var programRec = computeEvalProgramRecommendation(gatherEvalHistoryState());
-      const data = await api({
-        action:'submitInstructorFirstEval', name:info.name, phone:info.phone,
-        history: compileEvalHistoryText(),
-        inspection: compileEvalExamText(EVAL_INSPECTION_SECTION),
-        movement: compileEvalExamText(EVAL_MOVEMENT_SECTION),
-        palpation: compileEvalExamText(EVAL_PALPATION_SECTION),
-        memo: document.getElementById('evalMemo').value.trim(),
-        sendToMember: document.getElementById('evalSendMember').checked,
-        programRecommendation: programRec,
-      });
-      document.getElementById('evalSubmitBtn').disabled = false;
-      if (data.ok) {
-        var msg = '저장 완료';
-        if (data.send && data.send.ok) {
-          msg += ' · ' + (data.send.channel === 'alimtalk' ? '알림톡' : '문자') + ' 발송됨';
-        }
-        toast(msg);
-        if (state.selected && data.memberBriefNotes) {
-          state.selected.memberBriefNotes = String(data.memberBriefNotes).trim();
-          renderBriefEvalNotes_(state.selected);
-        }
-        renderEvalProgramRecommendation(data.programRecommendation || programRec);
-        await loadFirstEvalView(info.phone, info.name);
-        switchEvalTab('evalView', document.querySelector('.eval-tab[data-pane="evalView"]'));
-      } else toast(data.message || '실패');
+      try {
+        const data = await api({
+          action:'submitInstructorFirstEval', name:info.name, phone:info.phone,
+          history: compileEvalHistoryText(),
+          inspection: compileEvalExamText(EVAL_INSPECTION_SECTION),
+          movement: compileEvalExamText(EVAL_MOVEMENT_SECTION),
+          palpation: compileEvalExamText(EVAL_PALPATION_SECTION),
+          memo: document.getElementById('evalMemo').value.trim(),
+          sendToMember: document.getElementById('evalSendMember').checked,
+          programRecommendation: programRec,
+        }, { timeoutMs: EVAL_AI_REPORT_TIMEOUT_MS });
+        stopEvalSubmitCountdown_();
+        if (btn) btn.disabled = false;
+        if (data.ok) {
+          var msg = '저장 완료';
+          if (data.send && data.send.ok) {
+            msg += ' · ' + (data.send.channel === 'alimtalk' ? '알림톡' : '문자') + ' 발송됨';
+          }
+          toast(msg);
+          var briefAfter = String(data.memberBriefNotes || data.conciseBrief || '').trim();
+          if (state.selected && briefAfter) {
+            state.evalConciseBrief = briefAfter;
+            applyFirstEvalBriefToMemberUi_(state.selected, briefAfter, { forceSessionNote: true });
+          }
+          renderEvalProgramRecommendation(data.programRecommendation || programRec);
+          await loadFirstEvalView(info.phone, info.name);
+          switchEvalTab('evalView', document.querySelector('.eval-tab[data-pane="evalView"]'));
+        } else toast(data.message || '실패');
+      } catch (err) {
+        stopEvalSubmitCountdown_();
+        if (btn) btn.disabled = false;
+        toast((err && err.message) || 'AI 리포트 생성에 실패했습니다.');
+      }
     }
 
     document.getElementById('evalModal').addEventListener('click', function(e){ if(e.target===this) closeEvalModal(); });
