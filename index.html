@@ -61,7 +61,7 @@
     .page-hd-btn:hover { background:rgba(255,255,255,.26); border-color:rgba(255,255,255,.45); }
     .page-hd-btn:active { transform:scale(.98); }
     .page-hd-btn--refresh {
-      width:34px; height:34px; padding:0; font-size:15px; flex:0 0 auto;
+      flex:0 0 auto;
     }
     .page-hd-btn--eval {
       background:rgba(255,255,255,.22);
@@ -84,12 +84,10 @@
       .page-hd-side { gap:4px; }
       .page-hd-actions { gap:3px; flex-wrap:nowrap; max-width:100%; }
       .page-hd-btn { font-size:10px; padding:5px 6px; }
-      .page-hd-btn--refresh { width:30px; height:30px; font-size:13px; }
       .page-hd-link { font-size:9px; }
     }
     @media (max-width:380px) {
       .page-hd-btn { font-size:9px; padding:5px 5px; }
-      .page-hd-btn--refresh { width:28px; height:28px; font-size:12px; }
     }
     main { max-width:760px; margin:0 auto; padding:12px 12px 20px; }
 
@@ -1597,7 +1595,7 @@
           <a class="page-hd-link" href="https://docs.google.com/spreadsheets/d/1I8zIUUaP-eIGpB2y4dMgZbDRiBBzjpAGEWU0RD3yk8g/edit" target="_blank" rel="noopener noreferrer">예약 스케줄</a>
         </div>
         <div class="page-hd-actions">
-          <button type="button" class="page-hd-btn page-hd-btn--refresh" onclick="loadBoard()" title="새로고침" aria-label="새로고침">🔄</button>
+          <button type="button" class="page-hd-btn page-hd-btn--refresh" onclick="loadBoard()" title="새로고침" aria-label="새로고침">새로고침</button>
           <button type="button" class="page-hd-btn" onclick="sendWellnessIntakeSms_()">사전평가</button>
           <button type="button" class="page-hd-btn page-hd-btn--eval" onclick="openEvalModal()">초회평가</button>
           <a class="page-hd-btn" href="#" onclick="openApplicationForm_(event)">회원등록</a>
