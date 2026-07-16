@@ -35,25 +35,56 @@
     }
     .page-hd { background: linear-gradient(135deg,#1e3a6e,#2563eb); color:#fff; padding:14px 16px 12px; }
     .page-hd-inner {
-      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
       max-width:760px; margin:0 auto;
+      flex-wrap:nowrap;
     }
-    .page-hd-main { min-width:0; flex:1; }
+    .page-hd-main { min-width:0; flex:1 1 auto; }
     .page-hd h1 { font-size:16px; font-weight:800; }
     .page-hd p { font-size:11px; opacity:.85; margin-top:2px; }
     .page-hd-actions {
-      display:flex; flex-shrink:0; gap:6px; flex-wrap:wrap; justify-content:flex-end;
+      display:flex; flex-shrink:0; gap:5px; flex-wrap:nowrap; justify-content:flex-end; align-items:center;
     }
-    .page-hd-link {
+    .page-hd-btn {
       display:inline-flex; align-items:center; justify-content:center;
       padding:6px 10px; border-radius:8px; font-size:11px; font-weight:800;
       text-decoration:none; white-space:nowrap; line-height:1.2;
       background:rgba(255,255,255,.16); color:#fff;
       border:1px solid rgba(255,255,255,.28);
+      cursor:pointer; font-family:inherit;
       transition: background .15s, border-color .15s;
     }
-    .page-hd-link:hover { background:rgba(255,255,255,.26); border-color:rgba(255,255,255,.45); }
-    .page-hd-link:active { transform:scale(.98); }
+    .page-hd-btn:hover { background:rgba(255,255,255,.26); border-color:rgba(255,255,255,.45); }
+    .page-hd-btn:active { transform:scale(.98); }
+    .page-hd-btn--refresh {
+      width:34px; height:34px; padding:0; font-size:15px; flex:0 0 auto;
+    }
+    .page-hd-btn--eval {
+      background:rgba(255,255,255,.22);
+      border-color:rgba(255,255,255,.4);
+    }
+    .page-hd-links {
+      display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;
+    }
+    .page-hd-link {
+      font-size:10px; font-weight:700; color:rgba(255,255,255,.88);
+      text-decoration:underline; text-underline-offset:2px;
+      white-space:nowrap;
+    }
+    .page-hd-link:hover { color:#fff; }
+    @media (max-width:520px) {
+      .page-hd { padding:10px 10px 10px; }
+      .page-hd-inner { gap:6px; flex-wrap:wrap; align-items:flex-start; }
+      .page-hd h1 { font-size:13px; }
+      .page-hd p { font-size:9px; }
+      .page-hd-actions { gap:3px; flex-wrap:wrap; max-width:100%; }
+      .page-hd-btn { font-size:10px; padding:5px 6px; }
+      .page-hd-btn--refresh { width:30px; height:30px; font-size:13px; }
+    }
+    @media (max-width:380px) {
+      .page-hd-btn { font-size:9px; padding:5px 5px; }
+      .page-hd-btn--refresh { width:28px; height:28px; font-size:12px; }
+    }
     main { max-width:760px; margin:0 auto; padding:12px 12px 20px; }
 
     .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-bottom:12px; box-shadow:var(--shadow); }
@@ -98,11 +129,6 @@
       background: var(--zone-members-soft);
     }
     .section-zone--members .condition-history-card .ch-date { color: var(--zone-members); }
-    .section-zone--members .toolbar .btn-eval {
-      background: linear-gradient(135deg, var(--zone-members), #2a508f);
-      border-color: var(--zone-members);
-    }
-
     .section-zone--program {
       background: linear-gradient(165deg, var(--zone-program-bg) 0%, #fff 42%);
       border-color: var(--zone-program-border);
@@ -1542,10 +1568,16 @@
       <div class="page-hd-main">
         <h1>Re:Al 강사 · 회원 관리</h1>
         <p id="dateLine">—</p>
+        <div class="page-hd-links">
+          <a class="page-hd-link" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠</a>
+          <a class="page-hd-link" href="https://docs.google.com/spreadsheets/d/1I8zIUUaP-eIGpB2y4dMgZbDRiBBzjpAGEWU0RD3yk8g/edit" target="_blank" rel="noopener noreferrer">예약 스케줄</a>
+        </div>
       </div>
       <div class="page-hd-actions">
-        <a class="page-hd-link" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠</a>
-        <a class="page-hd-link" href="https://docs.google.com/spreadsheets/d/1I8zIUUaP-eIGpB2y4dMgZbDRiBBzjpAGEWU0RD3yk8g/edit" target="_blank" rel="noopener noreferrer">예약 스케줄</a>
+        <button type="button" class="page-hd-btn page-hd-btn--refresh" onclick="loadBoard()" title="새로고침" aria-label="새로고침">🔄</button>
+        <button type="button" class="page-hd-btn" onclick="sendWellnessIntakeSms_()">사전평가</button>
+        <button type="button" class="page-hd-btn page-hd-btn--eval" onclick="openEvalModal()">초회평가</button>
+        <a class="page-hd-btn" href="#" onclick="openApplicationForm_(event)">회원등록</a>
       </div>
     </div>
   </header>
@@ -1553,13 +1585,7 @@
   <main>
     <!-- 1. 오늘 예약 회원 -->
     <section class="card section-zone section-zone--members">
-      <div class="card-title">오늘 예약 회원</div>      
-      <div class="toolbar">
-        <button type="button" class="btn btn-ghost" onclick="loadBoard()">새로고침</button>
-        <button type="button" class="btn btn-ghost" style="margin-left:auto;" onclick="sendWellnessIntakeSms_()">사전 평가</button>
-        <button type="button" class="btn btn-eval" onclick="openEvalModal()">초회 평가</button>
-        <a class="btn btn-ghost" href="#" onclick="openApplicationForm_(event)">회원등록</a>
-      </div>
+      <div class="card-title">오늘 예약 회원</div>
       <div class="member-chips" id="memberChips"><span class="empty-hint">불러오는 중…</span></div>
       <div class="member-overview-wrap" id="memberOverviewWrap">
         <div class="member-overview-top">
@@ -3550,41 +3576,57 @@
       };
     }
 
-    function projectedAttendStatsForFamilyMember_(anchorMember, memberIndex) {
-      var idx = Math.max(0, parseInt(memberIndex, 10) || 0);
-      var counts = parseFamilySharedCountsFromBoard_(anchorMember);
-      var attendAfter = counts.attend + idx + 1;
-      return {
-        attendCount: attendAfter,
-        payRounds: counts.pay,
-        remaining: Math.max(0, counts.pay - attendAfter),
-        sessionDisplay: attendAfter + '/' + counts.pay,
-      };
-    }
-
     function buildProjectedAttendOutcomeHtml_(m) {
       if (!m || !m.suffix8) return '';
-      var passN = resolveAttendPassCount_();
-      var data = projectedAttendStats_(m, passN);
+      var locked = memberAttendSlotLocked_(m);
+      var passN = locked ? 0 : resolveAttendPassCount_();
+      var data;
+      if (locked) {
+        var key = memberPhoneMatchKey_(m);
+        var familySize = 0;
+        if (key && state.board && state.board.members) {
+          state.board.members.forEach(function (x) {
+            if (memberPhoneMatchKey_(x) === key) familySize++;
+          });
+        }
+        var cur =
+          familySize > 1 ? parseFamilySharedCountsFromBoard_(m) : parseSessionCountsFromMember_(m);
+        data = {
+          attendCount: cur.attend,
+          payRounds: cur.pay,
+          remaining: cur.remain,
+          sessionDisplay: cur.attend + '/' + cur.pay,
+          memberName: m && m.name,
+          attendPassCount: 0,
+        };
+      } else {
+        data = projectedAttendStats_(m, passN);
+      }
       var html =
         '<div class="session-attend-result-summary">' +
         '<p class="attend-result-line1">' + escapeHtml(formatAttendResultLine1(data)) + '</p>' +
         '<p class="attend-result-line2">' + escapeHtml(formatAttendMemberRemainLine(data, m.name)) + '</p>' +
         '</div>';
-      if (passN > 1) {
+      if (!locked && passN > 1) {
         var family = familyMultiPassTargets_(m, passN);
         if (family.length >= passN && family.length > 1) {
           html +=
             '<p class="attend-result-status ok">가족 ' + passN + '명 · 공유 수강권 ' + passN + '회 사용</p>';
+          var counts = parseFamilySharedCountsFromBoard_(m);
           family.slice(0, passN).forEach(function (fm, fi) {
-            var fd = projectedAttendStatsForFamilyMember_(m, fi);
+            var stampAttend = counts.attend + fi + 1;
+            var stampSd = stampAttend + '/' + counts.pay;
             html +=
               '<p class="attend-result-sub">' +
               escapeHtml(fm.name) +
-              ' · ' +
-              escapeHtml(formatAttendMemberRemainLine(fd, fm.name)) +
+              ' ' +
+              escapeHtml(stampSd) +
               '</p>';
           });
+          html +=
+            '<p class="attend-result-partial" style="margin-top:6px;">스케줄에는 위 회차가 차례로 찍히고, 남은 횟수는 공유 ' +
+            escapeHtml(data.sessionDisplay) +
+            ' 기준입니다.</p>';
         } else {
           html +=
             '<p class="attend-result-status ok">' + passN + '회 한 번에 사용 예정</p>';
@@ -4560,10 +4602,11 @@
       applyAttendButtonMode_(memberAttendSlotLocked_(m || state.selected));
     }
 
-    /** 이 칩(이름·시간·회차칸)에 출석 n/m이 반영됐을 때만 출석 버튼 잠금 — 결석·미처리·다른 가족 출석은 제외 */
+    /** 이 칩의 당일 출석이 반영됐으면 출석 버튼 잠금 — 다른 가족만 출석한 경우는 제외(본인 히스토리·스케줄 기준) */
     function memberAttendSlotLocked_(m) {
       if (!m || !m.suffix8) return false;
       if (state.completedKeys[memberKey(m)]) return true;
+      if (memberHasTodayAttendanceClient_(m)) return true;
       if (scheduleSessionStatusLabelForChipClient_(m.scheduleSession)) return true;
       return scheduleSessionShowsAttendanceClient(m.scheduleSession);
     }
@@ -7507,8 +7550,11 @@
       if (data && data.saved) markMemberProgressSaved_(m);
       if (data.familyResults && data.familyResults.length && state.board && state.board.members) {
         var suf8 = String(m.suffix8 || '').replace(/\D/g, '').slice(-8);
+        var sharedSd = String(data.sessionDisplay || '').trim();
         data.familyResults.forEach(function (fr) {
           var frName = normalizeMemberNameForKey_(fr.name);
+          // 스케줄 칸: 공유 회차 스탬프(22/23/24) · 칩 잔여 표시: 최종 공유값
+          var stampSd = String(fr.scheduleStamp || fr.sessionDisplay || sharedSd || '').trim();
           state.board.members.forEach(function (bm) {
             var bmSuf = String(bm.suffix8 || '').replace(/\D/g, '').slice(-8);
             if (bmSuf !== suf8) return;
@@ -7516,11 +7562,11 @@
             if (data.completed) {
               markInstructorAttendComplete_(bm, {
                 completed: true,
-                sessionDisplay: fr.sessionDisplay || data.sessionDisplay,
+                sessionDisplay: sharedSd || stampSd,
               });
-              if (fr.sessionDisplay) bm.scheduleSession = fr.sessionDisplay;
+              if (stampSd) bm.scheduleSession = stampSd;
             }
-            if (fr.sessionDisplay) bm.sessionDisplay = fr.sessionDisplay;
+            if (sharedSd) bm.sessionDisplay = sharedSd;
           });
         });
       }
@@ -7734,10 +7780,25 @@
       closeExtraPassModal(true);
       if (!pending || !useExtra) {
         if (pending && pending.data) {
-          applyCompleteSessionResult(pending.member, pending.data);
-          showAttendResult(pending.member, Object.assign({}, pending.data, {
+          var m = pending.member;
+          // 이미 출석됨 → 추가 회차 안 씀 → 진도 수정 모드로 전환
+          markInstructorAttendComplete_(m, {
+            completed: true,
+            sessionDisplay: pending.data.sessionDisplay || m.sessionDisplay,
+          });
+          if (pending.data.saved) markMemberProgressSaved_(m);
+          syncMemberProgressFromServer(m, pending.data);
+          if (pending.data.sessionDisplay) {
+            syncSharedFamilySessionOnBoard_(m, pending.data);
+          }
+          updateAttendButtonsForFamilyAccount(m);
+          renderSelectedMemberUi();
+          showAttendResult(m, Object.assign({}, pending.data, {
             completed: false,
-            attendMessage: pending.data.attendMessage || '출석·알림톡은 처리되지 않았습니다',
+            saved: !!pending.data.saved,
+            attendMessage:
+              pending.data.attendMessage ||
+              '이미 오늘 출석이 반영되어 있어 추가 출석 없이 진도만 저장되었습니다',
           }), pending.opts || {});
         }
         return;
@@ -8182,14 +8243,25 @@
       if (data.completed) {
         if (data.familyResults && data.familyResults.length > 1) {
           html += '<div class="session-attend-result-summary session-attend-family-results">';
+          var finalSd = String(data.sessionDisplay || '').trim();
           data.familyResults.forEach(function (fr) {
+            var line = String(fr.name || '').trim();
+            // 스케줄에 찍힌 공유 회차 스탬프(22/23/24) 우선 표시
+            var stamp = String(fr.scheduleStamp || fr.sessionDisplay || '').trim();
+            if (stamp) line += (line ? ' ' : '') + stamp;
             html +=
               '<p class="attend-result-line2">' +
-              escapeHtml(fr.name) +
-              ' ' +
-              escapeHtml(fr.sessionDisplay || '') +
+              escapeHtml(line) +
               '</p>';
           });
+          if (finalSd) {
+            html +=
+              '<p class="attend-result-partial" style="margin-top:6px;">공유 수강권 기준 ' +
+              escapeHtml(finalSd) +
+              ' · 남은 횟수 ' +
+              escapeHtml(String(data.remaining != null ? data.remaining : '-')) +
+              '회</p>';
+          }
           html += '</div>';
         } else {
           html +=
