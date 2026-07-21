@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Re:Al 강사 · 회원 관리</title>
+  <title>Re:Al 회원 관리</title>
   <meta name="theme-color" content="#1e3a6e">
   <style>
     :root {
@@ -1204,11 +1204,13 @@
     .eval-hist-title { font-size:12px; font-weight:800; color:var(--text); }
     .eval-hist-hint { font-size:10px; color:var(--dim); line-height:1.4; margin-bottom:6px; }
     .eval-hist-chips { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:6px; }
+    .eval-hist-side-chips { margin-top:2px; }
     .eval-hist-chip {
       font-size:11px; padding:5px 10px; border-radius:999px;
       border:1px solid var(--border); background:#fff; cursor:pointer;
       font-weight:600; line-height:1.35; text-align:left;
     }
+    .eval-hist-chip--side { min-width:52px; text-align:center; }
     .eval-hist-chip.on { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
     .eval-hist-chip--pain { border-color:#fca5a5; }
     .eval-hist-chip--pain.on { background:#fef2f2; border-color:#ef4444; color:#b91c1c; }
@@ -1586,7 +1588,7 @@
   <header class="page-hd">
     <div class="page-hd-inner">
       <div class="page-hd-main">
-        <h1>Re:Al 강사 · 회원 관리</h1>
+        <h1>Re:Al 회원 관리</h1>
         <p id="dateLine">—</p>
       </div>
       <div class="page-hd-side">
@@ -2699,9 +2701,10 @@
     var SESSION_DISCOMFORT_AREAS = [
       { id: 'comfortable', label: '편안함', group: 'quick' },
       { id: 'same', label: '동일 부위', group: 'quick' },
-      { id: 'both', label: 'Both', group: 'quick' },
       { id: 'lt', label: 'Lt', group: 'quick' },
       { id: 'rt', label: 'Rt', group: 'quick' },
+      { id: 'both', label: 'Both', group: 'quick' },
+      { id: 'center', label: '중앙', group: 'quick' },
       { id: 'headache', label: '두통', group: 'head_spine' },
       { id: 'jaw', label: '턱', group: 'head_spine' },
       { id: 'neck', label: '목', group: 'head_spine' },
@@ -5199,7 +5202,8 @@
         if (stats.allComplete) return true;
         if (stats.partial) return false;
       }
-      if (secKey === 'pos1_par' && subKey === 'par') return false;
+      // 누운 자세: PAR · 생활습관(누워서 호흡 운동) 기본 펼침
+      if (secKey === 'pos1_par' && (subKey === 'par' || subKey === 'lifestyle')) return false;
       return subKey !== 'par';
     }
 
@@ -6307,7 +6311,7 @@
       return m.discomfortHistory[m.discomfortHistory.length - 1];
     }
 
-    var SESSION_SIDE_MODIFIER_IDS = ['both', 'lt', 'rt'];
+    var SESSION_SIDE_MODIFIER_IDS = ['lt', 'rt', 'both', 'center'];
     var SESSION_SPECIAL_AREA_IDS = ['comfortable', 'same'];
 
     function isSessionSideModifierId_(id) {
@@ -6334,17 +6338,19 @@
 
     function sessionCheckSideLabel_(areas) {
       areas = areas || [];
-      if (areas.indexOf('both') >= 0) return 'Both';
       if (areas.indexOf('lt') >= 0) return 'Lt';
       if (areas.indexOf('rt') >= 0) return 'Rt';
+      if (areas.indexOf('both') >= 0) return 'Both';
+      if (areas.indexOf('center') >= 0) return '중앙';
       return '';
     }
 
     function parseSideFromConditionLabel_(label) {
       var s = String(label || '').trim();
-      if (/^Both\s+/i.test(s)) return { side: 'Both', rest: s.replace(/^Both\s+/i, '').trim() };
       if (/^Lt\s+/i.test(s)) return { side: 'Lt', rest: s.replace(/^Lt\s+/i, '').trim() };
       if (/^Rt\s+/i.test(s)) return { side: 'Rt', rest: s.replace(/^Rt\s+/i, '').trim() };
+      if (/^Both\s+/i.test(s)) return { side: 'Both', rest: s.replace(/^Both\s+/i, '').trim() };
+      if (/^중앙\s+/.test(s)) return { side: '중앙', rest: s.replace(/^중앙\s+/, '').trim() };
       return { side: '', rest: s };
     }
 
@@ -6419,6 +6425,71 @@
         lines[lastIdx] = '-' + parsed.label + ' ' + parsed.vas + ':' + (parsed.suffix || '');
       }
       return lines.join('\n');
+    }
+
+    function rebuildConditionNoteFromDiscomfortDisplay_(discomfort, freeText) {
+      var parts = String(discomfort || '').split(/\s*\/\s*/);
+      var lines = [];
+      parts.forEach(function (part) {
+        var t = String(part || '').trim();
+        if (!t) return;
+        var m = t.match(/^(.+?)\s*[·∙]\s*VAS\s*(\d+(?:~\d+)?)$/i) ||
+          t.match(/^(.+?)\s+VAS\s*(\d+(?:~\d+)?)$/i);
+        if (m) {
+          lines.push('-' + m[1].trim() + ' ' + m[2] + ':');
+          return;
+        }
+        var mLab = t.match(/^(.+?)\s*[·∙]\s*(.+)$/);
+        if (mLab) lines.push('-' + mLab[1].trim() + ' ' + mLab[2].trim() + ':');
+        else lines.push('-' + t + ':');
+      });
+      var free = String(freeText || '').trim();
+      if (!lines.length) return free;
+      if (!free) return lines.join('\n');
+      var last = lines[lines.length - 1];
+      lines[lines.length - 1] = /:\s*$/.test(last) ? last.replace(/:\s*$/, ': ') + free : last + '\n' + free;
+      return lines.join('\n');
+    }
+
+    /** 직전 회차 오늘의 컨디션 원문 (회원 히스토리 기준) */
+    function getPreviousSessionConditionNote_(m) {
+      m = m || state.selected;
+      if (!m) return '';
+      var list = m.conditionHistory || [];
+      var i;
+      for (i = 0; i < list.length; i++) {
+        var item = list[i];
+        if (!item) continue;
+        var raw = String(item.sessionNote || '').trim();
+        if (raw && !isHistoryPlaceholder_(raw)) {
+          if (raw.split('\n').some(function (ln) { return !!parseConditionLine_(ln); })) return raw;
+          var d = formatHistoryDiscomfortDisplay_(item.discomfort);
+          if (d) {
+            var rebuilt = rebuildConditionNoteFromDiscomfortDisplay_(d, raw);
+            if (rebuilt) return rebuilt;
+          }
+          return raw;
+        }
+        var discomfort = formatHistoryDiscomfortDisplay_(item.discomfort);
+        if (discomfort) {
+          var fromDiscomfort = rebuildConditionNoteFromDiscomfortDisplay_(discomfort, '');
+          if (fromDiscomfort) return fromDiscomfort;
+        }
+      }
+      return '';
+    }
+
+    /** 동일 부위 선택 시 직전 컨디션 → 오늘의 컨디션 붙여넣기 (비어 있을 때만) */
+    function applyPreviousConditionNoteOnSameArea_() {
+      var prev = getPreviousSessionConditionNote_();
+      if (!prev) return false;
+      if (!state.sessionCheck) state.sessionCheck = { areas: [], vas: null, note: '' };
+      var cur = String(state.sessionCheck.note || '').trim();
+      if (cur) return false;
+      state.sessionCheck.note = prev;
+      var noteEl = document.getElementById('sessionCheckNote');
+      if (noteEl) noteEl.value = prev;
+      return true;
     }
 
     function resolveSameDiscomfortAreaId_() {
@@ -6816,6 +6887,7 @@
         if (areas.indexOf('same') >= 0) {
           state.sessionCheck.areas = sessionCheckSideModifiers_(areas);
         } else {
+          applyPreviousConditionNoteOnSameArea_();
           var copied = resolveSameDiscomfortAreaId_();
           var mods = sessionCheckSideModifiers_(areas);
           state.sessionCheck.areas = copied ? mods.concat([copied]) : mods.concat(['same']);
@@ -9193,6 +9265,13 @@
     }
 
     /** History Taking — 내원 목적(항상) → 목적별 세부 · 통증 → OPQRST */
+    var EVAL_SIDE_CHIP_OPTIONS = [
+      { id: 'lt', label: 'Lt' },
+      { id: 'rt', label: 'Rt' },
+      { id: 'both', label: 'Both' },
+      { id: 'center', label: '중앙' },
+    ];
+
     function evalHistItem(id, title, hint, options, multi, extra) {
       extra = extra || {};
       return {
@@ -9202,6 +9281,8 @@
         multi: multi !== false,
         bodyDropdowns: !!extra.bodyDropdowns,
         areaSecId: extra.areaSecId || (id + '_area'),
+        sideChips: !!extra.sideChips,
+        sideSecId: extra.sideSecId || (id + '_side'),
         options: (options || []).map(function(x) {
           return typeof x === 'string' ? { id: x, label: x } : x;
         }),
@@ -9347,7 +9428,7 @@
           items: [
             evalHistItem('cc', 'C/C — Chief Complaint', '', [
               '정확히 짚음 (국소)', '애매·넓은 범위 (방사·연관 의심)',
-            ], true, { bodyDropdowns: true, areaSecId: 'cc_area' }),
+            ], true, { bodyDropdowns: true, areaSecId: 'cc_area', sideChips: true, sideSecId: 'cc_side' }),
             evalHistItem('onset', 'O — Onset', '', [
               '2주 미만', '2주 이상', '외상·사건 있음', '외상 없음 → 자세·습관 의심',
             ], true),
@@ -9439,6 +9520,33 @@
       return out;
     }
 
+    function getEvalSideChipSecs_() {
+      var out = [];
+      EVAL_HISTORY_GROUPS.forEach(function (grp) {
+        (grp.items || []).forEach(function (sec) {
+          if (sec.sideChips && sec.sideSecId) {
+            out.push({ id: sec.sideSecId, parentId: sec.id, parentTitle: sec.title });
+          }
+        });
+      });
+      return out;
+    }
+
+    function isEvalSideChipSec_(secId) {
+      return getEvalSideChipSecs_().some(function (s) { return s.id === secId; });
+    }
+
+    function renderEvalSideChipsHtml_(sec) {
+      if (!sec || !sec.sideChips) return '';
+      var sideSecId = sec.sideSecId || (sec.id + '_side');
+      var chips = EVAL_SIDE_CHIP_OPTIONS.map(function (opt) {
+        return '<button type="button" class="eval-hist-chip eval-hist-chip--side" data-sec="' +
+          escapeHtml(sideSecId) + '" data-val="' + escapeHtml(opt.label) +
+          '" onclick="toggleEvalHistChip(this)">' + escapeHtml(opt.label) + '</button>';
+      }).join('');
+      return '<div class="eval-hist-chips eval-hist-side-chips">' + chips + '</div>';
+    }
+
     function evalDropdownSelectionsForSec(secId) {
       var selected = [];
       document.querySelectorAll('.eval-body-area-select[data-sec="' + secId + '"]').forEach(function (sel) {
@@ -9481,6 +9589,7 @@
             getSelected: function () { return ''; },
           })
         : '';
+      var sideHtml = renderEvalSideChipsHtml_(sec);
       var titleHtml = sec.title
         ? '<div class="eval-hist-subtitle">' + escapeHtml(sec.title) + '</div>'
         : '';
@@ -9490,6 +9599,7 @@
           (sec.hint ? '<p class="eval-hist-hint">' + escapeHtml(sec.hint) + '</p>' : '') +
           '<div class="eval-hist-chips">' + chips + '</div>' +
           dropdownHtml +
+          sideHtml +
         '</div>'
       );
     }
@@ -9681,12 +9791,11 @@
         });
       }
       var on = btn.classList.toggle('on');
-      if ((sec && sec.multi === false) || (grpItem && grpItem.multi === false)) {
-        if (on) {
-          document.querySelectorAll('.eval-hist-chip[data-sec="' + secId + '"].on').forEach(function (el) {
-            if (el !== btn) el.classList.remove('on');
-          });
-        }
+      var singleSelect = (sec && sec.multi === false) || (grpItem && grpItem.multi === false) || isEvalSideChipSec_(secId);
+      if (singleSelect && on) {
+        document.querySelectorAll('.eval-hist-chip[data-sec="' + secId + '"].on').forEach(function (el) {
+          if (el !== btn) el.classList.remove('on');
+        });
       }
       if (secId === 'goal') updateEvalFormVisibility();
     }
@@ -9710,7 +9819,15 @@
           var selected = evalChipSelectionsForSec(sec.id);
           if (sec.bodyDropdowns && sec.areaSecId) {
             var areaSelected = evalDropdownSelectionsForSec(sec.areaSecId);
-            if (areaSelected.length) selected = selected.concat(areaSelected);
+            var sideSelected = sec.sideChips ? evalChipSelectionsForSec(sec.sideSecId) : [];
+            if (areaSelected.length && sideSelected.length) {
+              selected = selected.concat(areaSelected.map(function (area) {
+                return sideSelected[0] + ' ' + area;
+              }));
+            } else {
+              if (sideSelected.length) selected = selected.concat(sideSelected);
+              if (areaSelected.length) selected = selected.concat(areaSelected);
+            }
           }
           if (!selected.length) return;
           if (sec.title) rows.push('  · ' + sec.title + ': ' + selected.join(' / '));
@@ -9796,6 +9913,9 @@
       });
       getEvalBodyAreaDropdownSecs().forEach(function (sec) {
         out[sec.id] = evalDropdownSelectionsForSec(sec.id);
+      });
+      getEvalSideChipSecs_().forEach(function (sec) {
+        out[sec.id] = evalChipSelectionsForSec(sec.id);
       });
       var extra = document.getElementById('evalHistoryExtraMemo');
       out.extraMemo = extra ? String(extra.value || '').trim() : '';
