@@ -107,10 +107,12 @@
       border-left-color: var(--zone-members);
       box-shadow: 0 2px 14px rgba(30, 58, 110, 0.06);
     }
-    .section-zone--members > .card-title {
+    .section-zone--members > .members-hd > .card-title {
       color: var(--zone-members);
+      margin-bottom: 0;
+      flex-shrink: 0;
     }
-    .section-zone--members > .card-title::before {
+    .section-zone--members > .members-hd > .card-title::before {
       content: '';
       display: inline-block;
       width: 7px; height: 7px;
@@ -397,20 +399,48 @@
     }
     .member-chip .sess-ph { visibility:hidden; }
     .member-chip.search-selected { outline: 2px dashed var(--zone-members); outline-offset: 1px; }
+    .members-hd {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .members-hd .member-picker-bar {
+      flex: 1;
+      min-width: 180px;
+      margin-bottom: 0;
+    }
     .member-picker-bar { margin-bottom: 10px; }
-    .member-picker-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
-    .member-picker-tab {
-      border: 1px solid var(--border); background: #fff; border-radius: 8px;
-      padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--dim);
+    .member-search-row {
+      display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;
+      margin-bottom: 0;
     }
-    .member-picker-tab.on { background: var(--zone-members); border-color: var(--zone-members); color: #fff; }
-    .member-search-panel { display: none; }
-    .member-search-panel.show { display: block; }
+    .member-search-label {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12px; font-weight: 700; color: var(--zone-members);
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .member-search-ico {
+      display: inline-flex; width: 16px; height: 16px; color: var(--zone-members);
+    }
+    .member-search-ico svg { width: 100%; height: 100%; display: block; }
     .member-search-input {
-      width: 100%; border: 1px solid var(--border); border-radius: 8px;
-      padding: 9px 11px; font-size: 13px; margin-bottom: 8px;
+      flex: 1; min-width: 100px;
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 10px; font-size: 13px;
     }
-    .member-search-results { max-height: 220px; overflow-y: auto; }
+    .member-search-eta {
+      font-size: 11px; font-weight: 600; color: var(--dim);
+      white-space: nowrap; min-width: 4.5em;
+    }
+    .member-search-eta.is-loading { color: var(--zone-members); }
+    .member-search-results {
+      max-height: 220px; overflow-y: auto;
+      margin-top: 8px;
+      margin-bottom: 0;
+    }
+    .member-search-results:empty { display: none; margin-top: 0; }
     .member-search-item {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       width: 100%; text-align: left; border: 1px solid var(--border); background: #fff;
@@ -423,7 +453,6 @@
     .member-search-empty { font-size: 12px; color: var(--dim); padding: 8px 2px; }
     .member-search-loading { font-size: 12px; color: var(--dim); padding: 10px 2px; }
     .member-search-truncated { font-size: 11px; color: var(--dim); padding: 8px 2px 2px; border-top: 1px dashed var(--border); margin-top: 4px; }
-    .member-chips-wrap.hide-chips .member-chips { display: none; }
     .program-plan-bar {
       display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
       margin-bottom: 10px; padding: 8px 10px; border-radius: 8px;
@@ -1652,17 +1681,23 @@
   <main>
     <!-- 1. 오늘 예약 회원 -->
     <section class="card section-zone section-zone--members">
-      <div class="card-title">회원 선택</div>
-      <div class="member-picker-bar">
-        <div class="member-picker-tabs">
-          <button type="button" class="member-picker-tab on" id="memberPickerTabToday" onclick="switchMemberPickerTab('today')">오늘 예약</button>
-          <button type="button" class="member-picker-tab" id="memberPickerTabSearch" onclick="switchMemberPickerTab('search')">회원 검색</button>
-        </div>
-        <div class="member-search-panel" id="memberSearchPanel">
-          <input type="search" class="member-search-input" id="memberSearchInput" placeholder="이름으로 검색 (연락처·강사 표시)" autocomplete="off" oninput="onMemberSearchInput()">
-          <div class="member-search-results" id="memberSearchResults">
-            <p class="member-search-empty">이름을 입력하면 전체 회원에서 검색합니다.</p>
+      <div class="members-hd">
+        <div class="card-title">회원 선택</div>
+        <div class="member-picker-bar">
+          <div class="member-search-row">
+            <label class="member-search-label" for="memberSearchInput">
+              <span class="member-search-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="7"></circle>
+                  <path d="M20 20l-3.5-3.5"></path>
+                </svg>
+              </span>
+              회원 검색
+            </label>
+            <input type="search" class="member-search-input" id="memberSearchInput" placeholder="이름 입력" autocomplete="off" oninput="onMemberSearchInput()">
+            <span class="member-search-eta" id="memberSearchEta" hidden></span>
           </div>
+          <div class="member-search-results" id="memberSearchResults"></div>
         </div>
       </div>
       <div class="member-chips-wrap" id="memberChipsWrap">
@@ -3065,6 +3100,8 @@
       programPlanSavedAt: '',
       _memberSearchTimer: null,
       _memberSearchReq: 0,
+      _memberSearchCountdownTimer: null,
+      _memberSearchCountdownSec: 0,
     };
 
     var SESSION_DISCOMFORT_GROUP_LABELS = {
@@ -8114,17 +8151,49 @@
       loadProgressFromMemberStore(state.activeProgramTab);
     }
 
+    var MEMBER_SEARCH_EST_SEC = 12;
+    var _memberSearchCountdownTimer = null;
+    var _memberSearchCountdownSec = 0;
+
+    function stopMemberSearchCountdown_() {
+      if (_memberSearchCountdownTimer) {
+        clearInterval(_memberSearchCountdownTimer);
+        _memberSearchCountdownTimer = null;
+      }
+      _memberSearchCountdownSec = 0;
+      var eta = document.getElementById('memberSearchEta');
+      if (eta) {
+        eta.hidden = true;
+        eta.textContent = '';
+        eta.classList.remove('is-loading');
+      }
+    }
+
+    function updateMemberSearchCountdownUi_() {
+      var eta = document.getElementById('memberSearchEta');
+      var sec = Math.max(0, _memberSearchCountdownSec);
+      if (eta) {
+        eta.hidden = false;
+        eta.classList.add('is-loading');
+        eta.textContent = '약 ' + sec + '초';
+      }
+      var inline = document.getElementById('memberSearchEtaInline');
+      if (inline) inline.textContent = String(sec);
+    }
+
+    function startMemberSearchCountdown_() {
+      stopMemberSearchCountdown_();
+      _memberSearchCountdownSec = MEMBER_SEARCH_EST_SEC;
+      updateMemberSearchCountdownUi_();
+      _memberSearchCountdownTimer = setInterval(function() {
+        if (_memberSearchCountdownSec > 0) _memberSearchCountdownSec -= 1;
+        updateMemberSearchCountdownUi_();
+      }, 1000);
+    }
+
     function switchMemberPickerTab(tab) {
-      state.memberPickerTab = tab === 'search' ? 'search' : 'today';
-      var todayBtn = document.getElementById('memberPickerTabToday');
-      var searchBtn = document.getElementById('memberPickerTabSearch');
-      var panel = document.getElementById('memberSearchPanel');
-      var wrap = document.getElementById('memberChipsWrap');
-      if (todayBtn) todayBtn.classList.toggle('on', state.memberPickerTab === 'today');
-      if (searchBtn) searchBtn.classList.toggle('on', state.memberPickerTab === 'search');
-      if (panel) panel.classList.toggle('show', state.memberPickerTab === 'search');
-      if (wrap) wrap.classList.toggle('hide-chips', state.memberPickerTab === 'search');
-      if (state.memberPickerTab === 'search') {
+      /* 탭 전환 없이 검색 입력만 사용 — 호환용 noop */
+      if (tab === 'search') {
         var input = document.getElementById('memberSearchInput');
         if (input) input.focus();
       }
@@ -8135,7 +8204,8 @@
       state.memberSearchQuery = input ? String(input.value || '').trim() : '';
       if (state._memberSearchTimer) clearTimeout(state._memberSearchTimer);
       if (!state.memberSearchQuery) {
-        renderMemberSearchResults([]);
+        stopMemberSearchCountdown_();
+        renderMemberSearchResults(null);
         return;
       }
       state._memberSearchTimer = setTimeout(function() {
@@ -8146,13 +8216,16 @@
 
     async function runMemberSearch_(query) {
       if (!query) {
-        renderMemberSearchResults([]);
+        stopMemberSearchCountdown_();
+        renderMemberSearchResults(null);
         return;
       }
       var reqId = ++state._memberSearchReq;
+      startMemberSearchCountdown_();
       renderMemberSearchResults(null, null, { loading: true });
       var data = await api({ action: 'instructorSearchMembers', query: query }, { timeoutMs: 45000 });
       if (reqId !== state._memberSearchReq) return;
+      stopMemberSearchCountdown_();
       if (!data.ok) {
         renderMemberSearchResults([], data.message || '검색 실패');
         return;
@@ -8167,7 +8240,12 @@
       var root = document.getElementById('memberSearchResults');
       if (!root) return;
       if (opts.loading) {
-        root.innerHTML = '<p class="member-search-empty member-search-loading">검색 중…</p>';
+        root.innerHTML = '<p class="member-search-empty member-search-loading">회원정보 검색 중… (예상 <span id="memberSearchEtaInline">' +
+          Math.max(0, _memberSearchCountdownSec) + '</span>초)</p>';
+        return;
+      }
+      if (results == null && !errMsg) {
+        root.innerHTML = '';
         return;
       }
       if (errMsg) {
@@ -8266,7 +8344,12 @@
       var m = buildMemberFromSearchResult_(r);
       state.searchSelectedMember = m;
       selectMember(m, true);
-      switchMemberPickerTab('today');
+      var input = document.getElementById('memberSearchInput');
+      if (input) input.value = '';
+      state.memberSearchQuery = '';
+      state.memberSearchResults = [];
+      stopMemberSearchCountdown_();
+      renderMemberSearchResults(null);
     }
 
     function updateProgramPlanBar_() {
