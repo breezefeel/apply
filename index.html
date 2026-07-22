@@ -396,6 +396,44 @@
       font-variant-numeric:tabular-nums;
     }
     .member-chip .sess-ph { visibility:hidden; }
+    .member-chip.search-selected { outline: 2px dashed var(--zone-members); outline-offset: 1px; }
+    .member-picker-bar { margin-bottom: 10px; }
+    .member-picker-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+    .member-picker-tab {
+      border: 1px solid var(--border); background: #fff; border-radius: 8px;
+      padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--dim);
+    }
+    .member-picker-tab.on { background: var(--zone-members); border-color: var(--zone-members); color: #fff; }
+    .member-search-panel { display: none; }
+    .member-search-panel.show { display: block; }
+    .member-search-input {
+      width: 100%; border: 1px solid var(--border); border-radius: 8px;
+      padding: 9px 11px; font-size: 13px; margin-bottom: 8px;
+    }
+    .member-search-results { max-height: 220px; overflow-y: auto; }
+    .member-search-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      width: 100%; text-align: left; border: 1px solid var(--border); background: #fff;
+      border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; cursor: pointer;
+    }
+    .member-search-item:hover { border-color: var(--zone-members-border); background: var(--zone-members-soft); }
+    .member-search-item .ms-name { font-size: 13px; font-weight: 700; }
+    .member-search-item .ms-meta { font-size: 11px; color: var(--dim); }
+    .member-search-item .ms-phone { font-size: 11px; color: var(--zone-members); font-weight: 600; white-space: nowrap; }
+    .member-search-empty { font-size: 12px; color: var(--dim); padding: 8px 2px; }
+    .member-search-loading { font-size: 12px; color: var(--dim); padding: 10px 2px; }
+    .member-search-truncated { font-size: 11px; color: var(--dim); padding: 8px 2px 2px; border-top: 1px dashed var(--border); margin-top: 4px; }
+    .member-chips-wrap.hide-chips .member-chips { display: none; }
+    .program-plan-bar {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+      margin-bottom: 10px; padding: 8px 10px; border-radius: 8px;
+      background: var(--zone-session-soft, #f8fafc); border: 1px solid var(--border);
+    }
+    .program-plan-status { font-size: 11px; color: var(--dim); flex: 1; min-width: 140px; }
+    .program-plan-status.pinned { color: #b91c1c; font-weight: 600; }
+    .btn-save-program { background: #dc2626; color: #fff; border: none; }
+    .btn-save-program:disabled { opacity: 0.45; }
+    .btn-unpin-program { border-color: #fca5a5; color: #b91c1c; }
 
     @media (min-width:520px) {
       .inst-row-chips {
@@ -856,6 +894,12 @@
     .method-row.done .method-label { color:#047857; font-weight:600; }
     .method-row.done-prior input[type="checkbox"]:checked { accent-color: #86efac; }
     .method-row.done-recent input[type="checkbox"]:checked { accent-color: var(--green); }
+    .method-row.done-planned {
+      background: #fef2f2; border-left: 3px solid #dc2626;
+    }
+    .method-row.done-planned .method-label { color: #b91c1c; font-weight: 600; }
+    .method-row.done-planned input[type="checkbox"]:checked { accent-color: #dc2626; }
+    .legend-swatch.done-planned { background: #fef2f2; border: 1px solid #fca5a5; }
     .method-row.done .check-prior-only {
       accent-color: var(--green);
       width:18px; height:18px;
@@ -951,6 +995,7 @@
     .program-tab:hover { border-color:#93c5fd; color:var(--blue); }
     .program-tab.on { background:var(--blue); color:#fff; border-color:var(--blue); }
     .program-card-title { font-size:14px; font-weight:800; color:var(--blue); }
+    .program-tab-sub { font-size:11px; color:var(--dim); margin-top:2px; line-height:1.35; }
 
     .field { margin-bottom:8px; }
     .field label { display:block; font-size:11px; font-weight:600; color:var(--dim); margin-bottom:4px; }
@@ -1607,8 +1652,22 @@
   <main>
     <!-- 1. 오늘 예약 회원 -->
     <section class="card section-zone section-zone--members">
-      <div class="card-title">오늘 예약 회원</div>
-      <div class="member-chips" id="memberChips"><span class="empty-hint">불러오는 중…</span></div>
+      <div class="card-title">회원 선택</div>
+      <div class="member-picker-bar">
+        <div class="member-picker-tabs">
+          <button type="button" class="member-picker-tab on" id="memberPickerTabToday" onclick="switchMemberPickerTab('today')">오늘 예약</button>
+          <button type="button" class="member-picker-tab" id="memberPickerTabSearch" onclick="switchMemberPickerTab('search')">회원 검색</button>
+        </div>
+        <div class="member-search-panel" id="memberSearchPanel">
+          <input type="search" class="member-search-input" id="memberSearchInput" placeholder="이름으로 검색 (연락처·강사 표시)" autocomplete="off" oninput="onMemberSearchInput()">
+          <div class="member-search-results" id="memberSearchResults">
+            <p class="member-search-empty">이름을 입력하면 전체 회원에서 검색합니다.</p>
+          </div>
+        </div>
+      </div>
+      <div class="member-chips-wrap" id="memberChipsWrap">
+        <div class="member-chips" id="memberChips"><span class="empty-hint">불러오는 중…</span></div>
+      </div>
       <div class="member-overview-wrap" id="memberOverviewWrap">
         <div class="member-overview-top">
           <div class="member-brief" id="memberBrief">
@@ -1660,9 +1719,11 @@
       <div class="program-card-top">
         <div class="program-tabs" id="programTabs"></div>
         <div class="program-card-title" id="programCardTitle">Re:Al Movement</div>
+        <div class="program-tab-sub" id="programTabSub"></div>
       </div>
-      <div class="card-sub" id="programCardSub">과거 진행은 <strong style="color:#86efac;font-weight:700;">옅은 초록</strong>, 직전 회차는 <strong style="color:var(--green);font-weight:700;">진한 초록</strong>, 오늘 진행은 <strong style="color:var(--blue);font-weight:700;">체크</strong> · 초록 항목을 다시 누르면 오늘 진행으로 표시됩니다.</div>
+      <div class="card-sub" id="programCardSub">고정 저장은 <strong style="color:#dc2626;font-weight:700;">빨간색</strong>(오늘 체크해도 빨강 유지), 과거 진행은 <strong style="color:#86efac;font-weight:700;">옅은 초록</strong>, 직전 회차는 <strong style="color:var(--green);font-weight:700;">진한 초록</strong>, 오늘만 진행은 <strong style="color:var(--blue);font-weight:700;">체크</strong>입니다.</div>
       <div class="movement-legend" id="programLegend">
+        <span><i class="legend-swatch done-planned"></i>고정 저장(체크해도 빨강)</span>
         <span><i class="legend-swatch done-prior"></i>과거 진행</span>
         <span><i class="legend-swatch done-recent"></i>직전 회차</span>
         <span><i class="legend-swatch today"></i>오늘 진행</span>
@@ -1735,6 +1796,11 @@
           <button type="button" class="pass-btn" id="attendPassPlus" onclick="changeAttendPassCount(1)" disabled aria-label="회차 늘리기">+</button>
         </div>
         <p class="session-save-only-hint" id="sessionSaveOnlyHint" hidden></p>
+        <div class="program-plan-bar" id="programPlanBar" hidden>
+          <span class="program-plan-status" id="programPlanStatus">프로그램을 작성한 뒤 저장하세요.</span>
+          <button type="button" class="btn btn-unpin-program" id="unpinProgramBtn" onclick="unpinProgramPlan()" hidden title="고정 해제">고정 해제</button>
+          <button type="button" class="btn btn-save-program" id="saveProgramBtn" onclick="saveProgramPlan()" disabled title="출석 없이 프로그램만 저장">프로그램 저장</button>
+        </div>
         <div class="session-wrap-btns">
           <button type="button" class="btn btn-attend-silent" id="attendSilentBtn" onclick="attendSilentSession()" disabled title="출석·진도 저장 · 알림톡 없음">알림 없음</button>
           <button type="button" class="btn btn-attend-basic" id="attendBasicBtn" onclick="attendBasicSession()" disabled title="출석·진도 저장 · 기본 알림톡">기본 알림톡</button>
@@ -2719,18 +2785,130 @@
       return PROGRAM_TABS.find(function(t) { return t.id === tabId; }) || PROGRAM_TABS[0];
     }
 
+    function emptyMemberProgressBucket_() {
+      return { saved: {}, recent: {}, today: {}, planned: {}, sectionCollapsed: {}, sectionCollapsedTouched: {} };
+    }
+
     function saveProgressToMemberStore() {
       if (!state.selectedKey) return;
       if (!state.progressByMember[state.selectedKey]) {
         state.progressByMember[state.selectedKey] = {};
       }
+      var prev = state.progressByMember[state.selectedKey][state.activeProgramTab] || {};
       state.progressByMember[state.selectedKey][state.activeProgramTab] = {
         saved: Object.assign({}, state.savedProgress),
         recent: Object.assign({}, state.recentSessionProgress),
         today: Object.assign({}, state.todayProgress),
+        planned: prev.planned ? Object.assign({}, prev.planned) : {},
         sectionCollapsed: Object.assign({}, state.sectionCollapsed),
         sectionCollapsedTouched: Object.assign({}, state.sectionCollapsedTouched),
       };
+    }
+
+    /** 운동 ID를 탭별 bucket.saved/recent/today/planned에 분배 */
+    function distributeProgressFieldToMemberStore_(field, progressMap) {
+      if (!state.selectedKey) return;
+      if (!state.progressByMember[state.selectedKey]) {
+        state.progressByMember[state.selectedKey] = {};
+      }
+      var bucket = state.progressByMember[state.selectedKey];
+      PROGRAM_TABS.forEach(function(tab) {
+        if (!bucket[tab.id]) bucket[tab.id] = emptyMemberProgressBucket_();
+        bucket[tab.id][field] = {};
+      });
+      Object.keys(progressMap || {}).forEach(function(id) {
+        var val = progressMap[id];
+        if (!val) return;
+        var tabId = catalogTabForItemId(id);
+        if (!bucket[tabId]) bucket[tabId] = emptyMemberProgressBucket_();
+        bucket[tabId][field][id] = true;
+      });
+    }
+
+    function distributePlannedToMemberStore_(plannedMap) {
+      distributeProgressFieldToMemberStore_('planned', plannedMap);
+    }
+
+    function collectSessionProgressForProgramSave_() {
+      saveProgressToMemberStore();
+      var out = {};
+      var bucket = state.progressByMember[state.selectedKey];
+      if (!bucket) return out;
+      PROGRAM_TABS.forEach(function(tab) {
+        var today = bucket[tab.id] && bucket[tab.id].today;
+        if (!today) return;
+        Object.keys(today).forEach(function(id) {
+          if (today[id]) out[id] = ['done'];
+        });
+      });
+      return out;
+    }
+
+    function programPlanSessionIds_(sessionProgress) {
+      return Object.keys(sessionProgress || {}).filter(function(id) {
+        var v = sessionProgress[id];
+        return !!v && (v === true || v === 'done' || (Array.isArray(v) && v.length));
+      }).sort();
+    }
+
+    function summarizeProgramPlanSelections_() {
+      saveProgressToMemberStore();
+      var bucket = state.progressByMember[state.selectedKey];
+      if (!bucket) return '';
+      var parts = [];
+      PROGRAM_TABS.forEach(function(tab) {
+        var today = bucket[tab.id] && bucket[tab.id].today;
+        if (!today) return;
+        var n = Object.keys(today).filter(function(id) { return today[id]; }).length;
+        if (n > 0) parts.push(tab.label + ' ' + n + '개');
+      });
+      return parts.join(' · ');
+    }
+
+    function isProgramPlanDirty_() {
+      var m = state.selected;
+      if (!m || !m.suffix8) return false;
+      var plan = m.pinnedPlan;
+      var hasPinned = !!(plan && plan.pinned);
+      var draftIds = programPlanSessionIds_(collectSessionProgressForProgramSave_());
+      var savedIds = programPlanSessionIds_(plan && plan.sessionProgress);
+      var nextEl = document.getElementById('sessionNextProgress');
+      var memoEl = document.getElementById('sessionCoachMemo');
+      var nextTouched = !!(nextEl && nextEl.dataset.touched === '1');
+      var memoTouched = !!(memoEl && memoEl.dataset.touched === '1');
+      if (hasPinned) {
+        if (draftIds.join('\n') !== savedIds.join('\n')) return true;
+        var curNext = normalizeNextProgressText(nextEl ? nextEl.value : '');
+        var savedNext = normalizeNextProgressText((plan && plan.nextProgress) || '');
+        if (curNext !== savedNext) return true;
+        var curMemo = memoEl ? effectiveSessionCoachMemo(memoEl.value).slice(0, 80) : '';
+        var savedMemo = String((plan && plan.coachMemo) || '').trim();
+        if (curMemo !== savedMemo) return true;
+        return false;
+      }
+      /* 고정 없음: 체크만은 출석용으로 보고, 다음진도·키포인트 수정 시에만 미저장으로 간주 */
+      return nextTouched || memoTouched;
+    }
+
+    function confirmLeaveProgramPlanEdits_() {
+      if (!isProgramPlanDirty_()) return true;
+      var summary = summarizeProgramPlanSelections_();
+      var msg = state.programPlanPinned
+        ? '고정 프로그램과 다른 내용이 있습니다.\n다른 회원으로 이동하면 변경이 사라집니다.'
+        : '저장하지 않은 다음 진도·키포인트가 있습니다.\n다른 회원으로 이동하면 내용이 사라집니다.';
+      if (summary && state.programPlanPinned) msg += '\n\n현재 선택: ' + summary;
+      msg += '\n\n계속할까요?';
+      return confirm(msg);
+    }
+
+    function buildSearchSelectedMemberRowHtml_(members) {
+      var searchM = state.searchSelectedMember;
+      if (!searchM || !searchM.isSearchSelected || isTodayScheduledMember_(searchM)) return '';
+      var sk = memberKey(searchM);
+      if ((members || []).some(function(x) { return memberKey(x) === sk; })) return '';
+      return '<div class="inst-row"><div class="inst-row-hd" style="background:#eff6ff;border-left:4px solid #3b82f6">검색 선택</div><div class="inst-row-chips">' +
+        buildMemberChipButtonHtml_(searchM, { withInstructorStyle: false }) +
+        '</div></div>';
     }
 
     function distributeServerProgressToStore(m, opts) {
@@ -2749,6 +2927,7 @@
               saved: {},
               recent: {},
               today: {},
+              planned: {},
               sectionCollapsed: {},
               sectionCollapsedTouched: {},
             };
@@ -2761,7 +2940,7 @@
         if (!prog[id] || !prog[id].length) return;
         var tab = catalogTabForItemId(id);
         if (!store[tab]) {
-          store[tab] = { saved: {}, recent: {}, today: {}, sectionCollapsed: {}, sectionCollapsedTouched: {} };
+          store[tab] = { saved: {}, recent: {}, today: {}, planned: {}, sectionCollapsed: {}, sectionCollapsedTouched: {} };
         }
         if (recent[id] && recent[id].length) {
           store[tab].recent[id] = true;
@@ -2779,6 +2958,7 @@
       state.savedProgress = data ? Object.assign({}, data.saved) : {};
       state.recentSessionProgress = data ? Object.assign({}, data.recent) : {};
       state.todayProgress = data ? Object.assign({}, data.today) : {};
+      state.plannedProgress = data ? Object.assign({}, data.planned) : {};
       state.progressOrigin = {};
       state.sectionCollapsed = data ? Object.assign({}, data.sectionCollapsed) : {};
       state.sectionCollapsedTouched = data ? Object.assign({}, data.sectionCollapsedTouched) : {};
@@ -2797,7 +2977,9 @@
     }
 
     function methodRowProgressClass(item, hasMember) {
-      if (!hasMember || state.todayProgress[item.id]) return '';
+      if (!hasMember) return '';
+      if (state.plannedProgress[item.id]) return ' done-planned';
+      if (state.todayProgress[item.id]) return '';
       if (state.recentSessionProgress[item.id]) return ' done-recent';
       if (state.savedProgress[item.id]) return ' done-prior';
       return '';
@@ -2828,7 +3010,8 @@
       root.innerHTML = html;
       var meta = programTabMeta(state.activeProgramTab);
       document.getElementById('programCardTitle').textContent = meta.label;
-      document.getElementById('programCardSub').textContent = meta.sub;
+      var tabSub = document.getElementById('programTabSub');
+      if (tabSub) tabSub.textContent = meta.sub || '';
       var legend = document.getElementById('programLegend');
       if (legend) legend.style.display = '';
     }
@@ -2847,6 +3030,7 @@
       savedProgress: {},
       recentSessionProgress: {},
       todayProgress: {},
+      plannedProgress: {},
       progressOrigin: {},
       evalReportText: '',
       evalAiReport: '',
@@ -2872,6 +3056,15 @@
       nextBooking: null,
       memberDetailLoading: false,
       memberDetailLoadError: '',
+      memberPickerTab: 'today',
+      searchSelectedMember: null,
+      memberSearchQuery: '',
+      memberSearchResults: [],
+      memberSearchTruncated: false,
+      programPlanPinned: false,
+      programPlanSavedAt: '',
+      _memberSearchTimer: null,
+      _memberSearchReq: 0,
     };
 
     var SESSION_DISCOMFORT_GROUP_LABELS = {
@@ -4549,6 +4742,13 @@
       delete nextEl.dataset.touched;
     }
 
+    function setSessionNextProgressDraft(text) {
+      var nextEl = document.getElementById('sessionNextProgress');
+      if (!nextEl) return;
+      nextEl.value = normalizeNextProgressText(text);
+      delete nextEl.dataset.touched;
+    }
+
     function applySavedNextProgress(m, raw) {
       if (!m) return;
       m.nextProgress = normalizeNextProgressText(raw);
@@ -4878,16 +5078,16 @@
     }
 
     function updateAttendButtonsForFamilyAccount(m) {
-      var has = !!(m && m.suffix8);
-      var slotLocked = has && memberAttendSlotLocked_(m);
+      var canAttend = canAttendSelectedMember_(m);
+      var slotLocked = canAttend && memberAttendSlotLocked_(m);
       var silent = document.getElementById('attendSilentBtn');
       var basic = document.getElementById('attendBasicBtn');
       var progress = document.getElementById('attendProgressBtn');
       var hint = document.getElementById('sessionSaveOnlyHint');
       applyAttendButtonMode_(slotLocked);
-      if (silent) silent.disabled = !has;
-      if (basic) basic.disabled = !has;
-      if (progress) progress.disabled = !has;
+      if (silent) silent.disabled = !canAttend;
+      if (basic) basic.disabled = !canAttend;
+      if (progress) progress.disabled = !canAttend;
       if (hint) {
         hint.hidden = !slotLocked;
         if (slotLocked) {
@@ -4921,6 +5121,7 @@
     async function attendSilentSession() {
       var m = state.selected;
       if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
+      if (!canAttendSelectedMember_(m)) { toast('오늘 예약 회원만 출석할 수 있습니다'); return; }
       if (memberAttendSlotLocked_(m)) {
         await saveProgressOnlySession();
         return;
@@ -4941,6 +5142,7 @@
     async function attendBasicSession() {
       var m = state.selected;
       if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
+      if (!canAttendSelectedMember_(m)) { toast('오늘 예약 회원만 출석할 수 있습니다'); return; }
       syncSessionRecordFieldsFromModal();
       if (memberAttendSlotLocked_(m)) {
         await runResendAttendAlimtalk(m, mergedProgressMapForSave(), { basicAttendOnly: true });
@@ -4954,6 +5156,7 @@
     async function attendWithProgressSession() {
       var m = state.selected;
       if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
+      if (!canAttendSelectedMember_(m)) { toast('오늘 예약 회원만 출석할 수 있습니다'); return; }
       syncSessionRecordFieldsFromModal();
       if (memberAttendSlotLocked_(m)) {
         _pendingAttendAlimtalk = buildAttendAlimtalkPayload();
@@ -5804,6 +6007,7 @@
       var resolved = isMemberCompleted(m) || absent;
       var cls = resolved ? ' done' : '';
       if (absent) cls += ' absent';
+      if (m && m.isSearchSelected && !isTodayScheduledMember_(m)) cls += ' search-selected';
       return cls;
     }
 
@@ -6439,17 +6643,21 @@
       const root = document.getElementById('memberChips');
       const members = todayMembers();
       const instructors = instructorsList();
-      if (!members.length) {
+      const searchChipHtml = buildSearchSelectedMemberRowHtml_(members);
+      if (!members.length && !searchChipHtml) {
         root.innerHTML = '<span class="empty-hint">오늘 예약 없음</span>';
         return;
       }
+      let html = '<div class="instructor-rows">';
+      if (!members.length) {
+        html += '<p class="empty-hint" style="margin:0 0 8px">오늘 예약 없음</p>';
+      } else {
       members.sort(function(a, b) {
         var ia = a.instructorIndex != null ? a.instructorIndex : 99;
         var ib = b.instructorIndex != null ? b.instructorIndex : 99;
         if (ia !== ib) return ia - ib;
         return parseTime(a.time) - parseTime(b.time) || String(a.name).localeCompare(String(b.name), 'ko');
       });
-      let html = '<div class="instructor-rows">';
       instructors.forEach(function(inst) {
         const rowMembers = members.filter(function(m) {
           return (m.instructorIndex != null ? m.instructorIndex : -1) === inst.index;
@@ -6479,12 +6687,17 @@
         });
         html += '</div></div>';
       }
+      }
+      html += searchChipHtml;
       html += '</div>';
       root.innerHTML = html;
     }
 
     function selectMemberByKey(key) {
-      const m = todayMembers().find(function(x){ return memberKey(x)===key; });
+      var m = todayMembers().find(function(x){ return memberKey(x)===key; });
+      if (!m && state.searchSelectedMember && memberKey(state.searchSelectedMember) === key) {
+        m = state.searchSelectedMember;
+      }
       if (m) selectMember(m, true);
     }
 
@@ -7046,11 +7259,7 @@
     }
 
     function scheduleSessionCheckAutoSave() {
-      if (_sessionCheckSaveTimer) clearTimeout(_sessionCheckSaveTimer);
-      _sessionCheckSaveTimer = setTimeout(function () {
-        _sessionCheckSaveTimer = null;
-        autoSaveProgress();
-      }, 800);
+      /* 프로그램은 저장 버튼으로만 서버 반영 */
     }
 
     async function flushPendingSessionSavesBeforeAttend_(m) {
@@ -7060,7 +7269,7 @@
         _sessionCheckSaveTimer = null;
       }
       syncSessionRecordFieldsFromModal();
-      return await autoSaveProgress() !== false;
+      return true;
     }
 
     function dismissPendingCompleteSessionModals_(opts) {
@@ -7113,6 +7322,9 @@
       state.sessionDraftVisitKey = '';
       state.sessionDraftVisitKeyMemberKey = '';
       state.pendingScheduleSync = null;
+      state.plannedProgress = {};
+      state.programPlanPinned = false;
+      state.programPlanSavedAt = '';
       var memoEl = document.getElementById('sessionCoachMemo');
       if (memoEl) {
         memoEl.value = '';
@@ -7393,6 +7605,120 @@
 
     var _memberDetailReq = 0;
 
+    function invalidateMemberDetailRequests_() {
+      ++_memberDetailReq;
+      if (state.memberDetailLoading) {
+        state.memberDetailLoading = false;
+        stopMemberDetailCountdown();
+      }
+    }
+
+    function clearPinnedProgramPlanLocal_(m, opts) {
+      opts = opts || {};
+      if (m) {
+        m.pinnedPlan = opts.pinnedPlan !== undefined ? opts.pinnedPlan : null;
+        m.plannedProgress = opts.plannedProgress || {};
+      }
+      state.plannedProgress = {};
+      state.programPlanPinned = false;
+      state.programPlanSavedAt = '';
+      distributePlannedToMemberStore_({});
+      if (state.selectedKey) loadProgressFromMemberStore(state.activeProgramTab);
+    }
+
+    function hasUserSessionProgressEdits_(todayOpt) {
+      var today = todayOpt || state.todayProgress || {};
+      if (Object.keys(today).some(function(k) { return today[k]; })) return true;
+      var bucket = state.progressByMember[state.selectedKey];
+      if (!bucket) return false;
+      return PROGRAM_TABS.some(function(tab) {
+        var t = bucket[tab.id] && bucket[tab.id].today;
+        return t && Object.keys(t).some(function(k) { return t[k]; });
+      });
+    }
+
+    function hasSessionCheckEdits_() {
+      var sc = state.sessionCheck || {};
+      if (sc.areas && sc.areas.length) return true;
+      if (sc.vas != null) return true;
+      if (String(sc.note || '').trim()) return true;
+      return false;
+    }
+
+    function applyMemberDetailFromResponse_(m, detail, opts) {
+      opts = opts || {};
+      if (!m || !detail) return false;
+      if (detail.needPin) {
+        showPin(true);
+        state.memberDetailLoadError = 'PIN 입력이 필요합니다.';
+        renderConditionHistory(m);
+        return false;
+      }
+      if (!detail.ok || !detail.member) {
+        state.memberDetailLoadError = (detail && detail.message) || '회원 정보를 불러오지 못했습니다.';
+        renderConditionHistory(m);
+        return false;
+      }
+      var member = detail.member;
+      state.memberDetailLoadError = '';
+      m.specialNotes = member.specialNotes || m.specialNotes || '';
+      m.memberBriefNotes = member.memberBriefNotes != null
+        ? String(member.memberBriefNotes || '').trim()
+        : (m.memberBriefNotes || '');
+      if (!opts.historyOnly) {
+        m.nextProgress = normalizeNextProgressText(member.nextProgress || m.nextProgress || '');
+      }
+      m.discomfortHistory = member.discomfortHistory || m.discomfortHistory || [];
+      m.discomfortHistoryLine = member.discomfortHistoryLine || m.discomfortHistoryLine || '';
+      m.conditionHistory = member.conditionHistory != null ? member.conditionHistory : (m.conditionHistory || []);
+      m.firstEvalBrief = member.firstEvalBrief || m.firstEvalBrief || null;
+      m.wellnessIntake = member.wellnessIntake || detail.wellnessIntake || null;
+      if (!opts.historyOnly && member.currentSessionCheck && !hasSessionCheckEdits_()) {
+        m.currentSessionCheck = member.currentSessionCheck;
+        state.sessionCheck.areas = (member.currentSessionCheck.areas || []).slice();
+        state.sessionCheck.vas = member.currentSessionCheck.vas != null ? member.currentSessionCheck.vas : null;
+        state.sessionCheck.note = member.currentSessionCheck.note || '';
+      }
+      if (opts.historyOnly) {
+        renderBriefEvalNotes_(m);
+        renderConditionHistory(m);
+        return true;
+      }
+      saveProgressToMemberStore();
+      if (!opts.skipProgressSync) {
+        m.pspProgress = member.pspProgress || m.pspProgress || {};
+        m.previousSessionProgress = member.previousSessionProgress || m.previousSessionProgress || {};
+        distributeServerProgressToStore(m);
+        loadProgressFromMemberStore(state.activeProgramTab);
+      }
+      if (!opts.skipPinnedPlanApply) {
+        m.pinnedPlan = member.pinnedPlan || null;
+        m.plannedProgress = member.plannedProgress || {};
+        mergeMemberApplicationPrefill_(m, member);
+        applyPinnedPlanFromMember_(m, opts.pinnedPlanOpts);
+        syncPlannedProgressToMemberStore_();
+        saveProgressToMemberStore();
+      }
+      renderSelectedMemberUi();
+      return true;
+    }
+
+    async function refreshMemberDetailAfterPlanSave_(m) {
+      if (!m || !m.suffix8) return;
+      var reqId = ++_memberDetailReq;
+      var selKey = memberKey(m);
+      try {
+        var detail = await api({ action: 'instructorMemberDetail', suffix8: m.suffix8, attendeeName: m.name }, {
+          timeoutMs: 60000,
+          timeoutMessage: '회원 히스토리 응답 시간 초과(약 60초).',
+        });
+        if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
+        applyMemberDetailFromResponse_(m, detail, { historyOnly: true });
+      } catch (e) {
+        if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
+      }
+    }
+
     async function enrichMemberDetailInBackground(m) {
       if (!m || !m.suffix8) return;
       var reqId = ++_memberDetailReq;
@@ -7406,41 +7732,7 @@
         if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
         state.memberDetailLoading = false;
         stopMemberDetailCountdown();
-        if (detail.needPin) {
-          showPin(true);
-          state.memberDetailLoadError = 'PIN 입력이 필요합니다.';
-          renderConditionHistory(m);
-          return;
-        }
-        if (!detail.ok || !detail.member) {
-          state.memberDetailLoadError = (detail && detail.message) || '회원 정보를 불러오지 못했습니다.';
-          renderConditionHistory(m);
-          return;
-        }
-        state.memberDetailLoadError = '';
-        m.specialNotes = detail.member.specialNotes || m.specialNotes || '';
-        m.memberBriefNotes = detail.member.memberBriefNotes != null
-          ? String(detail.member.memberBriefNotes || '').trim()
-          : (m.memberBriefNotes || '');
-        m.nextProgress = normalizeNextProgressText(detail.member.nextProgress || m.nextProgress || '');
-        m.pspProgress = detail.member.pspProgress || m.pspProgress || {};
-        m.previousSessionProgress = detail.member.previousSessionProgress || m.previousSessionProgress || {};
-        m.discomfortHistory = detail.member.discomfortHistory || m.discomfortHistory || [];
-        m.discomfortHistoryLine = detail.member.discomfortHistoryLine || m.discomfortHistoryLine || '';
-        m.conditionHistory = detail.member.conditionHistory != null ? detail.member.conditionHistory : (m.conditionHistory || []);
-        m.firstEvalBrief = detail.member.firstEvalBrief || m.firstEvalBrief || null;
-        if (detail.member.currentSessionCheck) {
-          m.currentSessionCheck = detail.member.currentSessionCheck;
-          state.sessionCheck.areas = (detail.member.currentSessionCheck.areas || []).slice();
-          state.sessionCheck.vas = detail.member.currentSessionCheck.vas != null ? detail.member.currentSessionCheck.vas : null;
-          state.sessionCheck.note = detail.member.currentSessionCheck.note || '';
-        }
-        m.wellnessIntake = detail.member.wellnessIntake || detail.wellnessIntake || null;
-        mergeMemberApplicationPrefill_(m, detail.member);
-        distributeServerProgressToStore(m);
-        loadProgressFromMemberStore(state.activeProgramTab);
-        saveProgressToMemberStore();
-        renderSelectedMemberUi();
+        applyMemberDetailFromResponse_(m, detail);
       } catch (e) {
         if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
         state.memberDetailLoading = false;
@@ -7451,6 +7743,9 @@
     }
 
     function selectMember(m, fromUser) {
+      if (fromUser && state.selected && state.selectedKey !== memberKey(m)) {
+        if (!confirmLeaveProgramPlanEdits_()) return;
+      }
       if (state.selectedKey && state.selectedKey !== memberKey(m)) {
         saveProgressToMemberStore();
         saveMemberAttendResult_(state.selectedKey);
@@ -7460,6 +7755,9 @@
         dismissPendingCompleteSessionModals_();
       }
       if (fromUser) state.activeProgramTab = resolveDefaultProgramTab(m);
+      if (!m.isSearchSelected && state.searchSelectedMember && memberKey(state.searchSelectedMember) !== memberKey(m)) {
+        state.searchSelectedMember = null;
+      }
       resetMemberSessionState(m);
       resetAttendPassCount(m);
       var mk = memberKey(m);
@@ -7470,6 +7768,10 @@
       }
       state.program = getProgramCatalog(state.activeProgramTab);
       loadProgressFromMemberStore(state.activeProgramTab);
+      if (m.pinnedPlan || (m.plannedProgress && Object.keys(m.plannedProgress).length)) {
+        applyPinnedPlanFromMember_(m);
+        syncPlannedProgressToMemberStore_();
+      }
       if (m.suffix8) {
         state.memberDetailLoading = true;
         state.memberDetailLoadError = '';
@@ -7744,40 +8046,326 @@
       renderProgramList();
       renderSessionWrapPanel();
       updateSendBar();
-      await autoSaveProgress();
     }
 
-    async function autoSaveProgress() {
-      const m = state.selected;
-      if (!m || !m.suffix8) return true;
-      const todayLabels = Object.keys(state.todayProgress).map(function(id){
-        const p = state.program.find(function(x){ return x.id===id; });
-        return p ? methodDisplayLabel(p) : id;
+    function isTodayScheduledMember_(m) {
+      if (!m || !m.suffix8) return false;
+      if (m.isSearchSelected && m.isTodayScheduled) return true;
+      if (m.isSearchSelected && !m.isTodayScheduled) return false;
+      return !!todayMembers().find(function(x) { return memberKey(x) === memberKey(m); });
+    }
+
+    function canAttendSelectedMember_(m) {
+      m = m || state.selected;
+      return !!(m && m.suffix8 && isTodayScheduledMember_(m));
+    }
+
+    function applyPinnedPlanFromMember_(m, opts) {
+      opts = opts || {};
+      state.plannedProgress = {};
+      state.programPlanPinned = false;
+      state.programPlanSavedAt = '';
+      var plan = (m && m.pinnedPlan) || null;
+      var planned = (m && m.plannedProgress) || (plan && plan.sessionProgress) || {};
+      var fullPlanned = {};
+      Object.keys(planned || {}).forEach(function(id) {
+        if (planned[id]) fullPlanned[id] = true;
       });
-      const data = await api({
-        action:'instructorSaveSession',
-        suffix8:m.suffix8, name:m.name, time:m.time, instructorIndex:m.instructorIndex,
-        clientVisitKey: ensureSessionDraftVisitKey_(m),
-        specialNotesNew: '',
-        nextProgress: getSessionNextProgress() || (m.nextProgress || '').trim(),
-        recordMode: 'progress',
-        sessionNote: todayLabels.length ? '오늘 진도: ' + todayLabels.join(', ') : '',
-        pspProgress: mergedProgressMapForSave(),
-        sessionProgress: todayProgressMap(),
-        discomfortAreas: getSessionCheckPayload().discomfortAreas,
-        vas: getSessionCheckPayload().vas,
-        sessionCheckNote: getSessionCheckPayload().sessionCheckNote,
+      distributePlannedToMemberStore_(fullPlanned);
+      if (plan && plan.pinned) {
+        state.programPlanPinned = true;
+        state.programPlanSavedAt = String(plan.savedAt || '').trim();
+      }
+      if (plan && plan.sessionProgress && !isMemberCompleted(m)) {
+        var skipToday = !opts.forceToday && hasUserSessionProgressEdits_();
+        if (!skipToday) {
+          distributeProgressFieldToMemberStore_('today', plan.sessionProgress);
+        }
+      }
+      loadProgressFromMemberStore(state.activeProgramTab);
+      if (plan && plan.nextProgress) {
+        var nextEl = document.getElementById('sessionNextProgress');
+        if (!nextEl || nextEl.dataset.touched !== '1') {
+          setSessionNextProgressDraft(plan.nextProgress);
+        }
+      }
+      if (plan && plan.coachMemo) {
+        var memoEl = document.getElementById('sessionCoachMemo');
+        if (memoEl && !memoEl.dataset.touched) memoEl.value = plan.coachMemo;
+      }
+    }
+
+    function syncPlannedProgressToMemberStore_() {
+      var fullPlanned = {};
+      Object.keys(state.plannedProgress || {}).forEach(function(id) {
+        if (state.plannedProgress[id]) fullPlanned[id] = true;
+      });
+      var bucket = state.progressByMember[state.selectedKey];
+      if (bucket) {
+        PROGRAM_TABS.forEach(function(tab) {
+          var p = bucket[tab.id] && bucket[tab.id].planned;
+          if (!p) return;
+          Object.keys(p).forEach(function(id) {
+            if (p[id]) fullPlanned[id] = true;
+          });
+        });
+      }
+      distributePlannedToMemberStore_(fullPlanned);
+      loadProgressFromMemberStore(state.activeProgramTab);
+    }
+
+    function switchMemberPickerTab(tab) {
+      state.memberPickerTab = tab === 'search' ? 'search' : 'today';
+      var todayBtn = document.getElementById('memberPickerTabToday');
+      var searchBtn = document.getElementById('memberPickerTabSearch');
+      var panel = document.getElementById('memberSearchPanel');
+      var wrap = document.getElementById('memberChipsWrap');
+      if (todayBtn) todayBtn.classList.toggle('on', state.memberPickerTab === 'today');
+      if (searchBtn) searchBtn.classList.toggle('on', state.memberPickerTab === 'search');
+      if (panel) panel.classList.toggle('show', state.memberPickerTab === 'search');
+      if (wrap) wrap.classList.toggle('hide-chips', state.memberPickerTab === 'search');
+      if (state.memberPickerTab === 'search') {
+        var input = document.getElementById('memberSearchInput');
+        if (input) input.focus();
+      }
+    }
+
+    function onMemberSearchInput() {
+      var input = document.getElementById('memberSearchInput');
+      state.memberSearchQuery = input ? String(input.value || '').trim() : '';
+      if (state._memberSearchTimer) clearTimeout(state._memberSearchTimer);
+      if (!state.memberSearchQuery) {
+        renderMemberSearchResults([]);
+        return;
+      }
+      state._memberSearchTimer = setTimeout(function() {
+        state._memberSearchTimer = null;
+        runMemberSearch_(state.memberSearchQuery);
+      }, 280);
+    }
+
+    async function runMemberSearch_(query) {
+      if (!query) {
+        renderMemberSearchResults([]);
+        return;
+      }
+      var reqId = ++state._memberSearchReq;
+      renderMemberSearchResults(null, null, { loading: true });
+      var data = await api({ action: 'instructorSearchMembers', query: query }, { timeoutMs: 45000 });
+      if (reqId !== state._memberSearchReq) return;
+      if (!data.ok) {
+        renderMemberSearchResults([], data.message || '검색 실패');
+        return;
+      }
+      state.memberSearchResults = data.results || [];
+      state.memberSearchTruncated = !!data.truncated;
+      renderMemberSearchResults(state.memberSearchResults, null, { truncated: state.memberSearchTruncated });
+    }
+
+    function renderMemberSearchResults(results, errMsg, opts) {
+      opts = opts || {};
+      var root = document.getElementById('memberSearchResults');
+      if (!root) return;
+      if (opts.loading) {
+        root.innerHTML = '<p class="member-search-empty member-search-loading">검색 중…</p>';
+        return;
+      }
+      if (errMsg) {
+        root.innerHTML = '<p class="member-search-empty">' + escapeHtml(errMsg) + '</p>';
+        return;
+      }
+      if (!results || !results.length) {
+        root.innerHTML = '<p class="member-search-empty">검색 결과가 없습니다.</p>';
+        return;
+      }
+      var html = '';
+      results.forEach(function(r, idx) {
+        var phoneText = r.phoneDisplay || ('···' + (r.phoneLast4 || ''));
+        var metaParts = [r.instructorName, r.program, r.branch].filter(Boolean);
+        if (r.isTodayScheduled) metaParts.push('오늘 예약');
+        var meta = metaParts.join(' · ');
+        html += '<button type="button" class="member-search-item" onclick="selectSearchMemberByIndex(' + idx + ')">' +
+          '<span><span class="ms-name">' + escapeHtml(r.name || '') + '</span>' +
+          (meta ? '<div class="ms-meta">' + escapeHtml(meta) + '</div>' : '') + '</span>' +
+          '<span class="ms-phone">' + escapeHtml(phoneText) + '</span>' +
+          '</button>';
+      });
+      if (opts.truncated) {
+        html += '<p class="member-search-truncated">결과가 많아 최대 40명까지만 표시합니다. 이름을 더 구체적으로 입력해 주세요.</p>';
+      }
+      root.innerHTML = html;
+    }
+
+    function buildMemberFromSearchResult_(r) {
+      var instIdx = resolveInstructorIndexByName_(r.instructorName, r.instructorIndex);
+      var instName = String(r.instructorName || '').trim();
+      if (!instName && instIdx != null) {
+        var hit = instructorsList().find(function(x) { return x.index === instIdx; });
+        if (hit) instName = hit.name;
+      }
+      return {
+        suffix8: r.suffix8,
+        name: r.name,
+        phoneDigits: r.phoneDigits,
+        phoneLast4: r.phoneLast4,
+        instructorName: instName,
+        instructorIndex: instIdx,
+        program: r.program || '',
+        branch: r.branch || '',
+        rowIndex: r.rowIndex,
+        attend: r.attend,
+        payRounds: r.payRounds,
+        remain: r.remain,
+        isSearchSelected: true,
+        isTodayScheduled: !!r.isTodayScheduled,
+        time: r.isTodayScheduled ? findTodayTimeForMember_(r) : '',
+      };
+    }
+
+    function resolveInstructorIndexByName_(name, serverIndex) {
+      if (serverIndex != null && serverIndex !== '' && !isNaN(serverIndex)) {
+        var si = parseInt(serverIndex, 10);
+        if (si >= 0) return si;
+      }
+      var n = String(name || '').trim();
+      if (!n) return null;
+      var list = instructorsList();
+      var i;
+      for (i = 0; i < list.length; i++) {
+        var iname = String(list[i].name || '').trim();
+        if (!iname) continue;
+        if (iname === n || iname.indexOf(n) >= 0 || n.indexOf(iname) >= 0) return list[i].index;
+      }
+      if (n.indexOf('박준규') >= 0) return 0;
+      if (n.indexOf('최진옥') >= 0) return 1;
+      if (n.indexOf('이상민') >= 0) return 2;
+      if (n.indexOf('김인준') >= 0) {
+        for (i = 0; i < list.length; i++) {
+          if (String(list[i].name || '').indexOf('김인준') >= 0) return list[i].index;
+        }
+      }
+      if (n.indexOf('최홍택') >= 0) {
+        for (i = 0; i < list.length; i++) {
+          if (String(list[i].name || '').indexOf('최홍택') >= 0) return list[i].index;
+        }
+      }
+      return null;
+    }
+
+    function findTodayTimeForMember_(r) {
+      var hit = todayMembers().find(function(m) {
+        return String(m.suffix8 || '') === String(r.suffix8 || '') &&
+          normalizeMemberNameForKey_(m.name) === normalizeMemberNameForKey_(r.name);
+      });
+      return hit ? hit.time : '';
+    }
+
+    function selectSearchMemberByIndex(idx) {
+      var r = state.memberSearchResults[idx];
+      if (!r) return;
+      var m = buildMemberFromSearchResult_(r);
+      state.searchSelectedMember = m;
+      selectMember(m, true);
+      switchMemberPickerTab('today');
+    }
+
+    function updateProgramPlanBar_() {
+      var bar = document.getElementById('programPlanBar');
+      var status = document.getElementById('programPlanStatus');
+      var saveBtn = document.getElementById('saveProgramBtn');
+      var unpinBtn = document.getElementById('unpinProgramBtn');
+      var hint = document.getElementById('sessionWrapMemberHint');
+      var m = state.selected;
+      var has = !!(m && m.suffix8);
+      if (bar) bar.hidden = !has;
+      if (!has) return;
+      if (hint) {
+        if (!isTodayScheduledMember_(m)) {
+          hint.textContent = '오늘 예약 외 회원 · 프로그램 저장만 가능합니다. 출석은 오늘 예약 회원만 처리됩니다.';
+        } else {
+          hint.textContent = '회원을 선택하면 아래에서 확인·저장할 수 있습니다.';
+        }
+      }
+      if (saveBtn) saveBtn.disabled = !has || state.attendProcessing;
+      if (unpinBtn) unpinBtn.hidden = !state.programPlanPinned;
+      if (status) {
+        status.classList.toggle('pinned', !!state.programPlanPinned);
+        var summary = summarizeProgramPlanSelections_();
+        var summaryPart = summary ? ' · 선택 ' + summary : '';
+        var dirtyPart = isProgramPlanDirty_() ? ' · 미저장 변경' : '';
+        if (state.programPlanPinned) {
+          var when = state.programPlanSavedAt ? state.programPlanSavedAt.slice(0, 16) : '';
+          status.textContent = '고정 저장됨' + (when ? ' · ' + when : '') + ' — 출석 완료 시 자동 해제' + summaryPart + dirtyPart;
+        } else {
+          status.textContent = '작성 후 「프로그램 저장」을 누르면 고정됩니다.' + summaryPart + dirtyPart;
+        }
+      }
+    }
+
+    async function saveProgramPlan() {
+      var m = state.selected;
+      if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
+      syncSessionRecordFieldsFromModal();
+      var sessionProgress = collectSessionProgressForProgramSave_();
+      if (!Object.keys(sessionProgress).length) {
+        toast('저장할 운동을 1개 이상 선택해 주세요');
+        return;
+      }
+      invalidateMemberDetailRequests_();
+      var saveBtn = document.getElementById('saveProgramBtn');
+      if (saveBtn) saveBtn.disabled = true;
+      var extras = getSessionRecordPayloadExtras();
+      var memoEl = document.getElementById('sessionCoachMemo');
+      var coachMemo = memoEl ? effectiveSessionCoachMemo(memoEl.value).slice(0, 80) : '';
+      var data = await api({
+        action: 'instructorSaveProgramPlan',
+        suffix8: m.suffix8,
+        name: m.name,
+        instructorIndex: m.instructorIndex,
+        nextProgress: extras.nextProgress,
+        coachMemo: coachMemo,
+        sessionProgress: sessionProgress,
+      });
+      if (saveBtn) saveBtn.disabled = false;
+      if (!data.ok) {
+        toast(data.message || '프로그램 저장 실패');
+        return;
+      }
+      m.pinnedPlan = data.pinnedPlan || null;
+      m.plannedProgress = data.plannedProgress || {};
+      m.nextProgress = data.nextProgress != null ? data.nextProgress : m.nextProgress;
+      applyPinnedPlanFromMember_(m, { forceToday: true });
+      syncPlannedProgressToMemberStore_();
+      saveProgressToMemberStore();
+      state.programPlanPinned = true;
+      state.programPlanSavedAt = m.pinnedPlan && m.pinnedPlan.savedAt ? m.pinnedPlan.savedAt : '';
+      renderProgramList();
+      renderSessionWrapPanel();
+      updateProgramPlanBar_();
+      var savedSummary = summarizeProgramPlanSelections_();
+      toast(savedSummary ? '프로그램 저장 완료 · ' + savedSummary : '프로그램 저장 완료');
+      refreshMemberDetailAfterPlanSave_(m);
+    }
+
+    async function unpinProgramPlan() {
+      var m = state.selected;
+      if (!m || !m.suffix8) return;
+      if (!confirm('고정된 프로그램을 해제할까요? 빨간색 강조가 사라집니다.')) return;
+      invalidateMemberDetailRequests_();
+      var data = await api({
+        action: 'instructorUnpinProgramPlan',
+        suffix8: m.suffix8,
+        name: m.name,
       });
       if (!data.ok) {
-        toast(data.message || '진도 저장 실패');
-        return false;
+        toast(data.message || '고정 해제 실패');
+        return;
       }
-      if (data.pspProgress) {
-        m.pspProgress = data.pspProgress;
-        m.previousSessionProgress = data.previousSessionProgress || m.previousSessionProgress || {};
-      }
-      markMemberProgressSaved_(m);
-      return true;
+      clearPinnedProgramPlanLocal_(m);
+      saveProgressToMemberStore();
+      renderProgramList();
+      updateProgramPlanBar_();
+      toast('고정 프로그램을 해제했습니다');
     }
 
     function updateSendBar() {
@@ -7787,6 +8375,7 @@
       if (panel) panel.classList.toggle('show', hasSheetMember);
       updateAttendPassStepper(m);
       setSessionActionButtonsDisabled(!hasSheetMember);
+      updateProgramPlanBar_();
     }
 
     function sessionNoteFromProgress() {
@@ -7980,6 +8569,23 @@
       if (data.discomfortHistoryLine != null) m.discomfortHistoryLine = data.discomfortHistoryLine;
       if (data.discomfortHistory) m.discomfortHistory = data.discomfortHistory;
       if (data.completed) resetAttendPassCount(m);
+      var attendApplied =
+        !!data.completed ||
+        !!(data.partialPass && data.passesApplied > 0);
+      if (attendApplied) {
+        var serverPinGone = data.pinnedPlanCleared || data.pinnedPlan == null;
+        if (serverPinGone) {
+          clearPinnedProgramPlanLocal_(m, {
+            pinnedPlan: data.pinnedPlan != null ? data.pinnedPlan : null,
+            plannedProgress: data.plannedProgress || {},
+          });
+        } else if (state.programPlanPinned || (m && m.pinnedPlan)) {
+          m.pinnedPlan = data.pinnedPlan;
+          m.plannedProgress = data.plannedProgress || {};
+          applyPinnedPlanFromMember_(m);
+          toast('출석은 반영됐지만 고정 프로그램 해제에 실패했습니다. 「고정 해제」를 눌러 주세요.');
+        }
+      }
       if (data.nextBookingLine || data.nextBookingBooked || data.nextBookingCancelled) {
         if (state.nextBooking) state.nextBooking.forceReload = true;
         fetchNextBookingForMember_(m);
