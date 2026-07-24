@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <title>Re:Al 강사 · 회원 관리</title>
   <meta name="theme-color" content="#1e3a6e">
   <style>
@@ -1228,7 +1228,32 @@
       color:#b45309;
     }
     .eval-member-hint { font-size:12px; font-weight:700; color:var(--blue); margin-bottom:12px; padding:8px 10px; background:var(--blue-bg); border-radius:8px; }
-    #evalModal .modal { max-width:680px; }
+    #evalModal .modal {
+      max-width:680px;
+      max-height:min(92dvh, calc(var(--eval-vv-h, 100dvh) - 8px));
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior:contain;
+      padding-bottom:calc(24px + var(--safe-b));
+    }
+    /* 키보드 열림: 모달이 보이는 영역 안에만 머물고, 중첩 스크롤은 풀어 전체 스크롤로 하단까지 도달 */
+    #evalModal.eval-kb-open {
+      align-items:flex-end;
+      justify-content:center;
+    }
+    #evalModal.eval-kb-open .modal {
+      max-height:calc(var(--eval-vv-h, 100dvh) - 4px);
+      border-radius:12px 12px 0 0;
+    }
+    #evalModal.eval-kb-open .eval-hist-form {
+      max-height:none;
+      overflow:visible;
+    }
+    #evalLeaveModal.modal-overlay { z-index:120; }
+    #evalLeaveModal .modal { max-width:360px; }
+    .eval-leave-msg { font-size:14px; line-height:1.55; color:var(--text); margin:0 0 16px; }
+    .eval-leave-actions { display:flex; flex-direction:column; gap:8px; }
+    .eval-leave-actions .btn { width:100%; }
+    .eval-leave-discard { color:#b91c1c; border-color:#fecaca; }
     .eval-hist-lead { font-size:11px; color:var(--dim); margin:0 0 8px; line-height:1.45; }
     .eval-hist-form {
       display:flex; flex-direction:column; gap:8px;
@@ -1851,7 +1876,7 @@
     <div class="modal">
       <div class="modal-hd">
         <h2>초회 평가 (STEP01)</h2>
-        <button type="button" class="modal-close" onclick="closeEvalModal()">×</button>
+        <button type="button" class="modal-close" onclick="requestCloseEvalModal()">×</button>
       </div>
       <div class="eval-tabs">
         <button type="button" class="eval-tab on" data-pane="evalWrite" onclick="switchEvalTab('evalWrite',this)">작성</button>
@@ -1929,6 +1954,22 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 초회 평가 — 미저장 닫기 확인 -->
+  <div class="modal-overlay" id="evalLeaveModal" role="dialog" aria-modal="true" aria-labelledby="evalLeaveTitle" onclick="evalLeaveStay_()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-hd">
+        <h2 id="evalLeaveTitle">저장할까요?</h2>
+        <button type="button" class="modal-close" onclick="evalLeaveStay_()" aria-label="닫기">×</button>
+      </div>
+      <p class="eval-leave-msg">작성 중인 초회 평가가 있습니다. 이대로 나가면 내용이 사라집니다.</p>
+      <div class="eval-leave-actions">
+        <button type="button" class="btn btn-primary" id="evalLeaveSaveBtn" onclick="evalLeaveSave_()">저장하기</button>
+        <button type="button" class="btn btn-ghost" onclick="evalLeaveStay_()">계속 작성</button>
+        <button type="button" class="btn btn-ghost eval-leave-discard" onclick="evalLeaveDiscard_()">저장하지 않고 닫기</button>
       </div>
     </div>
   </div>
@@ -10787,6 +10828,68 @@
         '</div>';
     }
 
+    var _evalFormBaseline = '';
+
+    function getEvalFormSignature_() {
+      return [
+        compileEvalHistoryText(),
+        compileEvalExamText(EVAL_INSPECTION_SECTION),
+        compileEvalExamText(EVAL_MOVEMENT_SECTION),
+        compileEvalExamText(EVAL_PALPATION_SECTION),
+        (document.getElementById('evalMemo') || {}).value || '',
+        document.getElementById('evalSendMember') && document.getElementById('evalSendMember').checked ? '1' : '0',
+      ].join('\x1e').trim();
+    }
+
+    function markEvalFormClean_() {
+      _evalFormBaseline = getEvalFormSignature_();
+    }
+
+    function isEvalFormDirty_() {
+      return getEvalFormSignature_() !== _evalFormBaseline;
+    }
+
+    function isEvalSubmitInProgress_() {
+      var btn = document.getElementById('evalSubmitBtn');
+      return !!(btn && btn.disabled && _evalSubmitCountdownStartedAt);
+    }
+
+    function openEvalLeaveModal_() {
+      var leave = document.getElementById('evalLeaveModal');
+      if (leave) leave.classList.add('open');
+    }
+
+    function closeEvalLeaveModal_() {
+      var leave = document.getElementById('evalLeaveModal');
+      if (leave) leave.classList.remove('open');
+    }
+
+    function evalLeaveStay_() {
+      closeEvalLeaveModal_();
+    }
+
+    function evalLeaveDiscard_() {
+      closeEvalLeaveModal_();
+      closeEvalModal();
+    }
+
+    async function evalLeaveSave_() {
+      closeEvalLeaveModal_();
+      await submitFirstEval();
+    }
+
+    function requestCloseEvalModal() {
+      if (isEvalSubmitInProgress_()) {
+        toast('AI 리포트 생성 중입니다. 완료될 때까지 기다려 주세요.');
+        return;
+      }
+      if (!isEvalFormDirty_()) {
+        closeEvalModal();
+        return;
+      }
+      openEvalLeaveModal_();
+    }
+
     async function openEvalModal() {
       const info = evalMemberInfo();
       if (!info.name || info.phone.length < 10) {
@@ -10798,13 +10901,100 @@
       clearEvalFormSelections_();
       await loadWellnessIntakePrefill_(info.phone);
       loadFirstEvalView(info.phone, info.name);
+      markEvalFormClean_();
+      closeEvalLeaveModal_();
       document.getElementById('evalModal').classList.add('open');
       document.body.style.overflow = 'hidden';
+      setupEvalModalViewport_();
     }
     function closeEvalModal() {
+      closeEvalLeaveModal_();
+      teardownEvalModalViewport_();
       document.getElementById('evalModal').classList.remove('open');
       document.body.style.overflow = '';
     }
+
+    var _evalVvListening = false;
+
+    function resetEvalModalViewportStyles_() {
+      var overlay = document.getElementById('evalModal');
+      if (!overlay) return;
+      overlay.style.top = '';
+      overlay.style.left = '';
+      overlay.style.width = '';
+      overlay.style.height = '';
+      overlay.style.right = '';
+      overlay.style.bottom = '';
+      overlay.style.removeProperty('--eval-vv-h');
+      overlay.classList.remove('eval-kb-open');
+    }
+
+    function syncEvalModalViewport_() {
+      var overlay = document.getElementById('evalModal');
+      if (!overlay || !overlay.classList.contains('open')) return;
+      var vv = window.visualViewport;
+      var layoutH = window.innerHeight || document.documentElement.clientHeight || 0;
+      if (!vv) {
+        overlay.style.setProperty('--eval-vv-h', layoutH + 'px');
+        overlay.classList.remove('eval-kb-open');
+        return;
+      }
+      /* 오버레이를 보이는 화면(키보드 위)에 맞춰 고정 */
+      overlay.style.top = vv.offsetTop + 'px';
+      overlay.style.left = vv.offsetLeft + 'px';
+      overlay.style.width = vv.width + 'px';
+      overlay.style.height = vv.height + 'px';
+      overlay.style.right = 'auto';
+      overlay.style.bottom = 'auto';
+      overlay.style.setProperty('--eval-vv-h', vv.height + 'px');
+      var kbOpen = layoutH - vv.height > 100;
+      overlay.classList.toggle('eval-kb-open', kbOpen);
+    }
+
+    function onEvalModalFocusIn_(e) {
+      var t = e.target;
+      if (!t || !t.closest || !t.closest('#evalModal.open')) return;
+      var tag = (t.tagName || '').toLowerCase();
+      if (tag !== 'textarea' && tag !== 'input' && tag !== 'select') return;
+      var scrollFocused = function () {
+        syncEvalModalViewport_();
+        try {
+          t.scrollIntoView({ block: 'center', behavior: 'smooth', inline: 'nearest' });
+        } catch (err) {
+          try { t.scrollIntoView(true); } catch (err2) { /* ignore */ }
+        }
+      };
+      scrollFocused();
+      setTimeout(scrollFocused, 80);
+      setTimeout(scrollFocused, 320);
+    }
+
+    function setupEvalModalViewport_() {
+      syncEvalModalViewport_();
+      if (_evalVvListening) return;
+      _evalVvListening = true;
+      var vv = window.visualViewport;
+      if (vv) {
+        vv.addEventListener('resize', syncEvalModalViewport_);
+        vv.addEventListener('scroll', syncEvalModalViewport_);
+      }
+      window.addEventListener('resize', syncEvalModalViewport_);
+      document.addEventListener('focusin', onEvalModalFocusIn_);
+    }
+
+    function teardownEvalModalViewport_() {
+      resetEvalModalViewportStyles_();
+      if (!_evalVvListening) return;
+      _evalVvListening = false;
+      var vv = window.visualViewport;
+      if (vv) {
+        vv.removeEventListener('resize', syncEvalModalViewport_);
+        vv.removeEventListener('scroll', syncEvalModalViewport_);
+      }
+      window.removeEventListener('resize', syncEvalModalViewport_);
+      document.removeEventListener('focusin', onEvalModalFocusIn_);
+    }
+
     function switchEvalTab(paneId, btn) {
       document.querySelectorAll('.eval-tab').forEach(function(t){ t.classList.remove('on'); });
       document.querySelectorAll('.eval-pane').forEach(function(p){ p.classList.remove('on'); });
@@ -11020,6 +11210,7 @@
           }
           renderEvalProgramRecommendation(data.programRecommendation || programRec);
           await loadFirstEvalView(info.phone, info.name);
+          markEvalFormClean_();
           switchEvalTab('evalView', document.querySelector('.eval-tab[data-pane="evalView"]'));
         } else toast(data.message || '실패');
       } catch (err) {
@@ -11029,7 +11220,7 @@
       }
     }
 
-    document.getElementById('evalModal').addEventListener('click', function(e){ if(e.target===this) closeEvalModal(); });
+    /* 초회 평가: 바깥 클릭으로 닫지 않음 — 미저장 시 ×에서 저장 여부 확인 */
     document.getElementById('coachNoteModal').addEventListener('click', function(e){ if(e.target===this) closeCoachingNoteModal(); });
     document.getElementById('attendResultModal').addEventListener('click', function(e){ if(e.target===this) closeAttendResultModal(); });
     document.getElementById('extraPassModal').addEventListener('click', function(e){ if(e.target===this) closeExtraPassModal(); });
