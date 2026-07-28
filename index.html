@@ -212,7 +212,6 @@
     .section-zone--session .session-wrap-actions {
       border-top-color: var(--zone-session-border);
     }
-    .section-zone--session .next-booking-label { color: var(--zone-session); }
     .section-zone--session .session-wrap-btns .btn-attend-progress {
       background: var(--zone-session);
       border-color: #353b85;
@@ -458,8 +457,13 @@
       margin-bottom: 10px; padding: 8px 10px; border-radius: 8px;
       background: var(--zone-session-soft, #f8fafc); border: 1px solid var(--border);
     }
-    .program-plan-status { font-size: 11px; color: var(--dim); flex: 1; min-width: 140px; }
+    .program-plan-status { font-size: 11px; color: var(--dim); flex: 1 1 100%; min-width: 140px; }
     .program-plan-status.pinned { color: #b91c1c; font-weight: 600; }
+    .program-plan-actions {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+      flex: 1 1 auto; width: 100%;
+    }
+    .program-plan-actions .attend-pass-stepper { margin-right: 0; }
     .btn-save-program { background: #dc2626; color: #fff; border: none; }
     .btn-save-program:disabled { opacity: 0.45; }
     .btn-unpin-program { border-color: #fca5a5; color: #b91c1c; }
@@ -1041,67 +1045,6 @@
     .session-wrap-actions {
       display:flex; flex-direction:column; gap:8px;
       margin-top:8px; padding-top:12px; border-top:1px solid var(--border);
-    }
-    .next-booking-panel {
-      display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px;
-      padding:8px 10px; border-radius:10px;
-      background:#f8fafc; border:1px solid var(--border);
-      font-size:11px; line-height:1.4;
-    }
-    .next-booking-panel.loading { opacity:.65; }
-    .next-booking-label {
-      font-weight:800; color:var(--blue); white-space:nowrap;
-    }
-    .next-booking-value {
-      font-weight:700; color:#334155; flex:1 1 auto;
-    }
-    .next-booking-existing {
-      flex:1 1 100%; width:100%;
-      font-size:10px; color:#64748b; line-height:1.4;
-    }
-    .next-booking-existing .next-booking-value {
-      font-weight:700; color:#334155;
-    }
-    .next-booking-existing.is-empty .next-booking-value {
-      font-weight:600; color:#94a3b8;
-    }
-    .next-booking-pick {
-      display:flex; flex-wrap:wrap; align-items:center; gap:6px; width:100%;
-    }
-    .next-booking-pick-head {
-      display:flex; align-items:center; justify-content:space-between;
-      gap:8px; flex:1 1 100%; width:100%;
-    }
-    .next-booking-schedule-btn {
-      flex:0 0 auto; padding:5px 10px; font-size:10px; font-weight:800;
-      border-color:#cbd5e1; color:var(--blue); background:#fff; white-space:nowrap;
-    }
-    .next-booking-pick input[type="date"],
-    .next-booking-pick select,
-    .next-booking-date-field {
-      flex:1 1 120px; min-width:0;
-    }
-    .next-booking-date-field {
-      position:relative; display:block; cursor:pointer;
-    }
-    .next-booking-date-text {
-      display:block; padding:6px 8px; border:1px solid var(--border); border-radius:8px;
-      font-size:11px; font-family:inherit; background:#fff; color:var(--dim);
-      pointer-events:none;
-    }
-    .next-booking-date-field.has-value .next-booking-date-text {
-      color:#334155; font-weight:700;
-    }
-    .next-booking-date-field input[type="date"] {
-      position:absolute; inset:0; width:100%; height:100%;
-      opacity:0; cursor:pointer; border:none; padding:0; margin:0;
-    }
-    .next-booking-pick select {
-      padding:6px 8px; border:1px solid var(--border); border-radius:8px;
-      font-size:11px; font-family:inherit; background:#fff;
-    }
-    .next-booking-hint {
-      flex:1 1 100%; font-size:10px; color:var(--dim); margin:0;
     }
     .session-wrap-actions .attend-pass-stepper {
       align-self:center;
@@ -1830,36 +1773,20 @@
       </div>
       <div id="sessionAttendCountdownBar" class="session-attend-countdown-bar" hidden aria-live="polite"></div>
       <div class="session-wrap-actions">
-        <div class="next-booking-panel" id="nextBookingPanel" hidden>
-          <div class="next-booking-existing" id="nextBookingExisting" hidden>
-            <span class="next-booking-label">다음 예약</span>
-            <span class="next-booking-value" id="nextBookingExistingText"></span>
-          </div>
-          <div class="next-booking-pick" id="nextBookingPick" hidden>
-            <div class="next-booking-pick-head">
-              <span class="next-booking-label">다음 예약 잡기</span>
-              <button type="button" class="btn btn-ghost next-booking-schedule-btn" id="nextBookingScheduleBtn" onclick="openMemberScheduleSheet_()" title="구글 시트 예약 스케줄표 열기">예약 스케줄</button>
-            </div>
-            <select id="nextBookingInstructor" aria-label="담당 강사" onchange="onNextBookingInputChange()"></select>
-            <label class="next-booking-date-field" id="nextBookingDateField">
-              <span class="next-booking-date-text" id="nextBookingDateText">날짜 선택</span>
-              <input type="date" id="nextBookingDate" aria-label="다음 예약 날짜" onfocus="openNextBookingDatePicker_()" onchange="onNextBookingDateInput_()" oninput="onNextBookingDateInput_()">
-            </label>
-            <select id="nextBookingTime" aria-label="다음 예약 시간" onchange="onNextBookingInputChange()"></select>
-            <p class="next-booking-hint">출석·알림톡 발송 시 스케줄표에도 함께 반영됩니다.</p>
-          </div>
-        </div>
-        <div class="attend-pass-stepper" id="attendPassStepper" title="한 번에 사용할 회차 수 (본인 연속 사용 · 가족 동시 출석)">
-          <span class="pass-caption">다회차</span>
-          <button type="button" class="pass-btn" id="attendPassMinus" onclick="changeAttendPassCount(-1)" disabled aria-label="회차 줄이기">−</button>
-          <span class="pass-num" id="attendPassCountLabel">1</span>
-          <button type="button" class="pass-btn" id="attendPassPlus" onclick="changeAttendPassCount(1)" disabled aria-label="회차 늘리기">+</button>
-        </div>
         <p class="session-save-only-hint" id="sessionSaveOnlyHint" hidden></p>
         <div class="program-plan-bar" id="programPlanBar" hidden>
           <span class="program-plan-status" id="programPlanStatus">프로그램을 작성한 뒤 저장하세요.</span>
           <button type="button" class="btn btn-unpin-program" id="unpinProgramBtn" onclick="unpinProgramPlan()" hidden title="고정 해제">고정 해제</button>
-          <button type="button" class="btn btn-save-program" id="saveProgramBtn" onclick="saveProgramPlan()" disabled title="출석 없이 프로그램만 저장">프로그램 저장</button>
+          <div class="program-plan-actions">
+            <button type="button" class="btn btn-save-program" id="saveProgramBtn" onclick="saveProgramPlan()" disabled title="출석 없이 프로그램만 저장">프로그램 저장</button>
+            <div class="attend-pass-stepper" id="attendPassStepper" title="한 번에 사용할 회차 수 (본인 연속 사용 · 가족 동시 출석)">
+              <span class="pass-caption">다회차</span>
+              <button type="button" class="pass-btn" id="attendPassMinus" onclick="changeAttendPassCount(-1)" disabled aria-label="회차 줄이기">−</button>
+              <span class="pass-num" id="attendPassCountLabel">1</span>
+              <button type="button" class="pass-btn" id="attendPassPlus" onclick="changeAttendPassCount(1)" disabled aria-label="회차 늘리기">+</button>
+            </div>
+            <button type="button" class="btn btn-ghost" id="nextBookingScheduleBtn" onclick="openMemberScheduleSheet_()" title="구글 시트 예약 스케줄표 열기">예약 스케줄</button>
+          </div>
         </div>
         <div class="session-wrap-btns">
           <button type="button" class="btn btn-attend-silent" id="attendSilentBtn" onclick="attendSilentSession()" disabled title="출석·진도 저장 · 알림톡 없음">알림 없음</button>
@@ -6899,6 +6826,68 @@
       return lines.join('\n');
     }
 
+    function rebuildConditionNoteFromDiscomfortDisplay_(discomfort, freeText) {
+      var parts = String(discomfort || '').split(/\s*\/\s*/);
+      var lines = [];
+      parts.forEach(function (part) {
+        var t = String(part || '').trim();
+        if (!t) return;
+        var m = t.match(/^(.+?)\s*[·∙]\s*VAS\s*(\d+(?:~\d+)?)$/i) ||
+          t.match(/^(.+?)\s+VAS\s*(\d+(?:~\d+)?)$/i);
+        if (m) {
+          lines.push('-' + m[1].trim() + ' ' + m[2] + ':');
+          return;
+        }
+        var mLab = t.match(/^(.+?)\s*[·∙]\s*(.+)$/);
+        if (mLab) lines.push('-' + mLab[1].trim() + ' ' + mLab[2].trim() + ':');
+        else lines.push('-' + t + ':');
+      });
+      var free = String(freeText || '').trim();
+      if (!lines.length) return free;
+      if (!free) return lines.join('\n');
+      var last = lines[lines.length - 1];
+      if (/:\s*$/.test(last)) lines[lines.length - 1] = last.replace(/:\s*$/, ': ') + free;
+      else lines[lines.length - 1] = last + ' ' + free;
+      return lines.join('\n');
+    }
+
+    /** 직전 회차 오늘의 컨디션 원문 (회원 히스토리 기준, 최신이 배열 앞) */
+    function getPreviousSessionConditionNote_(m) {
+      m = m || state.selected;
+      if (!m) return '';
+      var list = m.conditionHistory || [];
+      var i;
+      for (i = 0; i < list.length; i++) {
+        var item = normalizeConditionHistoryItem_(list[i]);
+        if (!item) continue;
+        var discomfort = formatHistoryDiscomfortDisplay_(item.discomfort);
+        var free = String(item.sessionNote || '').trim();
+        if (isHistoryPlaceholder_(free)) free = '';
+        if (discomfort) {
+          var rebuilt = rebuildConditionNoteFromDiscomfortDisplay_(discomfort, free);
+          if (rebuilt) return rebuilt;
+        }
+        if (free) {
+          if (free.split('\n').some(function (ln) { return !!parseConditionLine_(ln); })) return free;
+          return free;
+        }
+      }
+      return '';
+    }
+
+    /** 동일 부위 선택 시 직전 컨디션 → 오늘의 컨디션 붙여넣기 (비어 있을 때만) */
+    function applyPreviousConditionNoteOnSameArea_() {
+      var prev = getPreviousSessionConditionNote_();
+      if (!prev) return false;
+      if (!state.sessionCheck) state.sessionCheck = { areas: [], vas: null, note: '' };
+      var cur = String(state.sessionCheck.note || '').trim();
+      if (cur) return false;
+      state.sessionCheck.note = prev;
+      var noteEl = document.getElementById('sessionCheckNote');
+      if (noteEl) noteEl.value = prev;
+      return true;
+    }
+
     function resolveSameDiscomfortAreaId_() {
       var note = String(state.sessionCheck.note || '');
       var lines = note.trim().split('\n');
@@ -6918,6 +6907,27 @@
         if (a) return a;
       }
       return null;
+    }
+
+    var COMFORTABLE_CONDITION_LINE_ = '-편안함: 특이사항 없음';
+
+    /** 편안함 — VAS 없이 바로 「특이사항 없음」 기록 */
+    function applyComfortableConditionNote_() {
+      if (!state.sessionCheck) state.sessionCheck = { areas: [], vas: null, note: '' };
+      var sc = state.sessionCheck;
+      var note = String(sc.note || '').trim();
+      var lines = note ? note.split('\n').map(function (ln) { return String(ln || '').trim(); }) : [];
+      if (lines.indexOf(COMFORTABLE_CONDITION_LINE_) >= 0) {
+        sc.areas = [];
+        sc.vas = null;
+        return;
+      }
+      if (note) note = finalizeOpenConditionLines_(note);
+      sc.note = note ? note + '\n' + COMFORTABLE_CONDITION_LINE_ : COMFORTABLE_CONDITION_LINE_;
+      sc.areas = [];
+      sc.vas = null;
+      var noteEl = document.getElementById('sessionCheckNote');
+      if (noteEl) noteEl.value = sc.note;
     }
 
     function tryCommitSessionCheckSelection_() {
@@ -7289,11 +7299,12 @@
           state.sessionCheck.areas = rest.concat([id]);
         }
       } else if (id === 'comfortable') {
-        state.sessionCheck.areas = areas.indexOf('comfortable') >= 0 ? [] : ['comfortable'];
+        applyComfortableConditionNote_();
       } else if (id === 'same') {
         if (areas.indexOf('same') >= 0) {
           state.sessionCheck.areas = sessionCheckSideModifiers_(areas);
         } else {
+          applyPreviousConditionNoteOnSameArea_();
           var copied = resolveSameDiscomfortAreaId_();
           var mods = sessionCheckSideModifiers_(areas);
           state.sessionCheck.areas = copied ? mods.concat([copied]) : mods.concat(['same']);
