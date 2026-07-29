@@ -249,24 +249,11 @@
     }
     .btn-green { background:var(--green); color:#fff; border-color:#047857; }
     .btn-save { background:var(--blue); color:#fff; border-color:#1e3a6e; }
-    .attend-pass-stepper {
-      display:inline-flex; align-items:center; gap:2px;
-      background:#f1f5f9; border:1px solid var(--border); border-radius:10px;
-      padding:3px 4px; margin-right:6px;
+    .btn-extra-attend {
+      background:#f59e0b; color:#fff; border:none; font-weight:700; font-size:12px;
+      white-space:nowrap;
     }
-    .attend-pass-stepper .pass-caption {
-      font-size:10px; font-weight:800; color:var(--dim);
-      padding:0 4px 0 6px; white-space:nowrap;
-    }
-    .attend-pass-stepper .pass-btn {
-      width:28px; height:28px; border:none; border-radius:7px;
-      background:#fff; color:var(--text); font-size:16px; font-weight:700;
-      cursor:pointer; line-height:1; padding:0;
-    }
-    .attend-pass-stepper .pass-btn:disabled { opacity:.35; cursor:not-allowed; }
-    .attend-pass-stepper .pass-num {
-      min-width:20px; text-align:center; font-size:15px; font-weight:800;
-    }
+    .btn-extra-attend:disabled { opacity:.45; cursor:not-allowed; }
     .btn:disabled { opacity:.45; cursor:not-allowed; }
 
     /* 오늘 회원 — 강사명 한 줄 + 칩 (좁으면 3열, 넓으면 4·5열…) */
@@ -460,10 +447,10 @@
     .program-plan-status { font-size: 11px; color: var(--dim); flex: 1 1 100%; min-width: 140px; }
     .program-plan-status.pinned { color: #b91c1c; font-weight: 600; }
     .program-plan-actions {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+      display: flex; flex-wrap: nowrap; align-items: center; gap: 6px;
       flex: 1 1 auto; width: 100%;
     }
-    .program-plan-actions .attend-pass-stepper { margin-right: 0; }
+    .program-plan-actions .btn { flex: 1 1 0; min-width: 0; text-align: center; }
     .btn-save-program { background: #dc2626; color: #fff; border: none; }
     .btn-save-program:disabled { opacity: 0.45; }
     .btn-unpin-program { border-color: #fca5a5; color: #b91c1c; }
@@ -1046,7 +1033,7 @@
       display:flex; flex-direction:column; gap:8px;
       margin-top:8px; padding-top:12px; border-top:1px solid var(--border);
     }
-    .session-wrap-actions .attend-pass-stepper {
+    .session-wrap-actions .btn-extra-attend {
       align-self:center;
     }
     .session-wrap-btns {
@@ -1109,7 +1096,7 @@
       font-size:11px; font-weight:800; color:var(--dim); margin-bottom:8px; text-align:center;
     }
     .attend-result-status {
-      margin-top:12px; font-size:13px; font-weight:700; line-height:1.5;
+      margin-top:4px; font-size:13px; font-weight:700; line-height:1.5;
     }
     .attend-result-status.ok { color:#047857; }
     .attend-result-status.warn { color:#b45309; }
@@ -1563,8 +1550,8 @@
     .alimtalk-preview.is-result-mode {
       background:transparent; color:inherit; padding:0;
     }
-    .alimtalk-preview.is-result-mode .preview-label { color:var(--blue); font-size:12px; }
-    .session-attend-result-summary { margin-bottom:10px; text-align:left; }
+    .alimtalk-preview.is-result-mode .preview-label { color:var(--blue); font-size:12px; margin-bottom:4px; }
+    .session-attend-result-summary { margin-bottom:4px; text-align:left; }
     .session-attend-result-summary .attend-result-line1 {
       font-size:18px; font-weight:800; color:var(--blue); margin:0 0 4px;
     }
@@ -1582,7 +1569,7 @@
     .session-attend-sent-label {
       font-size:10px; font-weight:700; color:#94a3b8; margin-bottom:6px;
     }
-    .session-attend-status { margin-top:10px; text-align:left; }
+    .session-attend-status { margin-top:4px; text-align:left; }
     .session-attend-processing {
       text-align:center; padding:20px 12px; color:#94a3b8;
     }
@@ -1779,12 +1766,7 @@
           <button type="button" class="btn btn-unpin-program" id="unpinProgramBtn" onclick="unpinProgramPlan()" hidden title="고정 해제">고정 해제</button>
           <div class="program-plan-actions">
             <button type="button" class="btn btn-save-program" id="saveProgramBtn" onclick="saveProgramPlan()" disabled title="출석 없이 프로그램만 저장">프로그램 저장</button>
-            <div class="attend-pass-stepper" id="attendPassStepper" title="한 번에 사용할 회차 수 (본인 연속 사용 · 가족 동시 출석)">
-              <span class="pass-caption">다회차</span>
-              <button type="button" class="pass-btn" id="attendPassMinus" onclick="changeAttendPassCount(-1)" disabled aria-label="회차 줄이기">−</button>
-              <span class="pass-num" id="attendPassCountLabel">1</span>
-              <button type="button" class="pass-btn" id="attendPassPlus" onclick="changeAttendPassCount(1)" disabled aria-label="회차 늘리기">+</button>
-            </div>
+            <button type="button" class="btn btn-extra-attend" id="extraAttendBtn" onclick="extraAttendSession()" hidden title="1회 추가 소진">추가 출석</button>
             <button type="button" class="btn btn-ghost" id="nextBookingScheduleBtn" onclick="openMemberScheduleSheet_()" title="구글 시트 예약 스케줄표 열기">예약 스케줄</button>
           </div>
         </div>
@@ -5099,14 +5081,7 @@
           hint.textContent = '출석이 이미 반영되었습니다. 진도 수정 또는 알림톡 재발송을 선택하세요.';
         }
       }
-      if (slotLocked) {
-        var minus = document.getElementById('attendPassMinus');
-        var plus = document.getElementById('attendPassPlus');
-        if (minus) minus.disabled = true;
-        if (plus) plus.disabled = true;
-      } else {
-        updateAttendPassStepper(m);
-      }
+      updateAttendPassStepper(m);
     }
 
     function setSessionActionButtonsDisabled(disabled) {
@@ -6366,19 +6341,6 @@
       }));
     }
 
-    function changeAttendPassCount(delta) {
-      var m = state.selected;
-      if (!m || !m.suffix8) return;
-      var max = maxAttendPassCount(m);
-      var next = (state.attendPassCount || 1) + delta;
-      if (next < 1) next = 1;
-      if (next > max) next = max;
-      state.attendPassCount = next;
-      state.familyCoAttendNames = defaultFamilyCoAttendNames_(m, next);
-      updateAttendPassStepper();
-      updateSessionWrapPreview();
-    }
-
     function resetAttendPassCount(m) {
       state.attendPassCount = 1;
       state.familyCoAttendNames = null;
@@ -6388,32 +6350,27 @@
     function updateAttendPassStepper(m) {
       m = m || state.selected;
       var has = !!(m && m.suffix8);
-      var max = has ? maxAttendPassCount(m) : 1;
-      var n = state.attendPassCount || 1;
-      if (n > max) {
-        n = max;
-        state.attendPassCount = n;
-      }
-      if (n < 1) {
-        n = 1;
-        state.attendPassCount = 1;
-      }
-      var label = document.getElementById('attendPassCountLabel');
-      var minus = document.getElementById('attendPassMinus');
-      var plus = document.getElementById('attendPassPlus');
-      var stepper = document.getElementById('attendPassStepper');
-      if (label) label.textContent = String(n);
-      if (minus) minus.disabled = !has || n <= 1;
-      if (plus) plus.disabled = !has || n >= max;
-      if (stepper) stepper.style.opacity = has ? '1' : '.45';
-      if (has && n > 1) {
-        state.familyCoAttendNames = defaultFamilyCoAttendNames_(m, n);
-      } else if (n <= 1) {
-        state.familyCoAttendNames = null;
+      state.attendPassCount = 1;
+      state.familyCoAttendNames = null;
+      var btn = document.getElementById('extraAttendBtn');
+      if (btn) {
+        var locked = has && memberAttendSlotLocked_(m);
+        btn.hidden = !locked;
       }
       if (!state.attendProcessing && !(state.inlineAttendResult && state.inlineAttendResult.memberKey === state.selectedKey)) {
         updateSessionWrapPreview();
       }
+    }
+
+    async function extraAttendSession() {
+      var m = state.selected;
+      if (!m || !m.suffix8) { toast('회원을 선택해 주세요'); return; }
+      if (!confirm('이미 출석되었습니다. 1회 더 소진하겠습니까?')) return;
+      state.attendPassCount = 2;
+      syncSessionRecordFieldsFromModal();
+      _pendingAttendAlimtalk = null;
+      var progress = mergedProgressMapForSave();
+      await runCompleteSession(m, progress, { skipAttendAlimtalk: true, attendPassCount: 2, confirmMultiPass: true });
     }
     function instructorsList() {
       return (state.board && state.board.instructors && state.board.instructors.length)
