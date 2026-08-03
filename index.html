@@ -107,12 +107,12 @@
       border-left-color: var(--zone-members);
       box-shadow: 0 2px 14px rgba(30, 58, 110, 0.06);
     }
-    .section-zone--members > .members-hd > .card-title {
+    .section-zone--members > .members-hd > .board-date-btn {
       color: var(--zone-members);
       margin-bottom: 0;
       flex-shrink: 0;
     }
-    .section-zone--members > .members-hd > .card-title::before {
+    .section-zone--members > .members-hd > .board-date-btn::before {
       content: '';
       display: inline-block;
       width: 7px; height: 7px;
@@ -391,6 +391,50 @@
       gap: 10px;
       margin-bottom: 10px;
       flex-wrap: wrap;
+    }
+    .board-date-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin: 0;
+      padding: 4px 8px 4px 2px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.2;
+      cursor: pointer;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .board-date-btn:hover,
+    .board-date-btn:focus-visible {
+      background: var(--zone-members-soft);
+      outline: none;
+    }
+    .board-date-btn .board-date-text {
+      font-variant-numeric: tabular-nums;
+    }
+    .board-date-btn .board-date-caret {
+      font-size: 10px;
+      font-weight: 700;
+      opacity: 0.55;
+      margin-left: 1px;
+    }
+    .board-date-native {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      color-scheme: light;
     }
     .members-hd .member-picker-bar {
       flex: 1;
@@ -984,8 +1028,56 @@
     .psp-align-chain { display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-bottom:10px; }
     .psp-align-step { font-size:10px; font-weight:600; background:var(--blue-soft); color:var(--blue); padding:4px 8px; border-radius:6px; }
     .psp-align-arrow { font-size:10px; color:#94a3b8; }
-    .movement-legend { display:flex; flex-wrap:wrap; gap:10px; font-size:10px; color:var(--dim); margin-bottom:10px; }
+    .movement-legend { display:flex; flex-wrap:wrap; align-items:center; gap:10px; font-size:10px; color:var(--dim); margin-bottom:10px; }
     .movement-legend span { display:inline-flex; align-items:center; gap:5px; }
+    .btn-load-program-plan {
+      display: inline-flex; align-items: center; justify-content: center;
+      margin: 0; padding: 5px 10px;
+      border: 1px solid #fca5a5; border-radius: 8px;
+      background: #fef2f2; color: #b91c1c;
+      font-size: 11px; font-weight: 700; line-height: 1.2;
+      cursor: pointer; white-space: nowrap;
+    }
+    .btn-load-program-plan:hover,
+    .btn-load-program-plan:focus-visible {
+      background: #fee2e2; border-color: #f87171; outline: none;
+    }
+    .btn-load-program-plan:disabled {
+      opacity: 1;
+      cursor: not-allowed;
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #94a3b8;
+    }
+    .btn-load-program-plan:disabled:hover,
+    .btn-load-program-plan:disabled:focus-visible {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .pinned-program-plan-list {
+      display: none;
+      margin: -2px 0 12px;
+      padding: 8px 10px;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      background: #fef2f2;
+    }
+    .pinned-program-plan-list.show { display: block; }
+    .pinned-program-plan-list .pinned-plan-title {
+      font-size: 11px; font-weight: 800; color: #b91c1c; margin: 0 0 6px;
+    }
+    .pinned-program-plan-list ul {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .pinned-program-plan-list li {
+      font-size: 11px; font-weight: 600; color: #b91c1c;
+      background: #fff; border: 1px solid #fecaca;
+      border-radius: 999px; padding: 3px 8px;
+    }
+    .pinned-program-plan-list .pinned-plan-empty {
+      margin: 0; font-size: 11px; color: #b91c1c;
+    }
     .legend-swatch { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
     .legend-swatch.done-prior { background:#f0fdf4; border:1px solid #bbf7d0; }
     .legend-swatch.done-recent { background:var(--green-bg); border:1px solid var(--green); }
@@ -1634,10 +1726,14 @@
   </header>
 
   <main>
-    <!-- 1. 오늘 예약 회원 -->
+    <!-- 1. 선택일 예약 회원 -->
     <section class="card section-zone section-zone--members">
       <div class="members-hd">
-        <div class="card-title">회원 선택</div>
+        <label class="board-date-btn" id="boardDateBtn" title="날짜 선택" aria-label="예약 날짜 선택" onclick="openBoardDatePicker(event)">
+          <span class="board-date-text" id="boardDateLabel">—</span>
+          <span class="board-date-caret" aria-hidden="true">▾</span>
+          <input type="date" class="board-date-native" id="boardDateInput" aria-label="날짜" onchange="onBoardDateChange(this.value)">
+        </label>
         <div class="member-picker-bar">
           <div class="member-search-row">
             <label class="member-search-label" for="memberSearchInput">
@@ -1713,11 +1809,13 @@
       </div>
       <div class="card-sub" id="programCardSub">고정 저장은 <strong style="color:#dc2626;font-weight:700;">빨간색</strong>(오늘 체크해도 빨강 유지), 과거 진행은 <strong style="color:#86efac;font-weight:700;">옅은 초록</strong>, 직전 회차는 <strong style="color:var(--green);font-weight:700;">진한 초록</strong>, 오늘만 진행은 <strong style="color:var(--blue);font-weight:700;">체크</strong>입니다.</div>
       <div class="movement-legend" id="programLegend">
+        <button type="button" class="btn-load-program-plan" id="loadProgramPlanBtn" onclick="loadPinnedProgramPlan()" title="저장된 프로그램이 없습니다" disabled>프로그램 불러오기</button>
         <span><i class="legend-swatch done-planned"></i>고정 저장(체크해도 빨강)</span>
         <span><i class="legend-swatch done-prior"></i>과거 진행</span>
         <span><i class="legend-swatch done-recent"></i>직전 회차</span>
         <span><i class="legend-swatch today"></i>오늘 진행</span>
       </div>
+      <div class="pinned-program-plan-list" id="pinnedProgramPlanList" hidden></div>
       <div id="pspProgramList"><div class="empty-hint">불러오는 중…</div></div>
     </section>
 
@@ -2826,7 +2924,92 @@
           if (today[id]) out[id] = ['done'];
         });
       });
+      // today가 비어 있어도 이미 고정된 항목이 있으면 재저장 가능
+      if (!Object.keys(out).length) {
+        PROGRAM_TABS.forEach(function(tab) {
+          var planned = bucket[tab.id] && bucket[tab.id].planned;
+          if (!planned) return;
+          Object.keys(planned).forEach(function(id) {
+            if (planned[id]) out[id] = ['done'];
+          });
+        });
+      }
       return out;
+    }
+
+    function clearMemberSessionProgressDraft_(mk) {
+      var key = mk || state.selectedKey;
+      var store = key ? state.progressByMember[key] : null;
+      if (!store) return;
+      PROGRAM_TABS.forEach(function(tab) {
+        if (!store[tab.id]) return;
+        store[tab.id].today = {};
+        store[tab.id].planned = {};
+      });
+    }
+
+    function labelForProgramItemId_(id) {
+      var meta = exerciseMetaById_[id];
+      if (meta && meta.label) return meta.label;
+      var catalogs = [
+        state.program,
+        state.movementCatalog,
+        typeof buildFaceCatalog === 'function' ? buildFaceCatalog() : null,
+        typeof buildFuncJinokCatalog === 'function' ? buildFuncJinokCatalog() : null,
+        typeof buildHongtaekCatalog === 'function' ? buildHongtaekCatalog() : null,
+        typeof buildInjunCatalog === 'function' ? buildInjunCatalog() : null,
+      ];
+      var i;
+      var j;
+      for (i = 0; i < catalogs.length; i++) {
+        var list = catalogs[i];
+        if (!list || !list.length) continue;
+        for (j = 0; j < list.length; j++) {
+          if (list[j] && list[j].id === id) {
+            return methodDisplayLabel(list[j]);
+          }
+        }
+      }
+      return id;
+    }
+
+    function renderPinnedProgramPlanList_(plan, opts) {
+      opts = opts || {};
+      var el = document.getElementById('pinnedProgramPlanList');
+      if (!el) return;
+      var progress = (plan && plan.sessionProgress) || {};
+      var ids = programPlanSessionIds_(progress);
+      if (!ids.length) {
+        el.classList.remove('show');
+        el.hidden = true;
+        el.innerHTML = '';
+        return;
+      }
+      var title = opts.title || '저장된 프로그램';
+      var html = '<p class="pinned-plan-title">' + escapeHtml(title) + ' · ' + ids.length + '개</p><ul>';
+      ids.forEach(function(id) {
+        html += '<li>' + escapeHtml(labelForProgramItemId_(id)) + '</li>';
+      });
+      html += '</ul>';
+      el.innerHTML = html;
+      el.hidden = false;
+      el.classList.add('show');
+    }
+
+    function hidePinnedProgramPlanList_() {
+      var el = document.getElementById('pinnedProgramPlanList');
+      if (!el) return;
+      el.classList.remove('show');
+      el.hidden = true;
+      el.innerHTML = '';
+    }
+
+    function switchToTabForProgramIds_(ids) {
+      if (!ids || !ids.length) return;
+      var tabId = catalogTabForItemId(ids[0]);
+      if (tabId && tabId !== state.activeProgramTab) {
+        switchProgramTab(tabId);
+      }
     }
 
     function programPlanSessionIds_(sessionProgress) {
@@ -3042,6 +3225,7 @@
       memberDetailLoading: false,
       memberDetailLoadError: '',
       memberPickerTab: 'today',
+      boardDateYmd: '',
       searchSelectedMember: null,
       memberSearchQuery: '',
       memberSearchResults: [],
@@ -4026,11 +4210,86 @@
     }
 
     function seoulTodayYmd_() {
-      var d = new Date();
-      var y = d.getFullYear();
-      var m = String(d.getMonth() + 1).padStart(2, '0');
-      var day = String(d.getDate()).padStart(2, '0');
-      return y + '-' + m + '-' + day;
+      try {
+        return new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'Asia/Seoul',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).format(new Date());
+      } catch (e) {
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+      }
+    }
+
+    function normalizeBoardYmd_(ymd) {
+      var s = String(ymd || '').trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+      return seoulTodayYmd_();
+    }
+
+    function boardDateYmd_() {
+      if (!state.boardDateYmd) state.boardDateYmd = seoulTodayYmd_();
+      return state.boardDateYmd;
+    }
+
+    function isBoardDateToday_() {
+      return boardDateYmd_() === seoulTodayYmd_();
+    }
+
+    function dayKrFromYmd_(ymd) {
+      var parts = String(ymd || '').split('-');
+      if (parts.length !== 3) return '';
+      var dt = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      if (isNaN(dt.getTime())) return '';
+      return ['일', '월', '화', '수', '목', '금', '토'][dt.getDay()] || '';
+    }
+
+    function formatBoardDateLabel_(ymd, dayKr) {
+      var s = normalizeBoardYmd_(ymd);
+      var parts = s.split('-');
+      var label = parseInt(parts[1], 10) + '/' + parseInt(parts[2], 10);
+      var kr = dayKr || dayKrFromYmd_(s);
+      if (kr) label += ' (' + kr + ')';
+      if (s === seoulTodayYmd_()) label += ' · 오늘';
+      return label;
+    }
+
+    function syncBoardDateUi_(ymd, dayKr) {
+      var normalized = normalizeBoardYmd_(ymd);
+      state.boardDateYmd = normalized;
+      var input = document.getElementById('boardDateInput');
+      if (input && input.value !== normalized) input.value = normalized;
+      var label = document.getElementById('boardDateLabel');
+      if (label) label.textContent = formatBoardDateLabel_(normalized, dayKr);
+    }
+
+    function openBoardDatePicker(ev) {
+      var input = document.getElementById('boardDateInput');
+      if (!input) return;
+      if (!input.value) input.value = boardDateYmd_();
+      // 라벨/텍스트 클릭 시 네이티브 날짜 선택기 우선 호출 (지원 브라우저)
+      if (ev && ev.target === input) return;
+      if (typeof input.showPicker === 'function') {
+        try {
+          if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+          input.showPicker();
+        } catch (e) {}
+      }
+    }
+
+    function onBoardDateChange(ymd) {
+      var next = normalizeBoardYmd_(ymd);
+      if (next === boardDateYmd_() && state.board && state.board.date === next) {
+        syncBoardDateUi_(next, state.board.dayKr);
+        return;
+      }
+      syncBoardDateUi_(next);
+      loadBoard({ keepSelection: false });
     }
 
     function seoulTomorrowYmd_() {
@@ -5101,7 +5360,10 @@
     async function attendSilentSession() {
       var m = state.selected;
       if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
-      if (!canAttendSelectedMember_(m)) { toast('오늘 예약 회원만 출석할 수 있습니다'); return; }
+      if (!canAttendSelectedMember_(m)) {
+        toast(isBoardDateToday_() ? '오늘 예약 회원만 출석할 수 있습니다' : '출석은 오늘 날짜에서만 처리할 수 있습니다');
+        return;
+      }
       if (memberAttendSlotLocked_(m)) {
         await saveProgressOnlySession();
         return;
@@ -5122,7 +5384,10 @@
     async function attendBasicSession() {
       var m = state.selected;
       if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
-      if (!canAttendSelectedMember_(m)) { toast('오늘 예약 회원만 출석할 수 있습니다'); return; }
+      if (!canAttendSelectedMember_(m)) {
+        toast(isBoardDateToday_() ? '오늘 예약 회원만 출석할 수 있습니다' : '출석은 오늘 날짜에서만 처리할 수 있습니다');
+        return;
+      }
       syncSessionRecordFieldsFromModal();
       if (memberAttendSlotLocked_(m)) {
         await runResendAttendAlimtalk(m, mergedProgressMapForSave(), { basicAttendOnly: true });
@@ -5136,7 +5401,10 @@
     async function attendWithProgressSession() {
       var m = state.selected;
       if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
-      if (!canAttendSelectedMember_(m)) { toast('오늘 예약 회원만 출석할 수 있습니다'); return; }
+      if (!canAttendSelectedMember_(m)) {
+        toast(isBoardDateToday_() ? '오늘 예약 회원만 출석할 수 있습니다' : '출석은 오늘 날짜에서만 처리할 수 있습니다');
+        return;
+      }
       syncSessionRecordFieldsFromModal();
       if (memberAttendSlotLocked_(m)) {
         _pendingAttendAlimtalk = buildAttendAlimtalkPayload();
@@ -6501,8 +6769,10 @@
       _boardSyncInFlight = true;
       // 버튼 「새로고침」만 선택·결과 초기화. silent(백그라운드 동기화)는 선택 유지
       var clearSelectionOnLoad = !opts.silent && !opts.keepSelection;
+      var requestYmd = normalizeBoardYmd_(opts.date || boardDateYmd_());
+      syncBoardDateUi_(requestYmd);
       try {
-        const data = await api({ action: 'instructorDayBoard' }, {
+        const data = await api({ action: 'instructorDayBoard', date: requestYmd }, {
           timeoutMs: BOARD_LOAD_TIMEOUT_MS,
           timeoutMessage:
             '회원 목록 응답 시간 초과(약 ' + BOARD_LOAD_TIMEOUT_SEC + '초). ' +
@@ -6537,8 +6807,9 @@
         state.movementCatalog = mergeMovementCatalogFromServer_(data.pspProgram || data.pspCatalog);
         state.scheduleProgramColors = data.scheduleProgramColors || SCHEDULE_PROGRAM_COLORS_FALLBACK;
         state.program = getProgramCatalog(state.activeProgramTab);
+        syncBoardDateUi_(data.date || requestYmd, data.dayKr);
         document.getElementById('dateLine').textContent =
-          (data.date || '') + ' (' + (data.dayKr || '') + ') · 예약 ' + (data.members || []).length + '명';
+          (data.date || requestYmd) + ' (' + (data.dayKr || dayKrFromYmd_(data.date || requestYmd) || '') + ') · 예약 ' + (data.members || []).length + '명';
         renderProgramTabs();
         if (clearSelectionOnLoad) {
           clearUiAfterManualBoardRefresh_();
@@ -6606,13 +6877,14 @@
       const members = todayMembers();
       const instructors = instructorsList();
       const searchChipHtml = buildSearchSelectedMemberRowHtml_(members);
+      var emptyHint = isBoardDateToday_() ? '오늘 예약 없음' : (formatBoardDateLabel_(boardDateYmd_()) + ' 예약 없음');
       if (!members.length && !searchChipHtml) {
-        root.innerHTML = '<span class="empty-hint">오늘 예약 없음</span>';
+        root.innerHTML = '<span class="empty-hint">' + emptyHint + '</span>';
         return;
       }
       let html = '<div class="instructor-rows">';
       if (!members.length) {
-        html += '<p class="empty-hint" style="margin:0 0 8px">오늘 예약 없음</p>';
+        html += '<p class="empty-hint" style="margin:0 0 8px">' + emptyHint + '</p>';
       } else {
       members.sort(function(a, b) {
         var ia = a.instructorIndex != null ? a.instructorIndex : 99;
@@ -7650,6 +7922,8 @@
     }
 
     var _memberDetailReq = 0;
+    var _programPlanSaveInFlight = false;
+    var _programPlanLoadInFlight = false;
 
     function invalidateMemberDetailRequests_() {
       ++_memberDetailReq;
@@ -7670,6 +7944,7 @@
       state.programPlanSavedAt = '';
       distributePlannedToMemberStore_({});
       if (state.selectedKey) loadProgressFromMemberStore(state.activeProgramTab);
+      hidePinnedProgramPlanList_();
     }
 
     function hasUserSessionProgressEdits_(todayOpt) {
@@ -7738,12 +8013,30 @@
         loadProgressFromMemberStore(state.activeProgramTab);
       }
       if (!opts.skipPinnedPlanApply) {
-        m.pinnedPlan = member.pinnedPlan || null;
-        m.plannedProgress = member.plannedProgress || {};
+        var incomingPlan = member.pinnedPlan || null;
+        var localPlan = m.pinnedPlan || null;
+        var localNewer =
+          !!(localPlan && localPlan.pinned) &&
+          (!incomingPlan ||
+            String(localPlan.savedAt || '') > String(incomingPlan.savedAt || ''));
+        // 서버 매칭 실패·지연 응답보다, 방금 저장한 로컬 고정본을 우선
+        if (localNewer) {
+          m.pinnedPlan = localPlan;
+          m.plannedProgress = localPlan.sessionProgress || m.plannedProgress || {};
+        } else {
+          m.pinnedPlan = incomingPlan;
+          m.plannedProgress = member.plannedProgress || (incomingPlan && incomingPlan.sessionProgress) || {};
+        }
         mergeMemberApplicationPrefill_(m, member);
-        applyPinnedPlanFromMember_(m, opts.pinnedPlanOpts);
+        var pinOpts = Object.assign({ forceToday: !hasUserSessionProgressEdits_() }, opts.pinnedPlanOpts || {});
+        applyPinnedPlanFromMember_(m, pinOpts);
         syncPlannedProgressToMemberStore_();
         saveProgressToMemberStore();
+        if (m.pinnedPlan && m.pinnedPlan.pinned && programPlanSessionIds_(m.pinnedPlan.sessionProgress).length) {
+          renderPinnedProgramPlanList_(m.pinnedPlan, { title: '고정 저장 프로그램' });
+        } else {
+          hidePinnedProgramPlanList_();
+        }
       }
       renderSelectedMemberUi();
       return true;
@@ -7807,6 +8100,9 @@
       resetMemberSessionState(m);
       resetAttendPassCount(m);
       var mk = memberKey(m);
+      // 이전 선택에서 남은 today/planned가 고정 프로그램 적용을 막지 않도록 초기화
+      clearMemberSessionProgressDraft_(mk);
+      hidePinnedProgramPlanList_();
       if (m.suffix8 && (Object.keys(m.pspProgress || {}).length || Object.keys(m.previousSessionProgress || {}).length)) {
         distributeServerProgressToStore(m, { resetBaseline: true });
       } else if (!state.progressByMember[mk]) {
@@ -7815,8 +8111,9 @@
       state.program = getProgramCatalog(state.activeProgramTab);
       loadProgressFromMemberStore(state.activeProgramTab);
       if (m.pinnedPlan || (m.plannedProgress && Object.keys(m.plannedProgress).length)) {
-        applyPinnedPlanFromMember_(m);
+        applyPinnedPlanFromMember_(m, { forceToday: true });
         syncPlannedProgressToMemberStore_();
+        renderPinnedProgramPlanList_(m.pinnedPlan, { title: '고정 저장 프로그램' });
       }
       if (m.suffix8) {
         state.memberDetailLoading = true;
@@ -8103,7 +8400,7 @@
 
     function canAttendSelectedMember_(m) {
       m = m || state.selected;
-      return !!(m && m.suffix8 && isTodayScheduledMember_(m));
+      return !!(m && m.suffix8 && isBoardDateToday_() && isTodayScheduledMember_(m));
     }
 
     function applyPinnedPlanFromMember_(m, opts) {
@@ -8232,7 +8529,7 @@
       var reqId = ++state._memberSearchReq;
       startMemberSearchCountdown_();
       renderMemberSearchResults(null, null, { loading: true });
-      var data = await api({ action: 'instructorSearchMembers', query: query }, { timeoutMs: 45000 });
+      var data = await api({ action: 'instructorSearchMembers', query: query, date: boardDateYmd_() }, { timeoutMs: 45000 });
       if (reqId !== state._memberSearchReq) return;
       stopMemberSearchCountdown_();
       if (!data.ok) {
@@ -8269,7 +8566,7 @@
       results.forEach(function(r, idx) {
         var phoneText = r.phoneDisplay || ('···' + (r.phoneLast4 || ''));
         var metaParts = [r.instructorName, r.program, r.branch].filter(Boolean);
-        if (r.isTodayScheduled) metaParts.push('오늘 예약');
+        if (r.isTodayScheduled) metaParts.push(isBoardDateToday_() ? '오늘 예약' : '선택일 예약');
         var meta = metaParts.join(' · ');
         html += '<button type="button" class="member-search-item" onclick="selectSearchMemberByIndex(' + idx + ')">' +
           '<span><span class="ms-name">' + escapeHtml(r.name || '') + '</span>' +
@@ -8361,6 +8658,42 @@
       renderMemberSearchResults(null);
     }
 
+    function hasSavedPinnedProgram_(m) {
+      m = m || state.selected;
+      if (!m || !m.suffix8) return false;
+      var plan = m.pinnedPlan;
+      return !!(plan && plan.pinned && programPlanSessionIds_(plan.sessionProgress).length);
+    }
+
+    function updateLoadProgramPlanButton_() {
+      var loadBtn = document.getElementById('loadProgramPlanBtn');
+      if (!loadBtn) return;
+      var m = state.selected;
+      var has = !!(m && m.suffix8);
+      var knownSaved = hasSavedPinnedProgram_(m);
+      if (has && state.memberDetailLoading && !knownSaved) {
+        loadBtn.disabled = true;
+        loadBtn.title = '저장 여부 확인 중…';
+        return;
+      }
+      var canLoad =
+        has &&
+        !state.attendProcessing &&
+        !_programPlanSaveInFlight &&
+        !_programPlanLoadInFlight &&
+        knownSaved;
+      loadBtn.disabled = !canLoad;
+      loadBtn.title = !has
+        ? '회원을 선택해 주세요'
+        : state.attendProcessing
+          ? '출석 처리 중에는 불러올 수 없습니다'
+          : _programPlanLoadInFlight
+            ? '불러오는 중…'
+            : canLoad
+              ? '저장된 고정 프로그램 불러오기'
+              : '저장된 프로그램이 없습니다';
+    }
+
     function updateProgramPlanBar_() {
       var bar = document.getElementById('programPlanBar');
       var status = document.getElementById('programPlanStatus');
@@ -8370,9 +8703,15 @@
       var m = state.selected;
       var has = !!(m && m.suffix8);
       if (bar) bar.hidden = !has;
-      if (!has) return;
+      updateLoadProgramPlanButton_();
+      if (!has) {
+        hidePinnedProgramPlanList_();
+        return;
+      }
       if (hint) {
-        if (!isTodayScheduledMember_(m)) {
+        if (!isBoardDateToday_()) {
+          hint.textContent = '다른 날짜 조회 중 · 프로그램 저장만 가능합니다. 출석은 오늘 날짜에서만 처리됩니다.';
+        } else if (!isTodayScheduledMember_(m)) {
           hint.textContent = '오늘 예약 외 회원 · 프로그램 저장만 가능합니다. 출석은 오늘 예약 회원만 처리됩니다.';
         } else {
           hint.textContent = '회원을 선택하면 아래에서 확인·저장할 수 있습니다.';
@@ -8397,67 +8736,187 @@
     async function saveProgramPlan() {
       var m = state.selected;
       if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
+      if (_programPlanSaveInFlight) { toast('프로그램 저장 중입니다…'); return; }
       syncSessionRecordFieldsFromModal();
       var sessionProgress = collectSessionProgressForProgramSave_();
       if (!Object.keys(sessionProgress).length) {
         toast('저장할 운동을 1개 이상 선택해 주세요');
         return;
       }
+      var hadExistingPlan = hasSavedPinnedProgram_(m);
       invalidateMemberDetailRequests_();
       var saveBtn = document.getElementById('saveProgramBtn');
+      _programPlanSaveInFlight = true;
       if (saveBtn) saveBtn.disabled = true;
-      var extras = getSessionRecordPayloadExtras();
-      var memoEl = document.getElementById('sessionCoachMemo');
-      var coachMemo = memoEl ? effectiveSessionCoachMemo(memoEl.value).slice(0, 80) : '';
-      var data = await api({
-        action: 'instructorSaveProgramPlan',
-        suffix8: m.suffix8,
-        name: m.name,
-        instructorIndex: m.instructorIndex,
-        nextProgress: extras.nextProgress,
-        coachMemo: coachMemo,
-        sessionProgress: sessionProgress,
-      });
-      if (saveBtn) saveBtn.disabled = false;
-      if (!data.ok) {
-        toast(data.message || '프로그램 저장 실패');
+      updateLoadProgramPlanButton_();
+      try {
+        var extras = getSessionRecordPayloadExtras();
+        var memoEl = document.getElementById('sessionCoachMemo');
+        var coachMemo = memoEl ? effectiveSessionCoachMemo(memoEl.value).slice(0, 80) : '';
+        var data = await api({
+          action: 'instructorSaveProgramPlan',
+          suffix8: m.suffix8,
+          name: m.name,
+          instructorIndex: m.instructorIndex,
+          nextProgress: extras.nextProgress,
+          coachMemo: coachMemo,
+          sessionProgress: sessionProgress,
+          overwritePinnedPlan: true,
+        });
+        if (!data.ok) {
+          toast(data.message || '프로그램 저장 실패');
+          return;
+        }
+        // 새 저장은 기존 planned/today를 완전히 교체
+        clearMemberSessionProgressDraft_(memberKey(m));
+        var fallbackPlan = {
+          date: seoulTodayYmd_(),
+          savedAt: (data.pinnedPlan && data.pinnedPlan.savedAt) || '',
+          pinned: true,
+          sessionProgress: sessionProgress,
+          nextProgress: extras.nextProgress || '',
+          coachMemo: coachMemo,
+          sessionNote: '',
+        };
+        m.pinnedPlan = data.pinnedPlan || fallbackPlan;
+        m.pinnedPlan.sessionProgress = sessionProgress;
+        m.pinnedPlan.pinned = true;
+        if (data.pinnedPlan && data.pinnedPlan.savedAt) m.pinnedPlan.savedAt = data.pinnedPlan.savedAt;
+        m.plannedProgress = sessionProgress;
+        m.nextProgress = data.nextProgress != null ? data.nextProgress : m.nextProgress;
+        applyPinnedPlanFromMember_(m, { forceToday: true });
+        syncPlannedProgressToMemberStore_();
+        saveProgressToMemberStore();
+        state.programPlanPinned = true;
+        state.programPlanSavedAt = m.pinnedPlan && m.pinnedPlan.savedAt ? m.pinnedPlan.savedAt : '';
+        switchToTabForProgramIds_(programPlanSessionIds_(m.pinnedPlan.sessionProgress));
+        renderProgramList();
+        renderPinnedProgramPlanList_(m.pinnedPlan, { title: '고정 저장 프로그램' });
+        renderSessionWrapPanel();
+        var savedSummary = summarizeProgramPlanSelections_();
+        var baseMsg = hadExistingPlan ? '프로그램 덮어쓰기 완료' : '프로그램 저장 완료';
+        toast(savedSummary ? baseMsg + ' · ' + savedSummary : baseMsg);
+        refreshMemberDetailAfterPlanSave_(m);
+      } catch (saveErr) {
+        toast((saveErr && saveErr.message) || '프로그램 저장 중 오류가 발생했습니다');
+      } finally {
+        _programPlanSaveInFlight = false;
+        if (saveBtn) saveBtn.disabled = !(state.selected && state.selected.suffix8) || state.attendProcessing;
+        updateProgramPlanBar_();
+      }
+    }
+
+    async function loadPinnedProgramPlan() {
+      var m = state.selected;
+      if (!m || !m.suffix8) { toast('회원을 먼저 선택해 주세요'); return; }
+      if (_programPlanLoadInFlight || _programPlanSaveInFlight) return;
+      if (!hasSavedPinnedProgram_(m)) {
+        updateLoadProgramPlanButton_();
+        toast('저장된 프로그램이 없습니다');
         return;
       }
-      m.pinnedPlan = data.pinnedPlan || null;
-      m.plannedProgress = data.plannedProgress || {};
-      m.nextProgress = data.nextProgress != null ? data.nextProgress : m.nextProgress;
-      applyPinnedPlanFromMember_(m, { forceToday: true });
-      syncPlannedProgressToMemberStore_();
-      saveProgressToMemberStore();
-      state.programPlanPinned = true;
-      state.programPlanSavedAt = m.pinnedPlan && m.pinnedPlan.savedAt ? m.pinnedPlan.savedAt : '';
-      renderProgramList();
-      renderSessionWrapPanel();
-      updateProgramPlanBar_();
-      var savedSummary = summarizeProgramPlanSelections_();
-      toast(savedSummary ? '프로그램 저장 완료 · ' + savedSummary : '프로그램 저장 완료');
-      refreshMemberDetailAfterPlanSave_(m);
+      _programPlanLoadInFlight = true;
+      updateLoadProgramPlanButton_();
+      try {
+        var detail = await api({
+          action: 'instructorMemberDetail',
+          suffix8: m.suffix8,
+          attendeeName: m.name,
+        }, {
+          timeoutMs: 60000,
+          timeoutMessage: '저장된 프로그램 불러오기 응답 시간 초과(약 60초).',
+        });
+        if (state.selectedKey !== memberKey(m)) return;
+        if (!detail || detail.needPin) {
+          showPin(true);
+          toast('강사 PIN이 필요합니다');
+          return;
+        }
+        if (!detail.ok || !detail.member) {
+          toast((detail && detail.message) || '저장된 프로그램을 불러오지 못했습니다');
+          return;
+        }
+        var plan = detail.member.pinnedPlan || null;
+        var planned = detail.member.plannedProgress || (plan && plan.sessionProgress) || {};
+        var planIds = programPlanSessionIds_((plan && plan.sessionProgress) || planned);
+        if ((!plan || !plan.pinned) && !planIds.length) {
+          m.pinnedPlan = null;
+          m.plannedProgress = {};
+          state.programPlanPinned = false;
+          state.programPlanSavedAt = '';
+          clearMemberSessionProgressDraft_(memberKey(m));
+          loadProgressFromMemberStore(state.activeProgramTab);
+          hidePinnedProgramPlanList_();
+          renderProgramList();
+          toast('저장된 고정 프로그램이 없습니다. 운동을 선택한 뒤 「프로그램 저장」을 눌러 주세요');
+          return;
+        }
+        if (!plan) {
+          plan = {
+            pinned: true,
+            sessionProgress: planned,
+            savedAt: '',
+            nextProgress: detail.member.nextProgress || '',
+            coachMemo: '',
+          };
+        }
+        clearMemberSessionProgressDraft_(memberKey(m));
+        m.pinnedPlan = plan;
+        m.plannedProgress = plan.sessionProgress || planned;
+        if (detail.member.nextProgress != null) {
+          m.nextProgress = normalizeNextProgressText(detail.member.nextProgress || '');
+        }
+        applyPinnedPlanFromMember_(m, { forceToday: true });
+        syncPlannedProgressToMemberStore_();
+        saveProgressToMemberStore();
+        state.programPlanPinned = true;
+        state.programPlanSavedAt = m.pinnedPlan && m.pinnedPlan.savedAt ? m.pinnedPlan.savedAt : '';
+        switchToTabForProgramIds_(programPlanSessionIds_(m.pinnedPlan.sessionProgress || planned));
+        renderProgramList();
+        renderPinnedProgramPlanList_(m.pinnedPlan, { title: '불러온 고정 프로그램' });
+        renderSessionWrapPanel();
+        var n = programPlanSessionIds_(m.pinnedPlan.sessionProgress || planned).length;
+        toast(n ? ('저장된 프로그램 ' + n + '개를 불러왔습니다') : '저장된 프로그램을 불러왔습니다');
+        try {
+          var listEl = document.getElementById('pinnedProgramPlanList');
+          if (listEl) listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (scrollErr) {}
+      } catch (loadErr) {
+        toast((loadErr && loadErr.message) || '프로그램 불러오기 중 오류가 발생했습니다');
+      } finally {
+        _programPlanLoadInFlight = false;
+        updateProgramPlanBar_();
+      }
     }
 
     async function unpinProgramPlan() {
       var m = state.selected;
       if (!m || !m.suffix8) return;
+      if (_programPlanSaveInFlight) return;
       if (!confirm('고정된 프로그램을 해제할까요? 빨간색 강조가 사라집니다.')) return;
       invalidateMemberDetailRequests_();
-      var data = await api({
-        action: 'instructorUnpinProgramPlan',
-        suffix8: m.suffix8,
-        name: m.name,
-      });
-      if (!data.ok) {
-        toast(data.message || '고정 해제 실패');
-        return;
+      var unpinBtn = document.getElementById('unpinProgramBtn');
+      if (unpinBtn) unpinBtn.disabled = true;
+      try {
+        var data = await api({
+          action: 'instructorUnpinProgramPlan',
+          suffix8: m.suffix8,
+          name: m.name,
+        });
+        if (!data.ok) {
+          toast(data.message || '고정 해제 실패');
+          return;
+        }
+        clearPinnedProgramPlanLocal_(m);
+        saveProgressToMemberStore();
+        renderProgramList();
+        toast('고정 프로그램을 해제했습니다');
+      } catch (unpinErr) {
+        toast((unpinErr && unpinErr.message) || '고정 해제 중 오류가 발생했습니다');
+      } finally {
+        if (unpinBtn) unpinBtn.disabled = false;
+        updateProgramPlanBar_();
       }
-      clearPinnedProgramPlanLocal_(m);
-      saveProgressToMemberStore();
-      renderProgramList();
-      updateProgramPlanBar_();
-      toast('고정 프로그램을 해제했습니다');
     }
 
     function updateSendBar() {
@@ -8500,6 +8959,10 @@
         name: opts.memberName || m.name,
         time: m.time,
         instructorIndex: m.instructorIndex,
+        instructorName: m.instructorName || '',
+        // 다음 예약 instructorIndex에 덮어쓰여도 당일 스케줄 열 강사는 유지
+        scheduleInstructorIndex: m.instructorIndex,
+        scheduleInstructorName: m.instructorName || '',
         rowKey: opts.rowKey != null ? opts.rowKey : (m.rowKey || m.rowIndex),
         phoneLast4: opts.phoneLast4 != null ? opts.phoneLast4 : m.phoneLast4,
         specialNotesNew: extras.specialNotesNew,
@@ -8551,6 +9014,9 @@
       }
       payload.phoneDigits = m.phoneDigits || '';
       if (payload.instructorIndex == null) payload.instructorIndex = m.instructorIndex;
+      // 다음 예약 강사로 instructorIndex가 바뀌어도 당일 스케줄 열은 유지
+      payload.scheduleInstructorIndex = m.instructorIndex;
+      payload.scheduleInstructorName = m.instructorName || '';
       var nextAlimtalkLine = getNextBookingAlimtalkLine();
       if (nextAlimtalkLine && !payload.bookNextSchedule) {
         payload.attendAlimtalkNextBooking = nextAlimtalkLine;
@@ -11215,6 +11681,7 @@
     renderProgramTabs();
     initSessionCheckPanel();
     paintInstructorBuildBadge_();
+    syncBoardDateUi_(seoulTodayYmd_());
     loadBoard();
   </script>
 </body>
