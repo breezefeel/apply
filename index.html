@@ -499,6 +499,136 @@
     .btn-save-program:disabled { opacity: 0.45; }
     .btn-unpin-program { border-color: #fca5a5; color: #b91c1c; }
 
+    .next-booking-panel {
+      margin: 10px 0 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+    }
+    .next-booking-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      gap: 10px;
+      align-items: start;
+    }
+    .next-booking-existing {
+      min-width: 0;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid var(--border);
+    }
+    .next-booking-existing-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--dim);
+      margin-bottom: 4px;
+    }
+    .next-booking-existing-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink, #0f172a);
+      line-height: 1.35;
+      word-break: keep-all;
+    }
+    .next-booking-existing.is-empty .next-booking-existing-text {
+      color: var(--dim);
+      font-weight: 600;
+    }
+    .next-booking-pick {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+    .next-booking-pick-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--dim);
+    }
+    .next-booking-pick-fields {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr) minmax(0, 0.9fr);
+      gap: 6px;
+    }
+    .next-booking-date-field {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .next-booking-date-field.has-value { border-color: #93c5fd; }
+    .next-booking-date-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--dim);
+      pointer-events: none;
+    }
+    .next-booking-date-field.has-value .next-booking-date-text { color: var(--ink, #0f172a); }
+    .next-booking-date-field input[type="date"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      cursor: pointer;
+    }
+    .next-booking-pick select {
+      width: 100%;
+      min-height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      padding: 0 8px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .next-booking-replace {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+    .next-booking-replace input {
+      margin-top: 2px;
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+    .next-booking-replace-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .next-booking-replace-text strong {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink, #0f172a);
+    }
+    .next-booking-replace-text span {
+      font-size: 11px;
+      color: var(--dim);
+      line-height: 1.4;
+    }
+    @media (max-width: 560px) {
+      .next-booking-row { grid-template-columns: 1fr; }
+      .next-booking-pick-fields { grid-template-columns: 1fr 1fr; }
+      .next-booking-date-field { grid-column: 1 / -1; }
+    }
+
     @media (min-width:520px) {
       .inst-row-chips {
         grid-template-columns:repeat(auto-fill, minmax(7.6rem, 1fr));
@@ -1855,6 +1985,34 @@
           <div id="sessionAttendResultBody"></div>
           <button type="button" class="btn btn-primary session-attend-scroll-btn" id="sessionAttendScrollBtn" onclick="scrollToMemberSection()">↑ 위로 올리기</button>
         </div>
+      </div>
+      <div class="next-booking-panel" id="nextBookingPanel" hidden>
+        <div class="next-booking-row">
+          <div class="next-booking-existing" id="nextBookingExisting">
+            <span class="next-booking-existing-label">다음 예약</span>
+            <div class="next-booking-existing-text" id="nextBookingExistingText">없음</div>
+          </div>
+          <div class="next-booking-pick" id="nextBookingPick">
+            <span class="next-booking-pick-label">다음 예약일 선택</span>
+            <div class="next-booking-pick-fields">
+              <label class="next-booking-date-field" id="nextBookingDateField" onclick="openNextBookingDatePicker_()">
+                <span class="next-booking-date-text" id="nextBookingDateText">날짜 선택</span>
+                <input type="date" id="nextBookingDate" onchange="onNextBookingDateInput_()" aria-label="다음 예약 날짜">
+              </label>
+              <select id="nextBookingTime" onchange="onNextBookingInputChange()" aria-label="다음 예약 시간">
+                <option value="">시간 선택</option>
+              </select>
+              <select id="nextBookingInstructor" onchange="onNextBookingInputChange()" aria-label="다음 예약 강사"></select>
+            </div>
+          </div>
+        </div>
+        <label class="next-booking-replace" for="nextBookingReplaceCheck">
+          <input type="checkbox" id="nextBookingReplaceCheck" onchange="onNextBookingReplaceChange_()">
+          <span class="next-booking-replace-text">
+            <strong>다음 예약 변경</strong>
+            <span>체크 시 선택한 일정으로 교체합니다(새 일정 반영 후 기존 삭제). 체크하지 않으면 기존 예약을 유지한 채 추가합니다.</span>
+          </span>
+        </label>
       </div>
       <div id="sessionAttendCountdownBar" class="session-attend-countdown-bar" hidden aria-live="polite"></div>
       <div class="session-wrap-actions">
@@ -4352,10 +4510,12 @@
         scheduleSheetUrl: SCHEDULE_SPREADSHEET_FALLBACK,
         previousBooking: null,
         rescheduleActive: false,
+        replaceExisting: false,
         familyBookings: [],
         combinedNextBookingLine: '',
         noBookingMessage: '',
       };
+      syncNextBookingReplaceCheckUi_(false);
     }
 
     function nextBookingSlotsAreSame_(a, b) {
@@ -4370,11 +4530,18 @@
       var ymd = String(nb.pickedYmd || '').trim();
       var time = String(nb.pickedTime || '').trim();
       if (ymd && isFutureNextBookingYmd_(ymd)) {
-        nb.rescheduleActive = true;
         var previewTime = time || (nb.previousBooking && nb.previousBooking.timeStr) || '';
         if (previewTime) {
+          nb.rescheduleActive = true;
           nb.display = formatNextBookingDisplayClient_(ymd, previewTime);
           nb.line = '📅 다음 예약: ' + nb.display;
+          return;
+        }
+        // 날짜만 선택·시간 미정 → 예약 미완성, 기존 다음 예약 문구 유지
+        nb.rescheduleActive = false;
+        if (hasScheduledNextBooking_(nb) && nb.previousBooking) {
+          nb.display = nb.previousBooking.display || nb.display;
+          nb.line = nb.previousBooking.line || (nb.display ? '📅 다음 예약: ' + nb.display : '');
         } else {
           nb.display = '';
           nb.line = '';
@@ -4509,6 +4676,10 @@
       }
       var ymd = String(nb.pickedYmd || '').trim();
       var time = String(nb.pickedTime || '').trim();
+      if (!time && nb.previousBooking && nb.previousBooking.timeStr) {
+        time = String(nb.previousBooking.timeStr || '').trim();
+        nb.pickedTime = time;
+      }
       if (!ymd || !time || !isFutureNextBookingYmd_(ymd)) {
         var mk = m ? memberKey(m) : state.selectedKey;
         if (mk && nb.loadedKey === mk && !nb.loading) {
@@ -4524,23 +4695,46 @@
         instructorIndex: instIdx,
         useScheduleNextBooking: false,
       };
-      var prev = nb.previousBooking;
-      if (prev && prev.ymd && prev.timeStr && !nextBookingSlotsAreSame_(
-        { ymd: ymd, timeStr: time, instIdx: instIdx },
-        prev
-      )) {
-        payload.cancelPreviousBookingYmd = prev.ymd;
-        payload.cancelPreviousBookingTime = prev.timeStr;
-        payload.cancelPreviousInstIdx = prev.instIdx != null ? prev.instIdx : instIdx;
+      // 「다음 예약 변경」 체크 시에만 기존 삭제(새 일정 성공 후). 미체크면 추가만.
+      if (isNextBookingReplaceChecked_() && nb.previousBooking) {
+        var prev = nb.previousBooking;
+        if (prev.ymd && prev.timeStr && !nextBookingSlotsAreSame_(
+          { ymd: ymd, timeStr: time, instIdx: instIdx },
+          prev
+        )) {
+          payload.cancelPreviousBookingYmd = prev.ymd;
+          payload.cancelPreviousBookingTime = prev.timeStr;
+          payload.cancelPreviousInstIdx = prev.instIdx != null ? prev.instIdx : instIdx;
+        }
       }
       return payload;
+    }
+
+    function isNextBookingReplaceChecked_() {
+      var el = document.getElementById('nextBookingReplaceCheck');
+      return !!(el && el.checked && !el.disabled);
+    }
+
+    function onNextBookingReplaceChange_() {
+      var nb = state.nextBooking;
+      if (nb) nb.replaceExisting = isNextBookingReplaceChecked_();
+      onNextBookingInputChange();
+    }
+
+    function syncNextBookingReplaceCheckUi_(checked) {
+      var el = document.getElementById('nextBookingReplaceCheck');
+      if (el) el.checked = !!checked;
+      if (state.nextBooking) state.nextBooking.replaceExisting = !!checked;
     }
 
     function userPickedNewNextBooking_() {
       var nb = state.nextBooking;
       if (!nb) return false;
       var ymd = String(nb.pickedYmd || '').trim();
-      return !!(nb.rescheduleActive && ymd && isFutureNextBookingYmd_(ymd));
+      var time = String(nb.pickedTime || '').trim() ||
+        (nb.previousBooking && nb.previousBooking.timeStr) ||
+        '';
+      return !!(nb.rescheduleActive && ymd && time && isFutureNextBookingYmd_(ymd));
     }
 
     async function refreshNextBookingBeforeAttendAlimtalk_(m) {
@@ -4615,6 +4809,22 @@
 
     function onNextBookingDateInput_() {
       updateNextBookingDateLabel_();
+      var nb = state.nextBooking;
+      var dateEl = document.getElementById('nextBookingDate');
+      var timeEl = document.getElementById('nextBookingTime');
+      if (nb && dateEl && dateEl.value) {
+        // 날짜만 고르면 기존 예약 시간(또는 비어 있으면 선택 유지)을 기본으로 채움
+        if (timeEl && !String(timeEl.value || '').trim()) {
+          var fallback =
+            (nb.previousBooking && nb.previousBooking.timeStr) ||
+            nb.timeStr ||
+            '';
+          if (fallback) {
+            timeEl.value = fallback;
+            nb.pickedTime = fallback;
+          }
+        }
+      }
       onNextBookingInputChange();
     }
 
@@ -4627,6 +4837,7 @@
       var instEl = document.getElementById('nextBookingInstructor');
       nb.pickedYmd = dateEl ? String(dateEl.value || '').trim() : '';
       nb.pickedTime = timeEl ? String(timeEl.value || '').trim() : '';
+      nb.replaceExisting = isNextBookingReplaceChecked_();
       if (instEl && instEl.value !== '') {
         nb.pickedInstIdx = parseInt(instEl.value, 10);
         nb.instName = instructorNameByIndex_(nb.pickedInstIdx);
@@ -4646,6 +4857,7 @@
       var existingText = document.getElementById('nextBookingExistingText');
       var pickWrap = document.getElementById('nextBookingPick');
       var dateEl = document.getElementById('nextBookingDate');
+      var replaceEl = document.getElementById('nextBookingReplaceCheck');
       var m = state.selected;
       if (!panel) return;
       if (!m || !m.suffix8) {
@@ -4653,15 +4865,31 @@
         return;
       }
       var nb = state.nextBooking;
+      panel.hidden = false;
       if (!nb || nb.loading) {
-        panel.hidden = true;
-        panel.classList.toggle('loading', !!(nb && nb.loading));
-        if (existingWrap) existingWrap.hidden = true;
+        panel.classList.add('loading');
+        if (existingWrap) {
+          existingWrap.hidden = false;
+          existingWrap.classList.add('is-empty');
+        }
+        if (existingText) existingText.textContent = '불러오는 중…';
         if (pickWrap) pickWrap.hidden = true;
+        if (replaceEl) replaceEl.disabled = true;
         return;
       }
       panel.classList.remove('loading');
-      panel.hidden = false;
+      var hasExisting = hasScheduledNextBooking_(nb);
+      if (replaceEl) {
+        // 기존 다음 예약이 없으면 「변경」 의미 없음 → 비활성
+        if (!hasExisting) {
+          nb.replaceExisting = false;
+          replaceEl.checked = false;
+          replaceEl.disabled = true;
+        } else {
+          replaceEl.disabled = false;
+          replaceEl.checked = !!nb.replaceExisting;
+        }
+      }
       ensureNextBookingInstOptions(nb.pickedInstIdx != null ? nb.pickedInstIdx : nb.instIdx);
       ensureNextBookingTimeOptions(nb.timeSlots);
       if (dateEl) {
@@ -4674,19 +4902,15 @@
         timeEl.value = nb.pickedTime || '';
       }
       if (existingWrap && existingText) {
-        existingWrap.classList.remove('is-empty');
-        if (hasScheduledNextBooking_(nb)) {
-          existingWrap.hidden = false;
+        existingWrap.hidden = false;
+        if (hasExisting) {
+          existingWrap.classList.remove('is-empty');
           var existLabel = nb.display || '';
-          if (nb.instName) existLabel = nb.instName + ' · ' + existLabel;
-          existingText.textContent = '현재 예약: ' + (existLabel || '—');
-        } else if (String(nb.noBookingMessage || '').trim()) {
-          existingWrap.hidden = false;
-          existingWrap.classList.add('is-empty');
-          existingText.textContent = nb.noBookingMessage;
+          if (nb.instName) existLabel = (existLabel ? existLabel + ' · ' : '') + nb.instName;
+          existingText.textContent = existLabel || '—';
         } else {
-          existingWrap.hidden = true;
-          existingText.textContent = '';
+          existingWrap.classList.add('is-empty');
+          existingText.textContent = '없음';
         }
       }
       if (pickWrap) pickWrap.hidden = false;
@@ -4723,6 +4947,7 @@
         state.nextBooking.pickedTime = '';
         state.nextBooking.pickedYmd = '';
         state.nextBooking.rescheduleActive = false;
+        state.nextBooking.replaceExisting = false;
         state.nextBooking.noBookingMessage = '';
       } else {
         state.nextBooking.fromSchedule = false;
@@ -4732,6 +4957,7 @@
         state.nextBooking.display = '';
         state.nextBooking.line = '';
         state.nextBooking.rescheduleActive = false;
+        state.nextBooking.replaceExisting = false;
         state.nextBooking.noBookingMessage = String(
           (data && data.noBookingMessage) || '한 달 이내 예약된 일정이 없습니다.'
         ).trim();
@@ -4777,6 +5003,7 @@
         state.nextBooking.display = '';
         state.nextBooking.line = '';
         state.nextBooking.rescheduleActive = false;
+        state.nextBooking.replaceExisting = false;
         state.nextBooking.familyBookings = [];
         state.nextBooking.combinedNextBookingLine = '';
       }
