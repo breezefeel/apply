@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-  <title>Re:Al 강사 · 회원 관리</title>
+  <title>Re:Al 회원 관리</title>
   <meta name="theme-color" content="#1e3a6e">
   <style>
     :root {
@@ -1208,6 +1208,146 @@
     .pinned-program-plan-list .pinned-plan-empty {
       margin: 0; font-size: 11px; color: #b91c1c;
     }
+    .program-plan-slot-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .program-plan-slot-row {
+      display: flex;
+      align-items: stretch;
+      gap: 6px;
+    }
+    .program-plan-slot-btn {
+      flex: 1 1 auto;
+      min-width: 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      min-height: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 4px;
+      line-height: 1.25;
+      text-align: left;
+    }
+    .program-plan-slot-btn small {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--dim);
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .program-plan-slot-btn.on {
+      border-color: #b91c1c;
+      background: #fef2f2;
+      color: #b91c1c;
+      box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.12);
+    }
+    .program-plan-slot-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .program-plan-slot-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 0 0 auto;
+    }
+    .program-plan-slot-action {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      min-width: 52px;
+      color: var(--text);
+    }
+    .program-plan-slot-action.pin {
+      border-color: #fecaca;
+      color: #b91c1c;
+      background: #fef2f2;
+    }
+    .program-plan-slot-action.pin.is-active {
+      background: #b91c1c;
+      color: #fff;
+      border-color: #b91c1c;
+    }
+    .program-plan-slot-action.clear {
+      border-color: #e2e8f0;
+      color: #64748b;
+    }
+    .program-plan-slot-action:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .program-plan-slot-summary-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--dim);
+      margin-bottom: 6px;
+    }
+    .program-plan-slot-summary-field textarea {
+      width: 100%;
+      min-height: 72px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    .program-plan-slot-load-item {
+      flex: 1 1 auto;
+      min-width: 0;
+      text-align: left;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px 14px;
+      cursor: pointer;
+    }
+    .program-plan-slot-load-item:hover:not(:disabled) {
+      border-color: #b91c1c;
+      background: #fef2f2;
+    }
+    .program-plan-slot-load-item:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .program-plan-slot-load-item.is-pinned {
+      border-color: #b91c1c;
+      background: #fef2f2;
+      box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.12);
+    }
+    .program-plan-slot-load-item .slot-hd {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .program-plan-slot-load-item .slot-meta {
+      font-size: 11px;
+      color: var(--dim);
+      line-height: 1.45;
+    }
     .legend-swatch { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
     .legend-swatch.done-prior { background:#f0fdf4; border:1px solid #bbf7d0; }
     .legend-swatch.done-recent { background:var(--green-bg); border:1px solid var(--green); }
@@ -1837,7 +1977,7 @@
   <header class="page-hd">
     <div class="page-hd-inner">
       <div class="page-hd-main">
-        <h1>Re:Al 강사 · 회원 관리</h1>
+        <h1>Re:Al 회원 관리</h1>
         <p id="dateLine">—</p>
       </div>
       <div class="page-hd-side">
@@ -1939,7 +2079,7 @@
       </div>
       <div class="card-sub" id="programCardSub">고정 저장은 <strong style="color:#dc2626;font-weight:700;">빨간색</strong>(오늘 체크해도 빨강 유지), 과거 진행은 <strong style="color:#86efac;font-weight:700;">옅은 초록</strong>, 직전 회차는 <strong style="color:var(--green);font-weight:700;">진한 초록</strong>, 오늘만 진행은 <strong style="color:var(--blue);font-weight:700;">체크</strong>입니다.</div>
       <div class="movement-legend" id="programLegend">
-        <button type="button" class="btn-load-program-plan" id="loadProgramPlanBtn" onclick="loadPinnedProgramPlan()" title="저장된 프로그램이 없습니다" disabled>프로그램 불러오기</button>
+        <button type="button" class="btn-load-program-plan" id="loadProgramPlanBtn" onclick="openProgramPlanLoadModal_()" title="저장된 프로그램이 없습니다" disabled>프로그램 불러오기</button>
         <span><i class="legend-swatch done-planned"></i>고정 저장(체크해도 빨강)</span>
         <span><i class="legend-swatch done-prior"></i>과거 진행</span>
         <span><i class="legend-swatch done-recent"></i>직전 회차</span>
@@ -2021,7 +2161,7 @@
           <span class="program-plan-status" id="programPlanStatus">프로그램을 작성한 뒤 저장하세요.</span>
           <button type="button" class="btn btn-unpin-program" id="unpinProgramBtn" onclick="unpinProgramPlan()" hidden title="고정 해제">고정 해제</button>
           <div class="program-plan-actions">
-            <button type="button" class="btn btn-save-program" id="saveProgramBtn" onclick="saveProgramPlan()" disabled title="출석 없이 프로그램만 저장">프로그램 저장</button>
+            <button type="button" class="btn btn-save-program" id="saveProgramBtn" onclick="openProgramPlanSaveModal_()" disabled title="출석 없이 프로그램만 저장">프로그램 저장</button>
             <button type="button" class="btn btn-extra-attend" id="extraAttendBtn" onclick="extraAttendSession()" hidden title="1회 추가 소진">추가 출석</button>
             <button type="button" class="btn btn-ghost" id="nextBookingScheduleBtn" onclick="openMemberScheduleSheet_()" title="구글 시트 예약 스케줄표 열기">예약 스케줄</button>
           </div>
@@ -2261,12 +2401,47 @@
     </div>
   </div>
 
+  <!-- 프로그램 저장 슬롯 -->
+  <div class="modal-overlay" id="programPlanSaveModal">
+    <div class="modal" style="max-width:440px;">
+      <div class="modal-hd">
+        <h2>프로그램 저장</h2>
+        <button type="button" class="modal-close" onclick="closeProgramPlanSaveModal()">×</button>
+      </div>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:4px;">저장할 슬롯을 선택하고 요약을 입력해 주세요. 우측에서 고정·비우기도 가능합니다.</p>
+      <div class="program-plan-slot-grid" id="programPlanSaveSlotGrid"></div>
+      <div class="program-plan-slot-summary-field">
+        <label for="programPlanSaveSummary">요약</label>
+        <textarea id="programPlanSaveSummary" maxlength="120" placeholder="예: 3단계 · 상체 위주 · 다음에 하체 추가"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button type="button" class="btn btn-primary" style="flex:1;" onclick="confirmProgramPlanSave_()">저장</button>
+        <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeProgramPlanSaveModal()">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 프로그램 불러오기 슬롯 -->
+  <div class="modal-overlay" id="programPlanLoadModal">
+    <div class="modal" style="max-width:440px;">
+      <div class="modal-hd">
+        <h2>프로그램 불러오기</h2>
+        <button type="button" class="modal-close" onclick="closeProgramPlanLoadModal()">×</button>
+      </div>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;">슬롯을 선택하거나 우측 <strong>고정</strong> / <strong>비우기</strong>를 사용하세요.</p>
+      <div id="programPlanLoadSlotList"></div>
+      <button type="button" class="btn btn-ghost" style="width:100%;margin-top:8px;" onclick="closeProgramPlanLoadModal()">취소</button>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-07-14-refresh-clear-selection';
+    const INSTRUCTOR_HTML_BUILD = '2026-08-05-slot-pin-clear';
+    const PROGRAM_PLAN_SLOT_COUNT = 5;
+    var _programPlanSaveSlot = 1;
     const BOARD_LOAD_TIMEOUT_MS = 90000;
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
     /** 회원 목록 UI 카운트다운용 예상 시간(초) — 실제 API 타임아웃과 별도 */
@@ -2291,13 +2466,14 @@
 
     function programSortKey(name) {
       const s = String(name || '');
-      var parOrder = { 'Passive Stretching': 1, 'Assisted Active': 2, 'Resistive': 3 };
+      var parOrder = { 'Passive Stretching': 1 };
       if (parOrder[s] != null) return parOrder[s];
       if (s === ACTIVE_STRETCHING_TITLE || s === '근막경선별 Active Stretching') return 0;
       if (/Active Stretching · 상체|근막경선별 Active · 상체/.test(s)) return 0.1;
       if (/Active Stretching · 하체|근막경선별 Active · 하체/.test(s)) return 0.2;
       var programOrder = {
         '소도구 목록': 0,
+        'Force Line 연결': 0.5,
         '생활습관': 20,
         '스쿼트 6단계': 31,
         '밸런스 트레이닝 6단계': 22,
@@ -2316,7 +2492,8 @@
       const m = s.match(/^(\d+)/);
       return m ? parseInt(m[1], 10) : 99;
     }
-    var P1_PAR_PROGRAMS = ['Passive Stretching', 'Assisted Active', 'Resistive'];
+    var P1_PAR_PROGRAMS = ['Passive Stretching'];
+    var FORCE_LINE_PROGRAM = 'Force Line 연결';
 
     function isP1ParProgram(progName) {
       return P1_PAR_PROGRAMS.indexOf(progName) >= 0;
@@ -2326,7 +2503,11 @@
       return !!(item && isP1ParProgram(item.program));
     }
 
-    /** Lying PAR 컴팩트 칩 — Supine 하지 / Prone 상지 */
+    function isForceLineProgram(progName) {
+      return String(progName || '') === FORCE_LINE_PROGRAM;
+    }
+
+    /** Lying Passive Stretching 컴팩트 칩 — Supine 하지 / Prone 상지 */
     function p1CompactLabel(item) {
       var label = String(item.label || '');
       var m = label.match(/^[①②③④]\s*(Supine|Prone)\s*·\s*(하지|상지)/);
@@ -2346,14 +2527,16 @@
 
     var P1_ALIMTALK_LABEL_ORDER = [
       '누워서 · 패시브 스트레칭',
-      '누워서 · 보조 능동 운동',
-      '누워서 · 저항 운동',
       '엎드려서 · 패시브 스트레칭',
-      '엎드려서 · 보조 능동 운동',
-      '엎드려서 · 저항 운동',
+      '상지 Flexion',
+      '상지 Extension',
+      '상지 Rotation',
+      '하지 Flexion',
+      '하지 Extension',
+      '하지 Rotation',
     ];
 
-    /** 알림톡 #{오늘진도} — Lying PAR는 자세·유형으로 통합 */
+    /** 알림톡 #{오늘진도} — Lying Passive Stretching은 자세·유형으로 통합 */
     function methodAlimtalkLabel(item) {
       if (!item) return '';
       if (item.alimtalkLabel) return String(item.alimtalkLabel).trim();
@@ -2362,9 +2545,8 @@
       if (P1_PAR_PROGRAMS.indexOf(prog) >= 0) {
         var posture = /Prone/i.test(label) ? '엎드려서' : '누워서';
         if (prog === 'Passive Stretching') return posture + ' · 패시브 스트레칭';
-        if (prog === 'Assisted Active') return posture + ' · 보조 능동 운동';
-        if (prog === 'Resistive') return posture + ' · 저항 운동';
       }
+      if (isForceLineProgram(prog)) return label;
       return methodDisplayLabel(item);
     }
 
@@ -2400,14 +2582,12 @@
       { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'① Supine · 하지' },
       { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'④ Prone · 상지' },
       { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'③ Prone · 하지' },
-      { id:'p1_su_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Assisted Active', label:'② Supine · 상지' },
-      { id:'p1_sl_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Assisted Active', label:'① Supine · 하지' },
-      { id:'p1_pu_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Assisted Active', label:'④ Prone · 상지' },
-      { id:'p1_pl_aa', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Assisted Active', label:'③ Prone · 하지' },
-      { id:'p1_su_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Resistive', label:'② Supine · 상지' },
-      { id:'p1_sl_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Resistive', label:'① Supine · 하지' },
-      { id:'p1_pu_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Resistive', label:'④ Prone · 상지' },
-      { id:'p1_pl_r', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Resistive', label:'③ Prone · 하지' },
+      { id:'p1_fl_ue_flex', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Force Line 연결', label:'상지 Flexion', alimtalkLabel:'Force Line · 상지 Flexion' },
+      { id:'p1_fl_ue_ext', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Force Line 연결', label:'상지 Extension', alimtalkLabel:'Force Line · 상지 Extension' },
+      { id:'p1_fl_ue_rot', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Force Line 연결', label:'상지 Rotation', alimtalkLabel:'Force Line · 상지 Rotation' },
+      { id:'p1_fl_le_flex', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Force Line 연결', label:'하지 Flexion', alimtalkLabel:'Force Line · 하지 Flexion' },
+      { id:'p1_fl_le_ext', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Force Line 연결', label:'하지 Extension', alimtalkLabel:'Force Line · 하지 Extension' },
+      { id:'p1_fl_le_rot', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Force Line 연결', label:'하지 Rotation', alimtalkLabel:'Force Line · 하지 Rotation' },
       { id:'post_breath_relax', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'1 · 누워서 호흡 운동', label:'편안한 호흡', alimtalkLabel:'누워서 편안한 호흡' },
       { id:'post_breath', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬', alimtalkLabel:'누워서 호흡 · 자세 정렬' },
       { id:'post_super_1', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'3 · Prone Superman 6단계', label:'① 척추 — 경추→척추분절 순 펴기', alimtalkLabel:'엎드려서 ① 등 펴기 · 목부터 하나씩' },
@@ -3144,7 +3324,11 @@
         return;
       }
       var title = opts.title || '저장된 프로그램';
-      var html = '<p class="pinned-plan-title">' + escapeHtml(title) + ' · ' + ids.length + '개</p><ul>';
+      var slotLabel = plan && (plan.slot || plan.slotIndex) ? (plan.slot || plan.slotIndex) + '번 슬롯 · ' : '';
+      var summary = plan && (plan.summary || plan.sessionNote) ? String(plan.summary || plan.sessionNote).trim() : '';
+      var html = '<p class="pinned-plan-title">' + escapeHtml(slotLabel + title) + ' · ' + ids.length + '개';
+      if (summary) html += '<br><span style="font-weight:500;color:#991b1b;">' + escapeHtml(summary) + '</span>';
+      html += '</p><ul>';
       ids.forEach(function(id) {
         html += '<li>' + escapeHtml(labelForProgramItemId_(id)) + '</li>';
       });
@@ -3175,6 +3359,188 @@
         var v = sessionProgress[id];
         return !!v && (v === true || v === 'done' || (Array.isArray(v) && v.length));
       }).sort();
+    }
+
+    function normalizeProgramPlanSlots_(raw) {
+      var out = {};
+      var slots = raw || {};
+      var i;
+      for (i = 1; i <= PROGRAM_PLAN_SLOT_COUNT; i++) {
+        var s = slots[String(i)] || slots[i];
+        if (!s || !programPlanSessionIds_(s.sessionProgress).length) continue;
+        out[String(i)] = {
+          slot: i,
+          summary: String(s.summary || s.sessionNote || '').trim(),
+          savedAt: s.savedAt || '',
+          date: s.date || '',
+          sessionProgress: s.sessionProgress || {},
+          nextProgress: s.nextProgress || '',
+          coachMemo: s.coachMemo || '',
+          sessionNote: s.sessionNote || '',
+        };
+      }
+      return out;
+    }
+
+    function memberProgramPlanSlots_(m) {
+      m = m || state.selected;
+      return normalizeProgramPlanSlots_((m && m.programPlanSlots) || {});
+    }
+
+    function hasAnyProgramPlanSlot_(m) {
+      m = m || state.selected;
+      if (!m || !m.suffix8) return false;
+      var slots = memberProgramPlanSlots_(m);
+      return Object.keys(slots).length > 0;
+    }
+
+    function countProgramPlanSlotItems_(slotData) {
+      return programPlanSessionIds_((slotData && slotData.sessionProgress) || {}).length;
+    }
+
+    function formatProgramPlanSlotSavedAt_(savedAt) {
+      var s = String(savedAt || '').trim();
+      if (!s) return '';
+      return s.length >= 16 ? s.slice(0, 16) : s;
+    }
+
+    function activePinnedSlotIndex_(m) {
+      m = m || state.selected;
+      if (!m || !m.pinnedPlan || !m.pinnedPlan.pinned) return 0;
+      return parseInt(m.pinnedPlan.slot || m.pinnedPlan.slotIndex, 10) || 0;
+    }
+
+    function renderProgramPlanSaveSlotGrid_(selectedSlot) {
+      var grid = document.getElementById('programPlanSaveSlotGrid');
+      if (!grid) return;
+      var slots = memberProgramPlanSlots_(state.selected);
+      var pinnedSlot = activePinnedSlotIndex_(state.selected);
+      var html = '';
+      var i;
+      for (i = 1; i <= PROGRAM_PLAN_SLOT_COUNT; i++) {
+        var key = String(i);
+        var existing = slots[key];
+        var count = countProgramPlanSlotItems_(existing);
+        var on = i === selectedSlot ? ' on' : '';
+        var hint = existing && existing.summary
+          ? '<small>' + escapeHtml(existing.summary) + '</small>'
+          : existing
+            ? '<small>저장됨 · ' + count + '개</small>'
+            : '<small>비어 있음</small>';
+        html += '<div class="program-plan-slot-row">';
+        html += '<button type="button" class="program-plan-slot-btn' + on + '" data-slot="' + i + '" onclick="selectProgramPlanSaveSlot_(' + i + ')">' +
+          i + '번 슬롯' + hint + '</button>';
+        html += '<div class="program-plan-slot-actions">';
+        html += '<button type="button" class="program-plan-slot-action pin' + (pinnedSlot === i ? ' is-active' : '') + '"' +
+          (count ? ' onclick="event.stopPropagation();confirmProgramPlanLoad_(' + i + ')"' : ' disabled') +
+          ' title="이 슬롯을 고정 프로그램으로 적용">' + (pinnedSlot === i ? '고정중' : '고정') + '</button>';
+        html += '<button type="button" class="program-plan-slot-action clear"' +
+          (count ? ' onclick="event.stopPropagation();clearProgramPlanSlot_(' + i + ')"' : ' disabled') +
+          ' title="이 슬롯 내용 삭제">비우기</button>';
+        html += '</div></div>';
+      }
+      grid.innerHTML = html;
+    }
+
+    function selectProgramPlanSaveSlot_(slot) {
+      _programPlanSaveSlot = Math.max(1, Math.min(PROGRAM_PLAN_SLOT_COUNT, parseInt(slot, 10) || 1));
+      renderProgramPlanSaveSlotGrid_(_programPlanSaveSlot);
+      var summaryEl = document.getElementById('programPlanSaveSummary');
+      if (summaryEl) {
+        var existing = memberProgramPlanSlots_(state.selected)[String(_programPlanSaveSlot)];
+        var autoSummary = summarizeProgramPlanSelections_();
+        summaryEl.value = (existing && existing.summary) || autoSummary || summaryEl.value || '';
+      }
+    }
+
+    function openProgramPlanSaveModal_() {
+      var m = state.selected;
+      if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
+      syncSessionRecordFieldsFromModal();
+      if (!Object.keys(collectSessionProgressForProgramSave_()).length) {
+        toast('저장할 운동을 1개 이상 선택해 주세요');
+        return;
+      }
+      var activeSlot = (m.pinnedPlan && (m.pinnedPlan.slot || m.pinnedPlan.slotIndex)) || 1;
+      _programPlanSaveSlot = activeSlot;
+      renderProgramPlanSaveSlotGrid_(_programPlanSaveSlot);
+      var summaryEl = document.getElementById('programPlanSaveSummary');
+      var autoSummary = summarizeProgramPlanSelections_();
+      var existing = memberProgramPlanSlots_(m)[String(_programPlanSaveSlot)];
+      if (summaryEl) {
+        summaryEl.value = (existing && existing.summary) || autoSummary || '';
+      }
+      document.getElementById('programPlanSaveModal').classList.add('open');
+      if (summaryEl) setTimeout(function() { summaryEl.focus(); }, 80);
+    }
+
+    function closeProgramPlanSaveModal_() {
+      document.getElementById('programPlanSaveModal').classList.remove('open');
+    }
+
+    function renderProgramPlanLoadSlotList_(slots) {
+      var root = document.getElementById('programPlanLoadSlotList');
+      if (!root) return;
+      slots = normalizeProgramPlanSlots_(slots || memberProgramPlanSlots_(state.selected));
+      var pinnedSlot = activePinnedSlotIndex_(state.selected);
+      var html = '';
+      var i;
+      var hasAny = false;
+      for (i = 1; i <= PROGRAM_PLAN_SLOT_COUNT; i++) {
+        var key = String(i);
+        var slot = slots[key];
+        var count = countProgramPlanSlotItems_(slot);
+        if (count) hasAny = true;
+        var summary = slot && slot.summary ? slot.summary : '요약 없음';
+        var when = slot && slot.savedAt ? formatProgramPlanSlotSavedAt_(slot.savedAt) : '';
+        var pinnedCls = pinnedSlot === i ? ' is-pinned' : '';
+        html += '<div class="program-plan-slot-row">';
+        html += '<button type="button" class="program-plan-slot-load-item' + pinnedCls + '"' +
+          (count ? ' onclick="confirmProgramPlanLoad_(' + i + ')"' : ' disabled') + '>' +
+          '<div class="slot-hd"><span>' + i + '번 슬롯' + (pinnedSlot === i ? ' · 고정중' : '') + '</span><span>' +
+          (count ? count + '개' : '비어 있음') + '</span></div>' +
+          '<div class="slot-meta">' + escapeHtml(summary) + (when ? ' · ' + escapeHtml(when) : '') + '</div>' +
+          '</button>';
+        html += '<div class="program-plan-slot-actions">';
+        html += '<button type="button" class="program-plan-slot-action pin' + (pinnedSlot === i ? ' is-active' : '') + '"' +
+          (count ? ' onclick="event.stopPropagation();confirmProgramPlanLoad_(' + i + ')"' : ' disabled') +
+          ' title="이 슬롯을 고정 프로그램으로 적용">' + (pinnedSlot === i ? '고정중' : '고정') + '</button>';
+        html += '<button type="button" class="program-plan-slot-action clear"' +
+          (count ? ' onclick="event.stopPropagation();clearProgramPlanSlot_(' + i + ')"' : ' disabled') +
+          ' title="이 슬롯 내용 삭제">비우기</button>';
+        html += '</div></div>';
+      }
+      if (!hasAny) {
+        html = '<p class="member-search-empty">저장된 슬롯이 없습니다. 운동을 선택한 뒤 「프로그램 저장」을 눌러 주세요.</p>';
+      }
+      root.innerHTML = html;
+    }
+
+    function closeProgramPlanLoadModal_() {
+      document.getElementById('programPlanLoadModal').classList.remove('open');
+    }
+
+    async function openProgramPlanLoadModal_() {
+      var m = state.selected;
+      if (!m || !m.suffix8) { toast('회원을 먼저 선택해 주세요'); return; }
+      if (_programPlanLoadInFlight || _programPlanSaveInFlight) return;
+      renderProgramPlanLoadSlotList_(memberProgramPlanSlots_(m));
+      document.getElementById('programPlanLoadModal').classList.add('open');
+      if (!hasAnyProgramPlanSlot_(m)) {
+        try {
+          var detail = await api({
+            action: 'instructorMemberDetail',
+            suffix8: m.suffix8,
+            attendeeName: m.name,
+          }, { timeoutMs: 60000 });
+          if (state.selectedKey !== memberKey(m)) return;
+          if (detail && detail.ok && detail.member) {
+            m.programPlanSlots = normalizeProgramPlanSlots_(detail.member.programPlanSlots || {});
+            if (detail.member.pinnedPlan) m.pinnedPlan = detail.member.pinnedPlan;
+            renderProgramPlanLoadSlotList_(m.programPlanSlots);
+          }
+        } catch (ignoreDetail) {}
+      }
     }
 
     function summarizeProgramPlanSelections_() {
@@ -3506,16 +3872,11 @@
 
     var COLLAPSIBLE_SECTIONS = ['self_tool', 'pos1_par', 'pos2', 'pos3'];
 
-    /** Position 1~3 — PAR · 생활습관 · 기능운동 서브 접기 (프로필 STEP03 구조) */
+    /** Position 1~3 — Stretching · A 생활습관 · R 기능운동 서브 접기 */
     var POSITION_SUB_CATEGORIES = {
       pos1_par: ['par', 'lifestyle', 'func'],
       pos2: ['par', 'lifestyle', 'func'],
       pos3: ['par', 'lifestyle', 'func'],
-    };
-    var SUB_CATEGORY_LABELS = {
-      par: 'PAR',
-      lifestyle: '생활습관',
-      func: '기능운동',
     };
 
     function positionHasSubCategories(secKey) {
@@ -3526,7 +3887,18 @@
       return secKey + ':' + subKey;
     }
 
-    /** PAR / 생활습관 / 기능운동 분류 */
+    /** Lying: Passive Stretching / Sitting·Standing: Active Stretching */
+    function subCategoryLabel(secKey, subKey) {
+      if (subKey === 'lifestyle') return 'A - 생활습관';
+      if (subKey === 'func') return 'R - 기능운동';
+      if (subKey === 'par') {
+        if (secKey === 'pos1_par') return 'Passive Stretching';
+        return 'Active Stretching';
+      }
+      return subKey;
+    }
+
+    /** Passive/Active Stretching · A 생활습관 · R 기능운동 분류 */
     function movementSubCategory(item) {
       if (!item) return 'func';
       var sec = item.uiSection || '';
@@ -4067,7 +4439,7 @@
       var id = String(item.id || '');
       if (prog === 'Passive Stretching') return 'passive';
       if (prog === 'Assisted Active') return 'assisted_active';
-      if (prog === 'Resistive') return 'resistive';
+      if (prog === 'Force Line 연결' || prog === 'Resistive') return 'resistive';
       if (prog === 'Resistive — Advanced') return 'resistive_advanced';
       if (isActiveStretchingProgram(prog)) return 'active_stretching';
       if (prog.indexOf('호흡') >= 0 || prog === '생활습관') return 'breathing_habit';
@@ -6999,7 +7371,11 @@
       var requestYmd = normalizeBoardYmd_(opts.date || boardDateYmd_());
       syncBoardDateUi_(requestYmd);
       try {
-        const data = await api({ action: 'instructorDayBoard', date: requestYmd }, {
+        const data = await api({
+          action: 'instructorDayBoard',
+          date: requestYmd,
+          forceRefresh: !opts.silent,
+        }, {
           timeoutMs: BOARD_LOAD_TIMEOUT_MS,
           timeoutMessage:
             '회원 목록 응답 시간 초과(약 ' + BOARD_LOAD_TIMEOUT_SEC + '초). ' +
@@ -8209,6 +8585,7 @@
       }
       var member = detail.member;
       state.memberDetailLoadError = '';
+      m.programPlanSlots = normalizeProgramPlanSlots_(member.programPlanSlots || m.programPlanSlots || {});
       m.specialNotes = member.specialNotes || m.specialNotes || '';
       m.memberBriefNotes = member.memberBriefNotes != null
         ? String(member.memberBriefNotes || '').trim()
@@ -8567,7 +8944,7 @@
             var subCollapsed = isSubSectionCollapsed(secKey, subKey);
             html += '<div class="psp-subsection collapsible' + (subCollapsed ? ' collapsed' : '') + '">';
             html += '<div class="psp-subsection-hd" onclick="toggleSubSectionCollapse(\'' + secKey + '\',\'' + subKey + '\')">';
-            html += escapeHtml(SUB_CATEGORY_LABELS[subKey] || subKey);
+            html += escapeHtml(subCategoryLabel(secKey, subKey));
             html += subSectionHeaderMeta(secKey, subKey);
             html += '</div><div class="psp-subsection-body">';
             html += renderProgramGroupsHtml(subItems, secKey, hasMember);
@@ -8886,10 +9263,7 @@
     }
 
     function hasSavedPinnedProgram_(m) {
-      m = m || state.selected;
-      if (!m || !m.suffix8) return false;
-      var plan = m.pinnedPlan;
-      return !!(plan && plan.pinned && programPlanSessionIds_(plan.sessionProgress).length);
+      return hasAnyProgramPlanSlot_(m);
     }
 
     function updateLoadProgramPlanButton_() {
@@ -8907,8 +9281,7 @@
         has &&
         !state.attendProcessing &&
         !_programPlanSaveInFlight &&
-        !_programPlanLoadInFlight &&
-        knownSaved;
+        !_programPlanLoadInFlight;
       loadBtn.disabled = !canLoad;
       loadBtn.title = !has
         ? '회원을 선택해 주세요'
@@ -8916,9 +9289,9 @@
           ? '출석 처리 중에는 불러올 수 없습니다'
           : _programPlanLoadInFlight
             ? '불러오는 중…'
-            : canLoad
-              ? '저장된 고정 프로그램 불러오기'
-              : '저장된 프로그램이 없습니다';
+            : knownSaved
+              ? '저장된 슬롯에서 프로그램 불러오기'
+              : '슬롯 목록 보기 · 저장된 프로그램 불러오기';
     }
 
     function updateProgramPlanBar_() {
@@ -8952,15 +9325,17 @@
         var summaryPart = summary ? ' · 선택 ' + summary : '';
         var dirtyPart = isProgramPlanDirty_() ? ' · 미저장 변경' : '';
         if (state.programPlanPinned) {
-          var when = state.programPlanSavedAt ? state.programPlanSavedAt.slice(0, 16) : '';
-          status.textContent = '고정 저장됨' + (when ? ' · ' + when : '') + ' — 출석 완료 시 자동 해제' + summaryPart + dirtyPart;
+          var when = state.programPlanSavedAt ? formatProgramPlanSlotSavedAt_(state.programPlanSavedAt) : '';
+          var slotNum = m.pinnedPlan && (m.pinnedPlan.slot || m.pinnedPlan.slotIndex);
+          var slotPart = slotNum ? slotNum + '번 슬롯 고정 · ' : '고정 저장됨 · ';
+          status.textContent = slotPart + (when || '방금 저장') + ' — 출석 완료 시 자동 해제' + summaryPart + dirtyPart;
         } else {
-          status.textContent = '작성 후 「프로그램 저장」을 누르면 고정됩니다.' + summaryPart + dirtyPart;
+          status.textContent = '작성 후 「프로그램 저장」으로 슬롯에 저장하세요.' + summaryPart + dirtyPart;
         }
       }
     }
 
-    async function saveProgramPlan() {
+    async function confirmProgramPlanSave_() {
       var m = state.selected;
       if (!m || !m.suffix8) { toast('시트 연동 회원을 선택해 주세요'); return; }
       if (_programPlanSaveInFlight) { toast('프로그램 저장 중입니다…'); return; }
@@ -8970,12 +9345,21 @@
         toast('저장할 운동을 1개 이상 선택해 주세요');
         return;
       }
-      var hadExistingPlan = hasSavedPinnedProgram_(m);
+      var slotIndex = _programPlanSaveSlot || 1;
+      var summaryEl = document.getElementById('programPlanSaveSummary');
+      var summary = summaryEl ? String(summaryEl.value || '').trim() : '';
+      if (!summary) {
+        toast('요약을 입력해 주세요');
+        if (summaryEl) summaryEl.focus();
+        return;
+      }
+      var hadExistingPlan = !!(memberProgramPlanSlots_(m)[String(slotIndex)]);
       invalidateMemberDetailRequests_();
       var saveBtn = document.getElementById('saveProgramBtn');
       _programPlanSaveInFlight = true;
       if (saveBtn) saveBtn.disabled = true;
       updateLoadProgramPlanButton_();
+      closeProgramPlanSaveModal_();
       try {
         var extras = getSessionRecordPayloadExtras();
         var memoEl = document.getElementById('sessionCoachMemo');
@@ -8985,6 +9369,8 @@
           suffix8: m.suffix8,
           name: m.name,
           instructorIndex: m.instructorIndex,
+          slotIndex: slotIndex,
+          summary: summary,
           nextProgress: extras.nextProgress,
           coachMemo: coachMemo,
           sessionProgress: sessionProgress,
@@ -8994,20 +9380,34 @@
           toast(data.message || '프로그램 저장 실패');
           return;
         }
-        // 새 저장은 기존 planned/today를 완전히 교체
         clearMemberSessionProgressDraft_(memberKey(m));
         var fallbackPlan = {
           date: seoulTodayYmd_(),
           savedAt: (data.pinnedPlan && data.pinnedPlan.savedAt) || '',
           pinned: true,
+          slot: data.slot || slotIndex,
+          summary: summary,
           sessionProgress: sessionProgress,
           nextProgress: extras.nextProgress || '',
           coachMemo: coachMemo,
-          sessionNote: '',
+          sessionNote: summary,
+        };
+        m.programPlanSlots = normalizeProgramPlanSlots_(data.programPlanSlots || m.programPlanSlots || {});
+        m.programPlanSlots[String(slotIndex)] = {
+          slot: slotIndex,
+          summary: summary,
+          savedAt: fallbackPlan.savedAt,
+          date: fallbackPlan.date,
+          sessionProgress: sessionProgress,
+          nextProgress: extras.nextProgress || '',
+          coachMemo: coachMemo,
+          sessionNote: summary,
         };
         m.pinnedPlan = data.pinnedPlan || fallbackPlan;
         m.pinnedPlan.sessionProgress = sessionProgress;
         m.pinnedPlan.pinned = true;
+        m.pinnedPlan.slot = data.slot || slotIndex;
+        m.pinnedPlan.summary = summary;
         if (data.pinnedPlan && data.pinnedPlan.savedAt) m.pinnedPlan.savedAt = data.pinnedPlan.savedAt;
         m.plannedProgress = sessionProgress;
         m.nextProgress = data.nextProgress != null ? data.nextProgress : m.nextProgress;
@@ -9021,7 +9421,9 @@
         renderPinnedProgramPlanList_(m.pinnedPlan, { title: '고정 저장 프로그램' });
         renderSessionWrapPanel();
         var savedSummary = summarizeProgramPlanSelections_();
-        var baseMsg = hadExistingPlan ? '프로그램 덮어쓰기 완료' : '프로그램 저장 완료';
+        var baseMsg = hadExistingPlan
+          ? slotIndex + '번 슬롯 덮어쓰기 완료'
+          : slotIndex + '번 슬롯 저장 완료';
         toast(savedSummary ? baseMsg + ' · ' + savedSummary : baseMsg);
         refreshMemberDetailAfterPlanSave_(m);
       } catch (saveErr) {
@@ -9033,65 +9435,47 @@
       }
     }
 
-    async function loadPinnedProgramPlan() {
+    async function confirmProgramPlanLoad_(slotIndex) {
       var m = state.selected;
       if (!m || !m.suffix8) { toast('회원을 먼저 선택해 주세요'); return; }
       if (_programPlanLoadInFlight || _programPlanSaveInFlight) return;
-      if (!hasSavedPinnedProgram_(m)) {
-        updateLoadProgramPlanButton_();
-        toast('저장된 프로그램이 없습니다');
-        return;
-      }
+      slotIndex = Math.max(1, Math.min(PROGRAM_PLAN_SLOT_COUNT, parseInt(slotIndex, 10) || 1));
       _programPlanLoadInFlight = true;
       updateLoadProgramPlanButton_();
+      closeProgramPlanLoadModal_();
       try {
-        var detail = await api({
-          action: 'instructorMemberDetail',
+        var data = await api({
+          action: 'instructorLoadProgramPlanSlot',
           suffix8: m.suffix8,
-          attendeeName: m.name,
+          name: m.name,
+          slotIndex: slotIndex,
         }, {
           timeoutMs: 60000,
           timeoutMessage: '저장된 프로그램 불러오기 응답 시간 초과(약 60초).',
         });
         if (state.selectedKey !== memberKey(m)) return;
-        if (!detail || detail.needPin) {
+        if (!data || data.needPin) {
           showPin(true);
           toast('강사 PIN이 필요합니다');
           return;
         }
-        if (!detail.ok || !detail.member) {
-          toast((detail && detail.message) || '저장된 프로그램을 불러오지 못했습니다');
+        if (!data.ok) {
+          toast(data.message || '저장된 프로그램을 불러오지 못했습니다');
           return;
         }
-        var plan = detail.member.pinnedPlan || null;
-        var planned = detail.member.plannedProgress || (plan && plan.sessionProgress) || {};
+        var plan = data.pinnedPlan || null;
+        var planned = data.plannedProgress || (plan && plan.sessionProgress) || {};
         var planIds = programPlanSessionIds_((plan && plan.sessionProgress) || planned);
-        if ((!plan || !plan.pinned) && !planIds.length) {
-          m.pinnedPlan = null;
-          m.plannedProgress = {};
-          state.programPlanPinned = false;
-          state.programPlanSavedAt = '';
-          clearMemberSessionProgressDraft_(memberKey(m));
-          loadProgressFromMemberStore(state.activeProgramTab);
-          hidePinnedProgramPlanList_();
-          renderProgramList();
-          toast('저장된 고정 프로그램이 없습니다. 운동을 선택한 뒤 「프로그램 저장」을 눌러 주세요');
+        if (!planIds.length) {
+          toast(slotIndex + '번 슬롯에 저장된 프로그램이 없습니다');
           return;
-        }
-        if (!plan) {
-          plan = {
-            pinned: true,
-            sessionProgress: planned,
-            savedAt: '',
-            nextProgress: detail.member.nextProgress || '',
-            coachMemo: '',
-          };
         }
         clearMemberSessionProgressDraft_(memberKey(m));
+        m.programPlanSlots = normalizeProgramPlanSlots_(data.programPlanSlots || m.programPlanSlots || {});
         m.pinnedPlan = plan;
         m.plannedProgress = plan.sessionProgress || planned;
-        if (detail.member.nextProgress != null) {
-          m.nextProgress = normalizeNextProgressText(detail.member.nextProgress || '');
+        if (data.nextProgress != null) {
+          m.nextProgress = normalizeNextProgressText(data.nextProgress || '');
         }
         applyPinnedPlanFromMember_(m, { forceToday: true });
         syncPlannedProgressToMemberStore_();
@@ -9102,8 +9486,12 @@
         renderProgramList();
         renderPinnedProgramPlanList_(m.pinnedPlan, { title: '불러온 고정 프로그램' });
         renderSessionWrapPanel();
-        var n = programPlanSessionIds_(m.pinnedPlan.sessionProgress || planned).length;
-        toast(n ? ('저장된 프로그램 ' + n + '개를 불러왔습니다') : '저장된 프로그램을 불러왔습니다');
+        var summary = (plan && plan.summary) ? String(plan.summary).trim() : '';
+        toast(summary
+          ? slotIndex + '번 슬롯 고정 · ' + summary
+          : slotIndex + '번 슬롯을 고정 프로그램으로 적용했습니다');
+        renderProgramPlanSaveSlotGrid_(_programPlanSaveSlot);
+        renderProgramPlanLoadSlotList_(m.programPlanSlots);
         try {
           var listEl = document.getElementById('pinnedProgramPlanList');
           if (listEl) listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -9112,6 +9500,69 @@
         toast((loadErr && loadErr.message) || '프로그램 불러오기 중 오류가 발생했습니다');
       } finally {
         _programPlanLoadInFlight = false;
+        updateProgramPlanBar_();
+      }
+    }
+
+    async function clearProgramPlanSlot_(slotIndex) {
+      var m = state.selected;
+      if (!m || !m.suffix8) { toast('회원을 먼저 선택해 주세요'); return; }
+      if (_programPlanLoadInFlight || _programPlanSaveInFlight) return;
+      slotIndex = Math.max(1, Math.min(PROGRAM_PLAN_SLOT_COUNT, parseInt(slotIndex, 10) || 1));
+      var existing = memberProgramPlanSlots_(m)[String(slotIndex)];
+      if (!countProgramPlanSlotItems_(existing)) {
+        toast(slotIndex + '번 슬롯은 이미 비어 있습니다');
+        return;
+      }
+      if (!confirm(slotIndex + '번 슬롯을 비울까요? 저장된 프로그램이 삭제됩니다.')) return;
+      _programPlanSaveInFlight = true;
+      updateLoadProgramPlanButton_();
+      try {
+        var data = await api({
+          action: 'instructorClearProgramPlanSlot',
+          suffix8: m.suffix8,
+          name: m.name,
+          slotIndex: slotIndex,
+        }, {
+          timeoutMs: 45000,
+          timeoutMessage: '슬롯 비우기 응답 시간 초과(약 45초).',
+        });
+        if (state.selectedKey !== memberKey(m)) return;
+        if (!data || data.needPin) {
+          showPin(true);
+          toast('강사 PIN이 필요합니다');
+          return;
+        }
+        if (!data.ok) {
+          toast(data.message || '슬롯 비우기에 실패했습니다');
+          return;
+        }
+        m.programPlanSlots = normalizeProgramPlanSlots_(data.programPlanSlots || {});
+        var clearedPinned = !!(data.pinnedCleared || data.pinnedPlan == null);
+        if (clearedPinned || (m.pinnedPlan && (m.pinnedPlan.slot || m.pinnedPlan.slotIndex) == slotIndex)) {
+          if (data.pinnedPlan) {
+            m.pinnedPlan = data.pinnedPlan;
+            m.plannedProgress = data.plannedProgress || data.pinnedPlan.sessionProgress || {};
+            applyPinnedPlanFromMember_(m, { forceToday: true });
+            syncPlannedProgressToMemberStore_();
+            state.programPlanPinned = true;
+            state.programPlanSavedAt = m.pinnedPlan.savedAt || '';
+            renderPinnedProgramPlanList_(m.pinnedPlan, { title: '고정 저장 프로그램' });
+          } else {
+            clearPinnedProgramPlanLocal_(m);
+            hidePinnedProgramPlanList_();
+            renderProgramList();
+          }
+        }
+        saveProgressToMemberStore();
+        renderProgramPlanSaveSlotGrid_(_programPlanSaveSlot);
+        renderProgramPlanLoadSlotList_(m.programPlanSlots);
+        renderSessionWrapPanel();
+        toast(slotIndex + '번 슬롯을 비웠습니다');
+      } catch (clearErr) {
+        toast((clearErr && clearErr.message) || '슬롯 비우기 중 오류가 발생했습니다');
+      } finally {
+        _programPlanSaveInFlight = false;
         updateProgramPlanBar_();
       }
     }
@@ -9135,6 +9586,9 @@
           return;
         }
         clearPinnedProgramPlanLocal_(m);
+        if (data.programPlanSlots) {
+          m.programPlanSlots = normalizeProgramPlanSlots_(data.programPlanSlots);
+        }
         saveProgressToMemberStore();
         renderProgramList();
         toast('고정 프로그램을 해제했습니다');
@@ -11883,6 +12337,8 @@
 
     /* 초회 평가: 바깥 클릭으로 닫지 않음 — 미저장 시 ×에서 저장 여부 확인 */
     document.getElementById('coachNoteModal').addEventListener('click', function(e){ if(e.target===this) closeCoachingNoteModal(); });
+    document.getElementById('programPlanSaveModal').addEventListener('click', function(e){ if(e.target===this) closeProgramPlanSaveModal_(); });
+    document.getElementById('programPlanLoadModal').addEventListener('click', function(e){ if(e.target===this) closeProgramPlanLoadModal_(); });
     document.getElementById('attendResultModal').addEventListener('click', function(e){ if(e.target===this) closeAttendResultModal(); });
     document.getElementById('extraPassModal').addEventListener('click', function(e){ if(e.target===this) closeExtraPassModal(); });
     document.getElementById('sameMemberTwoSlotModal').addEventListener('click', function(e){ if(e.target===this) closeSameMemberTwoSlotModal(); });
