@@ -2439,7 +2439,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-08-05-slot-pin-clear';
+    const INSTRUCTOR_HTML_BUILD = '2026-08-06-get-fallback';
     const PROGRAM_PLAN_SLOT_COUNT = 5;
     var _programPlanSaveSlot = 1;
     const BOARD_LOAD_TIMEOUT_MS = 90000;
@@ -6532,7 +6532,55 @@
       _loadCountdownTimer = setInterval(paintMemberLoadCountdown, 400);
     }
 
-    var API_GET_BODY_MAX = 1200;
+    /** GAS 웹앱은 POST 302 시 브라우저가 GET으로 바꿔 본문이 사라지고 unknown action이 난다 → 작은 요청은 GET */
+    var API_GET_BODY_MAX = 1800;
+
+    function apiCanUseGet_(body) {
+      return encodeURIComponent(body).length <= API_GET_BODY_MAX;
+    }
+
+    function isUnknownActionResponse_(data) {
+      return !!(data && data.ok === false && /unknown action/i.test(String(data.message || '')));
+    }
+
+    async function apiFetchJson_(method, body, signal) {
+      var res;
+      if (method === 'POST') {
+        res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: body,
+          signal: signal,
+        });
+      } else {
+        var url = API_URL + (API_URL.indexOf('?') >= 0 ? '&' : '?') + 'data=' + encodeURIComponent(body);
+        res = await fetch(url, {
+          method: 'GET',
+          signal: signal,
+        });
+      }
+      var text = await res.text();
+      try {
+        var data = JSON.parse(text);
+        if (data && data.result === 'error' && data.ok !== true) {
+          data.ok = false;
+        }
+        if (!res.ok) {
+          data.ok = false;
+          if (res.status >= 500) data.recoverable = true;
+          if (!data.message) data.message = '서버 오류 (HTTP ' + res.status + ')';
+        }
+        return data;
+      } catch (parseErr) {
+        return {
+          ok: false,
+          recoverable: !res.ok && (res.status >= 500 || res.status === 0),
+          message: res.ok
+            ? '서버 응답 형식 오류 — Apps Script 배포·URL 확인'
+            : '서버 오류 (HTTP ' + res.status + ') — Apps Script 배포·URL 확인',
+        };
+      }
+    }
 
     async function api(payload, opts) {
       opts = opts || {};
@@ -6540,45 +6588,22 @@
       var controller = new AbortController();
       var timer = setTimeout(function() { controller.abort(); }, timeoutMs);
       var body = JSON.stringify(Object.assign({ pin: state.pin }, payload));
-      var usePost = true;
+      var canGet = apiCanUseGet_(body);
+      // 회원 목록·조회 등 작은 payload는 GET 우선 (POST→리다이렉트→unknown action 방지)
+      // 진도·출석 등 큰 payload는 POST 본문
+      var usePost = opts.forcePost === true || !canGet;
       try {
-        var res;
-        if (usePost) {
-          // 진도·출석 payload는 URL 길이 한도를 넘기 쉬움 → POST 본문으로 전송 (doPost → routeInstructorApi_)
-          res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: body,
-            signal: controller.signal,
-          });
-        } else {
-          var url = API_URL + (API_URL.indexOf('?') >= 0 ? '&' : '?') + 'data=' + encodeURIComponent(body);
-          res = await fetch(url, {
-            method: 'GET',
-            signal: controller.signal,
-          });
+        var data = await apiFetchJson_(usePost ? 'POST' : 'GET', body, controller.signal);
+        // POST가 리다이렉트로 본문을 잃은 경우 GET 재시도
+        if (usePost && canGet && isUnknownActionResponse_(data)) {
+          data = await apiFetchJson_('GET', body, controller.signal);
         }
-        const text = await res.text();
-        try {
-          var data = JSON.parse(text);
-          if (data && data.result === 'error' && data.ok !== true) {
-            data.ok = false;
-          }
-          if (!res.ok) {
-            data.ok = false;
-            if (res.status >= 500) data.recoverable = true;
-            if (!data.message) data.message = '서버 오류 (HTTP ' + res.status + ')';
-          }
-          return data;
-        } catch (parseErr) {
-          return {
-            ok: false,
-            recoverable: !res.ok && (res.status >= 500 || res.status === 0),
-            message: res.ok
-              ? '서버 응답 형식 오류 — Apps Script 배포·URL 확인'
-              : '서버 오류 (HTTP ' + res.status + ') — Apps Script 배포·URL 확인',
-          };
+        if (isUnknownActionResponse_(data)) {
+          data.message =
+            '서버가 요청을 인식하지 못했습니다(unknown action). ' +
+            '페이지를 강력 새로고침하거나 Apps Script 웹앱 배포를 확인해 주세요.';
         }
+        return data;
       } catch (err) {
         if (err && err.name === 'AbortError') {
           var sec = Math.round(timeoutMs / 1000);
