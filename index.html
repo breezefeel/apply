@@ -1034,6 +1034,13 @@
       cursor:pointer; display:flex; align-items:center; justify-content:space-between;
       gap:8px; user-select:none; border-bottom:1px solid transparent;
     }
+    .psp-subsection-hd-main {
+      display:inline-flex; align-items:center; gap:6px; min-width:0; flex:1;
+    }
+    .psp-group-check {
+      width:15px; height:15px; margin:0; flex-shrink:0;
+      cursor:pointer; accent-color: var(--blue);
+    }
     .psp-subsection.collapsed .psp-subsection-hd { border-bottom:none; }
     .psp-subsection-hd::after {
       content:'▾'; font-size:10px; opacity:.45; flex-shrink:0;
@@ -8791,13 +8798,135 @@
       renderProgramList();
     }
 
-    function renderProgramGroupsHtml(items, secKey, hasMember) {
+    /** 그룹 전체선택 체크 상태 — 오늘 진도 기준 */
+    function groupTodayStats_(items) {
+      var total = (items || []).length;
+      var todayCount = 0;
+      (items || []).forEach(function(item) {
+        if (state.todayProgress[item.id]) todayCount++;
+      });
+      return {
+        total: total,
+        todayCount: todayCount,
+        allToday: total > 0 && todayCount === total,
+        partialToday: todayCount > 0 && todayCount < total,
+      };
+    }
+
+    function renderGroupSelectCheckboxHtml_(items, hasMember, onChangeCall) {
+      if (!items || !items.length) return '';
+      var stats = groupTodayStats_(items);
+      return '<input type="checkbox" class="psp-group-check"' +
+        (hasMember && stats.allToday ? ' checked' : '') +
+        (hasMember && stats.partialToday ? ' data-indeterminate="1"' : '') +
+        ' onclick="event.stopPropagation()"' +
+        ' onchange="' + onChangeCall + '">';
+    }
+
+    function applyTodayCheck_(id, checked) {
+      var wasRecent = !!state.recentSessionProgress[id];
+      var wasPrior = !!state.savedProgress[id];
+      var wasToday = !!state.todayProgress[id];
+      if (checked) {
+        if (wasToday) return false;
+        if (wasRecent) {
+          state.progressOrigin[id] = 'recent';
+          delete state.recentSessionProgress[id];
+        } else if (wasPrior) {
+          state.progressOrigin[id] = 'saved';
+          delete state.savedProgress[id];
+        }
+        state.todayProgress[id] = true;
+        return true;
+      }
+      if (wasToday) {
+        delete state.todayProgress[id];
+        if (state.progressOrigin[id] === 'recent') {
+          state.recentSessionProgress[id] = true;
+        } else if (state.progressOrigin[id] === 'saved') {
+          state.savedProgress[id] = true;
+        }
+        delete state.progressOrigin[id];
+        return true;
+      }
+      if (wasRecent) {
+        delete state.recentSessionProgress[id];
+        return true;
+      }
+      if (wasPrior) {
+        delete state.savedProgress[id];
+        return true;
+      }
+      return false;
+    }
+
+    function toggleItemsToday_(items, checked) {
+      var changed = false;
+      (items || []).forEach(function(item) {
+        if (!checked && !state.todayProgress[item.id]) return;
+        if (applyTodayCheck_(item.id, checked)) changed = true;
+      });
+      return changed;
+    }
+
+    function toggleSubCategoryToday(secKey, subKey, cb) {
+      if (!state.selected) {
+        toast('회원을 먼저 선택해 주세요');
+        cb.checked = false;
+        return;
+      }
+      toggleItemsToday_(subSectionItems(secKey, subKey), !!cb.checked);
+      refreshSectionCollapseDefaults();
+      renderProgramList();
+      renderSessionWrapPanel();
+      updateSendBar();
+    }
+
+    function toggleProgramGroupToday(secKey, progName, cb) {
+      if (!state.selected) {
+        toast('회원을 먼저 선택해 주세요');
+        cb.checked = false;
+        return;
+      }
+      var items = sectionItems(secKey).filter(function(p) {
+        return String(p.program || '') === String(progName || '');
+      });
+      toggleItemsToday_(items, !!cb.checked);
+      refreshSectionCollapseDefaults();
+      renderProgramList();
+      renderSessionWrapPanel();
+      updateSendBar();
+    }
+
+    function applyGroupCheckIndeterminate_() {
+      var root = document.getElementById('pspProgramList');
+      if (!root) return;
+      root.querySelectorAll('.psp-group-check[data-indeterminate="1"]').forEach(function(el) {
+        el.indeterminate = true;
+      });
+    }
+
+    function renderProgramPartHdHtml_(title, items, hasMember, withSelectAll, secKey, progName) {
+      var html = '<div class="psp-part-hd" style="margin-top:4px;">';
+      if (withSelectAll) {
+        var safeProg = String(progName || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        html += renderGroupSelectCheckboxHtml_(
+          items, hasMember,
+          'toggleProgramGroupToday(\'' + secKey + '\',\'' + safeProg + '\',this)'
+        );
+      }
+      html += '<span>' + escapeHtml(title) + '</span></div>';
+      return html;
+    }
+
+    function renderProgramGroupsHtml(items, secKey, hasMember, subKey) {
       var html = '';
       var programsInSection = {};
       items.forEach(function(item) {
         if (!programsInSection[item.program]) programsInSection[item.program] = [];
         programsInSection[item.program].push(item);
       });
+      var selectAllOnPart = subKey === 'func';
       var activeStretchingMainShown = false;
       Object.keys(programsInSection).sort(function(a, b) {
         var na = programSortKey(a), nb = programSortKey(b);
@@ -8808,10 +8937,14 @@
         if (isActiveStretchingProgram(progName)) {
           if (!activeStretchingMainShown) {
             activeStretchingMainShown = true;
-            html += '<div class="psp-part-hd" style="margin-top:4px;"><span>' + escapeHtml(ACTIVE_STRETCHING_TITLE) + '</span></div>';
+            html += renderProgramPartHdHtml_(
+              ACTIVE_STRETCHING_TITLE, progItems, hasMember, false, secKey, progName
+            );
           }
         } else if (!useFlatCheckboxRows(progName)) {
-          html += '<div class="psp-part-hd" style="margin-top:4px;"><span>' + escapeHtml(programCategoryTitle(progName)) + '</span></div>';
+          html += renderProgramPartHdHtml_(
+            programCategoryTitle(progName), progItems, hasMember, selectAllOnPart, secKey, progName
+          );
         }
         var cardCls = 'psp-part-card';
         if (secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0) cardCls += ' horizontal';
@@ -8985,51 +9118,34 @@
             var subCollapsed = isSubSectionCollapsed(secKey, subKey);
             html += '<div class="psp-subsection collapsible' + (subCollapsed ? ' collapsed' : '') + '">';
             html += '<div class="psp-subsection-hd" onclick="toggleSubSectionCollapse(\'' + secKey + '\',\'' + subKey + '\')">';
-            html += escapeHtml(subCategoryLabel(secKey, subKey));
+            html += '<span class="psp-subsection-hd-main">';
+            if (subKey === 'par' || subKey === 'lifestyle') {
+              html += renderGroupSelectCheckboxHtml_(
+                subItems, hasMember,
+                'toggleSubCategoryToday(\'' + secKey + '\',\'' + subKey + '\',this)'
+              );
+            }
+            html += '<span>' + escapeHtml(subCategoryLabel(secKey, subKey)) + '</span>';
+            html += '</span>';
             html += subSectionHeaderMeta(secKey, subKey);
             html += '</div><div class="psp-subsection-body">';
-            html += renderProgramGroupsHtml(subItems, secKey, hasMember);
+            html += renderProgramGroupsHtml(subItems, secKey, hasMember, subKey);
             html += '</div></div>';
           });
         } else {
-          html += renderProgramGroupsHtml(g.items, secKey, hasMember);
+          html += renderProgramGroupsHtml(g.items, secKey, hasMember, '');
         }
         html += '</div></div>';
       });
       root.innerHTML = html;
+      applyGroupCheckIndeterminate_();
     }
 
     async function toggleToday(id, cb) {
       if (!state.selected) {
         toast('회원을 먼저 선택해 주세요'); cb.checked = false; return;
       }
-      const wasRecent = !!state.recentSessionProgress[id];
-      const wasPrior = !!state.savedProgress[id];
-      const wasToday = !!state.todayProgress[id];
-      if (cb.checked) {
-        if (wasRecent) {
-          state.progressOrigin[id] = 'recent';
-          delete state.recentSessionProgress[id];
-        } else if (wasPrior) {
-          state.progressOrigin[id] = 'saved';
-          delete state.savedProgress[id];
-        }
-        state.todayProgress[id] = true;
-      } else {
-        if (wasToday) {
-          delete state.todayProgress[id];
-          if (state.progressOrigin[id] === 'recent') {
-            state.recentSessionProgress[id] = true;
-          } else if (state.progressOrigin[id] === 'saved') {
-            state.savedProgress[id] = true;
-          }
-          delete state.progressOrigin[id];
-        } else if (wasRecent) {
-          delete state.recentSessionProgress[id];
-        } else if (wasPrior) {
-          delete state.savedProgress[id];
-        }
-      }
+      applyTodayCheck_(id, !!cb.checked);
       refreshSectionCollapseDefaults();
       renderProgramList();
       renderSessionWrapPanel();
