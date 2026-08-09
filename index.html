@@ -6293,6 +6293,22 @@
 
     function buildRecoveredCompleteData_(rec) {
       if (!rec) return null;
+      var coNames =
+        (rec.familyCoAttendNames && rec.familyCoAttendNames.length
+          ? rec.familyCoAttendNames.slice()
+          : null) ||
+        (state.familyCoAttendNames && state.familyCoAttendNames.length
+          ? state.familyCoAttendNames.slice()
+          : null);
+      var fr = rec.familyResults || null;
+      var familyMulti = !!(
+        rec.familyMultiPass ||
+        (coNames && coNames.length >= 2) ||
+        (fr && fr.length > 1)
+      );
+      if (familyMulti && coNames && coNames.length >= 2) {
+        state.familyCoAttendNames = coNames.slice();
+      }
       return {
         ok: true,
         saved: !!rec.sessionSavedToday,
@@ -6312,6 +6328,9 @@
         discomfortHistoryLine: rec.discomfortHistoryLine,
         conditionHistory: rec.conditionHistory,
         currentSessionCheck: rec.currentSessionCheck,
+        familyMultiPass: familyMulti,
+        familySharedPool: !!rec.familySharedPool,
+        familyResults: fr,
         attendMessage: rec.attendCompletedToday
           ? '서버에는 이미 반영되어 있었습니다. 스케줄·알림톡만 확인합니다.'
           : '진도는 저장되어 있었습니다. 출석 처리를 이어갑니다.',
@@ -6331,15 +6350,19 @@
 
     async function fetchCompleteSessionRecoverState_(m, opts) {
       if (!m || !m.suffix8) return null;
+      opts = opts || {};
       var visitKey = opts.clientVisitKey || state.activeCompleteVisitKey || '';
+      var coNames = resolveFamilyCoAttendNames_(m, opts);
       try {
-        return await api({
+        var payload = {
           action: 'instructorCompleteSessionRecover',
           suffix8: m.suffix8,
           name: opts.memberName || m.name,
           rowKey: opts.rowKey != null ? opts.rowKey : (m.rowKey || m.rowIndex),
           clientVisitKey: visitKey,
-        }, { timeoutMs: 30000, preferPost: true });
+        };
+        if (coNames && coNames.length >= 2) payload.familyCoAttendNames = coNames;
+        return await api(payload, { timeoutMs: 30000, preferPost: true });
       } catch (e) {
         return null;
       }
@@ -7223,7 +7246,7 @@
         });
         state.attendPassCount = family.length;
         state.familyCoAttendNames = coNames;
-        updateAttendPassStepper(pending.member);
+        // updateAttendPassStepper 는 familyCoAttendNames 를 지우므로 호출하지 않음
         await runCompleteSession(pending.member, mergedProgressMapForSave(), Object.assign({}, pending.opts || {}, {
           confirmFamilyAll: true,
           confirmMultiPass: true,
@@ -7233,6 +7256,7 @@
         return;
       }
       state.attendPassCount = 1;
+      state.familyCoAttendNames = null;
       updateAttendPassStepper(pending.member);
       await runCompleteSession(pending.member, mergedProgressMapForSave(), Object.assign({}, pending.opts || {}, {
         confirmFamilySingle: true,
@@ -7246,11 +7270,14 @@
       updateAttendPassStepper(m);
     }
 
-    function updateAttendPassStepper(m) {
+    function updateAttendPassStepper(m, opts) {
       m = m || state.selected;
+      opts = opts || {};
       var has = !!(m && m.suffix8);
-      state.attendPassCount = 1;
-      state.familyCoAttendNames = null;
+      if (!opts.preserveFamilyMulti) {
+        state.attendPassCount = 1;
+        state.familyCoAttendNames = null;
+      }
       var btn = document.getElementById('extraAttendBtn');
       if (btn) {
         var locked = has && memberAttendSlotLocked_(m);
@@ -9922,6 +9949,43 @@
       });
     }
 
+    /** 가족 다회차 성공 후 — 함께 출석한 보드 칸을 전원 출석 완료로 표시 */
+    function markFamilyCoAttendCompleteOnBoard_(anchorMember, data) {
+      if (!anchorMember || !data || !data.completed || !state.board || !state.board.members) return;
+      var key = memberPhoneMatchKey_(anchorMember);
+      if (!key) return;
+      var sharedSd = String(data.sessionDisplay || '').trim();
+      var nameSet = {};
+      (data.familyResults || []).forEach(function (fr) {
+        var nk = normalizeMemberNameForKey_(fr && fr.name);
+        if (nk) nameSet[nk] = true;
+      });
+      (state.familyCoAttendNames || []).forEach(function (n) {
+        var nk = normalizeMemberNameForKey_(n);
+        if (nk) nameSet[nk] = true;
+      });
+      var anchorNk = normalizeMemberNameForKey_(anchorMember.name);
+      if (anchorNk) nameSet[anchorNk] = true;
+      var hasNameFilter = Object.keys(nameSet).length > 0;
+      state.board.members.forEach(function (bm) {
+        if (memberPhoneMatchKey_(bm) !== key) return;
+        var bmNk = normalizeMemberNameForKey_(bm.name);
+        if (hasNameFilter && !nameSet[bmNk]) return;
+        var stampSd = sharedSd;
+        (data.familyResults || []).forEach(function (fr) {
+          if (normalizeMemberNameForKey_(fr.name) !== bmNk) return;
+          var s = String(fr.scheduleStamp || fr.sessionDisplay || '').trim();
+          if (s) stampSd = s;
+        });
+        markInstructorAttendComplete_(bm, {
+          completed: true,
+          sessionDisplay: sharedSd || stampSd,
+        });
+        if (stampSd) bm.scheduleSession = stampSd;
+        if (sharedSd) bm.sessionDisplay = sharedSd;
+      });
+    }
+
     function applyCompleteSessionResult(m, data) {
       syncMemberProgressFromServer(m, data);
       if (data && data.saved) markMemberProgressSaved_(m);
@@ -9952,9 +10016,14 @@
       }
       if (
         data.completed &&
-        (data.familyMultiPass || data.familySharedPool || (data.familyResults && data.familyResults.length > 1))
+        (data.familyMultiPass ||
+          data.familySharedPool ||
+          (data.familyResults && data.familyResults.length > 1) ||
+          (state.familyCoAttendNames && state.familyCoAttendNames.length >= 2))
       ) {
         syncSharedFamilySessionOnBoard_(m, data);
+        // 이름 매칭 누락·타임아웃 복구 대비: 함께 출석 선택 인원도 출석 완료로 맞춤
+        markFamilyCoAttendCompleteOnBoard_(m, data);
       }
       if (typeof data.todayAttendCount === 'number') {
         m.todayAttendCount = data.todayAttendCount;
