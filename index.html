@@ -7510,7 +7510,8 @@
       if (state.sectionCollapsedTouched[secKey]) {
         return !!state.sectionCollapsed[secKey];
       }
-      if (isHongtaek) return true; // 홍택: 기본 접힘
+      if (secKey === 'hongtaek_screen') return false; // 스크린 패널: 기본 펼침
+      if (isHongtaek) return true; // 경선·단계: 기본 접힘
       return defaultSectionCollapsed(secKey, !!state.selected);
     }
 
