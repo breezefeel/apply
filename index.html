@@ -1031,9 +1031,24 @@
       padding: 12px;
       margin-bottom: 14px;
     }
-    .ht-screen-panel h3 {
+    .ht-screen-panel.collapsible > .ht-screen-hd {
+      cursor: pointer; user-select: none;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      margin: 0;
+    }
+    .ht-screen-panel.collapsible > .ht-screen-hd::after {
+      content: '▾'; font-size: 12px; opacity: .55; flex-shrink: 0;
+      transition: transform .15s; color: var(--zone-program);
+    }
+    .ht-screen-panel.collapsible.collapsed > .ht-screen-hd::after {
+      transform: rotate(-90deg);
+    }
+    .ht-screen-panel.collapsible.collapsed > .ht-screen-body { display: none; }
+    .ht-screen-panel h3, .ht-screen-panel .ht-screen-hd {
       font-size: 13px; font-weight: 800; color: var(--zone-program); margin-bottom: 4px;
     }
+    .ht-screen-panel.collapsible > .ht-screen-hd { margin-bottom: 0; }
+    .ht-screen-panel:not(.collapsed) > .ht-screen-hd { margin-bottom: 4px; }
     .ht-screen-panel .ht-screen-note {
       font-size: 11px; color: var(--dim); margin-bottom: 10px; line-height: 1.45;
     }
@@ -1211,6 +1226,14 @@
     .psp-subsection.collapsed .psp-subsection-hd::after { transform:rotate(-90deg); }
     .psp-subsection.collapsed .psp-subsection-body { display:none; }
     .psp-subsection-body { padding:8px 8px 4px; background:#fafbfd; }
+    .psp-part-wrap.psp-subsection {
+      margin-bottom: 8px; border: 1px solid #e2e8f0; border-radius: 8px;
+      background: #fff; overflow: hidden;
+    }
+    .psp-part-wrap.psp-subsection .psp-subsection-body {
+      padding: 8px 8px 4px;
+    }
+    .psp-part-wrap.psp-subsection .psp-part-card { margin-bottom: 0; border: none; border-radius: 0; }
     .psp-part-hd {
       display:flex; align-items:center; gap:8px;
       margin:12px 0 6px; font-size:12px; font-weight:700;
@@ -2936,77 +2959,77 @@
     }
 
     var HONGTAEK_THUMB_BY_ID = {
-      'ht_all_foam': 'pdf-extract/exercise-thumbs/gen_foam_roll.png',
-      'ht_all_long_reach': 'pdf-extract/exercise-thumbs/gen_long_reach.png',
-      'ht_all_reach_matrix': 'pdf-extract/exercise-thumbs/gen_reach_matrix.png',
-      'ht_all_unstable': 'pdf-extract/exercise-thumbs/gen_unstable.png',
-      'ht_arm_farmer': 'pdf-extract/exercise-thumbs/gen_suitcase.png',
-      'ht_arm_landmine': 'pdf-extract/exercise-thumbs/gen_landmine.png',
-      'ht_arm_ohp': 'pdf-extract/exercise-thumbs/gen_ohp.png',
-      'ht_arm_pec_lat': 'pdf-extract/exercise-thumbs/gen_pec_lat.png',
-      'ht_arm_row': 'pdf-extract/exercise-thumbs/gen_row.png',
-      'ht_arm_serratus': 'pdf-extract/exercise-thumbs/gen_wall_serratus.png',
-      'ht_arm_thor_ext': 'pdf-extract/exercise-thumbs/gen_thor_ext.png',
-      'ht_arm_wall_slide': 'pdf-extract/exercise-thumbs/panel_wall_slide.png',
-      'ht_dfl_9090': 'pdf-extract/exercise-thumbs/panel_9090.png',
-      'ht_dfl_adductor': 'pdf-extract/exercise-thumbs/gen_adductor.png',
-      'ht_dfl_barefoot': 'pdf-extract/exercise-thumbs/gen_barefoot.png',
-      'ht_dfl_carry_breath': 'pdf-extract/exercise-thumbs/gen_carry_breath.png',
-      'ht_dfl_copen_hold': 'pdf-extract/exercise-thumbs/panel_copenhagen.png',
-      'ht_dfl_copenhagen': 'pdf-extract/exercise-thumbs/panel_copenhagen.png',
-      'ht_dfl_diaphragm': 'pdf-extract/exercise-thumbs/gen_diaphragm.png',
-      'ht_dfl_goblet': 'pdf-extract/exercise-thumbs/panel_goblet.png',
-      'ht_dfl_inlet': 'pdf-extract/exercise-thumbs/gen_inlet.png',
-      'ht_dfl_short_foot': 'pdf-extract/exercise-thumbs/panel_short_foot.png',
-      'ht_fl_anti_rot': 'pdf-extract/exercise-thumbs/gen_anti_rot.png',
-      'ht_fl_band_hold': 'pdf-extract/exercise-thumbs/gen_band_hold.png',
-      'ht_fl_birddog': 'pdf-extract/exercise-thumbs/panel_birddog.png',
-      'ht_fl_cable': 'pdf-extract/exercise-thumbs/sl_split_cable.png',
-      'ht_fl_crossbody': 'pdf-extract/exercise-thumbs/gen_crossbody.png',
-      'ht_fl_oblique_reach': 'pdf-extract/exercise-thumbs/gen_oblique_reach.png',
-      'ht_fl_rot_throw': 'pdf-extract/exercise-thumbs/gen_rot_throw.png',
-      'ht_fl_skip': 'pdf-extract/exercise-thumbs/gen_skip.png',
-      'ht_fl_sprint': 'pdf-extract/exercise-thumbs/gen_sprint.png',
-      'ht_fl_tlf': 'pdf-extract/exercise-thumbs/gen_tlf_glide.png',
-      'ht_ll_bound': 'pdf-extract/exercise-thumbs/gen_lateral_bound.png',
-      'ht_ll_gate': 'pdf-extract/exercise-thumbs/panel_gate_walk.png',
-      'ht_ll_oh_carry': 'pdf-extract/exercise-thumbs/gen_oh_carry.png',
-      'ht_ll_open': 'pdf-extract/exercise-thumbs/gen_lat_open.png',
-      'ht_ll_peroneal': 'pdf-extract/exercise-thumbs/gen_tfl_release.png',
-      'ht_ll_side_reach': 'pdf-extract/exercise-thumbs/panel_side_reach.png',
-      'ht_ll_stepdown': 'pdf-extract/exercise-thumbs/gen_side_stepdown.png',
-      'ht_ll_suitcase': 'pdf-extract/exercise-thumbs/gen_suitcase.png',
-      'ht_sbl_calf': 'pdf-extract/exercise-thumbs/gen_calf_stretch.png',
-      'ht_sbl_cm_hop': 'pdf-extract/exercise-thumbs/panel_cm_hop.png',
-      'ht_sbl_conv_dl': 'pdf-extract/exercise-thumbs/gen_conv_dl.png',
-      'ht_sbl_heel': 'pdf-extract/exercise-thumbs/panel_heel_raise.png',
-      'ht_sbl_hinge': 'pdf-extract/exercise-thumbs/gen_hip_hinge.png',
-      'ht_sbl_hop': 'pdf-extract/exercise-thumbs/gen_hop.png',
-      'ht_sbl_kb_swing': 'pdf-extract/exercise-thumbs/gen_kb_swing.png',
-      'ht_sbl_nordic': 'pdf-extract/exercise-thumbs/panel_nordic.png',
-      'ht_sbl_plantar': 'pdf-extract/exercise-thumbs/gen_plantar_ball.png',
-      'ht_sbl_pogo': 'pdf-extract/exercise-thumbs/panel_pogo.png',
-      'ht_sbl_rdl': 'pdf-extract/exercise-thumbs/panel_rdl.png',
-      'ht_sbl_reverse_plank': 'pdf-extract/exercise-thumbs/sbl_reverse_plank.png',
-      'ht_sbl_rolldown': 'pdf-extract/exercise-thumbs/panel_rolldown.png',
-      'ht_sbl_stiff_dl': 'pdf-extract/exercise-thumbs/gen_stiff_dl.png',
-      'ht_sfl_brace': 'pdf-extract/exercise-thumbs/gen_rib_brace.png',
-      'ht_sfl_deadbug': 'pdf-extract/exercise-thumbs/gen_deadbug.png',
-      'ht_sfl_ext_dec': 'pdf-extract/exercise-thumbs/gen_backext_dec.png',
-      'ht_sfl_halfkneel': 'pdf-extract/exercise-thumbs/panel_halfkneel.png',
-      'ht_sfl_hanging': 'pdf-extract/exercise-thumbs/gen_hanging_kr.png',
-      'ht_sfl_land_dec': 'pdf-extract/exercise-thumbs/gen_land_dec.png',
-      'ht_sfl_ball_plank': 'pdf-extract/exercise-thumbs/sfl_ball_plank.png',
-      'ht_sfl_reach': 'pdf-extract/exercise-thumbs/gen_abd_reach.png',
-      'ht_sfl_rf_psoas': 'pdf-extract/exercise-thumbs/sfl_kneeling_lean.png',
-      'ht_sl_band_reach': 'pdf-extract/exercise-thumbs/gen_band_rot_reach.png',
-      'ht_sl_chop': 'pdf-extract/exercise-thumbs/panel_chop.png',
-      'ht_sl_mb_throw': 'pdf-extract/exercise-thumbs/sl_mb_throw.png',
-      'ht_sl_rot_lunge': 'pdf-extract/exercise-thumbs/sl_split_cable.png',
-      'ht_sl_scap_sling': 'pdf-extract/exercise-thumbs/gen_scap_sling.png',
-      'ht_sl_serr_obl': 'pdf-extract/exercise-thumbs/gen_serr_obl.png',
-      'ht_sl_thor_rot': 'pdf-extract/exercise-thumbs/gen_thor_rot.png',
-      'ht_sl_tib_fib': 'pdf-extract/exercise-thumbs/gen_tib_fib.png',
+      'ht_all_foam': 'exercise-thumbs/gen_foam_roll.png',
+      'ht_all_long_reach': 'exercise-thumbs/gen_long_reach.png',
+      'ht_all_reach_matrix': 'exercise-thumbs/gen_reach_matrix.png',
+      'ht_all_unstable': 'exercise-thumbs/gen_unstable.png',
+      'ht_arm_farmer': 'exercise-thumbs/gen_suitcase.png',
+      'ht_arm_landmine': 'exercise-thumbs/gen_landmine.png',
+      'ht_arm_ohp': 'exercise-thumbs/gen_ohp.png',
+      'ht_arm_pec_lat': 'exercise-thumbs/gen_pec_lat.png',
+      'ht_arm_row': 'exercise-thumbs/gen_row.png',
+      'ht_arm_serratus': 'exercise-thumbs/gen_wall_serratus.png',
+      'ht_arm_thor_ext': 'exercise-thumbs/gen_thor_ext.png',
+      'ht_arm_wall_slide': 'exercise-thumbs/panel_wall_slide.png',
+      'ht_dfl_9090': 'exercise-thumbs/panel_9090.png',
+      'ht_dfl_adductor': 'exercise-thumbs/gen_adductor.png',
+      'ht_dfl_barefoot': 'exercise-thumbs/gen_barefoot.png',
+      'ht_dfl_carry_breath': 'exercise-thumbs/gen_carry_breath.png',
+      'ht_dfl_copen_hold': 'exercise-thumbs/panel_copenhagen.png',
+      'ht_dfl_copenhagen': 'exercise-thumbs/panel_copenhagen.png',
+      'ht_dfl_diaphragm': 'exercise-thumbs/gen_diaphragm.png',
+      'ht_dfl_goblet': 'exercise-thumbs/panel_goblet.png',
+      'ht_dfl_inlet': 'exercise-thumbs/gen_inlet.png',
+      'ht_dfl_short_foot': 'exercise-thumbs/panel_short_foot.png',
+      'ht_fl_anti_rot': 'exercise-thumbs/gen_anti_rot.png',
+      'ht_fl_band_hold': 'exercise-thumbs/gen_band_hold.png',
+      'ht_fl_birddog': 'exercise-thumbs/panel_birddog.png',
+      'ht_fl_cable': 'exercise-thumbs/sl_split_cable.png',
+      'ht_fl_crossbody': 'exercise-thumbs/gen_crossbody.png',
+      'ht_fl_oblique_reach': 'exercise-thumbs/gen_oblique_reach.png',
+      'ht_fl_rot_throw': 'exercise-thumbs/gen_rot_throw.png',
+      'ht_fl_skip': 'exercise-thumbs/gen_skip.png',
+      'ht_fl_sprint': 'exercise-thumbs/gen_sprint.png',
+      'ht_fl_tlf': 'exercise-thumbs/gen_tlf_glide.png',
+      'ht_ll_bound': 'exercise-thumbs/gen_lateral_bound.png',
+      'ht_ll_gate': 'exercise-thumbs/panel_gate_walk.png',
+      'ht_ll_oh_carry': 'exercise-thumbs/gen_oh_carry.png',
+      'ht_ll_open': 'exercise-thumbs/gen_lat_open.png',
+      'ht_ll_peroneal': 'exercise-thumbs/gen_tfl_release.png',
+      'ht_ll_side_reach': 'exercise-thumbs/panel_side_reach.png',
+      'ht_ll_stepdown': 'exercise-thumbs/gen_side_stepdown.png',
+      'ht_ll_suitcase': 'exercise-thumbs/gen_suitcase.png',
+      'ht_sbl_calf': 'exercise-thumbs/gen_calf_stretch.png',
+      'ht_sbl_cm_hop': 'exercise-thumbs/panel_cm_hop.png',
+      'ht_sbl_conv_dl': 'exercise-thumbs/gen_conv_dl.png',
+      'ht_sbl_heel': 'exercise-thumbs/panel_heel_raise.png',
+      'ht_sbl_hinge': 'exercise-thumbs/gen_hip_hinge.png',
+      'ht_sbl_hop': 'exercise-thumbs/gen_hop.png',
+      'ht_sbl_kb_swing': 'exercise-thumbs/gen_kb_swing.png',
+      'ht_sbl_nordic': 'exercise-thumbs/panel_nordic.png',
+      'ht_sbl_plantar': 'exercise-thumbs/gen_plantar_ball.png',
+      'ht_sbl_pogo': 'exercise-thumbs/panel_pogo.png',
+      'ht_sbl_rdl': 'exercise-thumbs/panel_rdl.png',
+      'ht_sbl_reverse_plank': 'exercise-thumbs/sbl_reverse_plank.png',
+      'ht_sbl_rolldown': 'exercise-thumbs/panel_rolldown.png',
+      'ht_sbl_stiff_dl': 'exercise-thumbs/gen_stiff_dl.png',
+      'ht_sfl_brace': 'exercise-thumbs/gen_rib_brace.png',
+      'ht_sfl_deadbug': 'exercise-thumbs/gen_deadbug.png',
+      'ht_sfl_ext_dec': 'exercise-thumbs/gen_backext_dec.png',
+      'ht_sfl_halfkneel': 'exercise-thumbs/panel_halfkneel.png',
+      'ht_sfl_hanging': 'exercise-thumbs/gen_hanging_kr.png',
+      'ht_sfl_land_dec': 'exercise-thumbs/gen_land_dec.png',
+      'ht_sfl_ball_plank': 'exercise-thumbs/sfl_ball_plank.png',
+      'ht_sfl_reach': 'exercise-thumbs/gen_abd_reach.png',
+      'ht_sfl_rf_psoas': 'exercise-thumbs/sfl_kneeling_lean.png',
+      'ht_sl_band_reach': 'exercise-thumbs/gen_band_rot_reach.png',
+      'ht_sl_chop': 'exercise-thumbs/panel_chop.png',
+      'ht_sl_mb_throw': 'exercise-thumbs/sl_mb_throw.png',
+      'ht_sl_rot_lunge': 'exercise-thumbs/sl_split_cable.png',
+      'ht_sl_scap_sling': 'exercise-thumbs/gen_scap_sling.png',
+      'ht_sl_serr_obl': 'exercise-thumbs/gen_serr_obl.png',
+      'ht_sl_thor_rot': 'exercise-thumbs/gen_thor_rot.png',
+      'ht_sl_tib_fib': 'exercise-thumbs/gen_tib_fib.png',
     };
 
     function extractHongtaekCue_(coachingNote) {
@@ -3237,7 +3260,7 @@
       {
         id: 'DFL', sec: 'hongtaek_dfl', name: 'DFL · 심부전방',
         screen: '뒤꿈치 접지 스쿼트 + 호흡',
-        thumb: 'pdf-extract/exercise-thumbs/screens/screen_dfl.png',
+        thumb: 'exercise-thumbs/screens/screen_dfl.png',
         script: '안내: 지금부터 심부 지지(발·호흡)를 확인합니다.\n동작 1: 두 발 뒤꿈치를 붙이거나 가깝게 모으고, 가능한 깊이까지 앉았다가 일어납니다. 뒤꿈치가 바닥에서 뜨는지 느껴 보세요.\n동작 2: 편하게 서서 또는 누워, 코로 들이쉬며 배가 먼저 부풀고 옆구리가 벌어지게 숨을 쉽니다. 어깨가 귀로 올라가는지 봅니다.\n확인: 뒤꿈치가 일찍 뜨거나, 숨이 목·윗가슴으로만 가면 양성으로 표시합니다.',
         positive: '뒤꿈치가 일찍 뜸(발목 배굴 제한) 또는 흉식·어깨 호흡',
         target: '후경골근–내전근–요근–횡격막',
@@ -3246,7 +3269,7 @@
       {
         id: 'SBL', sec: 'hongtaek_sbl', name: 'SBL · 표면후방',
         screen: '손끝 닿기 + 누운 다리 들기',
-        thumb: 'pdf-extract/exercise-thumbs/screens/screen_sbl.png',
+        thumb: 'exercise-thumbs/screens/screen_sbl.png',
         script: '안내: 지금부터 뒤쪽 긴 라인(발바닥~등)을 확인합니다.\n동작 1: 무릎을 편 채 서서 상체를 천천히 앞으로 숙여 손끝이 어디까지 가는지 봅니다. 허리를 통째로 접지 말고 내려가 보세요.\n동작 2: 바로 누워 한쪽 무릎을 편 채 다리를 천천히 들어 올립니다(SLR). 반대도 합니다.\n확인: 손끝이 많이 안 닿거나, 숙일 때 등이 한 덩어리로만 움직이거나, 다리를 조금만 들어도 당기면 양성입니다.',
         positive: '전방 굴곡 제한 또는 흉요추가 분절되지 않음',
         target: '족저–비복–햄–기립근',
@@ -3255,7 +3278,7 @@
       {
         id: 'SFL', sec: 'hongtaek_sfl', name: 'SFL · 표면전방',
         screen: '누운 무릎 당기기 + 기립 젖히기',
-        thumb: 'pdf-extract/exercise-thumbs/screens/screen_sfl.png',
+        thumb: 'exercise-thumbs/screens/screen_sfl.png',
         script: '안내: 지금부터 앞쪽 라인(허벅지 앞~배)을 확인합니다.\n동작 1: 벤치 끝에 앉아 한쪽 무릎을 가슴 쪽으로 안고 등을 눕힙니다(토마스). 반대 허벅지가 바닥으로 내려가는지, 무릎이 편하게 굽혀지는지 봅니다.\n동작 2: 서서 손을 허리에 두고 천천히 뒤로 젖혀 봅니다. 허리가 꺾이며 배가 앞으로 많이 나오는지 확인합니다.\n확인: 누운 쪽 허벅지가 잘 안 내려가거나(앞라인 짧음), 젖힐 때 골반만 앞으로 많이 기울면 양성입니다.',
         positive: '고관절 신전 제한(하부 단축) 또는 기립 시 전방경사(상부 신장)',
         target: '대퇴직근(단축) & 복직근(신장)',
@@ -3264,7 +3287,7 @@
       {
         id: 'LL', sec: 'hongtaek_ll', name: 'LL · 외측',
         screen: '옆으로 숙이기 + 한발 서기 30초',
-        thumb: 'pdf-extract/exercise-thumbs/screens/screen_ll.png',
+        thumb: 'exercise-thumbs/screens/screen_ll.png',
         script: '안내: 지금부터 옆라인(골반 수평)을 확인합니다.\n동작 1: 서서 한 팔을 머리 위로 뻗고 몸통을 반대로 천천히 숙여 옆구리를 늘립니다. 좌우를 비교합니다.\n동작 2: 한 발로 30초 섭니다. 골반이 옆으로 처지거나 상체가 많이 기울지 않는지 봅니다. 반대 발도 합니다.\n확인: 한발 설 때 반대쪽 골반이 아래로 처지거나(트렌델렌버그), 좌우 옆 늘림이 크게 다르면 양성입니다.',
         positive: '편측 기립 시 반대쪽 골반 하강 또는 측방 불균형',
         target: '비골근–ITB–복사근–SCM',
@@ -3273,7 +3296,7 @@
       {
         id: 'SL', sec: 'hongtaek_sl', name: 'SL · 나선',
         screen: '회전 리치 + 스텝다운',
-        thumb: 'pdf-extract/exercise-thumbs/screens/screen_sl.png',
+        thumb: 'exercise-thumbs/screens/screen_sl.png',
         script: '안내: 지금부터 나선(회전·무릎 정렬)을 확인합니다.\n동작 1: 골반은 정면을 유지한 채 양손을 앞으로 모으고 가슴만 좌우로 돌려 멀리 뻗어 봅니다. 좌우 거리·힘을 비교합니다.\n동작 2: 낮은 박스·박스에 한 발로 서서 반대 발을 천천히 옆으로 내립니다. 지지 무릎이 안쪽으로 무너지는지 봅니다.\n확인: 회전이 한쪽만 많이 안 되거나, 내릴 때 무릎이 안쪽으로 무너지면 양성입니다.',
         positive: '회전 좌우차 또는 착지·하강 시 동적 무릎 외반',
         target: '복사근–전거근/능형–경골근',
@@ -3282,7 +3305,7 @@
       {
         id: 'Arm', sec: 'hongtaek_arm', name: 'Arm · 상지 4경선',
         screen: '월 슬라이드 + 팔 위로 들기',
-        thumb: 'pdf-extract/exercise-thumbs/screens/screen_arm.png',
+        thumb: 'exercise-thumbs/screens/screen_arm.png',
         script: '안내: 지금부터 팔·어깨가 머리 위로 가는 길을 확인합니다.\n동작 1: 벽에 엉덩이·등·머리를 붙이고 팔을 W자로 벽에 댑니다. 천천히 위로 밀어 Y까지 올려 보세요. 어깨가 귀로 올라가는지, 허리가 뜨는지 봅니다.\n동작 2: 서서 양팔을 귀 옆으로 들어 올립니다. 팔이 올라갈 때 허리를 과하게 젖혀 보상하지 않는지 확인합니다.\n확인: 팔이 잘 안 올라가 허리를 젖혀 대신하거나, 월 슬라이드에서 어깨만 으쓱하면 양성입니다.',
         positive: '어깨 굴곡을 흉추·요추 신전으로 대신함',
         target: '소흉근–광배–승모–회전근개',
@@ -3291,7 +3314,7 @@
       {
         id: 'FL', sec: 'hongtaek_fl', name: 'FL · 기능(사선)',
         screen: '크로스바디 리치 + 회전 파워 비교',
-        thumb: 'pdf-extract/exercise-thumbs/screens/screen_fl.png',
+        thumb: 'exercise-thumbs/screens/screen_fl.png',
         script: '안내: 지금부터 사선 연결(손↔반대 엉덩이)을 확인합니다.\n동작 1: 한 손을 반대쪽 위·옆으로 길게 뻗어 몸통을 가로지릅니다. 좌우를 비교해 어느 쪽이 더 길게/힘 있게 가는지 느껴 보세요.\n동작 2: 가볍게 메디신볼·밴드로 양쪽 회전 던지거나 당기기를 같은 횟수로 해 보고, 한쪽이 확실히 약한지 비교합니다.\n확인: 좌우 파워나 리치 느낌이 눈에 띄게 차이나면(대략 10% 이상) 양성입니다.',
         positive: '회전 파워·리치 좌우차 뚜렷(약 10% 초과)',
         target: '광배근–반대측 대둔근',
@@ -3696,8 +3719,11 @@
     function renderHongtaekScreenPanelHtml_() {
       var scr = getHongtaekScreen_();
       var positives = hongtaekPositiveLines_();
-      var html = '<div class="ht-screen-panel">';
-      html += '<h3>경선별 스크린 → 처방 추천</h3>';
+      var screenKey = 'hongtaek_screen';
+      var screenCollapsed = isSectionCollapsed(screenKey);
+      var html = '<div class="ht-screen-panel collapsible' + (screenCollapsed ? ' collapsed' : '') + '">';
+      html += '<h3 class="ht-screen-hd" onclick="toggleSectionCollapse(\'' + screenKey + '\')">경선별 스크린 → 처방 추천</h3>';
+      html += '<div class="ht-screen-body">';
       html += '<p class="ht-screen-note">강사가 아래 멘트를 읽어 주시면 회원이 따라 할 수 있습니다. 양성은 <b>개입 표적 가설</b>이며 병리 진단이 아닙니다. DFL 양성이면 지지 기반으로 가장 앞에 둡니다.</p>';
       html += '<div class="ht-screen-list">';
       HONGTAEK_SCREEN_MATRIX.forEach(function(row) {
@@ -3753,7 +3779,7 @@
         html += '<div class="ht-screen-rec">양성 소견을 체크하면 경선 추천 순서와 필터가 활성화됩니다.</div>';
       }
       html += buildHongtaekRxDraftHtml_();
-      html += '</div>';
+      html += '</div></div>';
       return html;
     }
 
@@ -3804,8 +3830,12 @@
         if (hasPos && !scr.filterRecOnly && !isRec && !isAlways) cls += ' ht-dimmed';
 
         var lineId = hongtaekLineFromSec_(secKey);
+        var secCollapsed = isSectionCollapsed(secKey);
+        cls += ' collapsible';
+        if (secCollapsed) cls += ' collapsed';
         html += '<div class="' + cls + '" data-ht-sec="' + escapeHtml(secKey) + '" data-ht-line="' + escapeHtml(lineId) + '">';
-        html += '<div class="psp-section-hd">' + escapeHtml(g.title) + sectionHeaderMeta(secKey);
+        html += '<div class="psp-section-hd" onclick="toggleSectionCollapse(\'' + secKey + '\')">' +
+          escapeHtml(g.title) + sectionHeaderMeta(secKey);
         if (hasPos && isRec && secKey !== 'hongtaek_video') {
           html += ' <span class="section-meta section-meta-done">추천</span>';
         }
@@ -3821,13 +3851,26 @@
         });
         progOrder.forEach(function(pName) {
           var st = hongtaekStageFromProgram_(pName);
-          html += '<div class="psp-part-wrap" data-ht-stage="' + escapeHtml(st) + '">';
-          html += renderProgramPartHdHtml_(pName, byProg[pName], hasMember, false, secKey, pName);
+          var stageKey = st === 'OTHER' ? ('prog_' + pName) : st;
+          var stageCollapsed = isSubSectionCollapsed(secKey, stageKey);
+          var gst = groupTodayStats_(byProg[pName]);
+          html += '<div class="psp-part-wrap psp-subsection collapsible' +
+            (stageCollapsed ? ' collapsed' : '') + '" data-ht-stage="' + escapeHtml(st) + '">';
+          html += '<div class="psp-subsection-hd" onclick="toggleSubSectionCollapse(\'' +
+            secKey + '\',\'' + String(stageKey).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + '\')">';
+          html += '<span class="psp-subsection-hd-main"><span>' + escapeHtml(pName) + '</span></span>';
+          html += progressHeaderMeta({
+            total: gst.total,
+            checked: gst.todayCount,
+            allComplete: gst.allToday,
+            partial: gst.partialToday
+          });
+          html += '</div><div class="psp-subsection-body">';
           html += '<div class="psp-part-card">';
           byProg[pName].forEach(function(item) {
             html += renderMethodRowHtml(item, secKey, hasMember, methodDisplayLabel(item));
           });
-          html += '</div></div>';
+          html += '</div></div></div>';
         });
         html += '</div></div>';
       });
@@ -7462,10 +7505,12 @@
     }
 
     function isSectionCollapsed(secKey) {
-      if (COLLAPSIBLE_SECTIONS.indexOf(secKey) < 0) return false;
+      var isHongtaek = String(secKey || '').indexOf('hongtaek') === 0;
+      if (COLLAPSIBLE_SECTIONS.indexOf(secKey) < 0 && !isHongtaek) return false;
       if (state.sectionCollapsedTouched[secKey]) {
         return !!state.sectionCollapsed[secKey];
       }
+      if (isHongtaek) return true; // 홍택: 기본 접힘
       return defaultSectionCollapsed(secKey, !!state.selected);
     }
 
@@ -7474,6 +7519,7 @@
       if (state.sectionCollapsedTouched[k]) {
         return !!state.sectionCollapsed[k];
       }
+      if (String(secKey || '').indexOf('hongtaek') === 0) return true; // 홍택 단계: 기본 접힘
       return defaultSubSectionCollapsed(secKey, subKey, !!state.selected);
     }
 
@@ -9794,15 +9840,17 @@
     }
 
     function toggleSectionCollapse(key) {
+      var next = !isSectionCollapsed(key);
       state.sectionCollapsedTouched[key] = true;
-      state.sectionCollapsed[key] = !isSectionCollapsed(key);
+      state.sectionCollapsed[key] = next;
       renderProgramList();
     }
 
     function toggleSubSectionCollapse(secKey, subKey) {
+      var next = !isSubSectionCollapsed(secKey, subKey);
       var k = collapsibleSubKey(secKey, subKey);
       state.sectionCollapsedTouched[k] = true;
-      state.sectionCollapsed[k] = !isSubSectionCollapsed(secKey, subKey);
+      state.sectionCollapsed[k] = next;
       renderProgramList();
     }
 
