@@ -1023,6 +1023,168 @@
       border:1px solid var(--border); border-radius:0 0 10px 10px;
       padding:10px; background:#fafbfd;
     }
+    /* 최홍택 · 경선 스크린 → 추천 */
+    .ht-screen-panel {
+      background: linear-gradient(165deg, #f2faf7 0%, #fff 55%);
+      border: 1px solid var(--zone-program-border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+    .ht-screen-panel h3 {
+      font-size: 13px; font-weight: 800; color: var(--zone-program); margin-bottom: 4px;
+    }
+    .ht-screen-panel .ht-screen-note {
+      font-size: 11px; color: var(--dim); margin-bottom: 10px; line-height: 1.45;
+    }
+    .ht-screen-list { display: flex; flex-direction: column; gap: 6px; }
+    .ht-screen-row {
+      display: grid;
+      grid-template-columns: 18px 52px 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .ht-screen-row.on {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+    .ht-screen-row input { margin-top: 2px; width: 16px; height: 16px; }
+    .ht-screen-line {
+      font-size: 12px; font-weight: 800; color: var(--zone-program); line-height: 1.2;
+    }
+    .ht-screen-meta { font-size: 11px; color: #334155; line-height: 1.45; }
+    .ht-screen-meta .pos { color: #b45309; }
+    .ht-screen-meta .tgt { color: var(--dim); }
+    .ht-screen-script {
+      margin-top: 6px; padding: 8px 9px; border-radius: 8px;
+      background: #f8fafc; border: 1px solid #e2e8f0;
+      font-size: 11px; color: #1e293b; line-height: 1.55;
+    }
+    .ht-screen-script b { font-weight: 800; }
+    .ht-screen-script .cue-pos { color: #b91c1c; }
+    .ht-screen-visual {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(140px, 42%);
+      gap: 8px; align-items: start; margin-top: 6px;
+    }
+    .ht-screen-thumb {
+      width: 100%; aspect-ratio: 2 / 1; object-fit: contain;
+      border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; display: block;
+    }
+    @media (max-width: 560px) {
+      .ht-screen-visual { grid-template-columns: 1fr; }
+    }
+    .ht-screen-actions {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center;
+    }
+    .ht-screen-actions .btn {
+      font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px;
+      border: 1px solid var(--border); background: #fff; cursor: pointer; font-family: inherit;
+    }
+    .ht-screen-actions .btn-primary {
+      background: var(--zone-program); color: #fff; border-color: var(--zone-program);
+    }
+    .ht-screen-actions .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .ht-screen-actions a.btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      text-decoration: none; color: inherit;
+    }
+
+    .ht-screen-rec {
+      margin-top: 10px; padding: 8px 10px; border-radius: 8px;
+      background: var(--zone-program-soft); border: 1px solid var(--zone-program-border);
+      font-size: 11px; color: #0f3d36; line-height: 1.45;
+    }
+    .ht-screen-rec strong { color: var(--zone-program); }
+    .ht-screen-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .ht-screen-chip {
+      font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 999px;
+      background: var(--zone-program); color: #fff;
+    }
+    .ht-screen-chip.dfl { background: #4338ca; }
+    .psp-section.ht-rec-hit > .psp-section-hd {
+      background: #ecfdf5;
+    }
+    .psp-section.ht-dimmed { opacity: .4; }
+    .method-row.has-thumb {
+      grid-template-columns: 24px 52px 1fr auto;
+    }
+    .method-thumb {
+      width: 52px; height: 40px; border-radius: 8px; object-fit: contain;
+      background: #f1f5f9; border: 1px solid var(--border); display: block;
+    }
+    .coach-note-thumb {
+      width: 100%; max-height: 220px; object-fit: contain; border-radius: 10px;
+      background: #f1f5f9; border: 1px solid var(--border); margin-bottom: 12px; display: block;
+    }
+    .coach-note-text { white-space: pre-wrap; }
+    .ht-rx-box {
+      margin-top: 10px; padding: 10px; border-radius: 10px;
+      background: #fff; border: 1px solid #b8e4d6;
+    }
+    .ht-rx-box h4 {
+      font-size: 12px; font-weight: 800; color: #0d7568; margin: 0 0 6px;
+    }
+    .ht-rx-box ol {
+      margin: 0 0 0 16px; padding: 0; font-size: 11px; color: #334155; line-height: 1.45;
+    }
+    .ht-rx-box li { margin-bottom: 4px; }
+    .ht-rx-box .hint { font-size: 10px; color: var(--dim); margin-top: 6px; }
+    .ht-rx-hd {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;
+    }
+    .ht-rx-hd h4 { margin: 0; }
+    .ht-rx-copy {
+      font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px;
+      border: 1px solid #0d7568; background: #0d7568; color: #fff; cursor: pointer; font-family: inherit;
+      flex-shrink: 0;
+    }
+    .ht-toolbar {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      margin: 12px 0 8px; padding: 10px; border-radius: 10px;
+      background: #f8fafc; border: 1px solid #e2e8f0;
+    }
+    .ht-toolbar input[type="search"] {
+      flex: 1 1 160px; min-width: 140px; padding: 7px 10px; border-radius: 8px;
+      border: 1px solid var(--border); font-size: 12px; font-family: inherit;
+    }
+    .ht-stage-filters, .ht-line-filters { display: flex; flex-wrap: wrap; gap: 4px; }
+    .ht-stage-filters button, .ht-line-filters button {
+      font-size: 11px; font-weight: 700; padding: 5px 9px; border-radius: 999px;
+      border: 1px solid var(--border); background: #fff; cursor: pointer; font-family: inherit; color: #334155;
+    }
+    .ht-stage-filters button.on, .ht-line-filters button.on {
+      background: var(--zone-program); color: #fff; border-color: var(--zone-program);
+    }
+    .ht-count-pill {
+      font-size: 11px; font-weight: 800; color: #0f766e;
+      background: #ecfdf5; border: 1px solid #a7f3d0; padding: 4px 9px; border-radius: 999px;
+    }
+    .method-cue {
+      font-size: 10px; color: var(--dim); margin-top: 2px; line-height: 1.35;
+    }
+    .method-cue b { color: #b91c1c; font-weight: 800; }
+    .method-thumb { cursor: zoom-in; }
+    .ht-screen-thumb { cursor: zoom-in; }
+    .coach-note-thumb { cursor: zoom-in; }
+    .ht-lightbox {
+      display: none; position: fixed; inset: 0; z-index: 12000;
+      background: rgba(15, 23, 42, .82); align-items: center; justify-content: center;
+      flex-direction: column; gap: 10px; padding: 20px; cursor: zoom-out;
+    }
+    .ht-lightbox.open { display: flex; }
+    .ht-lightbox img {
+      max-width: min(920px, 94vw); max-height: 78vh; object-fit: contain;
+      border-radius: 12px; background: #fff; box-shadow: 0 20px 50px rgba(0,0,0,.35);
+    }
+    .ht-lightbox .ht-lb-cap {
+      color: #e2e8f0; font-size: 13px; font-weight: 700; text-align: center; max-width: 90vw;
+    }
+
     .psp-subsection {
       margin-bottom:10px; border:1px solid #e2e8f0; border-radius:8px;
       background:#fff; overflow:hidden;
@@ -2396,9 +2558,15 @@
     </div>
   </div>
 
+  <!-- 홍택 썸네일 확대 -->
+  <div class="ht-lightbox" id="htLightbox" role="dialog" aria-modal="true" onclick="closeHongtaekLightbox_()">
+    <img id="htLightboxImg" alt="">
+    <div class="ht-lb-cap" id="htLightboxCap"></div>
+  </div>
+
   <!-- 운동 코칭 참고 -->
   <div class="modal-overlay" id="coachNoteModal">
-    <div class="modal" style="max-width:480px;">
+      <div class="modal" style="max-width:520px;">
       <div class="modal-hd">
         <h2 id="coachNoteTitle">코칭 참고</h2>
         <button type="button" class="modal-close" onclick="closeCoachingNoteModal()">×</button>
@@ -2446,7 +2614,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-08-06-get-fallback';
+    const INSTRUCTOR_HTML_BUILD = '2026-08-10-no-result-rescroll';
     const PROGRAM_PLAN_SLOT_COUNT = 5;
     var _programPlanSaveSlot = 1;
     const BOARD_LOAD_TIMEOUT_MS = 90000;
@@ -2709,7 +2877,7 @@
     var PROGRAM_TABS = [
       { id: 'movement', label: 'Re:Al 움직임', sub: '5단계 프로토콜 · 기능운동' },
       { id: 'func', label: '최진옥 원장', sub: 'Core · Trunk · Hip · Shoulder · Reformer' },
-      { id: 'hongtaek', label: '최홍택 원장', sub: '코어·골반 안정화 · 기능 패턴' },
+      { id: 'hongtaek', label: '최홍택 원장', sub: '근막 경선 · Strength & Coordination' },
       { id: 'injun', label: '김인준 원장', sub: '고관절·코어 · 흉추 가동성' },
       { id: 'face', label: 'Re:Al 페이스', sub: '작은얼굴 · 안면비대칭 프로그램' },
     ];
@@ -2761,65 +2929,252 @@
           videoDetailTitle: '',
           youtubeUrl: url,
           coachingNote: String(item.coachingNote || '').trim(),
+          thumbUrl: String(item.thumbUrl || '').trim(),
+          cue: String(item.cue || (String(item.coachingNote || '').match(/^포인트:\s*(.+)$/m) || ['',''])[1] || '').trim(),
         });
       });
     }
 
+    var HONGTAEK_THUMB_BY_ID = {
+      'ht_all_foam': 'pdf-extract/exercise-thumbs/gen_foam_roll.png',
+      'ht_all_long_reach': 'pdf-extract/exercise-thumbs/gen_long_reach.png',
+      'ht_all_reach_matrix': 'pdf-extract/exercise-thumbs/gen_reach_matrix.png',
+      'ht_all_unstable': 'pdf-extract/exercise-thumbs/gen_unstable.png',
+      'ht_arm_farmer': 'pdf-extract/exercise-thumbs/gen_suitcase.png',
+      'ht_arm_landmine': 'pdf-extract/exercise-thumbs/gen_landmine.png',
+      'ht_arm_ohp': 'pdf-extract/exercise-thumbs/gen_ohp.png',
+      'ht_arm_pec_lat': 'pdf-extract/exercise-thumbs/gen_pec_lat.png',
+      'ht_arm_row': 'pdf-extract/exercise-thumbs/gen_row.png',
+      'ht_arm_serratus': 'pdf-extract/exercise-thumbs/gen_wall_serratus.png',
+      'ht_arm_thor_ext': 'pdf-extract/exercise-thumbs/gen_thor_ext.png',
+      'ht_arm_wall_slide': 'pdf-extract/exercise-thumbs/panel_wall_slide.png',
+      'ht_dfl_9090': 'pdf-extract/exercise-thumbs/panel_9090.png',
+      'ht_dfl_adductor': 'pdf-extract/exercise-thumbs/gen_adductor.png',
+      'ht_dfl_barefoot': 'pdf-extract/exercise-thumbs/gen_barefoot.png',
+      'ht_dfl_carry_breath': 'pdf-extract/exercise-thumbs/gen_carry_breath.png',
+      'ht_dfl_copen_hold': 'pdf-extract/exercise-thumbs/panel_copenhagen.png',
+      'ht_dfl_copenhagen': 'pdf-extract/exercise-thumbs/panel_copenhagen.png',
+      'ht_dfl_diaphragm': 'pdf-extract/exercise-thumbs/gen_diaphragm.png',
+      'ht_dfl_goblet': 'pdf-extract/exercise-thumbs/panel_goblet.png',
+      'ht_dfl_inlet': 'pdf-extract/exercise-thumbs/gen_inlet.png',
+      'ht_dfl_short_foot': 'pdf-extract/exercise-thumbs/panel_short_foot.png',
+      'ht_fl_anti_rot': 'pdf-extract/exercise-thumbs/gen_anti_rot.png',
+      'ht_fl_band_hold': 'pdf-extract/exercise-thumbs/gen_band_hold.png',
+      'ht_fl_birddog': 'pdf-extract/exercise-thumbs/panel_birddog.png',
+      'ht_fl_cable': 'pdf-extract/exercise-thumbs/sl_split_cable.png',
+      'ht_fl_crossbody': 'pdf-extract/exercise-thumbs/gen_crossbody.png',
+      'ht_fl_oblique_reach': 'pdf-extract/exercise-thumbs/gen_oblique_reach.png',
+      'ht_fl_rot_throw': 'pdf-extract/exercise-thumbs/gen_rot_throw.png',
+      'ht_fl_skip': 'pdf-extract/exercise-thumbs/gen_skip.png',
+      'ht_fl_sprint': 'pdf-extract/exercise-thumbs/gen_sprint.png',
+      'ht_fl_tlf': 'pdf-extract/exercise-thumbs/gen_tlf_glide.png',
+      'ht_ll_bound': 'pdf-extract/exercise-thumbs/gen_lateral_bound.png',
+      'ht_ll_gate': 'pdf-extract/exercise-thumbs/panel_gate_walk.png',
+      'ht_ll_oh_carry': 'pdf-extract/exercise-thumbs/gen_oh_carry.png',
+      'ht_ll_open': 'pdf-extract/exercise-thumbs/gen_lat_open.png',
+      'ht_ll_peroneal': 'pdf-extract/exercise-thumbs/gen_tfl_release.png',
+      'ht_ll_side_reach': 'pdf-extract/exercise-thumbs/panel_side_reach.png',
+      'ht_ll_stepdown': 'pdf-extract/exercise-thumbs/gen_side_stepdown.png',
+      'ht_ll_suitcase': 'pdf-extract/exercise-thumbs/gen_suitcase.png',
+      'ht_sbl_calf': 'pdf-extract/exercise-thumbs/gen_calf_stretch.png',
+      'ht_sbl_cm_hop': 'pdf-extract/exercise-thumbs/panel_cm_hop.png',
+      'ht_sbl_conv_dl': 'pdf-extract/exercise-thumbs/gen_conv_dl.png',
+      'ht_sbl_heel': 'pdf-extract/exercise-thumbs/panel_heel_raise.png',
+      'ht_sbl_hinge': 'pdf-extract/exercise-thumbs/gen_hip_hinge.png',
+      'ht_sbl_hop': 'pdf-extract/exercise-thumbs/gen_hop.png',
+      'ht_sbl_kb_swing': 'pdf-extract/exercise-thumbs/gen_kb_swing.png',
+      'ht_sbl_nordic': 'pdf-extract/exercise-thumbs/panel_nordic.png',
+      'ht_sbl_plantar': 'pdf-extract/exercise-thumbs/gen_plantar_ball.png',
+      'ht_sbl_pogo': 'pdf-extract/exercise-thumbs/panel_pogo.png',
+      'ht_sbl_rdl': 'pdf-extract/exercise-thumbs/panel_rdl.png',
+      'ht_sbl_reverse_plank': 'pdf-extract/exercise-thumbs/sbl_reverse_plank.png',
+      'ht_sbl_rolldown': 'pdf-extract/exercise-thumbs/panel_rolldown.png',
+      'ht_sbl_stiff_dl': 'pdf-extract/exercise-thumbs/gen_stiff_dl.png',
+      'ht_sfl_brace': 'pdf-extract/exercise-thumbs/gen_rib_brace.png',
+      'ht_sfl_deadbug': 'pdf-extract/exercise-thumbs/gen_deadbug.png',
+      'ht_sfl_ext_dec': 'pdf-extract/exercise-thumbs/gen_backext_dec.png',
+      'ht_sfl_halfkneel': 'pdf-extract/exercise-thumbs/panel_halfkneel.png',
+      'ht_sfl_hanging': 'pdf-extract/exercise-thumbs/gen_hanging_kr.png',
+      'ht_sfl_land_dec': 'pdf-extract/exercise-thumbs/gen_land_dec.png',
+      'ht_sfl_ball_plank': 'pdf-extract/exercise-thumbs/sfl_ball_plank.png',
+      'ht_sfl_reach': 'pdf-extract/exercise-thumbs/gen_abd_reach.png',
+      'ht_sfl_rf_psoas': 'pdf-extract/exercise-thumbs/sfl_kneeling_lean.png',
+      'ht_sl_band_reach': 'pdf-extract/exercise-thumbs/gen_band_rot_reach.png',
+      'ht_sl_chop': 'pdf-extract/exercise-thumbs/panel_chop.png',
+      'ht_sl_mb_throw': 'pdf-extract/exercise-thumbs/sl_mb_throw.png',
+      'ht_sl_rot_lunge': 'pdf-extract/exercise-thumbs/sl_split_cable.png',
+      'ht_sl_scap_sling': 'pdf-extract/exercise-thumbs/gen_scap_sling.png',
+      'ht_sl_serr_obl': 'pdf-extract/exercise-thumbs/gen_serr_obl.png',
+      'ht_sl_thor_rot': 'pdf-extract/exercise-thumbs/gen_thor_rot.png',
+      'ht_sl_tib_fib': 'pdf-extract/exercise-thumbs/gen_tib_fib.png',
+    };
+
+    function extractHongtaekCue_(coachingNote) {
+      var m = String(coachingNote || '').match(/^포인트:\s*(.+)$/m);
+      return m ? String(m[1] || '').trim() : '';
+    }
+
+    function hongtaekLineItem(id, uiSection, sectionTitle, program, label, coachingNote, alimtalkLabel) {
+      var thumb = (typeof HONGTAEK_THUMB_BY_ID !== 'undefined' && HONGTAEK_THUMB_BY_ID[id]) || '';
+      var note = coachingNote || '';
+      return {
+        id: id,
+        uiSection: uiSection,
+        sectionTitle: sectionTitle,
+        program: program,
+        label: label,
+        alimtalkLabel: alimtalkLabel || label,
+        coachingNote: note,
+        cue: extractHongtaekCue_(note),
+        group: sectionTitle,
+        hasVideo: false,
+        thumbUrl: thumb,
+      };
+    }
+
     var HONGTAEK_CATALOG_RAW = [
+      /* ── 기존 영상 루틴 ── */
       {
         id: 'hongtaek_thoracic_mob',
-        uiSection: 'hongtaek_quad',
-        sectionTitle: '네발기기 · 흉추·골반',
-        program: '네발기기 · 흉추·골반',
+        uiSection: 'hongtaek_video',
+        sectionTitle: '기존 영상 루틴',
+        program: '기존 영상 루틴',
         label: '① 네발기기 흉추 가동성 스트레칭',
         linkUrl: 'https://youtu.be/KMecCAhaXCc',
         coachingNote: '메디신볼을 가슴 앞에 안고 스플릿 런지에서 앞발 방향으로 명치·배꼽이 함께 돌아가게 흉추를 회전합니다. 올라올 때 앞발바닥으로 바닥을 밀고 양쪽 무릎을 곧게 펴 정렬을 유지합니다.',
       },
       {
         id: 'hongtaek_hip_ext',
-        uiSection: 'hongtaek_quad',
-        sectionTitle: '네발기기 · 흉추·골반',
-        program: '네발기기 · 흉추·골반',
+        uiSection: 'hongtaek_video',
+        sectionTitle: '기존 영상 루틴',
+        program: '기존 영상 루틴',
         label: '② 코어-골반 안정화 힙 익스텐션',
         linkUrl: 'https://youtu.be/7Q7bNbKbKQQ',
         coachingNote: '박스 위 팔꿈치 지지 네발기기에서 배꼽을 당겨 척추 중립을 유지합니다. 숨을 내쉬며 다리를 들 때 허리가 아닌 엉덩이 근육 수축에 집중하고, 지지 무릎·골반이 한쪽으로 쏠리지 않게 합니다.',
       },
       {
         id: 'hongtaek_push_front_reach',
-        uiSection: 'hongtaek_prone',
-        sectionTitle: '엎드려서 · 코어 안정화',
-        program: '엎드려서 · 코어 안정화',
+        uiSection: 'hongtaek_video',
+        sectionTitle: '기존 영상 루틴',
+        program: '기존 영상 루틴',
         label: '③ 푸시-업 프론트 리치',
         linkUrl: 'https://youtu.be/80AUVnW-WL0',
         coachingNote: '무릎 지지 엎드린 자세에서 어깨~무릎 일직선을 유지하고 엉덩이를 들어 허리를 평평하게 합니다. 갈비뼈를 모으며 한 팔을 앞으로 뻗을 때 골반이 흔들리지 않도록 반대쪽 지지점에 힘을 줍니다.',
       },
       {
         id: 'hongtaek_glute_circle',
-        uiSection: 'hongtaek_prone',
-        sectionTitle: '엎드려서 · 코어 안정화',
-        program: '엎드려서 · 코어 안정화',
+        uiSection: 'hongtaek_video',
+        sectionTitle: '기존 영상 루틴',
+        program: '기존 영상 루틴',
         label: '④ 측면 사슬 안정화 중둔근 서클',
         linkUrl: 'https://youtu.be/4W5zyWJoDPw',
         coachingNote: '엎드린 코어 플랭크 자세에서 팔을 머리 위로 원(반원) 궤적으로 움직입니다. 골반·엉덩이가 좌우로 흔들리지 않게 중둔근으로 측면 사슬을 안정화합니다.',
       },
       {
         id: 'hongtaek_plank_twist',
-        uiSection: 'hongtaek_side',
-        sectionTitle: '측면·서기 · 기능 패턴',
-        program: '측면·서기 · 기능 패턴',
+        uiSection: 'hongtaek_video',
+        sectionTitle: '기존 영상 루틴',
+        program: '기존 영상 루틴',
         label: '⑤ 내전근-코어 안정화 플랭크 트위스트',
         linkUrl: 'https://youtu.be/20IZhWC1YGg',
         coachingNote: '사이드 플랭크에서 무릎을 박스에 올리고 골반을 들어 일직선을 만듭니다. 상체를 아래로 회전할 때 골반이 뒤로 빠지지 않게 고정하고, 박스를 누르는 허벅지 안쪽 힘을 유지합니다.',
       },
       {
         id: 'hongtaek_hip_hinge_dl',
-        uiSection: 'hongtaek_side',
-        sectionTitle: '측면·서기 · 기능 패턴',
-        program: '측면·서기 · 기능 패턴',
+        uiSection: 'hongtaek_video',
+        sectionTitle: '기존 영상 루틴',
+        program: '기존 영상 루틴',
         label: '⑥ 고관절 힌지 밸런스 데드리프트',
         linkUrl: 'https://youtu.be/nR-kiCG6fo8',
         coachingNote: '한 발을 박스에 올리고 뒤쪽 골반을 벽 쪽으로 밀며 힙 힌지로 상체를 숙입니다. 무릎이 앞으로 튀어나가지 않게 하고, 발바닥 전체로 바닥을 밀어 올릴 때 허리 곧은 정렬과 둔근 수축을 유지합니다.',
       },
+
+      /* ── DFL 먼저 (지지 기반) ── */
+      hongtaekLineItem('ht_dfl_diaphragm', 'hongtaek_dfl', 'DFL · 심부전방경선', '① Mobilize', '횡격막 이완', '준비: 편하게 누워 한 손을 아랫배에, 한 손을 옆구리에 둡니다.\n동작: 코로 천천히 들이쉬며 배가 먼저 부풀고, 이어서 옆구리·갈비뼈가 옆으로 벌어지게 합니다. 입으로 길게 내쉬며 갈비뼈를 모아 내립니다.\n포인트: 어깨를 으쓱하지 말고, 숨이 목·가슴 위쪽으로만 가지 않게 합니다.\n주의: 억지로 크게 들이쉬지 말고 편안한 크기로 5~8회 반복합니다.', 'DFL · 횡격막 이완'),
+      hongtaekLineItem('ht_dfl_adductor', 'hongtaek_dfl', 'DFL · 심부전방경선', '① Mobilize', '내전근군·후경골근 이완', '준비: 옆으로 눕거나 앉아서 허벅지 안쪽(내전근)에 볼·손을 댑니다.\n동작: 통증 없는 지점에 체중을 아주 천천히 실었다가 풉니다. 한 지점당 30~90초, 호흡은 계속합니다.\n포인트: 빠르게 문지르지 말고 압박-이완만 반복합니다.\n주의: 날카로운 통증·저림이 있으면 강도를 줄이거나 중단합니다.', 'DFL · 내전근·후경골근'),
+      hongtaekLineItem('ht_dfl_inlet', 'hongtaek_dfl', 'DFL · 심부전방경선', '① Mobilize', '흉곽 입구 이완', '준비: 앉거나 바로 누워 쇄골 아래·목 옆 부드러운 조직에 손·볼을 둡니다.\n동작: 가볍게 압박한 채 천천히 숨을 들이쉬고 내쉽니다. 목이 앞뒤로 크게 움직이지 않게 합니다.\n포인트: 목·어깨가 따라 올라가지 않게 고정합니다.\n주의: 동맥 부위나 강한 압박은 피합니다.', 'DFL · 흉곽 입구'),
+      hongtaekLineItem('ht_dfl_9090', 'hongtaek_dfl', 'DFL · 심부전방경선', '② Integrate', '90/90 호흡', '준비: 바로 누워 엉덩이·무릎을 90도로 구부려 발바닥을 벽에 댑니다(또는 무릎을 공중에).\n동작: 코로 들이쉬며 갈비뼈가 옆·뒤로 벌어지게 하고, 내쉬며 갈비뼈를 모아 바닥에 가깝게 내립니다.\n포인트: 갈비뼈가 위로 뜨거나 허리가 과도하게 뜨지 않게 합니다.\n주의: 숨 참지 말고 6~10회 호흡합니다.', 'DFL · 90/90 호흡'),
+      hongtaekLineItem('ht_dfl_short_foot', 'hongtaek_dfl', 'DFL · 심부전방경선', '② Integrate', '발 아치 도밍 (Short Foot)', '준비: 맨발로 서서 발바닥 전체를 바닥에 붙입니다.\n동작: 발가락은 길게 편 채로, 발 아치만 살짝 들어올려 발바닥 가운데가 살짝 떠오르게 합니다. 3~5초 유지 후 풉니다.\n포인트: 발가락을 구부리거나 발끝을 집지 않습니다.\n주의: 과도하게 올리면 종아리·발가락에 힘이 들어갑니다. 작은 움직임이면 충분합니다.', 'DFL · 발 아치 도밍'),
+      hongtaekLineItem('ht_dfl_copen_hold', 'hongtaek_dfl', 'DFL · 심부전방경선', '② Integrate', '저강도 코펜하겐 홀드', '준비: 사이드 플랭크처럼 옆으로 누워 아래쪽 팔꿈치로 지지하고, 위쪽 발 또는 무릎을 벤치·박스에 올립니다(저강도 버전).\n동작: 골반을 들어 머리~골반~무릎이 한 줄이 되게 유지합니다. 호흡을 멈추지 않습니다.\n포인트: 골반이 아래로 처지지 않게 합니다.\n주의: 허리·어깨에 통증이 있으면 무릎 지지 버전으로 낮춥니다.', 'DFL · 코펜하겐 홀드'),
+      hongtaekLineItem('ht_dfl_copenhagen', 'hongtaek_dfl', 'DFL · 심부전방경선', '③ Load', '코펜하겐 플랭크', '준비: 옆으로 누워 위쪽 발목을 벤치에 올리고, 아래쪽 팔꿈치로 바닥을 지지합니다.\n동작: 골반을 들어올려 몸을 일직선으로 만든 뒤 유지하거나, 천천히 올렸다 내립니다.\n포인트: 골반이 뒤로 빠지거나 아래로 떨어지지 않게 합니다.\n주의: 처음에는 짧은 시간부터, 통증 시 즉시 중단합니다.', 'DFL · 코펜하겐 플랭크'),
+      hongtaekLineItem('ht_dfl_goblet', 'hongtaek_dfl', 'DFL · 심부전방경선', '③ Load', '뒤꿈치 접지 고블릿 스쿼트', '준비: 두 발 뒤꿈치를 붙이거나 가깝게 모으고, 무게(덤벨·케틀벨)를 가슴 앞에 안습니다.\n동작: 상체를 세운 채 가능한 깊이까지 앉았다가 일어납니다. 뒤꿈치가 뜨는 지점이 발목 배굴 한계입니다.\n포인트: 뒤꿈치를 끝까지 바닥에 붙이려 합니다.\n주의: 무릎·허리 통증이 있으면 깊이를 줄입니다.', 'DFL · 고블릿 스쿼트'),
+      hongtaekLineItem('ht_dfl_carry_breath', 'hongtaek_dfl', 'DFL · 심부전방경선', '③ Load', '편측 캐리 + 호흡 통제', '준비: 한 손(또는 한 팔 오버헤드)에 적당한 무게를 들고 섭니다.\n동작: 허리를 옆으로 꺾지 않은 채 천천히 걷니다. 동시에 코로 들이쉬고 입으로 내쉬며 호흡 리듬을 유지합니다.\n포인트: 무게 쪽으로 몸이 기울지 않게, 갈비–골반을 가지런히 합니다.\n주의: 무게는 자세가 무너지지 않는 수준으로 고릅니다.', 'DFL · 편측 캐리·호흡'),
+      hongtaekLineItem('ht_dfl_barefoot', 'hongtaek_dfl', 'DFL · 심부전방경선', '② Integrate', '맨발 과제', '준비: 신발을 벗고 안전한 공간에서 시작합니다.\n동작: 매트·바닥·약간의 요철 등 다른 감촉을 느끼며 천천히 걷거나 섭니다.\n포인트: 균형만 잡으려 하지 말고, 발바닥이 느끼는 감각에 주의를 둡니다.\n주의: 날카로운 물체·미끄러운 바닥은 피합니다.', 'DFL · 맨발 과제'),
+
+      /* ── SBL ── */
+      hongtaekLineItem('ht_sbl_plantar', 'hongtaek_sbl', 'SBL · 표면후방경선', '① Mobilize', '족저 볼 릴리즈', '준비: 앉거나 서서 발바닥 아래에 마사지 볼을 둡니다.\n동작: 체중을 아주 천천히 실어 압박했다가 풉니다. 앞발·중간·뒤꿈치를 나눠 30~90초씩.\n포인트: 문지르기보다 누르고 숨 쉬기가 핵심입니다.\n주의: 참기 힘든 통증이면 강도를 낮춥니다.', 'SBL · 족저 볼'),
+      hongtaekLineItem('ht_sbl_calf', 'hongtaek_sbl', 'SBL · 표면후방경선', '① Mobilize', '비복근·가자미근 분리 신장', '준비: 벽이나 스텝을 앞에 두고 섭니다.\n동작: ① 무릎을 편 채로 뒤쪽 종아리를 늘립니다(비복근). ② 같은 자세에서 무릎만 살짝 구부려 다시 늘립니다(가자미근). 각 20~30초.\n포인트: 두 자세를 구분해 각각 느낍니다.\n주의: 발바닥이 과도하게 바깥/안으로 쓰러지지 않게 합니다.', 'SBL · 종아리 신장'),
+      hongtaekLineItem('ht_sbl_rolldown', 'hongtaek_sbl', 'SBL · 표면후방경선', '② Integrate', 'Roll-down & Roll-up', '준비: 두 발로 서서 무릎은 살짝만 풉니다.\n동작: 턱을 살짝 당긴 뒤 머리→목→등→허리 순서로 천천히 앞으로 말아 내립니다. 올라올 때는 반대로 아래에서부터 하나씩 폅니다.\n포인트: 허리를 통째로 접지 말고 척추를 마디마디 움직입니다.\n주의: 어지러움·허리 통증이 있으면 범위를 줄입니다.', 'SBL · 롤다운'),
+      hongtaekLineItem('ht_sbl_hinge', 'hongtaek_sbl', 'SBL · 표면후방경선', '② Integrate', '힙 힌지 패턴 / Stiff-leg reach', '준비: 봉이나 손을 허벅지 앞에 두고 섭니다. 무릎은 살짝만 굽힙니다.\n동작: 무릎 각도는 거의 고정한 채 엉덩이를 뒤로 밀며 상체를 숙입니다. 허리가 둥글게 말리지 않게 하고 다시 일어납니다.\n포인트: 무릎이 앞으로 나가지 않고, 엉덩이가 뒤로 가는 느낌입니다.\n주의: 햄스트링이 당기면 그 직전 범위에서 멈춥니다.', 'SBL · 힙 힌지'),
+      hongtaekLineItem('ht_sbl_rdl', 'hongtaek_sbl', 'SBL · 표면후방경선', '③ Load', 'RDL (루마니안 데드리프트)', '준비: 바벨·덤벨을 허벅지 앞에 들고 섭니다. 견갑은 가볍게 고정합니다.\n동작: 무릎 각도를 거의 유지한 채 엉덩이를 뒤로 보내 바를 무릎 아래까지 내린 뒤, 엉덩이로 밀어 일어납니다.\n포인트: 정강이는 수직에 가깝게, 바는 다리에 가깝게.\n주의: 허리가 과도하게 둥글면 무게를 줄입니다.', 'SBL · RDL'),
+      hongtaekLineItem('ht_sbl_nordic', 'hongtaek_sbl', 'SBL · 표면후방경선', '③ Load', '노르딕 햄스트링', '준비: 무릎 꿇고 발목을 파트너·패드에 고정합니다. 몸통은 곧게.\n동작: 고관절을 접지 않은 채 상체를 천천히 앞으로 기울입니다. 가능한 지점까지 내려갔다가 통제하며 돌아옵니다(또는 팔로 받쳐 올라옵니다).\n포인트: 엉덩이가 뒤로 빠지며 접히지 않게 합니다.\n주의: 햄스트링에 강한 당김·통증이 있으면 범위를 줄입니다.', 'SBL · 노르딕'),
+      hongtaekLineItem('ht_sbl_heel', 'hongtaek_sbl', 'SBL · 표면후방경선', '③ Load', '편측 폴오프 힐레이즈', '준비: 계단 끝에 한쪽 발앞꿈치를 올리고 반대 발은 들거나 가볍게 둡니다.\n동작: 뒤꿈치를 아래로 천천히 내린 뒤(약 3초), 앞꿈치로 밀어 올려 뒤꿈치를 높입니다.\n포인트: 내리는 구간을 서두르지 않습니다.\n주의: 균형이 불안하면 난간을 잡습니다.', 'SBL · 힐레이즈'),
+      hongtaekLineItem('ht_sbl_pogo', 'hongtaek_sbl', 'SBL · 표면후방경선', '③ Load', '포고 (Pogo)', '준비: 제자리에서 가볍게 섭니다. 무릎은 거의 편 상태.\n동작: 발목만 톡톡 튕기듯 작은 점프를 연속합니다. 땅에 오래 머물지 않습니다.\n포인트: 무릎으로 점프하지 말고 발목 스프링을 씁니다.\n주의: 착지가 무거우면 높이를 더 줄입니다.', 'SBL · 포고'),
+      hongtaekLineItem('ht_sbl_cm_hop', 'hongtaek_sbl', 'SBL · 표면후방경선', '③ Load', '카운터무브먼트 홉', '준비: 어깨너비로 섭니다.\n동작: 살짝 앉으며 팔을 뒤로 보냄과 동시에, 멈춤 없이 바로 위로 점프합니다. 착지 후 안정되면 반복합니다.\n포인트: 앉은 자세에서 멈추지 않는 것이 핵심입니다.\n주의: 착지 시 무릎이 안쪽으로 무너지지 않게 합니다.', 'SBL · CM 홉'),
+      hongtaekLineItem('ht_sbl_stiff_dl', 'hongtaek_sbl', 'SBL · 표면후방경선', '③ Load', '스티프 레그 데드리프트', '준비: 바를 잡고 무릎을 RDL보다 더 펴에 가깝게 둡니다.\n동작: 엉덩이를 뒤로 보내며 상체를 숙였다가, 뒤쪽 사슬 전체가 이어진 느낌으로 일어납니다.\n포인트: 무릎만 굽혀 올리지 말고 엉덩이–햄–등으로 연결합니다.\n주의: 유연성 부족 시 범위를 줄입니다.', 'SBL · 스티프 레그 DL'),
+      hongtaekLineItem('ht_sbl_conv_dl', 'hongtaek_sbl', 'SBL · 표면후방경선', '③ Load', '컨벤셔널 데드리프트', '준비: 바가 정강이 앞에 오게 서서 힙과 무릎을 함께 굽혀 바를 잡습니다.\n동작: 바닥을 밀며 일어나 바를 허벅지까지 올린 뒤, 통제하며 내립니다.\n포인트: RDL과 달리 무릎 굴곡을 허용한 분절 리프트입니다.\n주의: 허리가 과도하게 말리면 무게를 줄입니다.', 'SBL · 컨벤셔널 DL'),
+      hongtaekLineItem('ht_sbl_reverse_plank', 'hongtaek_sbl', 'SBL · 표면후방경선', '③ Load', '리버스 플랭크', '준비: 바닥에 앉아 손끝은 엉덩이 옆·약간 뒤로, 다리는 앞으로 뻗습니다.\n동작: 손을 밀고 뒤꿈치로 바닥을 누르며 골반을 들어올려 몸 전체를 일직선으로 만듭니다.\n포인트: 엉덩이가 처지지 않게, 고개는 과하게 젖히지 않습니다.\n주의: 손목이 불편하면 주먹·벤치를 사용합니다.', 'SBL · 리버스 플랭크'),
+      hongtaekLineItem('ht_sbl_kb_swing', 'hongtaek_sbl', 'SBL · 표면후방경선', '③ Load', '케틀벨 스윙', '준비: 케틀벨을 앞에 두고 힌지 자세로 손잡이를 잡습니다.\n동작: 엉덩이를 뒤로 보냈다가 빠르게 앞으로 밀어 벨을 가슴 높이까지 스윙합니다. 팔은 끈처럼 연결만 합니다.\n포인트: 어깨로 들어올리지 말고 엉덩이 반동으로 올립니다.\n주의: 허리가 과신전되며 젖혀지지 않게 합니다.', 'SBL · KB 스윙'),
+      hongtaekLineItem('ht_sbl_hop', 'hongtaek_sbl', 'SBL · 표면후방경선', '③ Load', '홉 (편측)', '준비: 한 발로 섭니다. 가볍게 균형을 잡습니다.\n동작: 같은 발로 작게 연속 점프합니다. 착지할 때마다 잠깐 안정시킵니다.\n포인트: 착지 시 무릎이 발끝 방향으로 향하고 안쪽으로 무너지지 않게 합니다.\n주의: 통증·불안정 시 양발 포고로 대체합니다.', 'SBL · 홉'),
+
+      /* ── SFL ── */
+      hongtaekLineItem('ht_sfl_rf_psoas', 'hongtaek_sfl', 'SFL · 표면전방경선', '① Mobilize', '대퇴직근·장요근 능동 신장', '준비: 반무릎(앞다리는 90도, 뒤무릎 바닥) 자세를 만듭니다.\n동작: 뒤쪽 골반을 살짝 후방경사로 고정한 채 몸을 앞으로 옮겨 앞허벅지·엉덩이 앞을 늘립니다. 필요하면 같은쪽 팔을 위로 뻗습니다.\n포인트: 허리가 과하게 젖혀지지 않게 골반을 먼저 고정합니다.\n주의: 무릎 불편 시 패드를 깝니다.', 'SFL · 대퇴·장요근'),
+      hongtaekLineItem('ht_sfl_reach', 'hongtaek_sfl', 'SFL · 표면전방경선', '① Mobilize', '복부 근막 리치', '준비: 바로 눕거나 무릎을 세우고 눕습니다.\n동작: 양팔·가슴·골반이 이어지도록 길게 뻗어 전면이 늘어나게 합니다. 호흡에 맞춰 5~8회.\n포인트: 한 근육만 당기지 말고 앞사슬 전체를 길게 만듭니다.\n주의: 허리 통증이 있으면 범위를 줄입니다.', 'SFL · 복부 리치'),
+      hongtaekLineItem('ht_sfl_brace', 'hongtaek_sfl', 'SFL · 표면전방경선', '② Integrate', '늑골 하강 유지 브레이싱', '준비: 서거나 누워 손을 갈비뼈 아래에 댑니다.\n동작: 살짝 숨을 내쉬며 갈비뼈를 아래로 모으고, 그 상태에서 복부에 부드럽게 압력을 만듭니다. 숨을 완전히 멈추지 않습니다.\n포인트: 갈비뼈가 위로 벌어지지 않게 유지합니다.\n주의: 과도하게 배를 밀어내거나 숨을 잠그지 않습니다.', 'SFL · 브레이싱'),
+      hongtaekLineItem('ht_sfl_halfkneel', 'hongtaek_sfl', 'SFL · 표면전방경선', '② Integrate', '하프닐링 리치업', '준비: 반무릎 자세, 골반은 정면.\n동작: 같은쪽 또는 반대 팔을 머리 위로 천천히 뻗습니다. 뻗는 동안 갈비뼈는 내린 상태를 유지합니다.\n포인트: 팔을 올리며 허리가 꺾이지 않게 합니다.\n주의: 어깨가 귀로 올라가면 범위를 줄입니다.', 'SFL · 하프닐링 리치'),
+      hongtaekLineItem('ht_sfl_deadbug', 'hongtaek_sfl', 'SFL · 표면전방경선', '③ Load', '데드버그', '준비: 바로 누워 팔·무릎을 천장 쪽으로 90도로 듭니다.\n동작: 반대쪽 팔과 다리를 천천히 길게 뻗었다가 돌아옵니다. 좌우 교대.\n포인트: 허리가 바닥에서 뜨지 않게 합니다. 뜨면 다리를 덜 뻗습니다.\n주의: 목·어깨에 힘이 들어가지 않게 합니다.', 'SFL · 데드버그'),
+      hongtaekLineItem('ht_sfl_hanging', 'hongtaek_sfl', 'SFL · 표면전방경선', '③ Load', '행잉 니레이즈', '준비: 풀업바에 어깨너비로 매달려 견갑을 가볍게 안정시킵니다.\n동작: 무릎을 가슴 쪽으로 천천히 들어올렸다가 내립니다. 반동을 쓰지 않습니다.\n포인트: 무릎만 굽히지 말고 골반을 살짝 후방경사로 말아 올립니다.\n주의: 어깨·팔꿈치 통증 시 중단합니다.', 'SFL · 행잉 니레이즈'),
+      hongtaekLineItem('ht_sfl_ext_dec', 'hongtaek_sfl', 'SFL · 표면전방경선', '③ Load', '백 익스텐션 감속', '준비: 백 익스텐션 벤치 또는 엎드린 자세에서 상체를 신전합니다.\n동작: 올라간 위치에서 3~5초에 걸쳐 천천히 내려옵니다.\n포인트: 올리는 속도보다 내리는 통제가 목적입니다.\n주의: 허리 끝범위에서 튕기지 않습니다.', 'SFL · 감속 신전'),
+      hongtaekLineItem('ht_sfl_land_dec', 'hongtaek_sfl', 'SFL · 표면전방경선', '③ Load', '전방 사슬 감속 착지', '준비: 낮은 박스나 제자리 점프부터 시작합니다.\n동작: 점프 후 착지할 때 발→무릎→힙 순으로 부드럽게 흡수하며 멈춥니다.\n포인트: 착지 소리가 크지 않게, 무릎이 안쪽으로 무너지지 않게.\n주의: 높은 점프는 착지가 안정된 뒤 올립니다.', 'SFL · 감속 착지'),
+      hongtaekLineItem('ht_sfl_ball_plank', 'hongtaek_sfl', 'SFL · 표면전방경선', '③ Load', '볼 지지 전면 플랭크', '준비: 팔꿈치는 벤치·매트, 정강이 또는 발은 짐볼 위에 둡니다.\n동작: 몸을 일직선으로 들어 플랭크를 유지합니다. 호흡을 계속합니다.\n포인트: 엉덩이가 처지거나 너무 높이 올라가지 않게 합니다.\n주의: 허리 불편 시 무릎을 볼에 올리는 쉬운 버전으로 합니다.', 'SFL · 볼 플랭크'),
+
+      /* ── LL ── */
+      hongtaekLineItem('ht_ll_open', 'hongtaek_ll', 'LL · 외측경선', '① Mobilize', '측방 늑골–골반 공간 열기', '준비: 바로 서거나 옆으로 눕습니다.\n동작: 한쪽 팔을 머리 위로 뻗으며 몸통을 반대쪽으로 길게 늘려 옆구리 공간을 엽니다. 호흡에 맞춰 좌우 실시.\n포인트: 허리만 꺾지 말고 늑골–골반 사이가 길어지게 합니다.\n주의: 통증 쪽은 범위를 줄입니다.', 'LL · 측방 공간'),
+      hongtaekLineItem('ht_ll_peroneal', 'hongtaek_ll', 'LL · 외측경선', '① Mobilize', '비골근·TFL 릴리즈', '준비: 폼롤러나 볼을 종아리 바깥·엉덩이 옆(TFL)에 둡니다.\n동작: 체중을 천천히 실어 30~90초 압박·이완합니다.\n포인트: 빠르게 롤링하지 않습니다.\n주의: 뼈·신경이 찌릿하면 위치를 바꿉니다.', 'LL · 비골근·TFL'),
+      hongtaekLineItem('ht_ll_side_reach', 'hongtaek_ll', 'LL · 외측경선', '② Integrate', '사이드 플랭크 리치스루', '준비: 사이드 플랭크(무릎 또는 족부 지지).\n동작: 위쪽 팔을 하늘로 들었다가 몸통 아래(리치스루)로 집어넣으며 상체를 살짝 회전합니다. 다시 엽니다.\n포인트: 골반이 뒤로 처지지 않게 높이를 유지합니다.\n주의: 어깨 불안정 시 무릎 지지로 낮춥니다.', 'LL · 사이드 리치스루'),
+      hongtaekLineItem('ht_ll_gate', 'hongtaek_ll', 'LL · 외측경선', '② Integrate', '게이트 워크 (밴드)', '준비: 미니밴드를 발목 또는 무릎 위에 깝니다.\n동작: 상체는 세운 채 옆으로 한 걸음씩 이동합니다. 발끝은 앞을 향하게.\n포인트: 골반이 좌우로 기울지 않게 수평을 유지합니다.\n주의: 무릎이 안쪽으로 무너지면 보폭을 줄입니다.', 'LL · 게이트 워크'),
+      hongtaekLineItem('ht_ll_oh_carry', 'hongtaek_ll', 'LL · 외측경선', '③ Load', '편측 오버헤드 캐리', '준비: 한 손으로 케틀벨·덤벨을 머리 위에 안정적으로 듭니다.\n동작: 갈비–골반을 가지런히 한 채 천천히 걷습니다.\n포인트: 무게 쪽으로 쓰러지지 않게 반대 옆구리를 길게 유지합니다.\n주의: 어깨가 불안정하면 수트케이스 캐리로 대체합니다.', 'LL · OH 캐리'),
+      hongtaekLineItem('ht_ll_suitcase', 'hongtaek_ll', 'LL · 외측경선', '③ Load', '수트케이스 캐리', '준비: 한 손에만 덤벨·케틀벨을 들고 옆구리에 붙입니다.\n동작: 몸이 무게 쪽으로 꺾이지 않게 저항하며 걷니다.\n포인트: 어깨를 귀 쪽으로 올리지 말고, 몸통을 세로로 세웁니다.\n주의: 허리 통증이 있으면 무게를 줄입니다.', 'LL · 수트케이스'),
+      hongtaekLineItem('ht_ll_stepdown', 'hongtaek_ll', 'LL · 외측경선', '③ Load', '사이드 스텝다운', '준비: 낮은 박스·계단에 한 발로 섭니다.\n동작: 반대 발을 옆으로 천천히 내리며 지지 다리로 내려갔다가 일어납니다.\n포인트: 지지 무릎이 안쪽으로 무너지지 않게 발끝 방향을 향하게 합니다.\n주의: 높이는 통제 가능한 것부터.', 'LL · 사이드 스텝다운'),
+      hongtaekLineItem('ht_ll_bound', 'hongtaek_ll', 'LL · 외측경선', '③ Load', '래터럴 바운드', '준비: 옆으로 뛸 공간을 확보합니다.\n동작: 한쪽으로 점프해 한 발로 착지한 뒤 2초간 정지합니다. 반대도 실시.\n포인트: 착지 안정(감속)이 점프 거리보다 중요합니다.\n주의: 착지가 흔들리면 거리를 줄입니다.', 'LL · 래터럴 바운드'),
+
+      /* ── SL ── */
+      hongtaekLineItem('ht_sl_thor_rot', 'hongtaek_sl', 'SL · 나선경선', '① Mobilize', '흉추 회전 가동', '준비: 옆으로 눕거나 네발기기·앉은 자세에서 골반을 고정합니다.\n동작: 골반은 고정한 채 가슴·흉추만 좌우로 천천히 회전합니다.\n포인트: 골반이 함께 돌아가면 안 됩니다.\n주의: 목만 돌리지 말고 가슴이 돌아가게 합니다.', 'SL · 흉추 회전'),
+      hongtaekLineItem('ht_sl_serr_obl', 'hongtaek_sl', 'SL · 나선경선', '① Mobilize', '전거근–외복사근 접합부 릴리즈', '준비: 옆으로 누워 손·볼을 옆갈비와 복부가 만나는 지점에 둡니다.\n동작: 가볍게 압박하며 숨을 들이쉬고 내쉽니다. 30~90초.\n포인트: 호흡과 함께 조직이 녹는 느낌으로.\n주의: 너무 세게 누르면 숨이 가빠집니다.', 'SL · 전거근-복사근'),
+      hongtaekLineItem('ht_sl_tib_fib', 'hongtaek_sl', 'SL · 나선경선', '① Mobilize', '경골근·비골근 릴리즈', '준비: 볼·롤러를 정강이 앞(경골근)과 바깥(비골근)에 둡니다.\n동작: 천천히 압박·이완합니다.\n포인트: 발 아치 슬링을 위한 준비 작업입니다.\n주의: 뼈를 직접 누르지 않습니다.', 'SL · 경골·비골근'),
+      hongtaekLineItem('ht_sl_band_reach', 'hongtaek_sl', 'SL · 나선경선', '② Integrate', '밴디드 로테이셔널 리치', '준비: 밴드를 옆에 고정하고 양손 또는 한 손으로 잡습니다.\n동작: 몸통을 회전하며 팔을 멀리 뻗었다가 천천히 돌아옵니다.\n포인트: 끝에서 탄성을 잃지 말고 통제합니다.\n주의: 무릎·골반 정렬이 무너지면 저항을 줄입니다.', 'SL · 밴드 회전 리치'),
+      hongtaekLineItem('ht_sl_scap_sling', 'hongtaek_sl', 'SL · 나선경선', '② Integrate', '전거근+능형근 동시 활성', '준비: 벽 또는 밴드/케이블 앞에 섭니다.\n동작: 팔을 앞으로 밀며 견갑을 갈비뼈에 밀착(전인)했다가, 당기며 견갑을 모읍니다(후인). 천천히 교대.\n포인트: 어깨를 귀로 올리지 않고 견갑 움직임만 분리합니다.\n주의: 목 긴장이 있으면 범위를 줄입니다.', 'SL · 견갑 슬링'),
+      hongtaekLineItem('ht_sl_chop', 'hongtaek_sl', 'SL · 나선경선', '③ Load', '케이블 촙 / 리프트', '준비: 케이블/밴드를 높거나 낮게 세팅합니다(촙=고→저, 리프트=저→고).\n동작: 발로 바닥을 밀며 골반이 먼저 돌고, 이어서 가슴·팔이 사선으로 당기거나 밉니다.\n포인트: 팔만 먼저 움직이지 않습니다.\n주의: 무게는 순서를 지킬 수 있는 정도로.', 'SL · 촙/리프트'),
+      hongtaekLineItem('ht_sl_rot_lunge', 'hongtaek_sl', 'SL · 나선경선', '③ Load', '회전 런지', '준비: 스플릿 런지 자세.\n동작: 앞무릎을 발끝 방향으로 유지한 채 상체(흉곽)를 한쪽으로 회전했다가 돌아옵니다.\n포인트: 무릎이 안쪽으로 무너지지 않게.\n주의: 균형이 어려우면 제자리 런지에서 작게 회전합니다.', 'SL · 회전 런지'),
+      hongtaekLineItem('ht_sl_mb_throw', 'hongtaek_sl', 'SL · 나선경선', '③ Load', '메디신볼 로테이셔널 스로우', '준비: 벽 앞에 메디신볼을 들고 섭니다.\n동작: 발로 밀어 골반→가슴 회전 후 벽을 향해 볼을 던집니다. 받아 반복.\n포인트: 팔 힘만으로 던지지 말고 하체부터 연결합니다.\n주의: 볼 무게는 통제 가능한 것으로.', 'SL · MB 스로우'),
+
+      /* ── Arm Lines ── */
+      hongtaekLineItem('ht_arm_pec_lat', 'hongtaek_arm', 'Arm · 상지 4경선', '① Mobilize', '소흉근(DFAL)·광배근(SFAL) 신장', '준비: 문틀에 팔을 걸치거나, 한쪽 팔을 위로/옆으로 고정합니다.\n동작: 몸을 천천히 돌려 가슴 앞(소흉)과 옆구리·겨드랑이(광배)를 늘립니다. 각 20~30초.\n포인트: 어깨를 귀로 올리지 않습니다.\n주의: 저림이 있으면 각도를 바꿉니다.', 'Arm · 소흉·광배'),
+      hongtaekLineItem('ht_arm_thor_ext', 'hongtaek_arm', 'Arm · 상지 4경선', '① Mobilize', '흉추 신전 가동', '준비: 폼롤러를 등 중상부에 가로로 두고 눕습니다. 손은 머리 뒤 또는 가슴 앞.\n동작: 엉덩이는 바닥에 둔 채 상체를 뒤로 열어 흉추를 신전합니다.\n포인트: 허리가 과하게 꺾이지 않게, 등 위가 열리게.\n주의: 통증 부위는 피합니다.', 'Arm · 흉추 신전'),
+      hongtaekLineItem('ht_arm_wall_slide', 'hongtaek_arm', 'Arm · 상지 4경선', '② Integrate', '월 슬라이드', '준비: 벽에 엉덩이·등·머리·팔을 붙이고 W자(팔꿈치 아래)로 시작합니다.\n동작: 팔을 천천히 위로 밀어 Y자까지 올린 뒤 내려옵니다. 손목·팔꿈치가 벽에서 너무 멀어지지 않게.\n포인트: 어깨가 귀로 올라가지 않게, 갈비뼈는 내린 채.\n주의: 벽에서 팔이 떨어지면 그 직전까지만.', 'Arm · 월 슬라이드'),
+      hongtaekLineItem('ht_arm_serratus', 'hongtaek_arm', 'Arm · 상지 4경선', '② Integrate', '벽 밀기 전거근 활성', '준비: 팔 뻗어 손바닥을 벽에 댑니다.\n동작: 팔꿈치를 편 채로 손바닥으로 벽을 밀어 등 사이(견갑)가 벌어지며 갈비에 붙게 합니다. 천천히 반복.\n포인트: 어깨를 올리지 않고 견갑만 전인.\n주의: 손목 부담 시 주먹으로 합니다.', 'Arm · 전거근 벽밀기'),
+      hongtaekLineItem('ht_arm_ohp', 'hongtaek_arm', 'Arm · 상지 4경선', '③ Load', '오버헤드 프레스', '준비: 덤벨·바를 어깨 높이에 둡니다. 갈비뼈는 내린 상태.\n동작: 머리 위로 밀어 올린 뒤 통제하며 내립니다. 바가 얼굴 앞을 지날 때 고개를 살짝 빼줍니다.\n포인트: 허리를 과하게 젖혀 올리지 않습니다.\n주의: 어깨 가동이 부족하면 랜드마인으로 대체합니다.', 'Arm · OHP'),
+      hongtaekLineItem('ht_arm_row', 'hongtaek_arm', 'Arm · 상지 4경선', '③ Load', '로우 / 풀업', '준비: 힌지 또는 좌식/풀업 자세.\n동작: 팔꿈치가 옆구리를 스치듯 당기며 견갑을 모읍니다. 천천히 펴며 돌아옵니다.\n포인트: 손목·어깨로 당기지 말고 팔꿈치·견갑으로.\n주의: 목 힘 빼기.', 'Arm · 로우/풀업'),
+      hongtaekLineItem('ht_arm_landmine', 'hongtaek_arm', 'Arm · 상지 4경선', '③ Load', '랜드마인 프레스', '준비: 바 한쪽을 코너에 고정(랜드마인)하고 다른쪽 끝을 잡습니다.\n동작: 가슴 앞에서 사선 위·앞으로 밉니다. 팔이 올라갈 때 견갑이 자연히 돌아가게 둡니다.\n포인트: 어깨를 과도하게 으쓱하지 않습니다.\n주의: 코어가 돌아가면 스플릿 스탠스로 안정시킵니다.', 'Arm · 랜드마인'),
+      hongtaekLineItem('ht_arm_farmer', 'hongtaek_arm', 'Arm · 상지 4경선', '③ Load', '파머스·수트케이스 캐리', '준비: 양손 또는 한 손에 무게를 들고 섭니다.\n동작: 어깨를 아래로 내린 채 짧게 걸으며 그립과 몸통을 안정시킵니다.\n포인트: 무게에 끌려 어깨가 올라가지 않게.\n주의: 손에서 미끄러지면 즉시 내려놓습니다.', 'Arm · 캐리'),
+
+      /* ── FL ── */
+      hongtaekLineItem('ht_fl_oblique_reach', 'hongtaek_fl', 'FL · 기능경선', '① Mobilize', '사선 리치', '준비: 서서 또는 런지 자세.\n동작: 한 손을 멀리 뻗으며 반대쪽 발뒤꿈치로 바닥을 눌러 사선 연결을 만듭니다.\n포인트: 손끝과 반대 발뒤꿈치가 이어지는 느낌을 찾습니다.\n주의: 허리만 비틀지 말고 발부터 연결합니다.', 'FL · 사선 리치'),
+      hongtaekLineItem('ht_fl_tlf', 'hongtaek_fl', 'FL · 기능경선', '① Mobilize', '흉요근막 활주', '준비: 네발기기 또는 옆으로 누워 손·볼을 허리 옆 넓은 근막 부위에 둡니다.\n동작: 호흡에 맞춰 아주 천천히 활주·압박합니다.\n포인트: 정적 스트레칭보다 움직이며 활주하는 감각.\n주의: 뼈 돌기 위는 피합니다.', 'FL · 흉요근막'),
+      hongtaekLineItem('ht_fl_birddog', 'hongtaek_fl', 'FL · 기능경선', '② Integrate', '버드독', '준비: 네발기기, 손·무릎은 어깨·골반 아래.\n동작: 반대 팔과 다리를 길게 뻗어 유지했다가 돌아옵니다. 좌우 교대.\n포인트: 골반이 좌우로 돌거나 허리만 꺾이지 않게.\n주의: 균형이 어려우면 팔만 또는 다리만.', 'FL · 버드독'),
+      hongtaekLineItem('ht_fl_band_hold', 'hongtaek_fl', 'FL · 기능경선', '② Integrate', '사선 밴드 홀드', '준비: 밴드를 사선으로 잡고 장력을 만듭니다.\n동작: 몸이 돌아가지 않게 버틴 채 호흡합니다(등척성).\n포인트: 움직이는 것이 아니라 버티는 것이 목적.\n주의: 어깨가 말리면 팔 위치를 조정합니다.', 'FL · 사선 밴드 홀드'),
+      hongtaekLineItem('ht_fl_anti_rot', 'hongtaek_fl', 'FL · 기능경선', '② Integrate', '스플릿 스탠스 안티로테이션', '준비: 스플릿 스탠스, 케이블/밴드를 몸 옆으로 잡습니다.\n동작: 손이 가슴 앞으로 나와도 몸통이 돌아가지 않게 버팁니다. 밀었다 당기며 반복 가능.\n포인트: 갈비–골반이 함께 정면을 유지.\n주의: 무게가 세면 보폭을 넓힙니다.', 'FL · 안티로테이션'),
+      hongtaekLineItem('ht_fl_cable', 'hongtaek_fl', 'FL · 기능경선', '③ Load', '스플릿 스탠스 케이블 프레스/풀', '준비: 앞뒤 스플릿 스탠스, 한손으로 케이블.\n동작: 몸통 회전을 억제한 채 프레스 또는 로우를 수행합니다.\n포인트: 팔 동작 중에도 골반이 흔들리지 않게.\n주의: 앞무릎 정렬 유지.', 'FL · 케이블 프레스/풀'),
+      hongtaekLineItem('ht_fl_rot_throw', 'hongtaek_fl', 'FL · 기능경선', '③ Load', '로테이셔널 스로우', '준비: 메디신볼을 잡고 벽·파트너를 향해 섭니다.\n동작: 발로 밀어 골반·몸통을 회전시키며 볼을 던집니다.\n포인트: 상체만 돌리지 말고 하체부터.\n주의: 무릎·허리 통증 시 던지는 속도를 줄입니다.', 'FL · 회전 스로우'),
+      hongtaekLineItem('ht_fl_sprint', 'hongtaek_fl', 'FL · 기능경선', '③ Load', '스프린트 & 사선 드릴', '준비: 직선 또는 콘 사이 공간을 확보합니다.\n동작: 짧은 거리 가속 후 안전하게 감속·방향 전환합니다.\n포인트: 달리기만 하지 말고 멈추는 기술도 포함합니다.\n주의: 준비운동 후, 미끄러운 바닥 금지.', 'FL · 스프린트 드릴'),
+      hongtaekLineItem('ht_fl_skip', 'hongtaek_fl', 'FL · 기능경선', '③ Load', '스킵', '준비: 제자리에서 가볍게 탄력을 만듭니다.\n동작: 한 무릎을 들 때 반대 팔을 함께 올리는 스킵 리듬으로 이동합니다.\n포인트: 같은쪽 팔다리가 함께 나가지 않게 교차.\n주의: 높이보다 리듬·협응이 우선.', 'FL · 스킵'),
+      hongtaekLineItem('ht_fl_crossbody', 'hongtaek_fl', 'FL · 기능경선', '② Integrate', '크로스바디 리치(검샤)', '준비: 서서 또는 앉아 한 손을 반대쪽 위로 뻗을 준비를 합니다.\n동작: 몸통을 가로질러 반대편으로 길게 뻗어 좌우를 비교합니다.\n포인트: 스크린용으로 좌우 파워·길이 차이를 관찰합니다.\n주의: 통증 쪽으로 억지 비교하지 않습니다.', 'FL · 크로스바디 리치'),
+
+      /* ── 전 경선 공통 ── */
+      hongtaekLineItem('ht_all_long_reach', 'hongtaek_all', '전 경선 · 자극·감각', '① Mobilize', '롱체인 리치', '준비: 서서 공간을 확보합니다.\n동작: 손끝부터 발끝까지 이어지게 여러 관절을 동시에 쓰며 크게 뻗습니다.\n포인트: 한 관절 스트레칭이 아니라 긴 사슬 뻗기.\n주의: 통증 범위는 피합니다.', '공통 · 롱체인 리치'),
+      hongtaekLineItem('ht_all_reach_matrix', 'hongtaek_all', '전 경선 · 자극·감각', '① Mobilize', '다방향 리치 매트릭스', '준비: 제자리.\n동작: 위·아래·옆·사선 등 방향을 바꿔가며 리치를 반복합니다.\n포인트: 같은 각도만 반복하지 말고 변주를 줍니다.\n주의: 호흡을 멈추지 않습니다.', '공통 · 리치 매트릭스'),
+      hongtaekLineItem('ht_all_foam', 'hongtaek_all', '전 경선 · 자극·감각', '① Mobilize', '폼롤러 / 볼 릴리즈', '준비: 롤러·볼을 목표 부위에 둡니다.\n동작: 체중을 천천히 실었다가 풉니다. 30~90초.\n포인트: 빠른 롤링보다 재수분(압박-이완)이 목적.\n주의: 관절·뼈·신경 증상 시 중단.', '공통 · 폼롤러·볼'),
+      hongtaekLineItem('ht_all_unstable', 'hongtaek_all', '전 경선 · 자극·감각', '② Integrate', '불안정면 / 시야 차단', '준비: 밸런스 패드·보스 등 불안정면, 또는 눈을 감고.\n동작: 선 자세·스쿼트·리치 등 단순 과제를 수행합니다.\n포인트: 흔들려도 갈비–골반 정렬을 유지하려는 것이 목적.\n주의: 낙상 위험이 있는 환경에서는 사용하지 않습니다.', '공통 · 감각 정련'),
     ];
 
     function jinokCatalogItem(id, uiSection, sectionTitle, program, label, alimtalkLabel) {
@@ -2875,6 +3230,616 @@
 
     function buildHongtaekCatalog() {
       return buildDirectorCatalogItems_(HONGTAEK_CATALOG_RAW);
+    }
+
+    /** Line-Specific Screening Matrix (유인물 p.33) */
+    var HONGTAEK_SCREEN_MATRIX = [
+      {
+        id: 'DFL', sec: 'hongtaek_dfl', name: 'DFL · 심부전방',
+        screen: '뒤꿈치 접지 스쿼트 + 호흡',
+        thumb: 'pdf-extract/exercise-thumbs/screens/screen_dfl.png',
+        script: '안내: 지금부터 심부 지지(발·호흡)를 확인합니다.\n동작 1: 두 발 뒤꿈치를 붙이거나 가깝게 모으고, 가능한 깊이까지 앉았다가 일어납니다. 뒤꿈치가 바닥에서 뜨는지 느껴 보세요.\n동작 2: 편하게 서서 또는 누워, 코로 들이쉬며 배가 먼저 부풀고 옆구리가 벌어지게 숨을 쉽니다. 어깨가 귀로 올라가는지 봅니다.\n확인: 뒤꿈치가 일찍 뜨거나, 숨이 목·윗가슴으로만 가면 양성으로 표시합니다.',
+        positive: '뒤꿈치가 일찍 뜸(발목 배굴 제한) 또는 흉식·어깨 호흡',
+        target: '후경골근–내전근–요근–횡격막',
+        priority: 1
+      },
+      {
+        id: 'SBL', sec: 'hongtaek_sbl', name: 'SBL · 표면후방',
+        screen: '손끝 닿기 + 누운 다리 들기',
+        thumb: 'pdf-extract/exercise-thumbs/screens/screen_sbl.png',
+        script: '안내: 지금부터 뒤쪽 긴 라인(발바닥~등)을 확인합니다.\n동작 1: 무릎을 편 채 서서 상체를 천천히 앞으로 숙여 손끝이 어디까지 가는지 봅니다. 허리를 통째로 접지 말고 내려가 보세요.\n동작 2: 바로 누워 한쪽 무릎을 편 채 다리를 천천히 들어 올립니다(SLR). 반대도 합니다.\n확인: 손끝이 많이 안 닿거나, 숙일 때 등이 한 덩어리로만 움직이거나, 다리를 조금만 들어도 당기면 양성입니다.',
+        positive: '전방 굴곡 제한 또는 흉요추가 분절되지 않음',
+        target: '족저–비복–햄–기립근',
+        priority: 2
+      },
+      {
+        id: 'SFL', sec: 'hongtaek_sfl', name: 'SFL · 표면전방',
+        screen: '누운 무릎 당기기 + 기립 젖히기',
+        thumb: 'pdf-extract/exercise-thumbs/screens/screen_sfl.png',
+        script: '안내: 지금부터 앞쪽 라인(허벅지 앞~배)을 확인합니다.\n동작 1: 벤치 끝에 앉아 한쪽 무릎을 가슴 쪽으로 안고 등을 눕힙니다(토마스). 반대 허벅지가 바닥으로 내려가는지, 무릎이 편하게 굽혀지는지 봅니다.\n동작 2: 서서 손을 허리에 두고 천천히 뒤로 젖혀 봅니다. 허리가 꺾이며 배가 앞으로 많이 나오는지 확인합니다.\n확인: 누운 쪽 허벅지가 잘 안 내려가거나(앞라인 짧음), 젖힐 때 골반만 앞으로 많이 기울면 양성입니다.',
+        positive: '고관절 신전 제한(하부 단축) 또는 기립 시 전방경사(상부 신장)',
+        target: '대퇴직근(단축) & 복직근(신장)',
+        priority: 3
+      },
+      {
+        id: 'LL', sec: 'hongtaek_ll', name: 'LL · 외측',
+        screen: '옆으로 숙이기 + 한발 서기 30초',
+        thumb: 'pdf-extract/exercise-thumbs/screens/screen_ll.png',
+        script: '안내: 지금부터 옆라인(골반 수평)을 확인합니다.\n동작 1: 서서 한 팔을 머리 위로 뻗고 몸통을 반대로 천천히 숙여 옆구리를 늘립니다. 좌우를 비교합니다.\n동작 2: 한 발로 30초 섭니다. 골반이 옆으로 처지거나 상체가 많이 기울지 않는지 봅니다. 반대 발도 합니다.\n확인: 한발 설 때 반대쪽 골반이 아래로 처지거나(트렌델렌버그), 좌우 옆 늘림이 크게 다르면 양성입니다.',
+        positive: '편측 기립 시 반대쪽 골반 하강 또는 측방 불균형',
+        target: '비골근–ITB–복사근–SCM',
+        priority: 4
+      },
+      {
+        id: 'SL', sec: 'hongtaek_sl', name: 'SL · 나선',
+        screen: '회전 리치 + 스텝다운',
+        thumb: 'pdf-extract/exercise-thumbs/screens/screen_sl.png',
+        script: '안내: 지금부터 나선(회전·무릎 정렬)을 확인합니다.\n동작 1: 골반은 정면을 유지한 채 양손을 앞으로 모으고 가슴만 좌우로 돌려 멀리 뻗어 봅니다. 좌우 거리·힘을 비교합니다.\n동작 2: 낮은 박스·박스에 한 발로 서서 반대 발을 천천히 옆으로 내립니다. 지지 무릎이 안쪽으로 무너지는지 봅니다.\n확인: 회전이 한쪽만 많이 안 되거나, 내릴 때 무릎이 안쪽으로 무너지면 양성입니다.',
+        positive: '회전 좌우차 또는 착지·하강 시 동적 무릎 외반',
+        target: '복사근–전거근/능형–경골근',
+        priority: 5
+      },
+      {
+        id: 'Arm', sec: 'hongtaek_arm', name: 'Arm · 상지 4경선',
+        screen: '월 슬라이드 + 팔 위로 들기',
+        thumb: 'pdf-extract/exercise-thumbs/screens/screen_arm.png',
+        script: '안내: 지금부터 팔·어깨가 머리 위로 가는 길을 확인합니다.\n동작 1: 벽에 엉덩이·등·머리를 붙이고 팔을 W자로 벽에 댑니다. 천천히 위로 밀어 Y까지 올려 보세요. 어깨가 귀로 올라가는지, 허리가 뜨는지 봅니다.\n동작 2: 서서 양팔을 귀 옆으로 들어 올립니다. 팔이 올라갈 때 허리를 과하게 젖혀 보상하지 않는지 확인합니다.\n확인: 팔이 잘 안 올라가 허리를 젖혀 대신하거나, 월 슬라이드에서 어깨만 으쓱하면 양성입니다.',
+        positive: '어깨 굴곡을 흉추·요추 신전으로 대신함',
+        target: '소흉근–광배–승모–회전근개',
+        priority: 6
+      },
+      {
+        id: 'FL', sec: 'hongtaek_fl', name: 'FL · 기능(사선)',
+        screen: '크로스바디 리치 + 회전 파워 비교',
+        thumb: 'pdf-extract/exercise-thumbs/screens/screen_fl.png',
+        script: '안내: 지금부터 사선 연결(손↔반대 엉덩이)을 확인합니다.\n동작 1: 한 손을 반대쪽 위·옆으로 길게 뻗어 몸통을 가로지릅니다. 좌우를 비교해 어느 쪽이 더 길게/힘 있게 가는지 느껴 보세요.\n동작 2: 가볍게 메디신볼·밴드로 양쪽 회전 던지거나 당기기를 같은 횟수로 해 보고, 한쪽이 확실히 약한지 비교합니다.\n확인: 좌우 파워나 리치 느낌이 눈에 띄게 차이나면(대략 10% 이상) 양성입니다.',
+        positive: '회전 파워·리치 좌우차 뚜렷(약 10% 초과)',
+        target: '광배근–반대측 대둔근',
+        priority: 7
+      }
+    ];
+
+    function emptyHongtaekScreen_() {
+      return { positives: {}, filterRecOnly: false, q: '', stage: 'ALL', tabLine: 'ALL' };
+    }
+
+    function normalizeHongtaekScreen_(scr) {
+      if (!scr || typeof scr !== 'object') return emptyHongtaekScreen_();
+      if (!scr.positives || typeof scr.positives !== 'object') scr.positives = {};
+      if (typeof scr.filterRecOnly !== 'boolean') scr.filterRecOnly = false;
+      if (typeof scr.q !== 'string') scr.q = '';
+      if (!scr.stage) scr.stage = 'ALL';
+      if (!scr.tabLine) scr.tabLine = 'ALL';
+      return scr;
+    }
+
+    function hongtaekStageFromProgram_(prog) {
+      var p = String(prog || '');
+      if (p.indexOf('Mobilize') >= 0) return 'Mobilize';
+      if (p.indexOf('Integrate') >= 0) return 'Integrate';
+      if (p.indexOf('Load') >= 0) return 'Load';
+      return 'OTHER';
+    }
+
+    function hongtaekLineFromSec_(sec) {
+      if (sec === 'hongtaek_all') return 'ALL';
+      if (sec === 'hongtaek_video') return 'VIDEO';
+      var hit = HONGTAEK_SCREEN_MATRIX.find(function(r) { return r.sec === sec; });
+      return hit ? hit.id : '';
+    }
+
+    var HONGTAEK_SCREEN_LS_KEY = 'hongtaek_screen_by_member_v1';
+
+    function persistHongtaekScreenStore_() {
+      try {
+        localStorage.setItem(HONGTAEK_SCREEN_LS_KEY, JSON.stringify(state.hongtaekScreenByMember || {}));
+      } catch (e) { /* ignore */ }
+    }
+
+    function loadHongtaekScreenStore_() {
+      try {
+        var raw = localStorage.getItem(HONGTAEK_SCREEN_LS_KEY);
+        if (!raw) return {};
+        var parsed = JSON.parse(raw);
+        return parsed && typeof parsed === 'object' ? parsed : {};
+      } catch (e) { return {}; }
+    }
+
+    function getHongtaekScreen_() {
+      var key = state.selectedKey || '__guest__';
+      if (!state.hongtaekScreenByMember) state.hongtaekScreenByMember = loadHongtaekScreenStore_();
+      if (!state.hongtaekScreenByMember[key]) {
+        state.hongtaekScreenByMember[key] = emptyHongtaekScreen_();
+      }
+      state.hongtaekScreenByMember[key] = normalizeHongtaekScreen_(state.hongtaekScreenByMember[key]);
+      return state.hongtaekScreenByMember[key];
+    }
+
+    function hongtaekPositiveLines_() {
+      var scr = getHongtaekScreen_();
+      return HONGTAEK_SCREEN_MATRIX
+        .filter(function(row) { return !!scr.positives[row.id]; })
+        .sort(function(a, b) { return a.priority - b.priority; });
+    }
+
+    function toggleHongtaekScreenPositive_(lineId, checked) {
+      var scr = getHongtaekScreen_();
+      if (checked) scr.positives[lineId] = true;
+      else delete scr.positives[lineId];
+      persistHongtaekScreenStore_();
+      renderProgramList();
+    }
+
+    function setHongtaekFilterRecOnly_(on) {
+      getHongtaekScreen_().filterRecOnly = !!on;
+      persistHongtaekScreenStore_();
+      renderProgramList();
+    }
+
+    function clearHongtaekScreen_() {
+      var key = state.selectedKey || '__guest__';
+      state.hongtaekScreenByMember[key] = emptyHongtaekScreen_();
+      persistHongtaekScreenStore_();
+      renderProgramList();
+      toast('스크린 초기화');
+    }
+
+    function applyHongtaekRecommendMobilize_() {
+      if (!state.selected) {
+        toast('회원을 먼저 선택해 주세요');
+        return;
+      }
+      var lines = hongtaekPositiveLines_();
+      if (!lines.length) {
+        toast('양성 경선을 먼저 체크하세요');
+        return;
+      }
+      var secSet = {};
+      lines.forEach(function(row) { secSet[row.sec] = true; });
+      secSet.hongtaek_all = true;
+      var n = 0;
+      (state.program || []).forEach(function(item) {
+        if (!secSet[item.uiSection]) return;
+        if (String(item.program || '').indexOf('Mobilize') < 0) return;
+        if (!state.todayProgress[item.id]) {
+          state.todayProgress[item.id] = true;
+          n++;
+        }
+      });
+      saveProgressToMemberStore();
+      renderProgramList();
+      renderSessionWrapPanel();
+      updateSendBar();
+      toast(n ? ('Mobilize ' + n + '개 오늘 체크') : '이미 체크된 Mobilize만 있습니다');
+    }
+
+
+    function applyHongtaekRecommendSample3Stage_() {
+      if (!state.selected) {
+        toast('회원을 먼저 선택해 주세요');
+        return;
+      }
+      var lines = hongtaekPositiveLines_();
+      if (!lines.length) {
+        toast('양성 경선을 먼저 체크하세요');
+        return;
+      }
+      var secSet = {};
+      lines.forEach(function(row) { secSet[row.sec] = true; });
+      secSet.hongtaek_all = true;
+      var stages = ['Mobilize', 'Integrate', 'Load'];
+      var picked = {};
+      stages.forEach(function(st) { picked[st] = {}; });
+      (state.program || []).forEach(function(item) {
+        if (!secSet[item.uiSection]) return;
+        var prog = String(item.program || '');
+        var st = null;
+        if (prog.indexOf('Mobilize') >= 0) st = 'Mobilize';
+        else if (prog.indexOf('Integrate') >= 0) st = 'Integrate';
+        else if (prog.indexOf('Load') >= 0) st = 'Load';
+        if (!st) return;
+        var key = item.uiSection;
+        if (picked[st][key]) return;
+        picked[st][key] = item.id;
+      });
+      var n = 0;
+      stages.forEach(function(st) {
+        Object.keys(picked[st]).forEach(function(key) {
+          var id = picked[st][key];
+          if (!state.todayProgress[id]) {
+            state.todayProgress[id] = true;
+            n++;
+          }
+        });
+      });
+      saveProgressToMemberStore();
+      renderProgramList();
+      renderSessionWrapPanel();
+      updateSendBar();
+      toast(n ? ('3단계 샘플 ' + n + '개 오늘 체크') : '이미 체크된 샘플만 있습니다');
+    }
+
+    function buildHongtaekRxItems_() {
+      var positives = hongtaekPositiveLines_();
+      if (!positives.length) return [];
+      var stages = ['Mobilize', 'Integrate', 'Load'];
+      var items = [];
+      positives.forEach(function(row) {
+        stages.forEach(function(st) {
+          var hit = (state.program || []).find(function(item) {
+            return item.uiSection === row.sec && String(item.program || '').indexOf(st) >= 0;
+          });
+          if (hit) {
+            items.push({
+              line: row.id,
+              stage: st,
+              label: hit.label || hit.alimtalkLabel || '',
+              cue: String(hit.cue || extractHongtaekCue_(hit.coachingNote) || '').trim()
+            });
+          }
+        });
+      });
+      var allM = (state.program || []).find(function(item) {
+        return item.uiSection === 'hongtaek_all' && String(item.program || '').indexOf('Mobilize') >= 0;
+      });
+      if (allM) {
+        items.push({
+          line: '공통',
+          stage: 'Mobilize',
+          label: allM.label || '',
+          cue: String(allM.cue || extractHongtaekCue_(allM.coachingNote) || '').trim()
+        });
+      }
+      return items;
+    }
+
+    function buildHongtaekRxDraftHtml_() {
+      var items = buildHongtaekRxItems_();
+      if (!items.length) return '';
+      var stageLabel = { Mobilize: '① Mobilize', Integrate: '② Integrate', Load: '③ Load' };
+      var html = '<div class="ht-rx-box"><div class="ht-rx-hd"><h4>오늘 처방 초안 (경선 × 3단계 대표 1개)</h4>';
+      html += '<button type="button" class="ht-rx-copy" id="htRxCopyBtn" onclick="copyHongtaekRxDraft_()">복사</button></div><ol>';
+      items.forEach(function(it) {
+        html += '<li><b>' + escapeHtml(it.line) + '</b> · ' +
+          escapeHtml(stageLabel[it.stage] || it.stage) + ' — ' +
+          escapeHtml(it.label);
+        if (it.cue) html += '<br><span style="color:#64748b">' + escapeHtml(it.cue) + '</span>';
+        html += '</li>';
+      });
+      html += '</ol><p class="hint">조직 내성·Locked Short/Long에 맞게 조절하세요. 아래 목록에서 세부 동작을 추가 체크하세요.</p></div>';
+      return html;
+    }
+
+    async function copyHongtaekRxDraft_() {
+      var items = buildHongtaekRxItems_();
+      if (!items.length) { toast('복사할 처방 초안이 없습니다'); return; }
+      var stageLabel = { Mobilize: '① Mobilize', Integrate: '② Integrate', Load: '③ Load' };
+      var text = items.map(function(it) {
+        var line = it.line + ' · ' + (stageLabel[it.stage] || it.stage) + ' — ' + it.label;
+        if (it.cue) line += ' (' + it.cue + ')';
+        return line;
+      }).join('\n');
+      var btn = document.getElementById('htRxCopyBtn');
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          throw new Error('clipboard unavailable');
+        }
+        if (btn) btn.textContent = '복사됨';
+        toast('처방 초안 복사됨');
+      } catch (e) {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          if (btn) btn.textContent = '복사됨';
+          toast('처방 초안 복사됨');
+        } catch (e2) {
+          if (btn) btn.textContent = '실패';
+          toast('복사 실패');
+        }
+      }
+      if (btn) setTimeout(function() { btn.textContent = '복사'; }, 1200);
+    }
+
+    function openHongtaekLightbox_(ev, src, cap) {
+      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+      var lb = document.getElementById('htLightbox');
+      var img = document.getElementById('htLightboxImg');
+      var capEl = document.getElementById('htLightboxCap');
+      if (!lb || !img) return;
+      img.src = src || '';
+      img.onclick = function(e) { if (e) e.stopPropagation(); };
+      if (capEl) capEl.textContent = cap || '';
+      lb.classList.add('open');
+    }
+
+    function closeHongtaekLightbox_() {
+      var lb = document.getElementById('htLightbox');
+      if (lb) lb.classList.remove('open');
+    }
+
+    function setHongtaekSearchQ_(val) {
+      getHongtaekScreen_().q = String(val || '');
+      persistHongtaekScreenStore_();
+      applyHongtaekVisibility_();
+    }
+
+    function setHongtaekStageFilter_(stage) {
+      getHongtaekScreen_().stage = stage || 'ALL';
+      persistHongtaekScreenStore_();
+      applyHongtaekVisibility_();
+      var root = document.getElementById('pspProgramList');
+      if (!root) return;
+      root.querySelectorAll('.ht-stage-filters button').forEach(function(b) {
+        b.classList.toggle('on', b.getAttribute('data-stage') === getHongtaekScreen_().stage);
+      });
+    }
+
+    function setHongtaekTabLine_(line) {
+      getHongtaekScreen_().tabLine = line || 'ALL';
+      persistHongtaekScreenStore_();
+      applyHongtaekVisibility_();
+      var root = document.getElementById('pspProgramList');
+      if (!root) return;
+      root.querySelectorAll('.ht-line-filters button').forEach(function(b) {
+        b.classList.toggle('on', b.getAttribute('data-line') === getHongtaekScreen_().tabLine);
+      });
+    }
+
+    function renderHongtaekToolbarHtml_() {
+      var scr = getHongtaekScreen_();
+      var stages = [
+        { id: 'ALL', label: '단계 전체' },
+        { id: 'Mobilize', label: 'Mobilize' },
+        { id: 'Integrate', label: 'Integrate' },
+        { id: 'Load', label: 'Load' }
+      ];
+      var lines = ['ALL', 'DFL', 'SBL', 'SFL', 'LL', 'SL', 'Arm', 'FL'];
+      var html = '<div class="ht-toolbar">';
+      html += '<input type="search" id="htSearchBox" placeholder="운동명·큐·설명 검색…" autocomplete="off" value="' +
+        escapeHtml(scr.q || '') + '" oninput="setHongtaekSearchQ_(this.value)">';
+      html += '<div class="ht-stage-filters">';
+      stages.forEach(function(st) {
+        html += '<button type="button" data-stage="' + st.id + '" class="' + (scr.stage === st.id ? 'on' : '') +
+          '" onclick="setHongtaekStageFilter_(\'' + st.id + '\')">' + escapeHtml(st.label) + '</button>';
+      });
+      html += '</div>';
+      html += '<div class="ht-line-filters">';
+      lines.forEach(function(id) {
+        var label = id === 'ALL' ? '전체' : id;
+        html += '<button type="button" data-line="' + id + '" class="' + (scr.tabLine === id ? 'on' : '') +
+          '" onclick="setHongtaekTabLine_(\'' + id + '\')">' + escapeHtml(label) + '</button>';
+      });
+      html += '</div>';
+      html += '<span class="ht-count-pill" id="htCountPill">0개</span>';
+      html += '</div>';
+      return html;
+    }
+
+    function applyHongtaekVisibility_() {
+      var root = document.getElementById('pspProgramList');
+      if (!root) return;
+      var scr = getHongtaekScreen_();
+      var q = String(scr.q || '').trim().toLowerCase();
+      var stage = scr.stage || 'ALL';
+      var tab = scr.tabLine || 'ALL';
+      var visible = 0;
+
+      root.querySelectorAll('[data-ht-sec]').forEach(function(sec) {
+        var line = sec.getAttribute('data-ht-line') || '';
+        var showSec = true;
+        if (tab !== 'ALL') {
+          if (line === 'VIDEO') showSec = false;
+          else if (line !== tab && line !== 'ALL') showSec = false;
+        }
+
+        var anyRow = false;
+        sec.querySelectorAll('.psp-part-wrap').forEach(function(wrap) {
+          var st = wrap.getAttribute('data-ht-stage') || 'OTHER';
+          var showWrap = showSec;
+          if (showWrap && stage !== 'ALL' && st !== stage) showWrap = false;
+
+          var anyRowIn = false;
+          wrap.querySelectorAll('.method-row').forEach(function(row) {
+            var show = showWrap;
+            if (show && q) {
+              var hay = (row.getAttribute('data-ht-search') || '').toLowerCase();
+              if (hay.indexOf(q) < 0) show = false;
+            }
+            row.style.display = show ? '' : 'none';
+            if (show) { anyRowIn = true; visible++; }
+          });
+          wrap.style.display = anyRowIn ? '' : 'none';
+          if (anyRowIn) anyRow = true;
+        });
+
+        // video / sections without psp-part-wrap
+        sec.querySelectorAll('.psp-part-card > .method-row, .psp-section-body > .psp-part-card > .method-row').forEach(function(row) {
+          if (row.closest('.psp-part-wrap')) return;
+          var show = showSec;
+          if (show && stage !== 'ALL') {
+            var rst = row.getAttribute('data-ht-stage') || 'OTHER';
+            if (rst !== stage) show = false;
+          }
+          if (show && q) {
+            var hay2 = (row.getAttribute('data-ht-search') || '').toLowerCase();
+            if (hay2.indexOf(q) < 0) show = false;
+          }
+          row.style.display = show ? '' : 'none';
+          if (show) { anyRow = true; visible++; }
+        });
+
+        sec.style.display = (showSec && anyRow) ? '' : 'none';
+      });
+
+      var pill = document.getElementById('htCountPill');
+      if (pill) pill.textContent = visible + '개';
+    }
+
+    function formatHongtaekScreenScript_(text) {
+      return escapeHtml(String(text || ''))
+        .replace(/^안내:/gm, '<b>안내:</b>')
+        .replace(/^동작 1:/gm, '<b>동작 1:</b>')
+        .replace(/^동작 2:/gm, '<b>동작 2:</b>')
+        .replace(/^확인:/gm, '<b class="cue-pos">확인:</b>')
+        .replace(/\n/g, '<br>');
+    }
+
+    function renderHongtaekScreenPanelHtml_() {
+      var scr = getHongtaekScreen_();
+      var positives = hongtaekPositiveLines_();
+      var html = '<div class="ht-screen-panel">';
+      html += '<h3>경선별 스크린 → 처방 추천</h3>';
+      html += '<p class="ht-screen-note">강사가 아래 멘트를 읽어 주시면 회원이 따라 할 수 있습니다. 양성은 <b>개입 표적 가설</b>이며 병리 진단이 아닙니다. DFL 양성이면 지지 기반으로 가장 앞에 둡니다.</p>';
+      html += '<div class="ht-screen-list">';
+      HONGTAEK_SCREEN_MATRIX.forEach(function(row) {
+        var on = !!scr.positives[row.id];
+        html += '<label class="ht-screen-row' + (on ? ' on' : '') + '">';
+        html += '<input type="checkbox"' + (on ? ' checked' : '') +
+          ' onchange="toggleHongtaekScreenPositive_(\'' + row.id + '\', this.checked)">';
+        html += '<span class="ht-screen-line">' + escapeHtml(row.id) + '</span>';
+        html += '<span class="ht-screen-meta">';
+        html += '<b>' + escapeHtml(row.name) + '</b> · ' + escapeHtml(row.screen);
+        if (row.script || row.thumb) {
+          html += '<div class="ht-screen-visual">';
+          if (row.script) {
+            html += '<div class="ht-screen-script">' + formatHongtaekScreenScript_(row.script) + '</div>';
+          } else {
+            html += '<div></div>';
+          }
+          if (row.thumb) {
+            html += '<img class="ht-screen-thumb" src="' + escapeHtml(row.thumb) + '" alt="' +
+              escapeHtml(row.id + ' 스크린') + '" loading="lazy" onclick="openHongtaekLightbox_(event, this.src, \'' +
+              escapeHtml(row.id + ' · ' + row.screen).replace(/&#39;/g, '') + '\')">';
+          }
+          html += '</div>';
+        }
+        html += '<span class="pos">양성 체크 · ' + escapeHtml(row.positive) + '</span><br>';
+        html += '<span class="tgt">1차 표적 · ' + escapeHtml(row.target) + '</span>';
+        html += '</span></label>';
+      });
+      html += '</div>';
+
+      html += '<div class="ht-screen-actions">';
+      html += '<button type="button" class="btn' + (scr.filterRecOnly ? ' btn-primary' : '') +
+        '" onclick="setHongtaekFilterRecOnly_(' + (scr.filterRecOnly ? 'false' : 'true') + ')">' +
+        (scr.filterRecOnly ? '추천만 보기 · ON' : '추천만 보기') + '</button>';
+      html += '<button type="button" class="btn btn-primary" onclick="applyHongtaekRecommendMobilize_()"' +
+        (positives.length ? '' : ' disabled') + '>추천 Mobilize 오늘 체크</button>';
+      html += '<button type="button" class="btn btn-primary" onclick="applyHongtaekRecommendSample3Stage_()"' +
+        (positives.length ? '' : ' disabled') + '>3단계 샘플 오늘 체크</button>';
+      html += '<button type="button" class="btn" onclick="clearHongtaekScreen_()">초기화</button>';
+      html += '</div>';
+
+      if (positives.length) {
+        html += '<div class="ht-screen-rec"><strong>추천 순서</strong> · Mobilize → Integrate → Load<br>';
+        html += '지지 기반(DFL)을 먼저, 이어서 양성 경선 처방.';
+        html += '<div class="ht-screen-chips">';
+        positives.forEach(function(row) {
+          html += '<span class="ht-screen-chip' + (row.id === 'DFL' ? ' dfl' : '') + '">' +
+            escapeHtml(row.id) + '</span>';
+        });
+        html += '<span class="ht-screen-chip">공통 자극</span>';
+        html += '</div></div>';
+      } else {
+        html += '<div class="ht-screen-rec">양성 소견을 체크하면 경선 추천 순서와 필터가 활성화됩니다.</div>';
+      }
+      html += buildHongtaekRxDraftHtml_();
+      html += '</div>';
+      return html;
+    }
+
+    function renderHongtaekProgramList_(root, list) {
+      var hasMember = !!state.selected;
+      var scr = getHongtaekScreen_();
+      var positives = hongtaekPositiveLines_();
+      var positiveSec = {};
+      positives.forEach(function(row) { positiveSec[row.sec] = true; });
+      var hasPos = positives.length > 0;
+
+      var grouped = {};
+      var sectionOrder = [];
+      list.forEach(function(item) {
+        var sec = item.uiSection || 'default';
+        if (!grouped[sec]) {
+          grouped[sec] = { title: item.sectionTitle || '프로그램', items: [] };
+          sectionOrder.push(sec);
+        }
+        grouped[sec].items.push(item);
+      });
+
+      // DFL(priority 1) 포함 양성 우선 → 공통 → 영상 → 나머지
+      sectionOrder.sort(function(a, b) {
+        function rank(sec) {
+          if (positiveSec[sec]) {
+            var hit = HONGTAEK_SCREEN_MATRIX.find(function(r) { return r.sec === sec; });
+            return hit ? hit.priority : 20;
+          }
+          if (sec === 'hongtaek_all') return 80;
+          if (sec === 'hongtaek_video') return 90;
+          var rest = HONGTAEK_SCREEN_MATRIX.find(function(r) { return r.sec === sec; });
+          return 40 + (rest ? rest.priority : 50);
+        }
+        return rank(a) - rank(b);
+      });
+
+      var html = renderHongtaekScreenPanelHtml_();
+      sectionOrder.forEach(function(secKey) {
+        var g = grouped[secKey];
+        if (!g) return;
+        var isRec = !!positiveSec[secKey] || secKey === 'hongtaek_all';
+        var isAlways = secKey === 'hongtaek_video' || secKey === 'hongtaek_all';
+        if (scr.filterRecOnly && hasPos && !isRec && !isAlways) return;
+
+        var cls = 'psp-section';
+        if (hasPos && isRec) cls += ' ht-rec-hit';
+        if (hasPos && !scr.filterRecOnly && !isRec && !isAlways) cls += ' ht-dimmed';
+
+        var lineId = hongtaekLineFromSec_(secKey);
+        html += '<div class="' + cls + '" data-ht-sec="' + escapeHtml(secKey) + '" data-ht-line="' + escapeHtml(lineId) + '">';
+        html += '<div class="psp-section-hd">' + escapeHtml(g.title) + sectionHeaderMeta(secKey);
+        if (hasPos && isRec && secKey !== 'hongtaek_video') {
+          html += ' <span class="section-meta section-meta-done">추천</span>';
+        }
+        html += '</div><div class="psp-section-body">';
+
+        // group by program (Mobilize/Integrate/Load)
+        var byProg = {};
+        var progOrder = [];
+        g.items.forEach(function(item) {
+          var p = item.program || '기타';
+          if (!byProg[p]) { byProg[p] = []; progOrder.push(p); }
+          byProg[p].push(item);
+        });
+        progOrder.forEach(function(pName) {
+          var st = hongtaekStageFromProgram_(pName);
+          html += '<div class="psp-part-wrap" data-ht-stage="' + escapeHtml(st) + '">';
+          html += renderProgramPartHdHtml_(pName, byProg[pName], hasMember, false, secKey, pName);
+          html += '<div class="psp-part-card">';
+          byProg[pName].forEach(function(item) {
+            html += renderMethodRowHtml(item, secKey, hasMember, methodDisplayLabel(item));
+          });
+          html += '</div></div>';
+        });
+        html += '</div></div>';
+      });
+      html += renderHongtaekToolbarHtml_();
+      // toolbar stays under screen; move it after screen panel before sections
+      root.innerHTML = html;
+      var toolbar = root.querySelector('.ht-toolbar');
+      var firstSec = root.querySelector('[data-ht-sec]');
+      if (toolbar && firstSec) {
+        root.insertBefore(toolbar, firstSec);
+      }
+      applyHongtaekVisibility_();
     }
 
     var INJUN_CATALOG_RAW = [
@@ -3180,7 +4145,7 @@
     function catalogTabForItemId(id) {
       if (/^face_/.test(id)) return 'face';
       if (/^func_(core|trunk|hip|shoulder|reformer)_/.test(id)) return 'func';
-      if (/^hongtaek_/.test(id)) return 'hongtaek';
+      if (/^ht_/.test(id) || /^hongtaek_/.test(id)) return 'hongtaek';
       if (/^injun_/.test(id)) return 'injun';
       return 'movement';
     }
@@ -3722,6 +4687,7 @@
       movementCatalog: buildLocalProgram(),
       activeProgramTab: 'movement',
       progressByMember: {},
+      hongtaekScreenByMember: (typeof loadHongtaekScreenStore_ === 'function' ? loadHongtaekScreenStore_() : {}),
       scheduleProgramColors: null,
       boardOnline: false,
       selected: null,
@@ -4306,15 +5272,15 @@
         '마지막 반복은 범위 줄여 마무리.'
       ),
       hongtaek_tab: coachMemoPresetList(
+        'DFL(지지) → Mobilize → Integrate → Load 순서로!',
+        'Locked Short는 늘리고, Locked Long은 단축 위치에서 강화!',
+        '무릎 신전 시 SBL이 하나로 이어짐(RDL=통합 부하).',
+        '오버헤드 전 흉추·Arm Line 가동성부터!',
+        'FL은 정적 자세보다 가속·감속 과제로!',
         '골반·복부 먼저 잡고, 천천히 패턴 연습!',
         '발바닥 전체로 받치고, 무릎·골반 정렬!',
         '호흡에 맞춰 움직이고, 어깨는 내려놓기!',
         '통증 없는 범위, 좌·우 균형 맞추기!',
-        '끝까지 밀지 말고, 중심 잡고 컨트롤!',
-        '무게 중심 발 중앙, 흔들림 최소화.',
-        '회전·이동 시 골반·어깨 따로 움직이지 않기.',
-        '통증 나면 범위·속도 줄이기.',
-        '패턴 익숙해질 때까지 천천히 반복.',
         '마지막은 강도 낮춰 호흡 정리.'
       ),
       injun_tab: coachMemoPresetList(
@@ -5730,15 +6696,23 @@
       return false;
     }
 
+    var _attendResultScrollTimer = null;
+
     function scrollToMemberSection() {
+      if (_attendResultScrollTimer) {
+        clearTimeout(_attendResultScrollTimer);
+        _attendResultScrollTimer = null;
+      }
       var chips = document.getElementById('memberChips');
       var target = chips ? chips.closest('.card') : document.querySelector('main .card');
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    /** 출석 결과·처리 중 패널이 화면 상단에 오도록 스크롤 */
+    /** 출석 결과·처리 중 패널이 화면 상단에 오도록 스크롤 (최초 진입 시에만 호출) */
     function scrollToAttendResultTop() {
-      window.setTimeout(function() {
+      if (_attendResultScrollTimer) clearTimeout(_attendResultScrollTimer);
+      _attendResultScrollTimer = window.setTimeout(function() {
+        _attendResultScrollTimer = null;
         var target =
           document.getElementById('sessionAlimtalkSectionLabel') ||
           document.getElementById('sessionAttendResultInline') ||
@@ -5820,6 +6794,8 @@
       var isProcessing = !!state.attendProcessing;
       var result = state.inlineAttendResult;
       var showResult = result && result.memberKey === state.selectedKey;
+      // 이미 결과 화면인데 폴링·스케줄 동기화로 다시 그리면 스크롤하지 않음
+      var enteringResultMode = showResult && !section.classList.contains('is-result-mode');
 
       section.classList.toggle('is-result-mode', showResult);
       if (hint) hint.hidden = showResult || isProcessing;
@@ -5867,7 +6843,7 @@
           resultWrap.hidden = false;
           document.getElementById('sessionAttendResultBody').innerHTML = result.html || '';
         }
-        scrollToAttendResultTop();
+        if (enteringResultMode) scrollToAttendResultTop();
         return;
       }
 
@@ -6516,7 +7492,12 @@
       setTimeout(function () { el.classList.remove('show'); }, 2800);
     }
     function escapeHtml(s) {
-      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
     var BOARD_AUTO_SYNC_IDLE_MS = 12 * 60 * 1000;
     var _loadCountdownTimer = null;
@@ -9019,10 +10000,22 @@
       const checked = isToday;
       const rowCls = methodRowProgressClass(item, hasMember);
       const badgeRow = renderMethodBadges_(item, secKey);
-      return '<label class="method-row' + rowCls + '">' +
+      var thumb = String(item.thumbUrl || '').trim();
+      var cue = String(item.cue || extractHongtaekCue_(item.coachingNote) || '').trim();
+      var stage = hongtaekStageFromProgram_(item.program);
+      var searchBits = [label, cue, item.coachingNote || '', item.program || '', item.sectionTitle || '']
+        .join(' ').replace(/\s+/g, ' ').trim();
+      var thumbHtml = thumb
+        ? '<img class="method-thumb" src="' + escapeHtml(thumb) + '" alt="" loading="lazy" onclick="openHongtaekLightbox_(event, this.src, \'' +
+          escapeHtml(label).replace(/&#39;/g, '') + '\')">'
+        : '';
+      var cueHtml = cue ? '<div class="method-cue"><b>큐</b> · ' + escapeHtml(cue) + '</div>' : '';
+      return '<label class="method-row' + rowCls + (thumb ? ' has-thumb' : '') +
+        '" data-ht-stage="' + escapeHtml(stage) + '" data-ht-search="' + escapeHtml(searchBits) + '">' +
         '<input type="checkbox"' + (checked ? ' checked' : '') +
         ' onchange="toggleToday(\'' + item.id + '\',this)">' +
-        '<div><div class="method-label">' + escapeHtml(label) + '</div>' +
+        thumbHtml +
+        '<div><div class="method-label">' + escapeHtml(label) + '</div>' + cueHtml +
         '</div>' + badgeRow + '</label>';
     }
 
@@ -9033,6 +10026,7 @@
         detailTitle: detail,
         url: String(item.youtubeUrl || '').trim(),
         note: String(item.coachingNote || '').trim(),
+        thumbUrl: String(item.thumbUrl || '').trim(),
       };
     }
 
@@ -9061,12 +10055,28 @@
       const note = String(data.note || '').trim();
       if (bodyEl) {
         var detail = String(data.detailTitle || '').trim();
+        var thumb = String(data.thumbUrl || '').trim();
         var bodyText = note || '설명 없음';
         if (detail && detail !== (data.label || '')) {
           bodyText = detail + (note ? '\n\n—\n\n' + note : '');
         }
-        bodyEl.textContent = bodyText;
-        bodyEl.classList.toggle('empty', !note && !detail);
+        function formatCoachNoteHtml_(text) {
+          var esc = escapeHtml(text);
+          return esc
+            .replace(/^준비:/gm, '<b>준비:</b>')
+            .replace(/^동작:/gm, '<b>동작:</b>')
+            .replace(/^포인트:/gm, '<b style="color:#b91c1c">포인트:</b>')
+            .replace(/^주의:/gm, '<b>주의:</b>')
+            .replace(/\n/g, '<br>');
+        }
+        var html = '';
+        if (thumb) {
+          html += '<img class="coach-note-thumb" src="' + escapeHtml(thumb) + '" alt="" onclick="openHongtaekLightbox_(event, this.src, \'' +
+            escapeHtml(String(data.label || '')).replace(/&#39;/g, '') + '\')">';
+        }
+        html += '<div class="coach-note-text">' + formatCoachNoteHtml_(bodyText) + '</div>';
+        bodyEl.innerHTML = html;
+        bodyEl.classList.toggle('empty', !note && !detail && !thumb);
       }
       document.getElementById('coachNoteModal').classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -9109,6 +10119,10 @@
       const list = state.program;
       if (!list.length) {
         root.innerHTML = '<div class="empty-hint">프로그램 없음</div>';
+        return;
+      }
+      if (state.activeProgramTab === 'hongtaek') {
+        renderHongtaekProgramList_(root, list);
         return;
       }
       if (state.activeProgramTab !== 'movement') {
@@ -11084,7 +12098,6 @@
         if (mk === state.selectedKey) state.inlineAttendResult = failResult;
         saveMemberAttendResult_(mk, failResult);
         renderSessionAlimtalkSection();
-        scrollToAttendResultTop();
         return;
       }
 
@@ -12575,6 +13588,9 @@
 
     /* 초회 평가: 바깥 클릭으로 닫지 않음 — 미저장 시 ×에서 저장 여부 확인 */
     document.getElementById('coachNoteModal').addEventListener('click', function(e){ if(e.target===this) closeCoachingNoteModal(); });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeHongtaekLightbox_();
+    });
     document.getElementById('programPlanSaveModal').addEventListener('click', function(e){ if(e.target===this) closeProgramPlanSaveModal_(); });
     document.getElementById('programPlanLoadModal').addEventListener('click', function(e){ if(e.target===this) closeProgramPlanLoadModal_(); });
     document.getElementById('attendResultModal').addEventListener('click', function(e){ if(e.target===this) closeAttendResultModal(); });
