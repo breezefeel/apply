@@ -2604,7 +2604,7 @@
     <div class="modal" style="max-width:440px;">
       <div class="modal-hd">
         <h2>프로그램 저장</h2>
-        <button type="button" class="modal-close" onclick="closeProgramPlanSaveModal()">×</button>
+        <button type="button" class="modal-close" onclick="closeProgramPlanSaveModal_()">×</button>
       </div>
       <p style="font-size:13px;color:var(--dim);margin-bottom:4px;">저장할 슬롯을 선택하고 요약을 입력해 주세요. 우측에서 고정·비우기도 가능합니다.</p>
       <div class="program-plan-slot-grid" id="programPlanSaveSlotGrid"></div>
@@ -2614,7 +2614,7 @@
       </div>
       <div style="display:flex;gap:8px;margin-top:14px;">
         <button type="button" class="btn btn-primary" style="flex:1;" onclick="confirmProgramPlanSave_()">저장</button>
-        <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeProgramPlanSaveModal()">취소</button>
+        <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeProgramPlanSaveModal_()">취소</button>
       </div>
     </div>
   </div>
@@ -2624,11 +2624,11 @@
     <div class="modal" style="max-width:440px;">
       <div class="modal-hd">
         <h2>프로그램 불러오기</h2>
-        <button type="button" class="modal-close" onclick="closeProgramPlanLoadModal()">×</button>
+        <button type="button" class="modal-close" onclick="closeProgramPlanLoadModal_()">×</button>
       </div>
       <p style="font-size:13px;color:var(--dim);margin-bottom:8px;">슬롯을 선택하거나 우측 <strong>고정</strong> / <strong>비우기</strong>를 사용하세요.</p>
       <div id="programPlanLoadSlotList"></div>
-      <button type="button" class="btn btn-ghost" style="width:100%;margin-top:8px;" onclick="closeProgramPlanLoadModal()">취소</button>
+      <button type="button" class="btn btn-ghost" style="width:100%;margin-top:8px;" onclick="closeProgramPlanLoadModal_()">취소</button>
     </div>
   </div>
 
@@ -2705,10 +2705,10 @@
       return String(progName || '') === FORCE_LINE_PROGRAM;
     }
 
-    /** Lying Passive Stretching 컴팩트 칩 — Supine 하지 / Prone 상지 */
+    /** Lying Passive Stretching 컴팩트 칩 — Supine 하체 / Prone 상체 */
     function p1CompactLabel(item) {
       var label = String(item.label || '');
-      var m = label.match(/^[①②③④]\s*(Supine|Prone)\s*·\s*(하지|상지)/);
+      var m = label.match(/^[①②③④]\s*(Supine|Prone)\s*·\s*(하체|상체)/);
       if (m) return m[1] + ' ' + m[2];
       return methodDisplayLabel(item);
     }
@@ -2776,10 +2776,10 @@
       { id:'ball_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'복부', alimtalkLabel:'마사지볼 · 복부', linkUrl:'https://www.youtube.com/shorts/zjvXLTL9E5A' },
       { id:'ball_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'엉덩이', alimtalkLabel:'마사지볼 · 엉덩이', linkUrl:'https://m.blog.naver.com/allenjoy/223442108509' },
       { id:'ball_scapula', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'견갑골', alimtalkLabel:'마사지볼 · 등(견갑)', linkUrl:'https://m.blog.naver.com/allenjoy/223449532242' },
-      { id:'p1_su_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'② Supine · 상지' },
-      { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'① Supine · 하지' },
-      { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'④ Prone · 상지' },
-      { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'③ Prone · 하지' },
+      { id:'p1_su_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'② Supine · 상체' },
+      { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'① Supine · 하체' },
+      { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'④ Prone · 상체' },
+      { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'③ Prone · 하체' },
       { id:'p1_fl_ue_flex', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Force Line 연결', label:'상지 Flexion', alimtalkLabel:'Force Line · 상지 Flexion' },
       { id:'p1_fl_ue_ext', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Force Line 연결', label:'상지 Extension', alimtalkLabel:'Force Line · 상지 Extension' },
       { id:'p1_fl_ue_rot', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Force Line 연결', label:'상지 Rotation', alimtalkLabel:'Force Line · 상지 Rotation' },
@@ -11012,7 +11012,7 @@
       });
     }
 
-    /** 가족 다회차 성공 후 — 함께 출석한 보드 칸을 전원 출석 완료로 표시 */
+    /** 가족 다회차 성공 후 — 함께 출석한 보드 칸만 출석 완료로 표시 (공유 수강권만으로는 전원 완료 금지) */
     function markFamilyCoAttendCompleteOnBoard_(anchorMember, data) {
       if (!anchorMember || !data || !data.completed || !state.board || !state.board.members) return;
       var key = memberPhoneMatchKey_(anchorMember);
@@ -11027,13 +11027,13 @@
         var nk = normalizeMemberNameForKey_(n);
         if (nk) nameSet[nk] = true;
       });
-      var anchorNk = normalizeMemberNameForKey_(anchorMember.name);
-      if (anchorNk) nameSet[anchorNk] = true;
-      var hasNameFilter = Object.keys(nameSet).length > 0;
+      var coNames = Object.keys(nameSet);
+      // 실제 함께 출석한 이름이 2명 이상일 때만 가족 칸 일괄 완료
+      if (coNames.length < 2) return;
       state.board.members.forEach(function (bm) {
         if (memberPhoneMatchKey_(bm) !== key) return;
         var bmNk = normalizeMemberNameForKey_(bm.name);
-        if (hasNameFilter && !nameSet[bmNk]) return;
+        if (!nameSet[bmNk]) return;
         var stampSd = sharedSd;
         (data.familyResults || []).forEach(function (fr) {
           if (normalizeMemberNameForKey_(fr.name) !== bmNk) return;
@@ -11052,7 +11052,14 @@
     function applyCompleteSessionResult(m, data) {
       syncMemberProgressFromServer(m, data);
       if (data && data.saved) markMemberProgressSaved_(m);
-      if (data.familyResults && data.familyResults.length && state.board && state.board.members) {
+      if (
+        data.completed &&
+        data.familyResults &&
+        data.familyResults.length &&
+        (data.familyMultiPass || data.familyResults.length > 1) &&
+        state.board &&
+        state.board.members
+      ) {
         var suf8 = String(m.suffix8 || '').replace(/\D/g, '').slice(-8);
         var sharedSd = String(data.sessionDisplay || '').trim();
         data.familyResults.forEach(function (fr) {
@@ -11063,13 +11070,11 @@
             var bmSuf = String(bm.suffix8 || '').replace(/\D/g, '').slice(-8);
             if (bmSuf !== suf8) return;
             if (normalizeMemberNameForKey_(bm.name) !== frName) return;
-            if (data.completed) {
-              markInstructorAttendComplete_(bm, {
-                completed: true,
-                sessionDisplay: sharedSd || stampSd,
-              });
-              if (stampSd) bm.scheduleSession = stampSd;
-            }
+            markInstructorAttendComplete_(bm, {
+              completed: true,
+              sessionDisplay: sharedSd || stampSd,
+            });
+            if (stampSd) bm.scheduleSession = stampSd;
             if (sharedSd) bm.sessionDisplay = sharedSd;
           });
         });
@@ -11077,15 +11082,16 @@
       if (data.completed) {
         markInstructorAttendComplete_(m, data);
       }
-      if (
-        data.completed &&
-        (data.familyMultiPass ||
-          data.familySharedPool ||
-          (data.familyResults && data.familyResults.length > 1) ||
-          (state.familyCoAttendNames && state.familyCoAttendNames.length >= 2))
-      ) {
+      // 공유 수강권이면 회차 숫자만 동기화. 전원 출석 완료 표시는 실제 다인 출석일 때만.
+      if (data.completed && data.familySharedPool) {
         syncSharedFamilySessionOnBoard_(m, data);
-        // 이름 매칭 누락·타임아웃 복구 대비: 함께 출석 선택 인원도 출석 완료로 맞춤
+      }
+      var didFamilyMulti =
+        !!(data.familyMultiPass ||
+          (data.familyResults && data.familyResults.length > 1) ||
+          (state.familyCoAttendNames && state.familyCoAttendNames.length >= 2));
+      if (data.completed && didFamilyMulti) {
+        syncSharedFamilySessionOnBoard_(m, data);
         markFamilyCoAttendCompleteOnBoard_(m, data);
       }
       if (typeof data.todayAttendCount === 'number') {
