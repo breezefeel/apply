@@ -4202,7 +4202,7 @@
       if (instName.indexOf('최진옥') >= 0 || instIdx === 1) return 'func';
       if (instName.indexOf('최홍택') >= 0) return 'hongtaek';
       if (instName.indexOf('김인준') >= 0) return 'injun';
-      if (instName === '이상민' || instIdx === 2) return 'movement';
+      if (instName === '이상민' || (instName && String(instName).indexOf('이상민') >= 0) || instIdx === 2) return 'movement';
       if (prog === '기능 운동' || prog === 'P-스트레칭') return 'movement';
       return 'movement';
     }
@@ -6939,11 +6939,11 @@
       applyAttendButtonMode_(memberAttendSlotLocked_(m || state.selected));
     }
 
-    /** 이 칩의 당일 출석이 반영됐으면 출석 버튼 잠금 — 다른 가족만 출석한 경우는 제외(본인 히스토리·스케줄 기준) */
+    /** 이 칩의 당일 출석이 반영됐으면 출석 버튼 잠금 — 스케줄 칸(본인 N/M·〃) 기준. 가족 공유 회차만으로는 잠그지 않음 */
     function memberAttendSlotLocked_(m) {
       if (!m || !m.suffix8) return false;
       if (state.completedKeys[memberKey(m)]) return true;
-      if (memberHasTodayAttendanceClient_(m)) return true;
+      if (state.completedPersonKeys && state.completedPersonKeys[memberPersonKey(m)]) return true;
       if (scheduleSessionStatusLabelForChipClient_(m.scheduleSession)) return true;
       return scheduleSessionShowsAttendanceClient(m.scheduleSession);
     }
@@ -7766,17 +7766,18 @@
           var s = item._slotSessions[t] || '';
           // 〃만으로는 출석으로 보지 않음 (위 결석+아래 〃 자동결석 오인 방지)
           if (scheduleSessionShowsRealAttendCountClient_(s)) anyAttend = true;
+          if (String(s || '').trim() === '〃') anyAttend = true;
           if (!isScheduleSlotResolvedClient_(s)) allResolved = false;
           if (!isScheduleSessionAbsentClient(s) && String(s || '').trim() !== '〃') allAbsent = false;
         });
         item.scheduleResolvedToday = allResolved;
-        item.absentToday = allAbsent && !anyAttend && !item.attendedToday && !(item.todayAttendCount > 0);
+        item.attendedToday = anyAttend;
+        item.absentToday = allAbsent && !anyAttend;
         item.sessionCompleted =
-          !!item.attendedToday ||
-          (item.todayAttendCount || 0) > 0 ||
-          (item.usesDualSlot && (item.todayAttendCount || 0) >= 2);
+          anyAttend ||
+          !!scheduleSessionStatusLabelForChipClient_(item.scheduleSession);
       }
-      if (item.attendedToday || (item.todayAttendCount || 0) > 0) {
+      if (item.attendedToday || scheduleSessionShowsAttendanceClient(item.scheduleSession)) {
         item.absentToday = false;
       }
       delete item._times;
@@ -7808,8 +7809,16 @@
     }
     function todayAttendCredits(m) {
       if (!m) return 0;
-      if (typeof m.todayAttendCount === 'number') return m.todayAttendCount;
-      return m.attendedToday ? 1 : 0;
+      // 칩 기준: 스케줄에 찍힌 실출석만 (공유 행 todayAttendCount 제외)
+      var raw = String(m.scheduleSession || '').trim();
+      if (!raw) return memberHasTodayAttendanceClient_(m) ? 1 : 0;
+      var lines = raw.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
+      var n = 0;
+      lines.forEach(function (ln) {
+        if (scheduleSessionShowsRealAttendCountClient_(ln)) n += 1;
+      });
+      if (n > 0) return n;
+      return memberHasTodayAttendanceClient_(m) ? 1 : 0;
     }
 
     /** 회원 칩 — 다회차(2회+)만 표시, 1회·1칸은 취소선으로 충분 */
@@ -7849,11 +7858,32 @@
         !!scheduleSessionStatusLabelForChipClient_(val);
     }
 
+    function extractScheduleAttendLabelClient_(val) {
+      var raw = String(val || '').trim();
+      if (!raw) return '';
+      var lines = raw.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
+      if (!lines.length) lines = [raw];
+      var i;
+      for (i = 0; i < lines.length; i++) {
+        var first = lines[i];
+        if (!first || isScheduleSessionAbsentClient(first)) continue;
+        if (/^\d+\s*\/\s*\d+$/.test(first)) return first;
+        if (first === '〃') return first;
+      }
+      return '';
+    }
+
     function memberChipSessionDisplay_(m) {
       if (!m) return '';
       var fromSchedule = scheduleSessionStatusLabelForChipClient_(m.scheduleSession);
       if (fromSchedule) return fromSchedule;
-      return String(m.sessionDisplay || '').trim();
+      // 이 칸에 찍힌 회차만 표시 — 가족 공유 sessionDisplay로 미출석 칩에 N/M 붙이지 않음
+      var fromAttend = extractScheduleAttendLabelClient_(m.scheduleSession);
+      if (fromAttend) return fromAttend;
+      if (state.completedKeys[memberKey(m)] || (state.completedPersonKeys && state.completedPersonKeys[memberPersonKey(m)])) {
+        return String(m.sessionDisplay || '').trim();
+      }
+      return '';
     }
 
     /** 실제 N/M 출석만 (결석·〃 제외) — 결석 후 출석 재동기화 판별용 */
@@ -7895,10 +7925,8 @@
       if (!m) return false;
       if (state.completedPersonKeys && state.completedPersonKeys[memberPersonKey(m)]) return true;
       if (state.completedKeys[memberKey(m)]) return true;
-      if (m.attendedToday) return true;
-      if (typeof m.todayAttendCount === 'number' && m.todayAttendCount > 0) return true;
-      // 스케줄 N/M만으로는 출석 완료로 보지 않음 (회원정보 히스토리 우선)
-      return false;
+      // 칩 출석 = 이 스케줄 칸(N/M·〃). 가족 공유 회원정보 todayAttendCount로는 판단하지 않음
+      return scheduleSessionShowsAttendanceClient(m.scheduleSession);
     }
 
     function isMemberAbsent(m) {
@@ -7925,9 +7953,8 @@
     function isMemberCompleted(m) {
       if (state.completedKeys[memberKey(m)]) return true;
       if (state.completedPersonKeys && state.completedPersonKeys[memberPersonKey(m)]) return true;
-      if (m && m.attendedToday) return true;
-      if (m && typeof m.todayAttendCount === 'number' && m.todayAttendCount > 0) return true;
-      // 상담·완료 등 상태 문구만 스케줄로 완료 표시 — N/M 단독은 회원정보 확인 후
+      // 스케줄 칸 기준 (공유 수강권 sessionDisplay·todayAttendCount로 전원 취소선 금지)
+      if (m && scheduleSessionShowsAttendanceClient(m.scheduleSession)) return true;
       if (m && scheduleSessionStatusLabelForChipClient_(m.scheduleSession)) return true;
       return false;
     }
@@ -10973,22 +11000,30 @@
         state.board.members.forEach(function (bm) {
           if (memberPersonKey(bm) !== pk) return;
           Object.assign(bm, patch);
-          if (data.sessionDisplay && (
-            isScheduleSessionAbsentClient(bm.scheduleSession) ||
-            (String(bm.scheduleSession || '').indexOf('〃') !== -1 &&
-              !scheduleSessionShowsRealAttendCountClient_(bm.scheduleSession))
-          )) {
-            bm.scheduleSession = data.sessionDisplay;
+          if (data.sessionDisplay) {
+            var cur = String(bm.scheduleSession || '').trim();
+            if (
+              !cur ||
+              isScheduleSessionAbsentClient(cur) ||
+              (cur.indexOf('〃') !== -1 && !scheduleSessionShowsRealAttendCountClient_(cur)) ||
+              !scheduleSessionShowsRealAttendCountClient_(cur)
+            ) {
+              bm.scheduleSession = data.sessionDisplay;
+            }
           }
         });
       }
       Object.assign(m, patch);
-      if (data.sessionDisplay && (
-        isScheduleSessionAbsentClient(m.scheduleSession) ||
-        (String(m.scheduleSession || '').indexOf('〃') !== -1 &&
-          !scheduleSessionShowsRealAttendCountClient_(m.scheduleSession))
-      )) {
-        m.scheduleSession = data.sessionDisplay;
+      if (data.sessionDisplay) {
+        var curM = String(m.scheduleSession || '').trim();
+        if (
+          !curM ||
+          isScheduleSessionAbsentClient(curM) ||
+          (curM.indexOf('〃') !== -1 && !scheduleSessionShowsRealAttendCountClient_(curM)) ||
+          !scheduleSessionShowsRealAttendCountClient_(curM)
+        ) {
+          m.scheduleSession = data.sessionDisplay;
+        }
       }
       state.completedPersonKeys[pk] = true;
       state.completedKeys[memberKey(m)] = true;
