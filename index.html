@@ -254,6 +254,12 @@
       white-space:nowrap;
     }
     .btn-extra-attend:disabled { opacity:.45; cursor:not-allowed; }
+    .session-wrap-actions .btn-extra-attend {
+      width:100%; align-self:stretch;
+      padding:10px 8px; border-radius:8px;
+      box-shadow:0 1px 0 rgba(180,83,9,.2);
+    }
+    .session-wrap-actions .btn-extra-attend[hidden] { display:none !important; }
     .btn:disabled { opacity:.45; cursor:not-allowed; }
 
     /* 오늘 회원 — 강사명 한 줄 + 칩 (좁으면 3열, 넓으면 4·5열…) */
@@ -1593,9 +1599,6 @@
       display:flex; flex-direction:column; gap:8px;
       margin-top:8px; padding-top:12px; border-top:1px solid var(--border);
     }
-    .session-wrap-actions .btn-extra-attend {
-      align-self:center;
-    }
     .session-wrap-btns {
       display:flex; gap:6px; width:100%;
     }
@@ -1635,7 +1638,7 @@
       margin-top:10px; font-size:18px; font-weight:700; color:#475569;
     }
     .attend-result-notice {
-      margin-top:12px; padding:12px 10px; border-radius:12px;
+      margin-top:0; margin-bottom:10px; padding:12px 10px; border-radius:12px;
       font-size:14px; font-weight:700; line-height:1.55; color:var(--blue);
       background:#fff; border:1px solid var(--border); text-align:left;
     }
@@ -2113,14 +2116,21 @@
       outline:none; border-color:var(--blue); box-shadow:0 0 0 2px rgba(59,130,246,.15);
     }
     .alimtalk-preview {
-      font-size:12px; line-height:1.4; white-space:pre-wrap;
+      font-size:12px; line-height:1.45; white-space:pre-wrap;
       background:#1e293b; color:#f1f5f9; border-radius:10px;
-      padding:12px; margin-bottom:10px;
+      padding:14px 14px 12px; margin-bottom:0;
+    }
+    .alimtalk-preview #sessionAlimtalkPreview {
+      margin-top:0; line-height:1.45;
     }
     .alimtalk-preview .session-attend-outcome-preview {
-      margin:0; padding:0 0 8px;
+      margin:0 0 8px; padding:0 0 8px;
       border-bottom:1px solid rgba(148,163,184,.28);
       text-align:left;
+    }
+    .alimtalk-preview .session-attend-outcome-preview:empty,
+    .alimtalk-preview .session-attend-outcome-preview[hidden] {
+      display:none; margin:0; padding:0; border:none;
     }
     .alimtalk-preview .session-attend-outcome-preview .session-attend-result-summary {
       margin:0;
@@ -2136,20 +2146,16 @@
     .alimtalk-preview .session-attend-outcome-preview .attend-result-status {
       margin:2px 0 0; font-size:11px; color:#86efac; line-height:1.35;
     }
-    .alimtalk-preview #sessionAlimtalkPreview {
-      margin-top:4px; line-height:1.4;
-    }
     .alimtalk-preview.is-processing #sessionAlimtalkPreview,
     .alimtalk-preview.is-processing .session-attend-outcome-preview {
       opacity:.55;
     }
     .session-attend-countdown-bar {
-      margin:-2px 0 10px;
-      padding:8px 12px 10px;
-      border-radius:0 0 10px 10px;
+      margin:8px 0 10px;
+      padding:10px 12px;
+      border-radius:10px;
       background:#0f172a;
       border:1px solid rgba(148,163,184,.22);
-      border-top:1px dashed rgba(148,163,184,.28);
       font-size:11px; font-weight:600; color:#94a3b8;
       text-align:center; line-height:1.45;
     }
@@ -2170,10 +2176,10 @@
       background:transparent; color:inherit; padding:0;
     }
     .session-attend-result-title {
-      font-size:13px; font-weight:800; color:var(--blue);
-      margin:0 0 8px; line-height:1.35;
+      font-size:15px; font-weight:800; color:var(--blue);
+      margin:0 0 10px; line-height:1.35;
     }
-    .session-attend-result-summary { margin-bottom:4px; text-align:left; }
+    .session-attend-result-summary { margin-bottom:8px; text-align:left; }
     .session-attend-result-summary .attend-result-line1 {
       font-size:18px; font-weight:800; color:var(--blue); margin:0 0 4px;
     }
@@ -2243,7 +2249,7 @@
       <div class="page-hd-side">
         <div class="page-hd-links">
           <a class="page-hd-link" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠</a>
-          <a class="page-hd-link" href="https://docs.google.com/spreadsheets/d/1I8zIUUaP-eIGpB2y4dMgZbDRiBBzjpAGEWU0RD3yk8g/edit" target="_blank" rel="noopener noreferrer">예약 스케줄</a>
+          <a class="page-hd-link" href="#" onclick="openMemberScheduleSheet_(event)" title="보드 날짜의 월 스케줄표로 이동">예약 스케줄</a>
         </div>
         <div class="page-hd-actions">
           <button type="button" class="page-hd-btn page-hd-btn--refresh" onclick="loadBoard()" title="새로고침" aria-label="새로고침">새로고침</button>
@@ -2386,6 +2392,7 @@
           <button type="button" class="btn btn-primary session-attend-scroll-btn" id="sessionAttendScrollBtn" onclick="scrollToMemberSection()">↑ 위로 올리기</button>
         </div>
       </div>
+      <div id="sessionAttendCountdownBar" class="session-attend-countdown-bar" hidden aria-live="polite"></div>
       <div class="next-booking-panel" id="nextBookingPanel" hidden>
         <div class="next-booking-row">
           <div class="next-booking-existing" id="nextBookingExisting">
@@ -2414,7 +2421,6 @@
           </span>
         </label>
       </div>
-      <div id="sessionAttendCountdownBar" class="session-attend-countdown-bar" hidden aria-live="polite"></div>
       <div class="session-wrap-actions">
         <p class="session-save-only-hint" id="sessionSaveOnlyHint" hidden></p>
         <div class="session-wrap-btns">
@@ -2422,13 +2428,13 @@
           <button type="button" class="btn btn-attend-basic" id="attendBasicBtn" onclick="attendBasicSession()" disabled title="출석·진도 저장 · 기본 알림톡">기본 알림톡</button>
           <button type="button" class="btn btn-attend-progress" id="attendProgressBtn" onclick="attendWithProgressSession()" disabled title="출석·진도 저장 · 진도 알림톡">출석+진도보내기</button>
         </div>
+        <button type="button" class="btn btn-extra-attend" id="extraAttendBtn" onclick="extraAttendSession()" hidden title="이미 출석한 회원 · 수강권 1회 더 소진">추가 출석 (+1회)</button>
         <div class="program-plan-bar" id="programPlanBar" hidden>
           <span class="program-plan-status" id="programPlanStatus">프로그램을 작성한 뒤 저장하세요.</span>
           <button type="button" class="btn btn-unpin-program" id="unpinProgramBtn" onclick="unpinProgramPlan()" hidden title="고정 해제">고정 해제</button>
           <div class="program-plan-actions">
             <button type="button" class="btn btn-save-program" id="saveProgramBtn" onclick="openProgramPlanSaveModal_()" disabled title="출석 없이 프로그램만 저장">프로그램 저장</button>
-            <button type="button" class="btn btn-extra-attend" id="extraAttendBtn" onclick="extraAttendSession()" hidden title="1회 추가 소진">추가 출석</button>
-            <button type="button" class="btn btn-ghost" id="nextBookingScheduleBtn" onclick="openMemberScheduleSheet_()" title="구글 시트 예약 스케줄표 열기">예약 스케줄</button>
+            <button type="button" class="btn btn-ghost" id="nextBookingScheduleBtn" onclick="openMemberScheduleSheet_()" title="보드 날짜의 월 스케줄표·해당 일자로 이동">예약 스케줄</button>
           </div>
         </div>
       </div>
@@ -2705,7 +2711,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-08-21-final-check';
+    const INSTRUCTOR_HTML_BUILD = '2026-08-21-roller-extra';
     const PROGRAM_PLAN_SLOT_COUNT = 5;
     var _programPlanSaveSlot = 1;
     const BOARD_LOAD_TIMEOUT_MS = 90000;
@@ -2841,14 +2847,14 @@
     /* 서버 연결 전에도 표시 — code.gs PSP_PROGRAM_CATALOG_ 와 동기화 */
     const MOVEMENT_CATALOG_RAW = [
       { id:'tool_list', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'소도구 목록', label:'소도구 목록', linkUrl:'https://blog.naver.com/allenjoy/222657632345' },
-      { id:'roller_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'엉덩이', alimtalkLabel:'폼롤러 · 엉덩이', coachingNote:'폼롤러를 엉덩이 근육 아래에 두고 통증 없는 범위에서 천천히 좌우·앞뒤로 굴립니다. 뼈가 아닌 근육 위에 올리고, 호흡을 멈추지 않습니다.' },
-      { id:'roller_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'허리', alimtalkLabel:'폼롤러 · 허리', coachingNote:'요추 양쪽 근육에 폼롤러를 대고 체중을 천천히 실어줍니다. 척추 뼈 위가 아닌 근육 부위에 위치시키고, 통증 0~3 정도로 유지합니다.' },
-      { id:'roller_back', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'등', alimtalkLabel:'폼롤러 · 등', coachingNote:'등 근육(견갑 사이·흉추 옆)에 폼롤러를 두고 천천히 위아래로 굴립니다. 목은 긴장하지 않게 하고, 호흡을 유지합니다.' },
-      { id:'roller_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'어깨', alimtalkLabel:'폼롤러 · 어깨', coachingNote:'어깨·견갑 주변 근육에 폼롤러를 대고 천천히 굴립니다. 어깨를 귀 쪽으로 올리지 않고, 통증 없는 범위에서 시행합니다.' },
-      { id:'roller_neck', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'목', alimtalkLabel:'폼롤러 · 목', coachingNote:'목 뒤·옆 근육에 가볍게 폼롤러를 대고 작은 범위로 움직입니다. 목뼈 위는 피하고, 압이 세면 즉시 줄입니다.' },
-      { id:'roller_calf', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'종아리', alimtalkLabel:'폼롤러 · 종아리', coachingNote:'종아리 근육 아래에 폼롤러를 두고 발목에서 무릎 쪽으로 천천히 굴립니다. 정강이뼈가 아닌 근육 위에 올리고, 좌·우 같은 시간으로 합니다.' },
-      { id:'roller_thigh', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'허벅지', alimtalkLabel:'폼롤러 · 허벅지', coachingNote:'허벅지 앞·옆·뒤 근육에 폼롤러를 두고 천천히 굴립니다. 무릎 관절 위는 피하고, 통증 없는 범위에서 호흡을 유지합니다.' },
-      { id:'roller_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'복부', alimtalkLabel:'폼롤러 · 복부', coachingNote:'복부 근육에 폼롤러를 가볍게 대고 작은 범위로 굴리거나 유지합니다. 깊게 누르지 말고, 불편하면 즉시 압을 줄입니다.' },
+      { id:'roller_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'엉덩이', alimtalkLabel:'폼롤러 · 엉덩이', coachingNote:'준비: 바닥에 앉아 폼롤러를 엉덩이(둔근) 아래에 둡니다. 손은 뒤로 바닥을 짚어 체중을 조절합니다.\n동작: 통증 없는 범위에서 좌우·앞뒤로 천천히 굴리거나, 압이 느껴지는 지점에서 20~40초 유지합니다.\n포인트: 뼈(좌골)가 아닌 근육 위에 올리고, 호흡을 멈추지 않습니다.\n주의: 찌릿하거나 통증이 세지면 체중을 줄이거나 중단합니다. 영상은 곧 추가 예정입니다.' },
+      { id:'roller_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'허리', alimtalkLabel:'폼롤러 · 허리', coachingNote:'준비: 옆으로 눕거나 기대어, 폼롤러를 허리(요추) 양쪽 근육에 둡니다.\n동작: 체중을 천천히 실어 위아래로 작게 굴리거나, 편한 지점에서 20~40초 유지합니다.\n포인트: 척추 뼈 위가 아닌 옆 근육에 위치시키고, 통증 0~3 정도로 유지합니다.\n주의: 허리 중앙·뼈 위를 직접 누르지 않습니다. 영상은 곧 추가 예정입니다.' },
+      { id:'roller_back', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'등', alimtalkLabel:'폼롤러 · 등', coachingNote:'준비: 폼롤러를 등(견갑 사이·흉추 옆 근육)에 가로로 두고 눕거나 기대어 체중을 조절합니다.\n동작: 엉덩이는 바닥에 가깝게 둔 채 천천히 위아래로 굴립니다. 한 구간에서 멈추어 호흡해도 됩니다.\n포인트: 목은 긴장하지 않게 하고, 허리보다 등 위·중간이 열리게 합니다.\n주의: 통증 부위·뼈 위는 피합니다. 영상은 곧 추가 예정입니다.' },
+      { id:'roller_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'어깨', alimtalkLabel:'폼롤러 · 어깨', coachingNote:'준비: 옆으로 눕거나 기대어 폼롤러를 어깨·견갑 주변 근육에 둡니다.\n동작: 작은 범위로 앞뒤·위아래로 천천히 굴리거나, 뭉친 지점에서 20~40초 유지합니다.\n포인트: 어깨를 귀 쪽으로 올리지 않고, 호흡을 유지합니다.\n주의: 관절·뼈를 직접 누르지 말고 근육만 자극합니다. 영상은 곧 추가 예정입니다.' },
+      { id:'roller_neck', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'목', alimtalkLabel:'폼롤러 · 목', coachingNote:'준비: 누운 자세에서 폼롤러를 목 뒤·옆 근육에 가볍게 둡니다. 머리 무게만으로 압을 조절합니다.\n동작: 아주 작은 범위로 좌우·위아래로 움직이거나, 편한 지점에서 15~30초 유지합니다.\n포인트: 목뼈(경추) 위는 피하고, 옆·뒤 근육만 닿게 합니다.\n주의: 압이 세거나 어지러움·저림이 있으면 즉시 중단합니다. 영상은 곧 추가 예정입니다.' },
+      { id:'roller_calf', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'종아리', alimtalkLabel:'폼롤러 · 종아리', coachingNote:'준비: 앉거나 손으로 몸을 지탱한 채 종아리 근육 아래에 폼롤러를 둡니다.\n동작: 발목에서 무릎 쪽으로 천천히 굴립니다. 뭉친 지점에서 잠시 멈추어 호흡합니다.\n포인트: 정강이뼈가 아닌 근육 위에 올리고, 좌·우 같은 시간으로 합니다.\n주의: 뼈·아킬레스 힘줄을 세게 누르지 않습니다. 영상은 곧 추가 예정입니다.' },
+      { id:'roller_thigh', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'허벅지', alimtalkLabel:'폼롤러 · 허벅지', coachingNote:'준비: 앞·옆·뒤 중 목표 근육을 정한 뒤 그 아래에 폼롤러를 둡니다. 팔·반대 다리로 체중을 조절합니다.\n동작: 천천히 위아래로 굴리며, 통증 없는 범위에서 20~40초 구간을 반복합니다.\n포인트: 무릎 관절·뼈 위는 피하고, 호흡을 유지합니다.\n주의: 통증이 세면 체중을 줄이거나 중단합니다. 영상은 곧 추가 예정입니다.' },
+      { id:'roller_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'복부', alimtalkLabel:'폼롤러 · 복부', coachingNote:'준비: 엎드리거나 옆으로 누워 폼롤러를 복부 근육(배곧은근·옆구리)에 가볍게 둡니다.\n동작: 깊게 누르지 말고 작은 범위로 굴리거나, 호흡에 맞춰 15~30초 유지합니다.\n포인트: 숨을 내쉴 때 배가 부드럽게 내려가게 하고, 힘을 과도하게 주지 않습니다.\n주의: 식사 직후·임신·복통이 있으면 하지 않습니다. 영상은 곧 추가 예정입니다.' },
       { id:'ball_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'어깨', alimtalkLabel:'마사지볼 · 어깨', linkUrl:'https://www.youtube.com/watch?v=drx2-P2OgpQ', coachingNote:'견갑골 위에 볼을 올리고 통증 없는 범위에서 천천히 원을 그립니다. 호흡을 멈추지 않고 어깨를 들어 올리지 않도록 안내합니다.' },
       { id:'ball_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'허리', alimtalkLabel:'마사지볼 · 허리', linkUrl:'https://www.youtube.com/watch?v=PgKSRcIW9c4', coachingNote:'요추 양쪽 근육에 볼을 대고 체중을 천천히 실어줍니다. 척추 뼈 위가 아닌 근육 부위에 위치시키는지 확인합니다.' },
       { id:'ball_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'복부', alimtalkLabel:'마사지볼 · 복부', linkUrl:'https://www.youtube.com/shorts/zjvXLTL9E5A' },
@@ -4867,7 +4873,7 @@
 
     var SESSION_DISCOMFORT_AREAS = [
       { id: 'comfortable', label: '편안함', group: 'quick' },
-      { id: 'same', label: '동일 부위', group: 'quick' },
+      { id: 'same', label: '동일', group: 'quick' },
       { id: 'both', label: '전체적', group: 'quick' },
       { id: 'lt', label: 'Lt', group: 'quick' },
       { id: 'center', label: '중앙', group: 'quick' },
@@ -5775,57 +5781,31 @@
       if (!m || !m.suffix8) return '';
       var locked = memberAttendSlotLocked_(m);
       var passN = locked ? 0 : resolveAttendPassCount_();
-      var data;
-      if (locked) {
-        var key = memberPhoneMatchKey_(m);
-        var familySize = 0;
-        if (key && state.board && state.board.members) {
-          state.board.members.forEach(function (x) {
-            if (memberPhoneMatchKey_(x) === key) familySize++;
-          });
-        }
-        var cur =
-          familySize > 1 ? parseFamilySharedCountsFromBoard_(m) : parseSessionCountsFromMember_(m);
-        data = {
-          attendCount: cur.attend,
-          payRounds: cur.pay,
-          remaining: cur.remain,
-          sessionDisplay: cur.attend + '/' + cur.pay,
-          memberName: m && m.name,
-          attendPassCount: 0,
-        };
+      if (locked || passN <= 1) return '';
+      var data = projectedAttendStats_(m, passN);
+      var html = '';
+      var family = familyMultiPassTargets_(m, passN);
+      if (family.length >= passN && family.length > 1) {
+        html +=
+          '<p class="attend-result-status ok">가족 ' + passN + '명 · 공유 수강권 ' + passN + '회 사용</p>';
+        var counts = parseFamilySharedCountsFromBoard_(m);
+        family.slice(0, passN).forEach(function (fm, fi) {
+          var stampAttend = counts.attend + fi + 1;
+          var stampSd = stampAttend + '/' + counts.pay;
+          html +=
+            '<p class="attend-result-sub">' +
+            escapeHtml(fm.name) +
+            ' ' +
+            escapeHtml(stampSd) +
+            '</p>';
+        });
+        html +=
+          '<p class="attend-result-partial" style="margin-top:6px;">스케줄에는 위 회차가 차례로 찍히고, 남은 횟수는 공유 ' +
+          escapeHtml(data.sessionDisplay) +
+          ' 기준입니다.</p>';
       } else {
-        data = projectedAttendStats_(m, passN);
-      }
-      var html =
-        '<div class="session-attend-result-summary">' +
-        '<p class="attend-result-line1">' + escapeHtml(formatAttendResultLine1(data)) + '</p>' +
-        '<p class="attend-result-line2">' + escapeHtml(formatAttendMemberRemainLine(data, m.name)) + '</p>' +
-        '</div>';
-      if (!locked && passN > 1) {
-        var family = familyMultiPassTargets_(m, passN);
-        if (family.length >= passN && family.length > 1) {
-          html +=
-            '<p class="attend-result-status ok">가족 ' + passN + '명 · 공유 수강권 ' + passN + '회 사용</p>';
-          var counts = parseFamilySharedCountsFromBoard_(m);
-          family.slice(0, passN).forEach(function (fm, fi) {
-            var stampAttend = counts.attend + fi + 1;
-            var stampSd = stampAttend + '/' + counts.pay;
-            html +=
-              '<p class="attend-result-sub">' +
-              escapeHtml(fm.name) +
-              ' ' +
-              escapeHtml(stampSd) +
-              '</p>';
-          });
-          html +=
-            '<p class="attend-result-partial" style="margin-top:6px;">스케줄에는 위 회차가 차례로 찍히고, 남은 횟수는 공유 ' +
-            escapeHtml(data.sessionDisplay) +
-            ' 기준입니다.</p>';
-        } else {
-          html +=
-            '<p class="attend-result-status ok">' + passN + '회 한 번에 사용 예정</p>';
-        }
+        html +=
+          '<p class="attend-result-status ok">' + passN + '회 한 번에 사용 예정</p>';
       }
       return html;
     }
@@ -6244,30 +6224,81 @@
       if (!nb) return;
       var year;
       var month;
+      var day;
       if (ymd) {
         var parts = String(ymd).split('-');
         if (parts.length === 3) {
           year = parseInt(parts[0], 10);
           month = parseInt(parts[1], 10);
+          day = parseInt(parts[2], 10);
         }
       }
       if (!year || !month) {
-        var now = new Date();
-        year = now.getFullYear();
-        month = now.getMonth() + 1;
+        var boardParts = String(boardDateYmd_() || '').split('-');
+        if (boardParts.length === 3) {
+          year = parseInt(boardParts[0], 10);
+          month = parseInt(boardParts[1], 10);
+          day = parseInt(boardParts[2], 10);
+        } else {
+          var now = new Date();
+          year = now.getFullYear();
+          month = now.getMonth() + 1;
+          day = now.getDate();
+        }
       }
       try {
         var data = await api({
           action: 'instructorScheduleSheetUrl',
           year: year,
           month: month,
+          day: day,
+          ymd: year + '-' + String(month).padStart(2, '0') + '-' + String(day || 1).padStart(2, '0'),
         }, { timeoutMs: 15000 });
         if (data.ok && data.url) nb.scheduleSheetUrl = data.url;
       } catch (err) {}
     }
 
-    async function openMemberScheduleSheet_() {
-      window.open(SCHEDULE_SPREADSHEET_FALLBACK, '_blank', 'noopener,noreferrer');
+    async function openMemberScheduleSheet_(ev) {
+      if (ev && ev.preventDefault) ev.preventDefault();
+      var ymd = boardDateYmd_();
+      var parts = String(ymd || '').split('-');
+      var year = parseInt(parts[0], 10);
+      var month = parseInt(parts[1], 10);
+      var day = parseInt(parts[2], 10);
+      var fallback = SCHEDULE_SPREADSHEET_FALLBACK;
+      var nb = state.nextBooking;
+      if (nb && nb.scheduleSheetUrl) fallback = nb.scheduleSheetUrl;
+      var win = null;
+      try {
+        win = window.open('about:blank', '_blank');
+      } catch (openErr) {
+        win = null;
+      }
+      try {
+        var data = await api({
+          action: 'instructorScheduleSheetUrl',
+          year: year,
+          month: month,
+          day: day,
+          ymd: ymd,
+        }, { timeoutMs: 15000 });
+        if (data && data.ok && data.url) {
+          if (nb) nb.scheduleSheetUrl = data.url;
+          if (win && !win.closed) {
+            win.location.href = data.url;
+            win.opener = null;
+          } else {
+            window.open(data.url, '_blank', 'noopener,noreferrer');
+          }
+          return;
+        }
+      } catch (err) {}
+      if (win && !win.closed) {
+        win.location.href = fallback;
+        win.opener = null;
+      } else {
+        window.open(fallback, '_blank', 'noopener,noreferrer');
+      }
     }
 
     function onNextBookingDateInput_() {
@@ -6589,26 +6620,42 @@
         todayBlock = formatTodayAlimtalkBlock(linkIds, includedIds);
       }
       var memoLine = (memo || '').trim() || '—';
-      var sess = m && m.sessionDisplay ? m.sessionDisplay : '';
-      var parts = sess.split('/');
-      var attendNow = parseInt(parts[0], 10) || 0;
-      var payTotal = parseInt(parts[1], 10) || 0;
       var passN = afterAttend ? 0 : resolveAttendPassCount_(passCount);
-      var familyPreview =
-        !afterAttend && passN > 1 ? familyMultiPassTargets_(m, passN) : [];
-      var familyPreviewMode = familyPreview.length >= passN && familyPreview.length > 1;
-      var attendDelta = afterAttend ? 0 : passN;
-      var attendBase = familyPreviewMode ? parseFamilySharedCountsFromBoard_(m).attend : attendNow;
-      var attendShown = afterAttend ? attendNow : attendBase + attendDelta;
-      var remainNext = payTotal ? Math.max(0, payTotal - attendShown) : '—';
+      var sessionLine = '—';
+      var remainLine = '—';
+      var resultData = fixedBlocks.resultData || null;
+      if (afterAttend && resultData && resultData.sessionDisplay) {
+        var sdParts = String(resultData.sessionDisplay).split('/');
+        var attDone = parseInt(sdParts[0], 10) || 0;
+        var payTot = parseInt(sdParts[1], 10) || 0;
+        sessionLine = payTot ? attDone + '회차 / ' + payTot + '회 중' : '—';
+        var remDone = resultData.remaining != null
+          ? parseInt(resultData.remaining, 10)
+          : (payTot ? Math.max(0, payTot - attDone) : NaN);
+        remainLine = isNaN(remDone) ? '—' : remDone + '회';
+      } else if (!afterAttend) {
+        var projected = projectedAttendStats_(m, passN);
+        sessionLine = projected.payRounds
+          ? projected.attendCount + '회차 / ' + projected.payRounds + '회 중'
+          : '—';
+        remainLine = projected.remaining != null ? projected.remaining + '회' : '—';
+      } else {
+        var sess = m && m.sessionDisplay ? m.sessionDisplay : '';
+        var parts = sess.split('/');
+        var attendNow = parseInt(parts[0], 10) || 0;
+        var payTotal = parseInt(parts[1], 10) || 0;
+        sessionLine = payTotal ? attendNow + '회차 / ' + payTotal + '회 중' : '—';
+        remainLine = payTotal ? Math.max(0, payTotal - attendNow) + '회' : '—';
+      }
       var multiLine = afterAttend
-        ? formatMultiPassAlimtalkLineFromData_(fixedBlocks.resultData)
+        ? formatMultiPassAlimtalkLineFromData_(resultData)
         : formatMultiPassAlimtalkLineClient_(passN, m);
+      // Solapi 진도 템플릿: #{날짜}/#{회차} #{남은회차} #{다회차} #{단계} #{오늘진도} #{키포인트} #{다음예약}
       var body =
         '🌟 출석 체크 완료 🌟\n\n' +
-        '📅 ' + (payTotal ? attendShown + '회차 / ' + payTotal + '회 중' : '—') + '\n' +
-        '— 남은 회차: ' + (remainNext === '—' ? '—' : remainNext + '회');
-      if (multiLine) body += '\n' + multiLine;
+        '📅 ' + sessionLine + '\n' +
+        '— 남은 회차: ' + remainLine;
+      if (multiLine) body += '\n\n' + multiLine;
       body += '\n\n' +
         '📍 ' + stageLine + '\n' +
         '✅ 오늘:\n' + todayBlock + '\n\n' +
@@ -6750,8 +6797,9 @@
       var outcomeEl = document.getElementById('sessionAttendOutcomePreview');
       if (outcomeEl) {
         if (m && m.suffix8) {
-          outcomeEl.innerHTML = buildProjectedAttendOutcomeHtml_(m);
-          outcomeEl.hidden = false;
+          var outcomeHtml = buildProjectedAttendOutcomeHtml_(m);
+          outcomeEl.innerHTML = outcomeHtml;
+          outcomeEl.hidden = !outcomeHtml;
         } else {
           outcomeEl.innerHTML = '';
           outcomeEl.hidden = true;
@@ -6924,9 +6972,11 @@
         var pm = state.selected;
         if (outcomeEl) {
           if (pm && pm.suffix8) {
-            outcomeEl.innerHTML = buildProjectedAttendOutcomeHtml_(pm);
-            outcomeEl.hidden = false;
+            var processingOutcome = buildProjectedAttendOutcomeHtml_(pm);
+            outcomeEl.innerHTML = processingOutcome;
+            outcomeEl.hidden = !processingOutcome;
           } else {
+            outcomeEl.innerHTML = '';
             outcomeEl.hidden = true;
           }
         }
@@ -7945,13 +7995,9 @@
       if (!m) return '';
       var fromSchedule = scheduleSessionStatusLabelForChipClient_(m.scheduleSession);
       if (fromSchedule) return fromSchedule;
-      // 이 칸에 찍힌 회차만 표시 — 가족 공유 sessionDisplay로 미출석 칩에 N/M 붙이지 않음
       var fromAttend = extractScheduleAttendLabelClient_(m.scheduleSession);
       if (fromAttend) return fromAttend;
-      if (state.completedKeys[memberKey(m)] || (state.completedPersonKeys && state.completedPersonKeys[memberPersonKey(m)])) {
-        return String(m.sessionDisplay || '').trim();
-      }
-      return '';
+      return String(m.sessionDisplay || '').trim();
     }
 
     /** 실제 N/M 출석만 (결석·〃 제외) — 결석 후 출석 재동기화 판별용 */
@@ -11896,10 +11942,8 @@
       if (data.completed) {
         if (data.familyResults && data.familyResults.length > 1) {
           html += '<div class="session-attend-result-summary session-attend-family-results">';
-          var finalSd = String(data.sessionDisplay || '').trim();
           data.familyResults.forEach(function (fr) {
             var line = String(fr.name || '').trim();
-            // 스케줄에 찍힌 공유 회차 스탬프(22/23/24) 우선 표시
             var stamp = String(fr.scheduleStamp || fr.sessionDisplay || '').trim();
             if (stamp) line += (line ? ' ' : '') + stamp;
             html +=
@@ -11907,21 +11951,7 @@
               escapeHtml(line) +
               '</p>';
           });
-          if (finalSd) {
-            html +=
-              '<p class="attend-result-partial" style="margin-top:6px;">공유 수강권 기준 ' +
-              escapeHtml(finalSd) +
-              ' · 남은 횟수 ' +
-              escapeHtml(String(data.remaining != null ? data.remaining : '-')) +
-              '회</p>';
-          }
           html += '</div>';
-        } else {
-          html +=
-            '<div class="session-attend-result-summary">' +
-            '<p class="attend-result-line1">' + escapeHtml(formatAttendResultLine1(data)) + '</p>' +
-            '<p class="attend-result-line2">' + escapeHtml(formatAttendMemberRemainLine(data, m.name)) + '</p>' +
-            '</div>';
         }
         html +=
           buildAttendPostNoticeHtml(data) +
