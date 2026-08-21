@@ -485,7 +485,7 @@
     .member-search-truncated { font-size: 11px; color: var(--dim); padding: 8px 2px 2px; border-top: 1px dashed var(--border); margin-top: 4px; }
     .program-plan-bar {
       display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-      margin-bottom: 10px; padding: 8px 10px; border-radius: 8px;
+      margin: 0; padding: 8px 10px; border-radius: 8px;
       background: var(--zone-session-soft, #f8fafc); border: 1px solid var(--border);
     }
     .program-plan-status { font-size: 11px; color: var(--dim); flex: 1 1 100%; min-width: 140px; }
@@ -953,6 +953,9 @@
     .eval-body-area-dd-label {
       font-size:9px; font-weight:800; color:#94a3b8; letter-spacing:0.03em;
     }
+    .eval-body-area-sides {
+      display:flex; flex-wrap:wrap; gap:5px; width:100%; margin-top:8px;
+    }
     @media (max-width:480px) {
       .session-discomfort-dropdowns,
       .eval-body-area-dropdowns {
@@ -985,7 +988,10 @@
     .session-discomfort-group .session-check-chip.on {
       background:var(--blue-bg); border-color:var(--blue); color:var(--blue); font-weight:700;
     }
-    .session-check-vas .session-check-chip { padding:6px 12px; font-size:10px; white-space:nowrap; }
+    .session-check-vas .session-check-chip {
+      flex:1 1 0; min-width:28px; max-width:44px; padding:6px 0;
+      font-size:11px; text-align:center; white-space:nowrap;
+    }
     .session-check-note-row textarea {
       width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:8px;
       font-size:12px; line-height:1.45; resize:vertical; min-height:52px;
@@ -1711,6 +1717,20 @@
     .eval-submit-status.is-over {
       color:#b45309;
     }
+    .eval-save-progress-bar {
+      position:sticky; top:0; z-index:50;
+      max-width:760px; margin:10px 12px 0; padding:10px 12px;
+      border-radius:10px; background:#eff6ff; border:1px solid #bfdbfe;
+      color:#1e3a8a; font-size:12px; font-weight:700; line-height:1.45; text-align:center;
+    }
+    .eval-save-progress-bar[hidden] { display:none !important; }
+    .eval-save-progress-bar .eval-countdown {
+      color:#2563eb; font-variant-numeric:tabular-nums;
+    }
+    .eval-save-progress-bar.is-over {
+      background:#fffbeb; border-color:#fcd34d; color:#92400e;
+    }
+    .eval-save-progress-bar.is-over .eval-countdown { color:#b45309; }
     .eval-member-hint { font-size:12px; font-weight:700; color:var(--blue); margin-bottom:12px; padding:8px 10px; background:var(--blue-bg); border-radius:8px; }
     #evalModal .modal {
       max-width:680px;
@@ -1787,6 +1807,12 @@
     .eval-hist-title { font-size:12px; font-weight:800; color:var(--text); }
     .eval-hist-hint { font-size:10px; color:var(--dim); line-height:1.4; margin-bottom:6px; }
     .eval-hist-chips { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:6px; }
+    .eval-hist-chips--vas .eval-hist-chip {
+      flex:1 1 0; min-width:28px; max-width:44px; padding:6px 0; text-align:center;
+    }
+    .eval-hist-chips--vas .eval-hist-chip[data-val="기타"] {
+      flex:0 1 auto; min-width:0; max-width:none; padding:5px 10px;
+    }
     .eval-hist-chip {
       font-size:11px; padding:5px 10px; border-radius:999px;
       border:1px solid var(--border); background:#fff; cursor:pointer;
@@ -1814,15 +1840,30 @@
     .eval-hist-sub { font-size:11px; color:var(--dim); font-weight:600; }
     .eval-hist-subrow + .eval-hist-subrow { margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); }
     .eval-hist-subtitle { font-size:11px; font-weight:800; color:var(--text); margin-bottom:5px; }
+    .eval-exam-details { margin-top:8px; }
+    .eval-exam-details-empty { font-size:11px; color:var(--dim); line-height:1.45; }
+    .eval-exam-detail-row {
+      display:flex; align-items:center; gap:8px; margin-top:6px;
+    }
+    .eval-exam-detail-label {
+      flex:0 1 auto; max-width:46%; font-size:11px; font-weight:700; color:var(--text);
+      line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .eval-exam-detail-input {
+      flex:1 1 auto; min-width:0; font-size:11px; padding:6px 8px;
+      border:1px solid var(--border); border-radius:6px; font-family:inherit;
+    }
     .eval-hist-memo-block .eval-hist-note { margin-top:4px; min-height:56px; max-height:120px; }
     .eval-hist-note {
       width:100%; min-height:34px; max-height:88px; font-size:11px;
       padding:6px 8px; border:1px solid var(--border); border-radius:6px; resize:vertical;
       font-family:inherit; line-height:1.45;
     }
+    .eval-hist-chip-note { margin-top:6px; min-height:44px; background:#fff; }
+    .eval-hist-chip-note[hidden] { display:none !important; }
     .eval-hist-section.eval-hist-hidden { display: none; }
     .eval-exam-block { margin-top: 0; }
-    /* 초회 평가 — 권장 프로그램·5단계 */
+    /* 초회 평가 — 권장 프로그램·3단계 */
     .eval-rec-panel {
       margin-bottom:14px; display:flex; flex-direction:column; gap:10px;
     }
@@ -1866,6 +1907,41 @@
     }
     .eval-rec-stage.recommended .sn { background:var(--blue); color:#fff; }
     .eval-rec-stage.recommended .st { color:var(--blue); }
+    .eval-rec-stage.always .badge,
+    .eval-rec-stage.recommended .badge {
+      display:inline-block; margin-top:4px; font-size:9px; font-weight:800;
+      padding:2px 6px; border-radius:999px;
+    }
+    .eval-rec-stage.always .badge { background:#ecfdf5; color:#047857; }
+    .eval-rec-stage.recommended .badge { background:rgba(30,58,110,.1); color:var(--blue); }
+    .eval-rec-posflow {
+      display:flex; align-items:center; gap:0; padding:10px 8px 12px;
+    }
+    .eval-rec-pos {
+      flex:1; min-width:0; text-align:center; padding:8px 4px; border-radius:8px;
+    }
+    .eval-rec-pos.start { background:var(--blue-bg); box-shadow:inset 0 0 0 1.5px var(--blue); }
+    .eval-rec-pos .pn {
+      width:22px; height:22px; border-radius:50%; font-size:10px; font-weight:800;
+      display:inline-flex; align-items:center; justify-content:center;
+      background:#e2e8f0; color:var(--dim); margin-bottom:4px;
+    }
+    .eval-rec-pos.start .pn { background:var(--blue); color:#fff; }
+    .eval-rec-pos .pt { font-size:11px; font-weight:800; color:var(--text); line-height:1.3; }
+    .eval-rec-pos .ps { font-size:9px; color:var(--dim); margin-top:2px; line-height:1.3; }
+    .eval-rec-pos-arrow {
+      flex:0 0 auto; color:#94a3b8; font-size:16px; font-weight:800; padding:0 2px;
+    }
+    .eval-rec-consult {
+      font-size:12px; line-height:1.55; color:#1e3a8a;
+      background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px;
+      padding:10px 12px;
+    }
+    .eval-rec-consult strong { color:var(--blue); }
+    .eval-rec-care-node.on-pstr .dot {
+      border-color:#047857; background:#047857; color:#fff;
+    }
+    .eval-rec-care-node.on-pstr .lbl { color:#047857; font-weight:800; }
     .eval-rec-stage.prior { background:var(--green-bg); opacity:.85; }
     .eval-rec-stage.prior .sn { background:var(--green); color:#fff; }
     .eval-rec-care { padding:10px 12px 12px; }
@@ -2039,21 +2115,10 @@
     .alimtalk-preview {
       font-size:12px; line-height:1.4; white-space:pre-wrap;
       background:#1e293b; color:#f1f5f9; border-radius:10px;
-      padding:8px 12px; margin-bottom:10px;
-    }
-    .alimtalk-preview .preview-label {
-      font-size:10px; font-weight:700; color:#94a3b8;
-      margin:0; line-height:1.35;
-    }
-    .alimtalk-preview-hint {
-      font-size:10px; color:#94a3b8;
-      margin:0; line-height:1.35;
-    }
-    .alimtalk-preview .preview-label + .alimtalk-preview-hint {
-      margin-top:2px;
+      padding:12px; margin-bottom:10px;
     }
     .alimtalk-preview .session-attend-outcome-preview {
-      margin:2px 0 0; padding:0 0 4px;
+      margin:0; padding:0 0 8px;
       border-bottom:1px solid rgba(148,163,184,.28);
       text-align:left;
     }
@@ -2104,7 +2169,10 @@
     .alimtalk-preview.is-result-mode {
       background:transparent; color:inherit; padding:0;
     }
-    .alimtalk-preview.is-result-mode .preview-label { color:var(--blue); font-size:12px; margin-bottom:4px; }
+    .session-attend-result-title {
+      font-size:13px; font-weight:800; color:var(--blue);
+      margin:0 0 8px; line-height:1.35;
+    }
     .session-attend-result-summary { margin-bottom:4px; text-align:left; }
     .session-attend-result-summary .attend-result-line1 {
       font-size:18px; font-weight:800; color:var(--blue); margin:0 0 4px;
@@ -2186,6 +2254,8 @@
       </div>
     </div>
   </header>
+
+  <div id="evalSaveProgressBar" class="eval-save-progress-bar" hidden aria-live="polite"></div>
 
   <main>
     <!-- 1. 선택일 예약 회원 -->
@@ -2308,8 +2378,6 @@
         <div class="memo-counter"><span id="sessionMemoCount">0</span>/80</div>
       </div>
       <div class="alimtalk-preview" id="sessionAlimtalkSection">
-        <div class="preview-label" id="sessionAlimtalkSectionLabel">알림톡으로 보내질 내용 (출석+진도보내기)</div>
-        <p class="alimtalk-preview-hint" id="sessionAlimtalkHint">세 버튼 모두 출석·진도 저장은 동일합니다. 알림톡만 선택에 따라 달라집니다.</p>
         <div id="sessionAttendProcessing" hidden></div>
         <div id="sessionAttendOutcomePreview" class="session-attend-outcome-preview" hidden></div>
         <div id="sessionAlimtalkPreview"></div>
@@ -2349,6 +2417,11 @@
       <div id="sessionAttendCountdownBar" class="session-attend-countdown-bar" hidden aria-live="polite"></div>
       <div class="session-wrap-actions">
         <p class="session-save-only-hint" id="sessionSaveOnlyHint" hidden></p>
+        <div class="session-wrap-btns">
+          <button type="button" class="btn btn-attend-silent" id="attendSilentBtn" onclick="attendSilentSession()" disabled title="출석·진도 저장 · 알림톡 없음">알림 없음</button>
+          <button type="button" class="btn btn-attend-basic" id="attendBasicBtn" onclick="attendBasicSession()" disabled title="출석·진도 저장 · 기본 알림톡">기본 알림톡</button>
+          <button type="button" class="btn btn-attend-progress" id="attendProgressBtn" onclick="attendWithProgressSession()" disabled title="출석·진도 저장 · 진도 알림톡">출석+진도보내기</button>
+        </div>
         <div class="program-plan-bar" id="programPlanBar" hidden>
           <span class="program-plan-status" id="programPlanStatus">프로그램을 작성한 뒤 저장하세요.</span>
           <button type="button" class="btn btn-unpin-program" id="unpinProgramBtn" onclick="unpinProgramPlan()" hidden title="고정 해제">고정 해제</button>
@@ -2357,11 +2430,6 @@
             <button type="button" class="btn btn-extra-attend" id="extraAttendBtn" onclick="extraAttendSession()" hidden title="1회 추가 소진">추가 출석</button>
             <button type="button" class="btn btn-ghost" id="nextBookingScheduleBtn" onclick="openMemberScheduleSheet_()" title="구글 시트 예약 스케줄표 열기">예약 스케줄</button>
           </div>
-        </div>
-        <div class="session-wrap-btns">
-          <button type="button" class="btn btn-attend-silent" id="attendSilentBtn" onclick="attendSilentSession()" disabled title="출석·진도 저장 · 알림톡 없음">알림 없음</button>
-          <button type="button" class="btn btn-attend-basic" id="attendBasicBtn" onclick="attendBasicSession()" disabled title="출석·진도 저장 · 기본 알림톡">기본 알림톡</button>
-          <button type="button" class="btn btn-attend-progress" id="attendProgressBtn" onclick="attendWithProgressSession()" disabled title="출석·진도 저장 · 진도 알림톡">출석+진도보내기</button>
         </div>
       </div>
       <p id="instructorBuildBadge" class="session-build-badge" aria-hidden="true"></p>
@@ -2637,7 +2705,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-08-10-no-result-rescroll';
+    const INSTRUCTOR_HTML_BUILD = '2026-08-21-final-check';
     const PROGRAM_PLAN_SLOT_COUNT = 5;
     var _programPlanSaveSlot = 1;
     const BOARD_LOAD_TIMEOUT_MS = 90000;
@@ -2671,6 +2739,8 @@
       if (/Active Stretching · 하체|근막경선별 Active · 하체/.test(s)) return 0.2;
       var programOrder = {
         '소도구 목록': 0,
+        '폼롤러': 1,
+        '12센티 마사지볼': 2,
         'Force Line 연결': 0.5,
         '생활습관': 20,
         '스쿼트 6단계': 31,
@@ -2771,6 +2841,14 @@
     /* 서버 연결 전에도 표시 — code.gs PSP_PROGRAM_CATALOG_ 와 동기화 */
     const MOVEMENT_CATALOG_RAW = [
       { id:'tool_list', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'소도구 목록', label:'소도구 목록', linkUrl:'https://blog.naver.com/allenjoy/222657632345' },
+      { id:'roller_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'엉덩이', alimtalkLabel:'폼롤러 · 엉덩이', coachingNote:'폼롤러를 엉덩이 근육 아래에 두고 통증 없는 범위에서 천천히 좌우·앞뒤로 굴립니다. 뼈가 아닌 근육 위에 올리고, 호흡을 멈추지 않습니다.' },
+      { id:'roller_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'허리', alimtalkLabel:'폼롤러 · 허리', coachingNote:'요추 양쪽 근육에 폼롤러를 대고 체중을 천천히 실어줍니다. 척추 뼈 위가 아닌 근육 부위에 위치시키고, 통증 0~3 정도로 유지합니다.' },
+      { id:'roller_back', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'등', alimtalkLabel:'폼롤러 · 등', coachingNote:'등 근육(견갑 사이·흉추 옆)에 폼롤러를 두고 천천히 위아래로 굴립니다. 목은 긴장하지 않게 하고, 호흡을 유지합니다.' },
+      { id:'roller_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'어깨', alimtalkLabel:'폼롤러 · 어깨', coachingNote:'어깨·견갑 주변 근육에 폼롤러를 대고 천천히 굴립니다. 어깨를 귀 쪽으로 올리지 않고, 통증 없는 범위에서 시행합니다.' },
+      { id:'roller_neck', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'목', alimtalkLabel:'폼롤러 · 목', coachingNote:'목 뒤·옆 근육에 가볍게 폼롤러를 대고 작은 범위로 움직입니다. 목뼈 위는 피하고, 압이 세면 즉시 줄입니다.' },
+      { id:'roller_calf', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'종아리', alimtalkLabel:'폼롤러 · 종아리', coachingNote:'종아리 근육 아래에 폼롤러를 두고 발목에서 무릎 쪽으로 천천히 굴립니다. 정강이뼈가 아닌 근육 위에 올리고, 좌·우 같은 시간으로 합니다.' },
+      { id:'roller_thigh', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'허벅지', alimtalkLabel:'폼롤러 · 허벅지', coachingNote:'허벅지 앞·옆·뒤 근육에 폼롤러를 두고 천천히 굴립니다. 무릎 관절 위는 피하고, 통증 없는 범위에서 호흡을 유지합니다.' },
+      { id:'roller_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'복부', alimtalkLabel:'폼롤러 · 복부', coachingNote:'복부 근육에 폼롤러를 가볍게 대고 작은 범위로 굴리거나 유지합니다. 깊게 누르지 말고, 불편하면 즉시 압을 줄입니다.' },
       { id:'ball_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'어깨', alimtalkLabel:'마사지볼 · 어깨', linkUrl:'https://www.youtube.com/watch?v=drx2-P2OgpQ', coachingNote:'견갑골 위에 볼을 올리고 통증 없는 범위에서 천천히 원을 그립니다. 호흡을 멈추지 않고 어깨를 들어 올리지 않도록 안내합니다.' },
       { id:'ball_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'허리', alimtalkLabel:'마사지볼 · 허리', linkUrl:'https://www.youtube.com/watch?v=PgKSRcIW9c4', coachingNote:'요추 양쪽 근육에 볼을 대고 체중을 천천히 실어줍니다. 척추 뼈 위가 아닌 근육 부위에 위치시키는지 확인합니다.' },
       { id:'ball_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'복부', alimtalkLabel:'마사지볼 · 복부', linkUrl:'https://www.youtube.com/shorts/zjvXLTL9E5A' },
@@ -4790,8 +4868,9 @@
     var SESSION_DISCOMFORT_AREAS = [
       { id: 'comfortable', label: '편안함', group: 'quick' },
       { id: 'same', label: '동일 부위', group: 'quick' },
-      { id: 'both', label: 'Both', group: 'quick' },
+      { id: 'both', label: '전체적', group: 'quick' },
       { id: 'lt', label: 'Lt', group: 'quick' },
+      { id: 'center', label: '중앙', group: 'quick' },
       { id: 'rt', label: 'Rt', group: 'quick' },
       { id: 'headache', label: '두통', group: 'head_spine' },
       { id: 'jaw', label: '턱', group: 'head_spine' },
@@ -4878,11 +4957,7 @@
       if (!sessionCheckRequiredFieldsReady_(state.sessionCheck)) scheduleSessionCheckAutoSave();
     }
 
-    var SESSION_VAS_RANGES = [
-      { key: '1-3', label: 'VAS 1~3', store: 2 },
-      { key: '4-6', label: 'VAS 4~6', store: 5 },
-      { key: '7-10', label: 'VAS 7~10', store: 8 },
-    ];
+    var SESSION_VAS_SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     var _sessionCheckSaveTimer = null;
 
@@ -5467,7 +5542,7 @@
       if (prog.indexOf('분절 운동') >= 0) return 'segmental';
       if (prog.indexOf('스쿼트') >= 0) return 'squat';
       if (prog.indexOf('밸런스') >= 0) return 'balance';
-      if (prog.indexOf('마사지볼') >= 0 || sec === 'self_tool') return 'self_tool';
+      if (prog.indexOf('마사지볼') >= 0 || prog === '폼롤러' || sec === 'self_tool') return 'self_tool';
       if (prog === '기능 운동') return 'func_movement';
       if (/^hongtaek_/.test(id) || /^hongtaek_/.test(sec)) return 'hongtaek_tab';
       if (/^injun_/.test(id) || /^injun_/.test(sec)) return 'injun_tab';
@@ -6757,7 +6832,6 @@
       _attendResultScrollTimer = window.setTimeout(function() {
         _attendResultScrollTimer = null;
         var target =
-          document.getElementById('sessionAlimtalkSectionLabel') ||
           document.getElementById('sessionAttendResultInline') ||
           document.getElementById('sessionAlimtalkSection');
         if (!target) return;
@@ -6827,8 +6901,6 @@
 
     function renderSessionAlimtalkSection() {
       var section = document.getElementById('sessionAlimtalkSection');
-      var label = document.getElementById('sessionAlimtalkSectionLabel');
-      var hint = document.getElementById('sessionAlimtalkHint');
       var processingEl = document.getElementById('sessionAttendProcessing');
       var previewEl = document.getElementById('sessionAlimtalkPreview');
       var resultWrap = document.getElementById('sessionAttendResultInline');
@@ -6841,17 +6913,14 @@
       var enteringResultMode = showResult && !section.classList.contains('is-result-mode');
 
       section.classList.toggle('is-result-mode', showResult);
-      if (hint) hint.hidden = showResult || isProcessing;
 
       var outcomeEl = document.getElementById('sessionAttendOutcomePreview');
       if (isProcessing) {
         section.classList.add('is-processing');
-        if (label) label.textContent = state.attendProcessingTitle || '처리 중…';
         if (processingEl) {
           processingEl.hidden = true;
           processingEl.innerHTML = '';
         }
-        if (hint) hint.hidden = false;
         var pm = state.selected;
         if (outcomeEl) {
           if (pm && pm.suffix8) {
@@ -6877,20 +6946,19 @@
       if (processingEl) processingEl.hidden = true;
 
       if (showResult) {
-        if (label) {
-          label.textContent = result.title || '🌟 출석·진도 저장 완료';
-        }
         if (outcomeEl) outcomeEl.hidden = true;
         previewEl.hidden = true;
         if (resultWrap) {
           resultWrap.hidden = false;
-          document.getElementById('sessionAttendResultBody').innerHTML = result.html || '';
+          var resultTitleHtml = result.title
+            ? '<p class="session-attend-result-title">' + escapeHtml(result.title) + '</p>'
+            : '';
+          document.getElementById('sessionAttendResultBody').innerHTML = resultTitleHtml + (result.html || '');
         }
         if (enteringResultMode) scrollToAttendResultTop();
         return;
       }
 
-      if (label) label.textContent = '알림톡으로 보내질 내용 (출석+진도보내기)';
       previewEl.hidden = false;
       if (resultWrap) resultWrap.hidden = true;
       updateSessionWrapPreview();
@@ -8674,7 +8742,7 @@
       return m.discomfortHistory[m.discomfortHistory.length - 1];
     }
 
-    var SESSION_SIDE_MODIFIER_IDS = ['both', 'lt', 'rt'];
+    var SESSION_SIDE_MODIFIER_IDS = ['both', 'lt', 'center', 'rt'];
     var SESSION_SPECIAL_AREA_IDS = ['comfortable', 'same'];
 
     function isSessionSideModifierId_(id) {
@@ -8701,16 +8769,19 @@
 
     function sessionCheckSideLabel_(areas) {
       areas = areas || [];
-      if (areas.indexOf('both') >= 0) return 'Both';
+      if (areas.indexOf('both') >= 0) return '전체적';
       if (areas.indexOf('lt') >= 0) return 'Lt';
+      if (areas.indexOf('center') >= 0) return '중앙';
       if (areas.indexOf('rt') >= 0) return 'Rt';
       return '';
     }
 
     function parseSideFromConditionLabel_(label) {
       var s = String(label || '').trim();
-      if (/^Both\s+/i.test(s)) return { side: 'Both', rest: s.replace(/^Both\s+/i, '').trim() };
+      if (/^전체적\s+/.test(s)) return { side: '전체적', rest: s.replace(/^전체적\s+/, '').trim() };
+      if (/^Both\s+/i.test(s)) return { side: '전체적', rest: s.replace(/^Both\s+/i, '').trim() };
       if (/^Lt\s+/i.test(s)) return { side: 'Lt', rest: s.replace(/^Lt\s+/i, '').trim() };
+      if (/^중앙\s+/.test(s)) return { side: '중앙', rest: s.replace(/^중앙\s+/, '').trim() };
       if (/^Rt\s+/i.test(s)) return { side: 'Rt', rest: s.replace(/^Rt\s+/i, '').trim() };
       return { side: '', rest: s };
     }
@@ -8744,24 +8815,16 @@
       return found ? found.id : null;
     }
 
-    function sessionVasRangeKeyFromValue_(vas) {
+    function sessionVasScoreFromValue_(vas) {
       if (vas == null || vas === '') return null;
       var n = Number(vas);
-      if (isNaN(n)) return null;
-      if (n <= 3) return '1-3';
-      if (n <= 6) return '4-6';
-      return '7-10';
-    }
-
-    function sessionVasStoreValueFromRangeKey_(rangeKey) {
-      var found = SESSION_VAS_RANGES.find(function (r) { return r.key === rangeKey; });
-      return found ? found.store : null;
+      if (isNaN(n) || n < 1 || n > 10) return null;
+      return n;
     }
 
     function sessionVasLabelFromValue_(vas) {
-      var key = sessionVasRangeKeyFromValue_(vas);
-      var found = SESSION_VAS_RANGES.find(function (r) { return r.key === key; });
-      return found ? found.label : ('VAS ' + vas);
+      var n = sessionVasScoreFromValue_(vas);
+      return n != null ? ('VAS ' + n) : '';
     }
 
     function parseConditionLine_(line) {
@@ -9206,10 +9269,9 @@
       areaRoot.innerHTML = html;
       if (vasRoot) {
         var vasHtml = '';
-        SESSION_VAS_RANGES.forEach(function (range) {
-          var keyEsc = String(range.key).replace(/'/g, "\\'");
-          vasHtml += '<button type="button" class="session-check-chip" data-vas-range="' + escapeHtml(range.key) +
-            '" onclick="setSessionVasRange(\'' + keyEsc + '\')">' + escapeHtml(range.label) + '</button>';
+        SESSION_VAS_SCORES.forEach(function (n) {
+          vasHtml += '<button type="button" class="session-check-chip" data-vas="' + n +
+            '" onclick="setSessionVas(' + n + ')">' + n + '</button>';
         });
         vasRoot.innerHTML = vasHtml;
       }
@@ -9240,10 +9302,10 @@
         sel.value = selectedId || '';
         sel.classList.toggle('has-value', !!selectedId);
       });
-      var activeVasRange = sessionVasRangeKeyFromValue_(sc.vas);
+      var activeVas = sessionVasScoreFromValue_(sc.vas);
       document.querySelectorAll('#sessionVasChips .session-check-chip').forEach(function (btn) {
-        var rangeKey = btn.getAttribute('data-vas-range');
-        btn.classList.toggle('on', !!rangeKey && rangeKey === activeVasRange);
+        var n = Number(btn.getAttribute('data-vas'));
+        btn.classList.toggle('on', activeVas != null && n === activeVas);
       });
       var noteEl = document.getElementById('sessionCheckNote');
       if (noteEl && noteEl !== document.activeElement) {
@@ -9284,10 +9346,11 @@
       if (!sessionCheckRequiredFieldsReady_(state.sessionCheck)) scheduleSessionCheckAutoSave();
     }
 
-    function setSessionVasRange(rangeKey) {
-      var store = sessionVasStoreValueFromRangeKey_(rangeKey);
-      var currentKey = sessionVasRangeKeyFromValue_(state.sessionCheck.vas);
-      state.sessionCheck.vas = currentKey === rangeKey ? null : store;
+    function setSessionVas(n) {
+      n = Number(n);
+      if (isNaN(n) || n < 1 || n > 10) return;
+      var current = sessionVasScoreFromValue_(state.sessionCheck.vas);
+      state.sessionCheck.vas = current === n ? null : n;
       renderSessionCheckPanel();
       tryCommitSessionCheckSelection_();
       if (!sessionCheckRequiredFieldsReady_(state.sessionCheck)) scheduleSessionCheckAutoSave();
@@ -10018,6 +10081,8 @@
         return String(a).localeCompare(String(b), 'ko');
       }).forEach(function(progName) {
         var progItems = programsInSection[progName];
+        var partSelectAll = selectAllOnPart ||
+          (secKey === 'self_tool' && (progName === '폼롤러' || progName.indexOf('마사지볼') >= 0));
         if (isActiveStretchingProgram(progName)) {
           if (!activeStretchingMainShown) {
             activeStretchingMainShown = true;
@@ -10027,11 +10092,11 @@
           }
         } else if (!useFlatCheckboxRows(progName)) {
           html += renderProgramPartHdHtml_(
-            programCategoryTitle(progName), progItems, hasMember, selectAllOnPart, secKey, progName
+            programCategoryTitle(progName), progItems, hasMember, partSelectAll, secKey, progName
           );
         }
         var cardCls = 'psp-part-card';
-        if (secKey === 'self_tool' && progName.indexOf('마사지볼') >= 0) cardCls += ' horizontal';
+        if (secKey === 'self_tool' && (progName.indexOf('마사지볼') >= 0 || progName === '폼롤러')) cardCls += ' horizontal';
         else if (isP1ParProgram(progName)) cardCls += ' p1-kind-card';
         html += '<div class="' + cardCls + '">';
         progItems.forEach(function(item) {
@@ -12159,9 +12224,8 @@
         renderSessionAlimtalkSection();
         startAttendProcessingCountdown_();
         var panel =
-          document.getElementById('sessionAlimtalkSectionLabel') ||
-          document.getElementById('sessionAttendCountdownBar') ||
-          document.getElementById('sessionAlimtalkSection');
+          document.getElementById('sessionAlimtalkSection') ||
+          document.getElementById('sessionAttendCountdownBar');
         if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else {
         renderSessionAlimtalkSection();
@@ -12568,6 +12632,23 @@
     /** History Taking — 내원 목적(항상) → 목적별 세부 · 통증 → OPQRST */
     function evalHistItem(id, title, hint, options, multi, extra) {
       extra = extra || {};
+      var opts = (options || []).map(function(x) {
+        if (typeof x === 'string') return { id: x, label: x };
+        return {
+          id: x.id || x.label,
+          label: x.label || x.id,
+          note: !!x.note,
+          notePlaceholder: x.notePlaceholder || '',
+        };
+      });
+      if (extra.otherNote) {
+        opts.push({
+          id: '기타',
+          label: '기타',
+          note: true,
+          notePlaceholder: extra.otherPlaceholder || '기타 내용을 적어 주세요',
+        });
+      }
       return {
         id: id,
         title: title || '',
@@ -12575,9 +12656,7 @@
         multi: multi !== false,
         bodyDropdowns: !!extra.bodyDropdowns,
         areaSecId: extra.areaSecId || (id + '_area'),
-        options: (options || []).map(function(x) {
-          return typeof x === 'string' ? { id: x, label: x } : x;
-        }),
+        options: opts,
       };
     }
 
@@ -12590,22 +12669,21 @@
         ], true),
       ],
       extraId: 'evalInspectionExtra',
-      extraPlaceholder: '그 외 inspection 소견',
+      extraPlaceholder: '세부 사항',
     };
 
     var EVAL_MOVEMENT_SECTION = {
       title: 'Movement Test',
       items: [
-        evalHistItem('mov_region', '제한·불편 부위', '다중 선택', [
-          '목', '어깨', '등·흉추', '허리·요추', '골반·고관절', '하체·무릎·발목',
+        evalHistItem('mov_region', '문제 포인트', '', [
+          '코어', '목', '어깨', '등·흉추', '허리·요추', '골반·고관절', '하체·무릎·발목',
         ], true),
         evalHistItem('mov_pattern', '문제 동작·상황', '', [
-          '굴곡 시 불편', '신전·뒤로 젖힘 불편', '회전·비틀기 불편',
-          '오래 같은 자세', '기상·아침에 심함', '활동·운동 후 악화',
+          '가동성 저하', '굴곡 시 불편', '신전·뒤로 젖힘 불편', '회전·비틀기 불편',
         ], true),
       ],
       extraId: 'evalMovementExtra',
-      extraPlaceholder: '그 외 movement test 소견',
+      extraPlaceholder: '세부 사항',
     };
 
     var EVAL_PALPATION_SECTION = {
@@ -12615,11 +12693,11 @@
           '목', '어깨', '상지', '등', '허리', '골반', '하지',
         ], true),
         evalHistItem('palp_quality', '촉진 소견', '', [
-          '근긴장·뭉침', '트리거 포인트', '부종·열감', 'ROM 제한', '특이 소견 없음',
+          '근막 점착', '근 긴장', '관절 제한', '부종', '열감', 'ROM 제한',
         ], true),
       ],
       extraId: 'evalPalpationExtra',
-      extraPlaceholder: '그 외 palpation 소견',
+      extraPlaceholder: '세부 사항',
     };
 
     var EVAL_HISTORY_GROUPS = (function () {
@@ -12661,7 +12739,9 @@
           groupTag: '[자세]',
           items: [
             evalHistItem('posture_focus', '우선 교정 부위', '', [
-              '거북목·목', '굽은 어깨·등', '골반·허리', '전신 균형·체형',
+              '거북목·목', '굽은 어깨·등', '어깨 비대칭', '척추 측만',
+              '허리 전만', '골반 틀어짐', '골반·허리', '무릎·다리 정렬',
+              '전신 균형·체형',
             ], true),
             evalHistItem('posture_life', '생활 패턴', '', [
               '장시간 책상·PC', '스마트폰·목 사용', '서서 일함', '운전·반복 동작',
@@ -12722,26 +12802,29 @@
               '정확히 짚음 (국소)', '애매·넓은 범위 (방사·연관 의심)',
             ], true, { bodyDropdowns: true, areaSecId: 'cc_area' }),
             evalHistItem('onset', 'O — Onset', '', [
-              '2주 미만', '2주 이상', '외상·사건 있음', '외상 없음 → 자세·습관 의심',
-            ], true),
+              '2주 미만', '2주 이상',
+              { label: '외상·사건 있음', note: true, notePlaceholder: '어떤 사건인지 적어 주세요' },
+              '외상 없음 → 자세·습관 의심',
+            ], true, { otherNote: true }),
             evalHistItem('provocation', 'P — Provocation', '', [
-              '힘 쓸 때 악화', '패시브 늘릴 때 악화', '특정 자세·동작', '안정 시에도',
-            ], true),
+              { label: '특정 자세·동작', note: true, notePlaceholder: '어떤 자세·동작인지 적어 주세요' },
+              '힘 쓸 때 악화',
+              '늘릴 때 악화',
+              '안정 시에도',
+            ], true, { otherNote: true }),
             evalHistItem('palliation', 'P — Palliation', '', [
               '쉬면 나아짐', '움직이면 나아짐', '열에 좋아짐', '냉에 좋아짐',
-            ], true),
+            ], true, { otherNote: true }),
             evalHistItem('quality', 'Q — Quality', '', [
               '뻐근', '당김', '날카로움', '욱씬', '찢어지는', '전기', '저림',
-            ], true),
+            ], true, { otherNote: true }),
             evalHistItem('region', 'R — Region / Radiation', '', [
               '국소·한 부위', '경로를 따라 방사', '여러 부위',
-            ], true),
-            evalHistItem('severity', 'S — Severity', '', [
-              'VAS 0~3 경증', 'VAS 4~6 중등도', 'VAS 7~10 중증',
-            ], true),
+            ], true, { otherNote: true }),
+            evalHistItem('severity', 'S — Severity', '', SESSION_VAS_SCORES.map(String), false, { otherNote: true }),
             evalHistItem('timing', 'T — Timing', '', [
               '쉬면 나아짐', '특정 자세·시간대 악화', '아침에 심함', '안정 시에도 지속',
-            ], true),
+            ], true, { otherNote: true }),
           ],
         },
         { isMemo: true, title: '그 외 사항', step: '✎', stepClass: 'memo', showWhenAnyGoal: true },
@@ -12776,6 +12859,23 @@
       });
     }
 
+    function evalBodyAreaSideSecId_(areaSecId) {
+      return String(areaSecId || '') + '_side';
+    }
+
+    function renderEvalBodyAreaSideChipsHtml_(areaSecId) {
+      var sideSec = evalBodyAreaSideSecId_(areaSecId);
+      var html = '<div class="eval-body-area-sides">';
+      SESSION_DISCOMFORT_AREAS.forEach(function (opt) {
+        if (!isSessionSideModifierId_(opt.id)) return;
+        html += '<button type="button" class="eval-hist-chip" data-sec="' + escapeHtml(sideSec) + '"' +
+          ' data-val="' + escapeHtml(opt.label) + '" onclick="toggleEvalHistChip(this)">' +
+          escapeHtml(opt.label) + '</button>';
+      });
+      html += '</div>';
+      return html;
+    }
+
     function getEvalHistoryChipSections() {
       var flat = [];
       EVAL_HISTORY_GROUPS.forEach(function (grp) {
@@ -12790,6 +12890,17 @@
             groupTitle: grp.title || '',
             groupSub: grp.sub || '',
           });
+          if (sec.bodyDropdowns && sec.areaSecId) {
+            flat.push({
+              id: evalBodyAreaSideSecId_(sec.areaSecId),
+              title: '',
+              multi: false,
+              groupStep: grp.step,
+              groupTag: grp.groupTag || '',
+              groupTitle: grp.title || '',
+              groupSub: grp.sub || '',
+            });
+          }
         });
       });
       [EVAL_INSPECTION_SECTION, EVAL_MOVEMENT_SECTION, EVAL_PALPATION_SECTION].forEach(function(block) {
@@ -12852,8 +12963,14 @@
             secId: sec.areaSecId,
             onChange: 'onEvalBodyAreaDropdown_(this)',
             getSelected: function () { return ''; },
-          })
+          }) + renderEvalBodyAreaSideChipsHtml_(sec.areaSecId)
         : '';
+      var notesHtml = (sec.options || []).filter(function (opt) { return opt.note; }).map(function (opt) {
+        return '<textarea class="eval-hist-note eval-hist-chip-note" rows="2" hidden' +
+          ' data-sec="' + escapeHtml(sec.id) + '" data-opt="' + escapeHtml(opt.label) + '"' +
+          ' placeholder="' + escapeHtml(opt.notePlaceholder || '내용을 적어 주세요') + '"' +
+          '></textarea>';
+      }).join('');
       var titleHtml = sec.title
         ? '<div class="eval-hist-subtitle">' + escapeHtml(sec.title) + '</div>'
         : '';
@@ -12861,7 +12978,8 @@
         '<div class="eval-hist-subrow" data-sec-id="' + escapeHtml(sec.id) + '">' +
           titleHtml +
           (sec.hint ? '<p class="eval-hist-hint">' + escapeHtml(sec.hint) + '</p>' : '') +
-          '<div class="eval-hist-chips">' + chips + '</div>' +
+          '<div class="eval-hist-chips' + (sec.id === 'severity' ? ' eval-hist-chips--vas' : '') + '">' + chips + '</div>' +
+          notesHtml +
           dropdownHtml +
         '</div>'
       );
@@ -12900,11 +13018,66 @@
       if (!root || !section) return;
       root.innerHTML =
         (section.items || []).map(renderEvalHistoryChipRow).join('') +
-        '<div class="eval-hist-subrow eval-hist-memo-block" style="margin-top:8px;">' +
-          '<div class="eval-hist-subtitle">그 외 사항</div>' +
-          '<textarea id="' + escapeHtml(section.extraId) + '" class="eval-hist-note eval-hist-extra" rows="2" placeholder="' +
-          escapeHtml(section.extraPlaceholder || '그 외 사항') + '"></textarea>' +
+        '<div class="eval-hist-subrow eval-exam-details">' +
+          '<div class="eval-hist-subtitle">세부 사항</div>' +
+          '<div class="eval-exam-details-body" id="' + escapeHtml(evalExamDetailsRootId_(section)) + '"></div>' +
         '</div>';
+      renderEvalExamDetails_(section);
+    }
+
+    function evalExamDetailsRootId_(section) {
+      return String(section && section.extraId ? section.extraId : 'evalExam') + 'Details';
+    }
+
+    var _evalExamDetailNotes = {};
+
+    function evalExamBlocks_() {
+      return [EVAL_INSPECTION_SECTION, EVAL_MOVEMENT_SECTION, EVAL_PALPATION_SECTION];
+    }
+
+    function collectEvalExamDetailNotes_(section) {
+      if (!section || !section.extraId) return;
+      if (!_evalExamDetailNotes[section.extraId]) _evalExamDetailNotes[section.extraId] = {};
+      var root = document.getElementById(evalExamDetailsRootId_(section));
+      if (!root) return;
+      root.querySelectorAll('.eval-exam-detail-input').forEach(function (inp) {
+        var val = inp.getAttribute('data-opt') || '';
+        if (!val) return;
+        _evalExamDetailNotes[section.extraId][val] = String(inp.value || '');
+      });
+    }
+
+    function renderEvalExamDetails_(section) {
+      if (!section) return;
+      collectEvalExamDetailNotes_(section);
+      var root = document.getElementById(evalExamDetailsRootId_(section));
+      if (!root) return;
+      var notes = _evalExamDetailNotes[section.extraId] || {};
+      var selected = [];
+      (section.items || []).forEach(function (sec) {
+        evalChipSelectionsForSec(sec.id).forEach(function (val) {
+          if (selected.indexOf(val) < 0) selected.push(val);
+        });
+      });
+      if (!selected.length) {
+        root.innerHTML = '<div class="eval-exam-details-empty">선택한 항목이 여기에 표시됩니다</div>';
+        return;
+      }
+      root.innerHTML = selected.map(function (val) {
+        var note = notes[val] || '';
+        return '<div class="eval-exam-detail-row">' +
+          '<div class="eval-exam-detail-label">' + escapeHtml(val) + '</div>' +
+          '<input type="text" class="eval-exam-detail-input" data-opt="' + escapeHtml(val) + '"' +
+            ' placeholder="세부 사항" value="' + escapeHtml(note) + '">' +
+        '</div>';
+      }).join('');
+    }
+
+    function refreshEvalExamDetailsForSec_(secId) {
+      evalExamBlocks_().forEach(function (block) {
+        var hit = (block.items || []).some(function (it) { return it.id === secId; });
+        if (hit) renderEvalExamDetails_(block);
+      });
     }
 
     function clearEvalFormSelections_() {
@@ -12913,9 +13086,15 @@
         sel.value = '';
         sel.classList.remove('has-value');
       });
-      ['evalHistoryExtraMemo', 'evalInspectionExtra', 'evalMovementExtra', 'evalPalpationExtra', 'evalMemo'].forEach(function (id) {
+      ['evalHistoryExtraMemo', 'evalMemo'].forEach(function (id) {
         var el = document.getElementById(id);
         if (el) el.value = '';
+      });
+      _evalExamDetailNotes = {};
+      evalExamBlocks_().forEach(function (block) { renderEvalExamDetails_(block); });
+      document.querySelectorAll('.eval-hist-chip-note').forEach(function (ta) {
+        ta.value = '';
+        ta.hidden = true;
       });
       var panel = document.getElementById('evalWellnessPrefillPanel');
       if (panel) panel.hidden = true;
@@ -12952,6 +13131,8 @@
         });
       });
       updateEvalFormVisibility();
+      updateEvalChipNotesVisibility_();
+      evalExamBlocks_().forEach(function (block) { renderEvalExamDetails_(block); });
       return applied;
     }
 
@@ -13054,14 +13235,37 @@
         });
       }
       var on = btn.classList.toggle('on');
+      var isOther = (btn.dataset.val || btn.textContent.trim()) === '기타';
       if ((sec && sec.multi === false) || (grpItem && grpItem.multi === false)) {
-        if (on) {
+        if (on && !isOther) {
           document.querySelectorAll('.eval-hist-chip[data-sec="' + secId + '"].on').forEach(function (el) {
-            if (el !== btn) el.classList.remove('on');
+            if (el !== btn && (el.dataset.val || el.textContent.trim()) !== '기타') el.classList.remove('on');
           });
         }
       }
       if (secId === 'goal') updateEvalFormVisibility();
+      updateEvalChipNotesVisibility_(secId);
+      refreshEvalExamDetailsForSec_(secId);
+    }
+
+    function updateEvalChipNotesVisibility_(secId) {
+      document.querySelectorAll('.eval-hist-chip-note').forEach(function (ta) {
+        if (secId && ta.getAttribute('data-sec') !== secId) return;
+        var optVal = ta.getAttribute('data-opt') || '';
+        var on = false;
+        document.querySelectorAll('.eval-hist-chip[data-sec="' + ta.getAttribute('data-sec') + '"].on').forEach(function (btn) {
+          if ((btn.dataset.val || btn.textContent.trim()) === optVal) on = true;
+        });
+        ta.hidden = !on;
+      });
+    }
+
+    function evalChipNoteText_(secId, optVal) {
+      var note = '';
+      document.querySelectorAll('.eval-hist-chip-note[data-sec="' + secId + '"]').forEach(function (ta) {
+        if (ta.getAttribute('data-opt') === optVal) note = String(ta.value || '').trim();
+      });
+      return note;
     }
 
     function evalChipSelectionsForSec(secId) {
@@ -13080,10 +13284,20 @@
         if (!evalGroupShouldShow(grp, goalIds)) return;
         var rows = [];
         (grp.items || []).forEach(function (sec) {
-          var selected = evalChipSelectionsForSec(sec.id);
+          var selected = evalChipSelectionsForSec(sec.id).map(function (val) {
+            var note = evalChipNoteText_(sec.id, val);
+            return note ? val + ' (' + note + ')' : val;
+          });
           if (sec.bodyDropdowns && sec.areaSecId) {
             var areaSelected = evalDropdownSelectionsForSec(sec.areaSecId);
-            if (areaSelected.length) selected = selected.concat(areaSelected);
+            var side = (evalChipSelectionsForSec(evalBodyAreaSideSecId_(sec.areaSecId))[0] || '');
+            if (areaSelected.length) {
+              selected = selected.concat(areaSelected.map(function (a) {
+                return side ? side + ' ' + a : a;
+              }));
+            } else if (side) {
+              selected = selected.concat([side]);
+            }
           }
           if (!selected.length) return;
           if (sec.title) rows.push('  · ' + sec.title + ': ' + selected.join(' / '));
@@ -13108,16 +13322,18 @@
 
     function compileEvalExamText(section) {
       if (!section) return '';
+      collectEvalExamDetailNotes_(section);
+      var notes = _evalExamDetailNotes[section.extraId] || {};
       var lines = [];
       (section.items || []).forEach(function (sec) {
-        var selected = evalChipSelectionsForSec(sec.id);
+        var selected = evalChipSelectionsForSec(sec.id).map(function (val) {
+          var note = String(notes[val] || '').trim();
+          return note ? val + ' (' + note + ')' : val;
+        });
         if (!selected.length) return;
         if (sec.title) lines.push(sec.title + ': ' + selected.join(' / '));
         else lines.push(selected.join(' / '));
       });
-      var extraEl = document.getElementById(section.extraId);
-      var extraText = extraEl ? String(extraEl.value || '').trim() : '';
-      if (extraText) lines.push('그 외: ' + extraText);
       return lines.join('\n').trim();
     }
 
@@ -13181,6 +13397,63 @@
       return patterns.some(function (re) { return re.test(text); });
     }
 
+    function evalSeverityScore_(histState) {
+      var list = (histState && histState.severity) || [];
+      var text = list.join(' ');
+      if (/중증|7\s*~\s*10/.test(text)) return 8;
+      if (/중등도|4\s*~\s*6/.test(text)) return 5;
+      if (/경증|0\s*~\s*3/.test(text)) return 2;
+      var n = null;
+      list.forEach(function (v) {
+        var m = String(v || '').match(/\b(10|[1-9])\b/);
+        if (m && n == null) n = parseInt(m[1], 10);
+      });
+      return n;
+    }
+
+    var EVAL_REAL_MOVEMENT_STAGES = [
+      {
+        num: 1,
+        title: '패시브 스트레칭 / 셀프 통증 케어',
+        short: '패시브 스트레칭',
+        sub: '셀프 통증 케어',
+        desc: '굳은 근육·관절을 안전하게 풀고, 스스로 통증을 관리하는 단계입니다.',
+      },
+      {
+        num: 2,
+        title: '생활 습관 및 자세 교정 운동',
+        short: '생활습관·자세 교정',
+        sub: '자세 교정 운동',
+        desc: '같은 문제가 반복되지 않도록 일상 습관과 자세를 바꿉니다.',
+      },
+      {
+        num: 3,
+        title: '기초 체력 및 기능 운동',
+        short: '기초 체력·기능',
+        sub: '기능 운동',
+        desc: '기초 체력을 키우고, 균형 있게 움직이는 힘을 만듭니다.',
+      },
+    ];
+
+    var EVAL_POSITION_FLOW = [
+      { num: 1, title: '누운 자세', sub: '가장 안전한 시작' },
+      { num: 2, title: '앉은 자세', sub: '일상 정렬' },
+      { num: 3, title: '선 자세', sub: '균형·기능' },
+    ];
+
+    function evalNeedsMedicalParallel_(histState) {
+      var vas = evalSeverityScore_(histState);
+      var warningQuality = histHasAny(histState, 'quality', [/날카|찢어|욱씬|전기|저림|이상감각/]);
+      return (vas != null && vas >= 4) || warningQuality;
+    }
+
+    function evalMedicalKind_(histState) {
+      var vas = evalSeverityScore_(histState);
+      if (!evalNeedsMedicalParallel_(histState)) return '';
+      if (vas != null && vas >= 7) return 'invasive';
+      return 'manual';
+    }
+
     function computeEvalProgramRecommendation(histState) {
       histState = histState || gatherEvalHistoryState();
       var goalId = 'posture';
@@ -13194,40 +13467,51 @@
         goalId = 'posture';
       }
 
-      var careStep = 'active';
-      if (histHasAny(histState, 'severity', [/7~10|중증/])) careStep = 'invasive';
-      else if (histHasAny(histState, 'severity', [/4~6|중등도/])) careStep = 'manual';
-      else if (histHasAny(histState, 'quality', [/전기|날카로움|찢어|욱씬/])) careStep = 'manual';
-      else if (histHasAny(histState, 'goal', [/통증/]) && careStep === 'active') careStep = 'manual';
-      else if (goalId === 'stretch' || goalId === 'prevention') careStep = 'pstr';
-      else if (goalId === 'fitness') {
-        careStep = histHasAny(histState, 'severity', [/0~3|경증/]) ? 'aa' : 'resistive';
-      } else if (goalId === 'face') careStep = 'manual';
+      var needsMedical = evalNeedsMedicalParallel_(histState);
+      var medicalKind = evalMedicalKind_(histState);
 
-      var movementStage = 2;
-      if (careStep === 'invasive' || careStep === 'manual') movementStage = 1;
-      else if (careStep === 'pstr') movementStage = 2;
-      else if (careStep === 'aa') movementStage = 3;
-      else if (careStep === 'active') movementStage = goalId === 'posture' ? 3 : 2;
-      else if (careStep === 'resistive') movementStage = 5;
-      if (goalId === 'fitness' && movementStage < 4) movementStage = 4;
-      if (goalId === 'prevention' && movementStage > 2) movementStage = 2;
+      var movementStage = 1;
+      if (needsMedical || goalId === 'stretch' || goalId === 'prevention' || histHasAny(histState, 'goal', [/통증/])) {
+        movementStage = 1;
+      } else if (goalId === 'fitness') {
+        movementStage = 3;
+      } else {
+        movementStage = 2;
+      }
 
-      var program = WELLNESS_PROGRAM_CATALOG[goalId] || WELLNESS_PROGRAM_CATALOG.posture;
-      var stageInfo = PROGRAM_STAGES.find(function (s) { return s.num === movementStage; }) || PROGRAM_STAGES[1];
-      var careIdx = EVAL_CARE_PATH_STEPS.findIndex(function (s) { return s.id === careStep; });
+      var stageInfo = EVAL_REAL_MOVEMENT_STAGES[movementStage - 1] || EVAL_REAL_MOVEMENT_STAGES[0];
+      var careSteps = ['pstr'];
+      if (medicalKind) careSteps.unshift(medicalKind);
+      var careLabels = careSteps.map(function (id) {
+        var found = EVAL_CARE_PATH_STEPS.find(function (s) { return s.id === id; });
+        return found ? found.label : id;
+      });
+
+      var extra = '';
+      if (needsMedical) {
+        extra = '통증 정도나 양상(날카로움·이상감각 등)을 보면 주사·보존 치료가 필요할 수 있어, 전문 의료 또는 비침습 치료를 병행하는 것이 좋습니다. 이와 함께 안전한 패시브 스트레칭은 항상 진행합니다.';
+      }
+      var positionNote = '이후 운동은 안전하게 누운 자세에서 시작하고, 앉은 자세 → 선 자세 순으로 진행합니다.';
+      var programDesc = [stageInfo.desc, extra, positionNote].filter(Boolean).join(' ');
 
       return {
         goalId: goalId,
-        programName: program.name,
-        programDesc: program.desc,
-        programNext: program.next,
-        careStep: careStep,
-        careStepLabel: (EVAL_CARE_PATH_STEPS[careIdx] || EVAL_CARE_PATH_STEPS[4]).label,
+        programName: movementStage + '단계 · ' + stageInfo.title,
+        programDesc: programDesc,
+        programNext: positionNote,
+        needsMedicalParallel: needsMedical,
+        medicalKind: medicalKind,
+        careSteps: careSteps,
+        careStep: medicalKind || 'pstr',
+        careStepLabel: careLabels.join(' + '),
         movementStage: movementStage,
         movementStageTitle: stageInfo.title,
-        movementStageAlimtalk: stageInfo.alimtalkLabel || stageInfo.title,
-        summaryLine: program.name + ' · Re:Al ' + movementStage + '단계(' + stageInfo.title + ') · ' + (EVAL_CARE_PATH_STEPS[careIdx] || {}).label,
+        movementStageAlimtalk: stageInfo.short,
+        consultNote: needsMedical
+          ? '병원 치료와 안전한 패시브 스트레칭을 함께 하는 것이 좋겠습니다.'
+          : '',
+        alwaysIncludePstr: true,
+        summaryLine: 'Re:Al ' + movementStage + '단계 · ' + stageInfo.title + (needsMedical ? ' · 의료 병행' : ''),
       };
     }
 
@@ -13238,25 +13522,38 @@
         root.innerHTML = '';
         return;
       }
-      var stagesHtml = PROGRAM_STAGES.map(function (st) {
+      var stageNum = Math.min(3, Math.max(1, Number(rec.movementStage) || 1));
+      var stagesHtml = EVAL_REAL_MOVEMENT_STAGES.map(function (st) {
         var cls = 'eval-rec-stage';
-        if (st.num === rec.movementStage) cls += ' recommended';
-        else if (st.num < rec.movementStage) cls += ' prior';
+        var badge = '';
+        if (st.num === 1) {
+          cls += ' always';
+          badge = '<div class="badge">항상 권장</div>';
+        }
+        if (st.num === stageNum) {
+          cls += ' recommended';
+          badge = '<div class="badge">지금 필요</div>';
+        } else if (st.num < stageNum) {
+          cls += ' prior';
+        }
         return (
           '<div class="' + cls + '">' +
             '<div class="sn">' + st.num + '</div>' +
-            '<div class="st">' + escapeHtml(st.title) + '</div>' +
-            '<div class="sk">' + escapeHtml(st.alimtalkLabel || st.titleEn || '') + '</div>' +
+            '<div class="st">' + escapeHtml(st.short) + '</div>' +
+            '<div class="sk">' + escapeHtml(st.sub) + '</div>' +
+            badge +
           '</div>'
         );
       }).join('');
 
-      var careIdx = EVAL_CARE_PATH_STEPS.findIndex(function (s) { return s.id === rec.careStep; });
-      if (careIdx < 0) careIdx = 3;
-      var careHtml = EVAL_CARE_PATH_STEPS.map(function (step, i) {
+      var careOn = rec.careSteps && rec.careSteps.length
+        ? rec.careSteps
+        : [rec.careStep || 'pstr'];
+      var careHtml = EVAL_CARE_PATH_STEPS.map(function (step) {
         var cls = 'eval-rec-care-node';
-        if (i === careIdx) cls += ' on';
-        else if (i < careIdx) cls += ' past';
+        if (careOn.indexOf(step.id) >= 0) {
+          cls += step.id === 'pstr' ? ' on-pstr' : ' on';
+        }
         return (
           '<div class="' + cls + '">' +
             '<div class="dot">' + escapeHtml(step.short) + '</div>' +
@@ -13265,22 +13562,42 @@
         );
       }).join('');
 
+      var posHtml = EVAL_POSITION_FLOW.map(function (pos, i) {
+        var cls = 'eval-rec-pos' + (i === 0 ? ' start' : '');
+        var arrow = i < EVAL_POSITION_FLOW.length - 1 ? '<div class="eval-rec-pos-arrow" aria-hidden="true">→</div>' : '';
+        return (
+          '<div class="' + cls + '">' +
+            '<div class="pn">' + pos.num + '</div>' +
+            '<div class="pt">' + escapeHtml(pos.title) + '</div>' +
+            '<div class="ps">' + escapeHtml(pos.sub) + '</div>' +
+          '</div>' + arrow
+        );
+      }).join('');
+
+      var consultHtml = rec.consultNote
+        ? '<div class="eval-rec-consult"><strong>상담 포인트</strong> — ' + escapeHtml(rec.consultNote) + '</div>'
+        : '';
+
       root.innerHTML =
         '<div class="eval-rec-panel">' +
           '<div class="eval-rec-hero">' +
-            '<div class="rec-tag">맞춤 프로그램 추천</div>' +
+            '<div class="rec-tag">리얼 무브먼트 프로그램 추천</div>' +
             '<div class="rec-name">' + escapeHtml(rec.programName) + '</div>' +
             '<div class="rec-desc">' + escapeHtml(rec.programDesc) + '</div>' +
           '</div>' +
+          consultHtml +
           '<div class="eval-rec-block">' +
-            '<div class="eval-rec-block-title">Real Movement 5단계 — 현재 추천 · ' + rec.movementStage + '단계</div>' +
+            '<div class="eval-rec-block-title">Re:Al Movement 3단계 — 현재 필요 · ' + stageNum + '단계</div>' +
             '<div class="eval-rec-stages">' + stagesHtml + '</div>' +
           '</div>' +
           '<div class="eval-rec-block">' +
-            '<div class="eval-rec-block-title">관리 로드맵 (PAR) — 현재 · ' + escapeHtml(rec.careStepLabel) + '</div>' +
+            '<div class="eval-rec-block-title">운동 진행 순서 — 누운 자세에서 안전하게 시작</div>' +
+            '<div class="eval-rec-posflow">' + posHtml + '</div>' +
+          '</div>' +
+          '<div class="eval-rec-block">' +
+            '<div class="eval-rec-block-title">관리 로드맵 (PAR) — ' + escapeHtml(rec.careStepLabel || '') + '</div>' +
             '<div class="eval-rec-care"><div class="eval-rec-care-track">' + careHtml + '</div></div>' +
           '</div>' +
-          '<div class="eval-rec-next"><strong>다음 방향</strong> — ' + escapeHtml(rec.programNext) + '</div>' +
         '</div>';
     }
 
@@ -13306,8 +13623,7 @@
     }
 
     function isEvalSubmitInProgress_() {
-      var btn = document.getElementById('evalSubmitBtn');
-      return !!(btn && btn.disabled && _evalSubmitCountdownStartedAt);
+      return !!_evalSaveInFlight;
     }
 
     function openEvalLeaveModal_() {
@@ -13336,7 +13652,7 @@
 
     function requestCloseEvalModal() {
       if (isEvalSubmitInProgress_()) {
-        toast('AI 리포트 생성 중입니다. 완료될 때까지 기다려 주세요.');
+        closeEvalModal();
         return;
       }
       if (!isEvalFormDirty_()) {
@@ -13347,6 +13663,9 @@
     }
 
     async function openEvalModal() {
+      if (_evalSaveInFlight) {
+        toast('이전 저장이 진행 중입니다. 회원 선택 화면에서 남은 시간을 확인할 수 있어요.');
+      }
       const info = evalMemberInfo();
       if (!info.name || info.phone.length < 10) {
         toast('회원을 먼저 선택해 주세요');
@@ -13486,31 +13805,36 @@
     }
 
     async function saveEvalToMemberBrief() {
+      if (_evalSaveInFlight) { toast('이미 저장이 진행 중입니다'); return; }
       const info = evalMemberInfo();
       const m = state.selected;
       if (!m || info.phone.length < 10) { toast('회원을 선택해 주세요'); return; }
-      const btn = document.getElementById('evalSaveBtn');
-      if (btn) btn.disabled = true;
+      var payload = {
+        action: 'instructorSaveFirstEvalBrief',
+        phone: info.phone,
+        name: info.name,
+        suffix8: m.suffix8,
+      };
+      beginEvalBackgroundSave_({
+        estSec: EVAL_BRIEF_SAVE_EST_SEC,
+        label: '회원정보 저장 중',
+      });
       try {
-        const data = await api({
-          action: 'instructorSaveFirstEvalBrief',
-          phone: info.phone,
-          name: info.name,
-          suffix8: m.suffix8,
-        });
+        const data = await api(payload, { timeoutMs: 30000 });
         if (!data.ok) {
           toast(data.message || '저장 실패');
           return;
         }
         const brief = String(data.memberBriefNotes || data.conciseBrief || state.evalConciseBrief || '').trim();
         state.evalConciseBrief = brief;
-        applyFirstEvalBriefToMemberUi_(m, brief, { forceSessionNote: true });
+        applyFirstEvalBriefToMemberUi_(m, brief, {
+          forceSessionNote: !!(state.selected && state.selected === m),
+        });
         toast('회원 정보에 저장되었습니다');
-        closeEvalModal();
       } catch (e) {
         toast('저장 중 오류가 발생했습니다.');
       } finally {
-        if (btn) btn.disabled = false;
+        endEvalBackgroundSave_();
       }
     }
 
@@ -13571,9 +13895,21 @@
 
     /** AI 리포트 생성(Claude + 시트 저장) 예상 소요 — UI 카운트다운용 */
     var EVAL_AI_REPORT_EST_SEC = 45;
+    var EVAL_BRIEF_SAVE_EST_SEC = 12;
     var EVAL_AI_REPORT_TIMEOUT_MS = 120000;
     var _evalSubmitCountdownTimer = null;
     var _evalSubmitCountdownStartedAt = 0;
+    var _evalSaveInFlight = false;
+    var _evalSaveCountdownLabel = '저장 중';
+    var _evalSaveCountdownEstSec = EVAL_AI_REPORT_EST_SEC;
+
+    function evalSaveProgressEls_() {
+      return {
+        bar: document.getElementById('evalSaveProgressBar'),
+        statusEl: document.getElementById('evalSubmitStatus'),
+        btn: document.getElementById('evalSubmitBtn'),
+      };
+    }
 
     function stopEvalSubmitCountdown_() {
       if (_evalSubmitCountdownTimer) {
@@ -13581,49 +13917,55 @@
         _evalSubmitCountdownTimer = null;
       }
       _evalSubmitCountdownStartedAt = 0;
-      var statusEl = document.getElementById('evalSubmitStatus');
-      if (statusEl) {
-        statusEl.hidden = true;
-        statusEl.classList.remove('is-over');
-        statusEl.textContent = '';
+      var els = evalSaveProgressEls_();
+      if (els.statusEl) {
+        els.statusEl.hidden = true;
+        els.statusEl.classList.remove('is-over');
+        els.statusEl.textContent = '';
       }
-      var btn = document.getElementById('evalSubmitBtn');
-      if (btn && btn.dataset.idleLabel) {
-        btn.textContent = btn.dataset.idleLabel;
-        delete btn.dataset.idleLabel;
+      if (els.bar) {
+        els.bar.hidden = true;
+        els.bar.classList.remove('is-over');
+        els.bar.textContent = '';
+      }
+      if (els.btn && els.btn.dataset.idleLabel) {
+        els.btn.textContent = els.btn.dataset.idleLabel;
+        delete els.btn.dataset.idleLabel;
+        els.btn.disabled = false;
       }
     }
 
     function paintEvalSubmitCountdown_() {
       if (!_evalSubmitCountdownStartedAt) return;
-      var statusEl = document.getElementById('evalSubmitStatus');
-      var btn = document.getElementById('evalSubmitBtn');
-      if (!statusEl) return;
-      var est = EVAL_AI_REPORT_EST_SEC;
+      var els = evalSaveProgressEls_();
+      var est = _evalSaveCountdownEstSec || EVAL_AI_REPORT_EST_SEC;
       var elapsed = Math.floor((Date.now() - _evalSubmitCountdownStartedAt) / 1000);
       var left = Math.max(0, est - elapsed);
-      statusEl.hidden = false;
-      if (left > 0) {
-        statusEl.classList.remove('is-over');
-        statusEl.innerHTML =
-          'AI 리포트 작성 중… <span class="eval-countdown">예상 ' +
-          est +
-          '초 · ' +
-          left +
-          '초 남음</span>';
-        if (btn) btn.textContent = 'AI 리포트 생성 중… (' + left + '초)';
-      } else {
-        statusEl.classList.add('is-over');
-        statusEl.innerHTML =
-          'AI 리포트 작성 중… <span class="eval-countdown">예상 ' +
-          est +
-          '초 · 조금 더 걸리고 있어요</span>';
-        if (btn) btn.textContent = 'AI 리포트 생성 중…';
+      var label = _evalSaveCountdownLabel || '저장 중';
+      var html = left > 0
+        ? escapeHtml(label) + '… <span class="eval-countdown">예상 ' + est + '초 · ' + left + '초 남음</span>'
+        : escapeHtml(label) + '… <span class="eval-countdown">예상 ' + est + '초 · 조금 더 걸리고 있어요</span>';
+      if (els.bar) {
+        els.bar.hidden = false;
+        els.bar.classList.toggle('is-over', left <= 0);
+        els.bar.innerHTML = html;
+      }
+      if (els.statusEl) {
+        els.statusEl.hidden = false;
+        els.statusEl.classList.toggle('is-over', left <= 0);
+        els.statusEl.innerHTML = html;
+      }
+      if (els.btn) {
+        els.btn.disabled = true;
+        els.btn.textContent = left > 0 ? (label + '… (' + left + '초)') : (label + '…');
       }
     }
 
-    function startEvalSubmitCountdown_() {
+    function startEvalSubmitCountdown_(opts) {
+      opts = opts || {};
       stopEvalSubmitCountdown_();
+      _evalSaveCountdownLabel = opts.label || '저장 중';
+      _evalSaveCountdownEstSec = opts.estSec || EVAL_AI_REPORT_EST_SEC;
       var btn = document.getElementById('evalSubmitBtn');
       if (btn && !btn.dataset.idleLabel) {
         btn.dataset.idleLabel = btn.textContent || 'AI 리포트 생성 · 저장';
@@ -13633,26 +13975,44 @@
       _evalSubmitCountdownTimer = setInterval(paintEvalSubmitCountdown_, 1000);
     }
 
+    function beginEvalBackgroundSave_(opts) {
+      _evalSaveInFlight = true;
+      markEvalFormClean_();
+      startEvalSubmitCountdown_(opts);
+      closeEvalModal();
+      clearSelectedMember_();
+    }
+
+    function endEvalBackgroundSave_() {
+      _evalSaveInFlight = false;
+      stopEvalSubmitCountdown_();
+    }
+
     async function submitFirstEval() {
+      if (_evalSaveInFlight) { toast('이미 저장이 진행 중입니다'); return; }
       const info = evalMemberInfo();
+      const member = state.selected;
       if (!info.name || info.phone.length < 10) { toast('회원을 선택해 주세요'); return; }
-      var btn = document.getElementById('evalSubmitBtn');
-      if (btn) btn.disabled = true;
-      startEvalSubmitCountdown_();
-      var programRec = computeEvalProgramRecommendation(gatherEvalHistoryState());
+      var memoEl = document.getElementById('evalMemo');
+      var sendEl = document.getElementById('evalSendMember');
+      var payload = {
+        action: 'submitInstructorFirstEval',
+        name: info.name,
+        phone: info.phone,
+        history: compileEvalHistoryText(),
+        inspection: compileEvalExamText(EVAL_INSPECTION_SECTION),
+        movement: compileEvalExamText(EVAL_MOVEMENT_SECTION),
+        palpation: compileEvalExamText(EVAL_PALPATION_SECTION),
+        memo: memoEl ? String(memoEl.value || '').trim() : '',
+        sendToMember: !!(sendEl && sendEl.checked),
+        programRecommendation: computeEvalProgramRecommendation(gatherEvalHistoryState()),
+      };
+      beginEvalBackgroundSave_({
+        estSec: EVAL_AI_REPORT_EST_SEC,
+        label: 'AI 리포트 저장 중',
+      });
       try {
-        const data = await api({
-          action:'submitInstructorFirstEval', name:info.name, phone:info.phone,
-          history: compileEvalHistoryText(),
-          inspection: compileEvalExamText(EVAL_INSPECTION_SECTION),
-          movement: compileEvalExamText(EVAL_MOVEMENT_SECTION),
-          palpation: compileEvalExamText(EVAL_PALPATION_SECTION),
-          memo: document.getElementById('evalMemo').value.trim(),
-          sendToMember: document.getElementById('evalSendMember').checked,
-          programRecommendation: programRec,
-        }, { timeoutMs: EVAL_AI_REPORT_TIMEOUT_MS });
-        stopEvalSubmitCountdown_();
-        if (btn) btn.disabled = false;
+        const data = await api(payload, { timeoutMs: EVAL_AI_REPORT_TIMEOUT_MS });
         if (data.ok) {
           var msg = '저장 완료';
           if (data.send && data.send.ok) {
@@ -13660,19 +14020,17 @@
           }
           toast(msg);
           var briefAfter = String(data.memberBriefNotes || data.conciseBrief || '').trim();
-          if (state.selected && briefAfter) {
+          if (briefAfter) {
             state.evalConciseBrief = briefAfter;
-            applyFirstEvalBriefToMemberUi_(state.selected, briefAfter, { forceSessionNote: true });
+            applyFirstEvalBriefToMemberUi_(member, briefAfter, {
+              forceSessionNote: !!(state.selected && state.selected === member),
+            });
           }
-          renderEvalProgramRecommendation(data.programRecommendation || programRec);
-          await loadFirstEvalView(info.phone, info.name);
-          markEvalFormClean_();
-          switchEvalTab('evalView', document.querySelector('.eval-tab[data-pane="evalView"]'));
         } else toast(data.message || '실패');
       } catch (err) {
-        stopEvalSubmitCountdown_();
-        if (btn) btn.disabled = false;
         toast((err && err.message) || 'AI 리포트 생성에 실패했습니다.');
+      } finally {
+        endEvalBackgroundSave_();
       }
     }
 
@@ -13695,12 +14053,14 @@
       if (document.visibilityState === 'visible') {
         paintMemberLoadCountdown();
         tickAttendProcessingCountdown_();
+        paintEvalSubmitCountdown_();
         tryAutoSyncBoard();
       }
     });
     window.addEventListener('focus', function() {
       paintMemberLoadCountdown();
       tickAttendProcessingCountdown_();
+      paintEvalSubmitCountdown_();
       tryAutoSyncBoard();
     });
     refreshSectionCollapseDefaults();
