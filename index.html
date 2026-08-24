@@ -1843,14 +1843,25 @@
     .eval-hist-sub { font-size:11px; color:var(--dim); font-weight:600; }
     .eval-hist-subrow + .eval-hist-subrow { margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); }
     .eval-hist-subtitle { font-size:11px; font-weight:800; color:var(--text); margin-bottom:5px; }
+    .eval-hist-optgroup { margin-bottom:8px; }
+    .eval-hist-optgroup:last-child { margin-bottom:0; }
+    .eval-hist-optgroup-label {
+      font-size:10px; font-weight:800; color:#64748b;
+      margin-bottom:4px; letter-spacing:0.04em;
+    }
+    .eval-hist-optgroup .eval-hist-chips { margin-bottom:0; }
+    .eval-mov-pattern-wrap .eval-hist-hint { margin-bottom:0; }
+    .eval-mov-pattern-block + .eval-mov-pattern-block {
+      margin-top:10px; padding-top:10px; border-top:1px dashed var(--border);
+    }
     .eval-exam-details { margin-top:8px; }
     .eval-exam-details-empty { font-size:11px; color:var(--dim); line-height:1.45; }
     .eval-exam-detail-row {
       display:flex; align-items:center; gap:8px; margin-top:6px;
     }
     .eval-exam-detail-label {
-      flex:0 1 auto; max-width:46%; font-size:11px; font-weight:700; color:var(--text);
-      line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      flex:0 1 auto; max-width:52%; font-size:11px; font-weight:700; color:var(--text);
+      line-height:1.35;
     }
     .eval-exam-detail-input {
       flex:1 1 auto; min-width:0; font-size:11px; padding:6px 8px;
@@ -2477,7 +2488,7 @@
             <span class="eval-panel-mark" aria-hidden="true">◎</span>
             <div class="eval-panel-head-text">
               <label>Inspection</label>
-              <p class="eval-panel-desc">자세·관찰 소견 · 다중 선택</p>
+              <p class="eval-panel-desc">부위별 자세·관찰 소견 · 다중 선택</p>
             </div>
           </div>
           <div class="eval-hist-form" id="evalInspectionForm"></div>
@@ -2487,7 +2498,7 @@
             <span class="eval-panel-mark" aria-hidden="true">↻</span>
             <div class="eval-panel-head-text">
               <label>Movement Test</label>
-              <p class="eval-panel-desc">동작·ROM 관련 소견 · 다중 선택</p>
+              <p class="eval-panel-desc">부위를 고른 뒤 문제 동작을 선택 · 다중 선택</p>
             </div>
           </div>
           <div class="eval-hist-form" id="evalMovementForm"></div>
@@ -2497,7 +2508,7 @@
             <span class="eval-panel-mark" aria-hidden="true">⊕</span>
             <div class="eval-panel-head-text">
               <label>Palpation</label>
-              <p class="eval-panel-desc">촉진·압통 소견 · 다중 선택</p>
+              <p class="eval-panel-desc">세부 부위 · 촉진 소견 · 다중 선택</p>
             </div>
           </div>
           <div class="eval-hist-form" id="evalPalpationForm"></div>
@@ -12660,19 +12671,35 @@
     }
 
     /** History Taking — 내원 목적(항상) → 목적별 세부 · 통증 → OPQRST */
+    function evalHistOpt_(x) {
+      if (typeof x === 'string') return { id: x, label: x };
+      return {
+        id: x.id || x.label,
+        label: x.label || x.id,
+        note: !!x.note,
+        notePlaceholder: x.notePlaceholder || '',
+        reportLabel: x.reportLabel || '',
+      };
+    }
+
     function evalHistItem(id, title, hint, options, multi, extra) {
       extra = extra || {};
-      var opts = (options || []).map(function(x) {
-        if (typeof x === 'string') return { id: x, label: x };
-        return {
-          id: x.id || x.label,
-          label: x.label || x.id,
-          note: !!x.note,
-          notePlaceholder: x.notePlaceholder || '',
-        };
+      var groups = [];
+      var flat = [];
+      (options || []).forEach(function(x) {
+        if (x && typeof x === 'object' && x.group && Array.isArray(x.options)) {
+          var gOpts = x.options.map(evalHistOpt_);
+          groups.push({
+            label: x.group,
+            options: gOpts.map(function(o) { return o.label; }),
+          });
+          gOpts.forEach(function(o) { flat.push(o); });
+        } else {
+          flat.push(evalHistOpt_(x));
+        }
       });
       if (extra.otherNote) {
-        opts.push({
+        flat.push({
           id: '기타',
           label: '기타',
           note: true,
@@ -12686,16 +12713,21 @@
         multi: multi !== false,
         bodyDropdowns: !!extra.bodyDropdowns,
         areaSecId: extra.areaSecId || (id + '_area'),
-        options: opts,
+        groups: groups.length ? groups : null,
+        options: flat,
       };
     }
 
     var EVAL_INSPECTION_SECTION = {
       title: 'Inspection',
       items: [
-        evalHistItem('insp_findings', '자세·관찰', '다중 선택', [
-          '거북목·일자목', '굽은 등·라운드 숄더', '허리 전만·요추전만', '어깨 비대칭',
-          '골반 틀어짐·골반 높이 차', '오다리', 'X자 다리', '척추 측만 의심',
+        evalHistItem('insp_findings', '자세·관찰', '부위별 다중 선택', [
+          { group: '목', options: ['거북목', '일자목'] },
+          { group: '어깨', options: ['라운드 숄더', '어깨 비대칭'] },
+          { group: '등', options: ['굽은 등', '척추 측만 의심'] },
+          { group: '허리', options: ['허리 전만', '요추전만'] },
+          { group: '골반', options: ['골반 틀어짐', '골반 높이 차'] },
+          { group: '무릎·다리', options: ['오다리', 'X자 다리'] },
         ], true),
       ],
       extraId: 'evalInspectionExtra',
@@ -12704,12 +12736,19 @@
 
     var EVAL_MOVEMENT_SECTION = {
       title: 'Movement Test',
+      pairRegionPattern: true,
+      regionSecId: 'mov_region',
+      patternSecId: 'mov_pattern',
       items: [
-        evalHistItem('mov_region', '문제 포인트', '', [
-          '코어', '목', '어깨', '등·흉추', '허리·요추', '골반·고관절', '하체·무릎·발목',
+        evalHistItem('mov_region', '문제 포인트', '부위를 먼저 선택', [
+          '코어', '목', '어깨', '등', '허리', '골반·고관절', '하체·무릎·발목',
         ], true),
-        evalHistItem('mov_pattern', '문제 동작·상황', '', [
-          '가동성 저하', '굴곡 시 불편', '신전·뒤로 젖힘 불편', '회전·비틀기 불편',
+        evalHistItem('mov_pattern', '문제 동작·상황', '선택한 부위별로 다중 선택', [
+          { id: '가동성 저하', label: '가동성 저하', reportLabel: '움직임이 잘 안 되거나 뻣뻣함' },
+          { id: '굴곡', label: '굴곡', reportLabel: '앞으로 숙일 때 불편' },
+          { id: '신전', label: '신전', reportLabel: '뒤로 젖힐 때 불편' },
+          { id: '회전', label: '회전', reportLabel: '몸을 비틀 때 불편' },
+          { id: '옆굽힘', label: '옆굽힘', reportLabel: '옆으로 숙일 때 불편' },
         ], true),
       ],
       extraId: 'evalMovementExtra',
@@ -12719,11 +12758,17 @@
     var EVAL_PALPATION_SECTION = {
       title: 'Palpation',
       items: [
-        evalHistItem('palp_region', '압통·긴장 부위', '다중 선택', [
-          '목', '어깨', '상지', '등', '허리', '골반', '하지',
+        evalHistItem('palp_region', '압통·긴장 부위', '세부 부위 · 다중 선택', [
+          { group: '목', options: ['후두하', '목 앞', '목 옆', '목 뒤'] },
+          { group: '어깨', options: ['승모근', '견갑 주변', '회전근개', '삼각근'] },
+          { group: '상지', options: ['상완', '팔꿈치', '전완', '손목·손'] },
+          { group: '등', options: ['상부 등', '견갑 사이', '중부 등', '하부 등'] },
+          { group: '허리', options: ['요추 옆', '허리 중앙', '옆구리'] },
+          { group: '골반·고관절', options: ['장골능', '장요근', '둔근', '이상근', '고관절 앞'] },
+          { group: '하지', options: ['허벅지 앞', '허벅지 뒤', '무릎 주변', '종아리', '발목'] },
         ], true),
         evalHistItem('palp_quality', '촉진 소견', '', [
-          '근막 점착', '근 긴장', '관절 제한', '부종', '열감', 'ROM 제한',
+          '근막 점착', '근 긴장', '관절 제한', '부종', '열감',
         ], true),
       ],
       extraId: 'evalPalpationExtra',
@@ -12979,14 +13024,34 @@
       selectEl.classList.toggle('has-value', !!selectEl.value);
     }
 
+    function renderEvalHistChipBtn_(sec, opt, extraAttrs) {
+      var goalAttr = sec.id === 'goal' && opt.id ? ' data-goal-id="' + escapeHtml(opt.id) + '"' : '';
+      var painCls = sec.id === 'goal' && opt.id === 'pain' ? ' eval-hist-chip--pain' : '';
+      return '<button type="button" class="eval-hist-chip' + painCls + '" data-sec="' + escapeHtml(sec.id) + '"' +
+        goalAttr + (extraAttrs || '') + ' data-val="' + escapeHtml(opt.label) + '" onclick="toggleEvalHistChip(this)">' +
+        escapeHtml(opt.label) + '</button>';
+    }
+
     function renderEvalHistoryChipRow(sec) {
-      var chips = (sec.options || []).map(function (opt) {
-        var goalAttr = sec.id === 'goal' && opt.id ? ' data-goal-id="' + escapeHtml(opt.id) + '"' : '';
-        var painCls = sec.id === 'goal' && opt.id === 'pain' ? ' eval-hist-chip--pain' : '';
-        return '<button type="button" class="eval-hist-chip' + painCls + '" data-sec="' + escapeHtml(sec.id) + '"' +
-          goalAttr + ' data-val="' + escapeHtml(opt.label) + '" onclick="toggleEvalHistChip(this)">' +
-          escapeHtml(opt.label) + '</button>';
-      }).join('');
+      var chipsHtml;
+      if (sec.groups && sec.groups.length) {
+        var optByLabel = {};
+        (sec.options || []).forEach(function (opt) { optByLabel[opt.label] = opt; });
+        chipsHtml = sec.groups.map(function (g) {
+          var chips = (g.options || []).map(function (label) {
+            return renderEvalHistChipBtn_(sec, optByLabel[label] || { id: label, label: label });
+          }).join('');
+          return '<div class="eval-hist-optgroup">' +
+            '<div class="eval-hist-optgroup-label">' + escapeHtml(g.label) + '</div>' +
+            '<div class="eval-hist-chips">' + chips + '</div>' +
+          '</div>';
+        }).join('');
+      } else {
+        var chips = (sec.options || []).map(function (opt) {
+          return renderEvalHistChipBtn_(sec, opt);
+        }).join('');
+        chipsHtml = '<div class="eval-hist-chips' + (sec.id === 'severity' ? ' eval-hist-chips--vas' : '') + '">' + chips + '</div>';
+      }
       var dropdownHtml = sec.bodyDropdowns
         ? renderBodyAreaDropdownsHtml_({
             prefix: 'eval',
@@ -13008,7 +13073,7 @@
         '<div class="eval-hist-subrow" data-sec-id="' + escapeHtml(sec.id) + '">' +
           titleHtml +
           (sec.hint ? '<p class="eval-hist-hint">' + escapeHtml(sec.hint) + '</p>' : '') +
-          '<div class="eval-hist-chips' + (sec.id === 'severity' ? ' eval-hist-chips--vas' : '') + '">' + chips + '</div>' +
+          chipsHtml +
           notesHtml +
           dropdownHtml +
         '</div>'
@@ -13046,12 +13111,21 @@
     function renderEvalExamBlock(section, rootId) {
       var root = document.getElementById(rootId);
       if (!root || !section) return;
+      var itemsHtml;
+      if (section.pairRegionPattern) {
+        var regionSec = (section.items || []).find(function (it) { return it.id === section.regionSecId; }) || section.items[0];
+        itemsHtml = renderEvalHistoryChipRow(regionSec) +
+          '<div class="eval-hist-subrow eval-mov-pattern-wrap" id="' + escapeHtml(section.extraId) + 'Patterns"></div>';
+      } else {
+        itemsHtml = (section.items || []).map(renderEvalHistoryChipRow).join('');
+      }
       root.innerHTML =
-        (section.items || []).map(renderEvalHistoryChipRow).join('') +
+        itemsHtml +
         '<div class="eval-hist-subrow eval-exam-details">' +
           '<div class="eval-hist-subtitle">세부 사항</div>' +
           '<div class="eval-exam-details-body" id="' + escapeHtml(evalExamDetailsRootId_(section)) + '"></div>' +
         '</div>';
+      if (section.pairRegionPattern) renderEvalMovementPatternRows_(section);
       renderEvalExamDetails_(section);
     }
 
@@ -13060,9 +13134,69 @@
     }
 
     var _evalExamDetailNotes = {};
+    var _evalMovementPairs = {};
 
     function evalExamBlocks_() {
       return [EVAL_INSPECTION_SECTION, EVAL_MOVEMENT_SECTION, EVAL_PALPATION_SECTION];
+    }
+
+    function evalMovementPairKey_(region, pattern) {
+      return String(region || '') + ' · ' + String(pattern || '');
+    }
+
+    function evalMovementPatternSec_(section) {
+      section = section || EVAL_MOVEMENT_SECTION;
+      return (section.items || []).find(function (it) { return it.id === (section.patternSecId || 'mov_pattern'); }) || null;
+    }
+
+    function renderEvalMovementPatternRows_(section) {
+      section = section || EVAL_MOVEMENT_SECTION;
+      var wrap = document.getElementById(String(section.extraId || '') + 'Patterns');
+      if (!wrap) return;
+      var regionSecId = section.regionSecId || 'mov_region';
+      var patternSec = evalMovementPatternSec_(section);
+      var regions = evalChipSelectionsForSec(regionSecId);
+      Object.keys(_evalMovementPairs).forEach(function (region) {
+        if (regions.indexOf(region) < 0) delete _evalMovementPairs[region];
+      });
+      if (!regions.length || !patternSec) {
+        wrap.innerHTML = '<p class="eval-hist-hint">부위를 먼저 선택하면 해당 부위의 문제 동작을 고를 수 있습니다</p>';
+        return;
+      }
+      wrap.innerHTML = regions.map(function (region) {
+        var selected = _evalMovementPairs[region] || [];
+        var chips = (patternSec.options || []).map(function (opt) {
+          var on = selected.indexOf(opt.label) >= 0 ? ' on' : '';
+          return '<button type="button" class="eval-hist-chip' + on + '" data-sec="' + escapeHtml(patternSec.id) + '"' +
+            ' data-region="' + escapeHtml(region) + '" data-val="' + escapeHtml(opt.label) + '"' +
+            ' onclick="toggleEvalHistChip(this)">' + escapeHtml(opt.label) + '</button>';
+        }).join('');
+        return '<div class="eval-mov-pattern-block">' +
+          '<div class="eval-hist-subtitle">' + escapeHtml(region) + ' · 문제 동작</div>' +
+          '<p class="eval-hist-hint">다중 선택</p>' +
+          '<div class="eval-hist-chips">' + chips + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function collectEvalExamDetailKeys_(section) {
+      if (section && section.pairRegionPattern) {
+        var keys = [];
+        var regionOrder = evalChipSelectionsForSec(section.regionSecId || 'mov_region');
+        regionOrder.forEach(function (region) {
+          (_evalMovementPairs[region] || []).forEach(function (pattern) {
+            keys.push(evalMovementPairKey_(region, pattern));
+          });
+        });
+        return keys;
+      }
+      var selected = [];
+      ((section && section.items) || []).forEach(function (sec) {
+        evalChipSelectionsForSec(sec.id).forEach(function (val) {
+          if (selected.indexOf(val) < 0) selected.push(val);
+        });
+      });
+      return selected;
     }
 
     function collectEvalExamDetailNotes_(section) {
@@ -13083,12 +13217,7 @@
       var root = document.getElementById(evalExamDetailsRootId_(section));
       if (!root) return;
       var notes = _evalExamDetailNotes[section.extraId] || {};
-      var selected = [];
-      (section.items || []).forEach(function (sec) {
-        evalChipSelectionsForSec(sec.id).forEach(function (val) {
-          if (selected.indexOf(val) < 0) selected.push(val);
-        });
-      });
+      var selected = collectEvalExamDetailKeys_(section);
       if (!selected.length) {
         root.innerHTML = '<div class="eval-exam-details-empty">선택한 항목이 여기에 표시됩니다</div>';
         return;
@@ -13121,7 +13250,11 @@
         if (el) el.value = '';
       });
       _evalExamDetailNotes = {};
-      evalExamBlocks_().forEach(function (block) { renderEvalExamDetails_(block); });
+      _evalMovementPairs = {};
+      evalExamBlocks_().forEach(function (block) {
+        if (block.pairRegionPattern) renderEvalMovementPatternRows_(block);
+        renderEvalExamDetails_(block);
+      });
       document.querySelectorAll('.eval-hist-chip-note').forEach(function (ta) {
         ta.value = '';
         ta.hidden = true;
@@ -13162,7 +13295,10 @@
       });
       updateEvalFormVisibility();
       updateEvalChipNotesVisibility_();
-      evalExamBlocks_().forEach(function (block) { renderEvalExamDetails_(block); });
+      evalExamBlocks_().forEach(function (block) {
+        if (block.pairRegionPattern) renderEvalMovementPatternRows_(block);
+        renderEvalExamDetails_(block);
+      });
       return applied;
     }
 
@@ -13274,6 +13410,27 @@
         }
       }
       if (secId === 'goal') updateEvalFormVisibility();
+      var examBlock = null;
+      evalExamBlocks_().forEach(function (block) {
+        (block.items || []).forEach(function (it) { if (it.id === secId) examBlock = block; });
+      });
+      if (examBlock && examBlock.pairRegionPattern) {
+        var chipVal = btn.dataset.val || btn.textContent.trim();
+        if (secId === examBlock.regionSecId) {
+          if (!on) delete _evalMovementPairs[chipVal];
+          renderEvalMovementPatternRows_(examBlock);
+        } else if (secId === examBlock.patternSecId) {
+          var region = btn.getAttribute('data-region') || '';
+          if (region) {
+            if (!_evalMovementPairs[region]) _evalMovementPairs[region] = [];
+            if (on) {
+              if (_evalMovementPairs[region].indexOf(chipVal) < 0) _evalMovementPairs[region].push(chipVal);
+            } else {
+              _evalMovementPairs[region] = _evalMovementPairs[region].filter(function (x) { return x !== chipVal; });
+            }
+          }
+        }
+      }
       updateEvalChipNotesVisibility_(secId);
       refreshEvalExamDetailsForSec_(secId);
     }
@@ -13350,13 +13507,48 @@
       return lines.join('\n').trim();
     }
 
+    function evalMovementReportLabel_(patternSec, pattern) {
+      var hit = ((patternSec && patternSec.options) || []).find(function (o) {
+        return o.label === pattern || o.id === pattern;
+      });
+      return (hit && hit.reportLabel) ? hit.reportLabel : pattern;
+    }
+
     function compileEvalExamText(section) {
       if (!section) return '';
       collectEvalExamDetailNotes_(section);
       var notes = _evalExamDetailNotes[section.extraId] || {};
       var lines = [];
+      if (section.pairRegionPattern) {
+        var patternSec = evalMovementPatternSec_(section);
+        evalChipSelectionsForSec(section.regionSecId || 'mov_region').forEach(function (region) {
+          var pats = _evalMovementPairs[region] || [];
+          if (!pats.length) return;
+          var parts = pats.map(function (p) {
+            var label = evalMovementReportLabel_(patternSec, p);
+            var note = String(notes[evalMovementPairKey_(region, p)] || '').trim();
+            return note ? label + ' (' + note + ')' : label;
+          });
+          lines.push(region + ': ' + parts.join(' / '));
+        });
+        return lines.join('\n').trim();
+      }
       (section.items || []).forEach(function (sec) {
-        var selected = evalChipSelectionsForSec(sec.id).map(function (val) {
+        var selectedAll = evalChipSelectionsForSec(sec.id);
+        if (sec.groups && sec.groups.length) {
+          sec.groups.forEach(function (g) {
+            var selected = selectedAll.filter(function (val) {
+              return (g.options || []).indexOf(val) >= 0;
+            }).map(function (val) {
+              var note = String(notes[val] || '').trim();
+              return note ? val + ' (' + note + ')' : val;
+            });
+            if (!selected.length) return;
+            lines.push(g.label + ': ' + selected.join(' / '));
+          });
+          return;
+        }
+        var selected = selectedAll.map(function (val) {
           var note = String(notes[val] || '').trim();
           return note ? val + ' (' + note + ')' : val;
         });
