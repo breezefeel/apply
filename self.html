@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>셀프 소도구 가이드 | REAL MOVEMENT</title>
+<meta name="description" content="폼롤러·12센티 마사지볼 셀프 자극. 사진 순서대로 따라 하세요.">
+<meta name="theme-color" content="#F6E4C4">
+<link rel="icon" href="리얼무브먼트_링크_로고.png">
+<link rel="apple-touch-icon" href="리얼무브먼트_링크_로고.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root {
+    --bg: #F6E4C4;
+    --paper: #fffdf8;
+    --ink: #0B2048;
+    --mute: #5c6b86;
+    --line: #e6d7bc;
+    --accent: #dc143c;
+    --navy: #1e3a6e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { padding: calc(16px + env(safe-area-inset-top)) 16px calc(36px + env(safe-area-inset-bottom)); }
+  .wrap { width: 100%; max-width: 560px; margin: 0 auto; }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .brand img { width: 46px; height: 46px; object-fit: contain; background: #fff; border-radius: 50%; }
+  .brand b { font-size: 13px; letter-spacing: .04em; }
+  .brand span { display: block; font-size: 11px; color: var(--mute); font-weight: 600; }
+  h1 { font-size: 22px; font-weight: 800; letter-spacing: -.04em; line-height: 1.3; margin: 0 0 8px; }
+  .lead { font-size: 13.5px; line-height: 1.7; color: var(--mute); word-break: keep-all; margin-bottom: 18px; }
+  .warn {
+    background: #fff; border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; font-size: 12.5px; line-height: 1.65; color: #5b3b12;
+    margin-bottom: 22px;
+  }
+  .sec-title {
+    font-size: 12px; font-weight: 800; letter-spacing: .12em;
+    color: var(--navy); margin: 8px 0 10px;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+  .card {
+    display: block; text-decoration: none; color: inherit;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 14px;
+    overflow: hidden;
+  }
+  .card img { width: 100%; height: 132px; object-fit: cover; display: block; background: #eee; }
+  .card .meta { padding: 10px 11px 12px; }
+  .card .k { font-size: 11px; font-weight: 800; color: var(--accent); }
+  .card .n { font-size: 15px; font-weight: 800; letter-spacing: -.03em; margin-top: 2px; }
+  .card .s { font-size: 11px; color: var(--mute); margin-top: 3px; }
+  .card.video .ph {
+    height: 132px; display: flex; align-items: center; justify-content: center;
+    background: #1e3a6e; color: #fff; font-size: 12px; font-weight: 800;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 13px; font-weight: 800; color: var(--navy);
+    text-decoration: none; margin-bottom: 12px;
+  }
+  .ex-kicker { font-size: 12px; font-weight: 800; color: var(--accent); letter-spacing: .06em; }
+  .ex-title { font-size: 24px; font-weight: 800; letter-spacing: -.04em; margin: 4px 0 12px; }
+  .note {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 15px; margin-bottom: 16px;
+  }
+  .note p { font-size: 13.5px; line-height: 1.7; word-break: keep-all; margin: 0 0 8px; }
+  .note p:last-child { margin: 0; }
+  .note b { display: inline-block; min-width: 42px; color: var(--navy); }
+  .step {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 16px;
+    overflow: hidden; margin-bottom: 14px;
+  }
+  .step img { width: 100%; display: block; background: #111; }
+  .step figcaption {
+    padding: 11px 13px 13px; font-size: 13.5px; line-height: 1.6; word-break: keep-all;
+  }
+  .step .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 22px; height: 22px; border-radius: 999px;
+    background: var(--navy); color: #fff; font-size: 11px; font-weight: 800;
+    margin-right: 6px; vertical-align: 1px;
+  }
+  .seq-hd {
+    font-size: 13px; font-weight: 800; color: var(--navy);
+    margin: 18px 0 8px; letter-spacing: -.02em;
+  }
+  .copy-row { display: flex; gap: 8px; margin: 8px 0 18px; }
+  .copy-row button {
+    flex: 1; border: 0; background: var(--navy); color: #fff;
+    font: inherit; font-weight: 800; font-size: 13px;
+    padding: 12px 10px; border-radius: 10px; cursor: pointer;
+  }
+  .copy-row a {
+    flex: 1; text-align: center; text-decoration: none;
+    background: #fff; color: var(--navy); border: 1.5px solid var(--navy);
+    font-weight: 800; font-size: 13px; padding: 11px 10px; border-radius: 10px;
+  }
+  .toast {
+    position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom));
+    transform: translateX(-50%) translateY(12px); opacity: 0;
+    background: #0B2048; color: #fff; font-size: 13px; font-weight: 700;
+    padding: 10px 16px; border-radius: 999px; pointer-events: none;
+    transition: .2s ease;
+  }
+  .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <img src="리얼무브먼트_링크_로고.png" alt="REAL MOVEMENT">
+    <div><b>REAL MOVEMENT</b><span>Better Movement, Better Life</span></div>
+  </div>
+
+  <div id="hub">
+    <h1>셀프 소도구 가이드</h1>
+    <p class="lead">센터에서 배운 폼롤러·12센티 마사지볼을 집에서 같은 순서로 따라 하세요. 사진은 방향·순서대로 찍어 두었습니다.</p>
+    <div class="warn">통증 0~3 정도만 유지하세요. 찌릿함·저림·어지러움이 있으면 즉시 멈추고, 뼈 위는 누르지 마세요.</div>
+    <div class="sec-title">FORM ROLLER</div>
+    <div class="grid" id="foamGrid"></div>
+    <div class="sec-title">12CM MASSAGE BALL</div>
+    <div class="grid" id="ballGrid"></div>
+  </div>
+
+  <div id="detail" class="hidden"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var BASE = 'self-photos/';
+var GUIDE = [
+  {
+    id: 'roller_hip', tool: 'foam', toolKo: '폼롤러', name: '엉덩이',
+    n: 7, sequences: [
+      { title: '한쪽', start: 1, captions: [
+        '바닥에 앉아 폼롤러를 한쪽 엉덩이(둔근) 아래에 둡니다. 손은 뒤로 짚어 체중을 조절해요.',
+        '같은 쪽 다리는 펴고, 반대 무릎은 가슴 쪽으로 당깁니다.',
+        '골반 옆을 손으로 잡아 롤러가 뼈(좌골)가 아닌 근육 위에 있게 해요.',
+        '통증 없는 범위에서 좌우·앞뒤로 천천히 굴리거나, 압이 느껴지는 지점에서 20~40초 유지합니다.'
+      ]},
+      { title: '반대쪽', start: 5, captions: [
+        '반대쪽 엉덩이 아래로 롤러를 옮겨 같은 자세를 만듭니다.',
+        '무릎을 당기며 호흡을 멈추지 마세요.',
+        '좌·우 같은 시간으로 마무리합니다. 찌릿하면 체중을 줄이거나 중단하세요.'
+      ]}
+    ],
+    note: [
+      ['준비', '바닥에 앉아 폼롤러를 엉덩이 아래에 두고, 손은 뒤로 짚어 체중을 조절해요.'],
+      ['동작', '통증 없는 범위에서 좌우·앞뒤로 천천히 굴리거나 20~40초 유지합니다.'],
+      ['포인트', '뼈가 아닌 근육 위에 올리고, 호흡을 멈추지 마세요.'],
+      ['주의', '찌릿하거나 통증이 세지면 체중을 줄이거나 중단합니다.']
+    ]
+  },
+  {
+    id: 'roller_waist', tool: 'foam', toolKo: '폼롤러', name: '허리',
+    n: 8, sequences: [
+      { title: '양 무릎', start: 1, captions: [
+        '폼롤러를 허리(천골) 아래에 가로로 두고 눕습니다.',
+        '양 무릎을 가슴 쪽으로 모아 올립니다.',
+        '양손으로 롤러 끝을 잡아 고정해요.',
+        '작은 범위로 유지하거나 아주 천천히 흔듭니다. 통증은 0~3 정도로요.'
+      ]},
+      { title: '좌우', start: 5, captions: [
+        '무릎을 조금 더 당겨 압을 조절합니다.',
+        '한쪽으로 기울여 허리 옆 근육만 자극해요. 척추 뼈 위는 피합니다.',
+        '반대쪽으로도 같은 각도로 기울입니다.',
+        '편한 지점에서 20~40초 유지한 뒤 천천히 내려옵니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '옆으로 눕거나 기대어, 폼롤러를 허리 양쪽 근육에 둡니다.'],
+      ['동작', '체중을 천천히 실어 위아래로 작게 굴리거나, 편한 지점에서 20~40초 유지해요.'],
+      ['포인트', '척추 뼈가 아닌 옆 근육에 두고, 통증 0~3 정도로 유지합니다.'],
+      ['주의', '허리 중앙·뼈 위를 직접 누르지 마세요.']
+    ]
+  },
+  {
+    id: 'roller_back', tool: 'foam', toolKo: '폼롤러', name: '등',
+    n: 10, sequences: [
+      { title: '중간 등', start: 1, captions: [
+        '폼롤러를 등 중간(흉추)에 가로로 두고 눕습니다. 무릎은 세워요.',
+        '양손을 머리 뒤에 가볍게 받칩니다. 목을 당기지 마세요.',
+        '엉덩이는 바닥에 가깝게 둔 채 천천히 위아래로 굴립니다.',
+        '한 구간에서 멈추어 호흡해도 됩니다.',
+        '허리가 아니라 등 위·중간이 열리게 체중을 조절해요.'
+      ]},
+      { title: '위쪽 등', start: 6, captions: [
+        '롤러를 견갑 사이·등 위쪽으로 옮겨요.',
+        '머리 무게만으로 천천히 젖혀 봅니다.',
+        '좌우로 아주 작게 움직여 뭉친 지점을 찾습니다.',
+        '통증 부위·뼈 위는 피하고, 숨은 계속 쉬세요.',
+        '목 긴장이 느껴지면 손을 더 받쳐 주세요.'
+      ]}
+    ],
+    note: [
+      ['준비', '폼롤러를 등(견갑 사이·흉추 옆 근육)에 가로로 두고 눕거나 기대요.'],
+      ['동작', '엉덩이는 바닥에 가깝게 둔 채 천천히 위아래로 굴립니다.'],
+      ['포인트', '목은 긴장하지 않게, 허리보다 등 위·중간이 열리게 해요.'],
+      ['주의', '통증 부위·뼈 위는 피합니다.']
+    ]
+  },
+  {
+    id: 'roller_calf', tool: 'foam', toolKo: '폼롤러', name: '종아리',
+    n: 7, sequences: [
+      { title: '종아리', start: 1, captions: [
+        '앉아 손으로 몸을 지탱하고, 종아리 아래에 폼롤러를 둡니다.',
+        '반대 다리를 포개 올려 압을 조절해도 됩니다.',
+        '발목에서 무릎 쪽으로 천천히 굴려요.',
+        '뭉친 지점에서 잠시 멈추어 호흡합니다.',
+        '정강이뼈가 아닌 근육 위에 올렸는지 확인하세요.',
+        '발끝을 안·밖으로 살짝 돌려 다른 섬유를 자극합니다.',
+        '통증이 세면 포갠 다리를 내려 체중을 줄여요.'
+      ]}
+    ],
+    note: [
+      ['준비', '앉거나 손으로 몸을 지탱한 채 종아리 근육 아래에 폼롤러를 둡니다.'],
+      ['동작', '발목에서 무릎 쪽으로 천천히 굴리고, 뭉친 지점에서 호흡해요.'],
+      ['포인트', '정강이뼈가 아닌 근육 위에 올리고, 좌·우 같은 시간으로 합니다.'],
+      ['주의', '뼈·아킬레스 힘줄을 세게 누르지 마세요.']
+    ]
+  },
+  {
+    id: 'roller_hamstring', tool: 'foam', toolKo: '폼롤러', name: '햄스트링',
+    n: 4, sequences: [
+      { title: '햄스트링', start: 1, captions: [
+        '앉아 폼롤러를 허벅지 뒤(햄스트링) 아래에 둡니다. 손은 뒤로 짚어 체중을 조절해요.',
+        '무릎 뒤에서 골반 쪽으로 천천히 굴립니다. 무릎 관절은 피하세요.',
+        '뭉친 지점에서 잠시 멈추어 호흡합니다.',
+        '반대쪽도 같은 시간으로 반복하고, 찌릿하면 체중을 줄여요.'
+      ]}
+    ],
+    note: [
+      ['준비', '앉아 폼롤러를 허벅지 뒤 근육 아래에 두고, 손으로 체중을 조절해요.'],
+      ['동작', '무릎 뒤에서 골반 쪽으로 천천히 굴리고, 뭉친 지점에서 호흡합니다.'],
+      ['포인트', '무릎 관절이 아닌 근육 위에 올리고, 좌·우 같은 시간으로 해요.'],
+      ['주의', '뼈·무릎 뒤를 세게 누르지 마세요.']
+    ]
+  },
+  {
+    id: 'roller_thigh', tool: 'foam', toolKo: '폼롤러', name: '허벅지',
+    n: 10, sequences: [
+      { title: '앞면', start: 1, captions: [
+        '엎드려 팔꿈치로 상체를 지탱하고, 허벅지 앞에 롤러를 둡니다.',
+        '한쪽만 올리고 반대 발끝으로 체중을 조절해도 됩니다.',
+        '무릎 관절·뼈 위는 피합니다.',
+        '뭉친 지점에서 20~40초 구간을 반복해요.',
+        '호흡을 유지하고, 허리가 꺾이지 않게 하세요.',
+        '무릎을 살짝 굽혀 앞면 자극을 조절합니다.'
+      ]},
+      { title: '안쪽', start: 7, captions: [
+        '한쪽 다리를 옆으로 벌려 안쪽 허벅지 아래에 롤러를 둡니다.',
+        '작은 범위로 위아래·좌우로 굴려요.',
+        '무릎 안쪽 관절은 피하고 근육만 자극합니다.',
+        '반대쪽도 같은 시간으로 반복하세요.'
+      ]}
+    ],
+    note: [
+      ['준비', '앞·옆·안쪽 중 목표 근육을 정한 뒤 그 아래에 폼롤러를 둡니다.'],
+      ['동작', '천천히 위아래로 굴리며, 통증 없는 범위에서 20~40초 반복해요.'],
+      ['포인트', '무릎 관절·뼈 위는 피하고, 호흡을 유지합니다.'],
+      ['주의', '통증이 세면 체중을 줄이거나 중단하세요.']
+    ]
+  },
+  {
+    id: 'roller_shoulder', tool: 'foam', toolKo: '폼롤러', name: '어깨',
+    n: 3, sequences: [
+      { title: '옆구리·겨드랑이', start: 1, captions: [
+        '옆으로 누워 폼롤러를 겨드랑이·견갑 바깥 근육에 둡니다.',
+        '아래팔은 머리 쪽으로 뻗어 목을 편하게 해요.',
+        '작은 범위로 앞뒤·위아래로 천천히 굴립니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '옆으로 누워 폼롤러를 어깨·견갑 주변 근육에 둡니다.'],
+      ['동작', '작은 범위로 앞뒤·위아래로 굴리거나, 뭉친 지점에서 20~40초 유지해요.'],
+      ['포인트', '어깨를 귀 쪽으로 올리지 않고, 호흡을 유지합니다.'],
+      ['주의', '관절·뼈를 직접 누르지 말고 근육만 자극하세요.']
+    ]
+  },
+  {
+    id: 'roller_neck', tool: 'foam', toolKo: '폼롤러', name: '목',
+    video: '', n: 0, sequences: [],
+    note: [
+      ['준비', '누운 자세에서 폼롤러를 목 뒤·옆 근육에 가볍게 둡니다. 머리 무게만으로 압을 조절해요.'],
+      ['동작', '아주 작은 범위로 좌우·위아래로 움직이거나, 편한 지점에서 15~30초 유지합니다.'],
+      ['포인트', '목뼈 위는 피하고, 옆·뒤 근육만 닿게 하세요.'],
+      ['주의', '압이 세거나 어지러움·저림이 있으면 즉시 중단합니다.']
+    ]
+  },
+  {
+    id: 'roller_abdomen', tool: 'foam', toolKo: '폼롤러', name: '복부',
+    n: 2, sequences: [
+      { title: '복부', start: 1, captions: [
+        '엎드려 폼롤러를 아랫배 아래에 가볍게 둡니다. 깊게 누르지 마세요.',
+        '호흡에 맞춰 작은 범위로 굴리거나 15~30초 유지해요.'
+      ]}
+    ],
+    note: [
+      ['준비', '엎드려 폼롤러를 복부 근육에 가볍게 둡니다.'],
+      ['동작', '깊게 누르지 말고 작은 범위로 굴리거나, 호흡에 맞춰 15~30초 유지해요.'],
+      ['포인트', '숨을 내쉴 때 배가 부드럽게 내려가게 하고, 힘을 과도하게 주지 마세요.'],
+      ['주의', '식사 직후·임신·복통이 있으면 하지 않습니다.']
+    ]
+  },
+  {
+    id: 'ball_scapula', tool: 'ball', toolKo: '12센티 마사지볼', name: '등',
+    n: 3, sequences: [
+      { title: '등', start: 1, captions: [
+        '기둥·벽에 등을 대고, 12센티 볼을 견갑 사이에 둡니다.',
+        '양팔을 가슴 앞에서 교차해 견갑이 열리게 해요.',
+        '무릎을 살짝 굽혀 체중을 볼에 천천히 실습니다.'
+      ]}
+    ],
+    extra: 'https://m.blog.naver.com/allenjoy/223449532242',
+    extraLabel: '블로그 참고',
+    note: [
+      ['준비', '벽에 등을 대고 볼을 견갑 사이에 둡니다. 팔은 가슴 앞에서 교차해요.'],
+      ['동작', '무릎을 굽혀 체중을 실어 위아래로 천천히 움직이거나 원을 그립니다.'],
+      ['포인트', '어깨를 귀 쪽으로 올리지 말고, 견갑이 열리는 느낌을 유지하세요.'],
+      ['주의', '척추 뼈 위는 피하고, 통증이 세면 체중을 줄입니다.']
+    ]
+  },
+  {
+    id: 'ball_shoulder', tool: 'ball', toolKo: '12센티 마사지볼', name: '견갑·어깨',
+    n: 5, sequences: [
+      { title: '뒤 어깨', start: 1, captions: [
+        '기둥 모서리에 볼을 두고, 뒤 어깨·견갑에 댑니다.',
+        '반대 손으로 같은 쪽 팔을 가슴 쪽으로 당겨 압을 조절해요.',
+        '작은 원·위아래로 천천히 움직입니다.',
+        '어깨를 으쓱하지 말고 호흡을 유지하세요.',
+        '찌릿하면 즉시 체중을 줄입니다.'
+      ]}
+    ],
+    extra: 'https://www.youtube.com/watch?v=drx2-P2OgpQ',
+    extraLabel: '영상 참고',
+    note: [
+      ['준비', '벽에 볼을 두고 뒤 어깨·견갑 근육에 댑니다.'],
+      ['동작', '통증 없는 범위에서 천천히 원을 그리거나 위아래로 움직입니다.'],
+      ['포인트', '호흡을 멈추지 않고, 어깨를 귀 쪽으로 올리지 마세요.'],
+      ['주의', '관절·뼈를 직접 누르지 않습니다.']
+    ]
+  },
+  {
+    id: 'ball_chest', tool: 'ball', toolKo: '12센티 마사지볼', name: '가슴',
+    n: 3, sequences: [
+      { title: '가슴', start: 1, captions: [
+        '볼을 앞 어깨·가슴 바깥(대흉근)에 두고 기둥에 기대요.',
+        '같은 쪽 팔은 뒤로 열어 앞면을 펴 줍니다.',
+        '정면에서 체중을 천천히 실어 압을 찾습니다. 쇄골·관절은 피하세요.'
+      ]}
+    ],
+    note: [
+      ['준비', '기둥에 볼을 두고 가슴 바깥·앞 어깨 근육에 댑니다.'],
+      ['동작', '팔을 뒤로 연 채 작은 범위로 위아래·원을 그립니다.'],
+      ['포인트', '호흡을 멈추지 않고, 어깨를 귀 쪽으로 올리지 마세요.'],
+      ['주의', '쇄골·관절이 아닌 근육에만 볼이 오게 해요.']
+    ]
+  },
+  {
+    id: 'ball_waist', tool: 'ball', toolKo: '12센티 마사지볼', name: '허리',
+    video: 'https://www.youtube.com/watch?v=PgKSRcIW9c4', n: 0, sequences: [],
+    note: [
+      ['준비', '요추 양쪽 근육에 볼을 댑니다. 척추 뼈 위가 아닌 근육에 두세요.'],
+      ['동작', '체중을 천천히 실어 작은 범위로 움직이거나 유지합니다.'],
+      ['포인트', '통증 0~3, 호흡은 계속 쉬어요.'],
+      ['주의', '허리 중앙 뼈 위는 누르지 마세요.']
+    ]
+  },
+  {
+    id: 'ball_abdomen', tool: 'ball', toolKo: '12센티 마사지볼', name: '복부',
+    n: 1, sequences: [
+      { title: '복부', start: 1, captions: [
+        '볼을 복부·옆구리 근육에 가볍게 두고, 깊게 누르지 마세요. 호흡에 맞춰 작은 범위로 자극해요.'
+      ]}
+    ],
+    extra: 'https://www.youtube.com/shorts/zjvXLTL9E5A',
+    extraLabel: '영상 참고',
+    note: [
+      ['준비', '볼을 복부 근육에 가볍게 둡니다.'],
+      ['동작', '깊게 누르지 말고 호흡에 맞춰 작은 범위로 자극해요.'],
+      ['포인트', '숨을 내쉴 때 배가 부드럽게 내려가게 합니다.'],
+      ['주의', '식사 직후·복통이 있으면 하지 않습니다.']
+    ]
+  },
+  {
+    id: 'ball_hip', tool: 'ball', toolKo: '12센티 마사지볼', name: '엉덩이',
+    n: 3, sequences: [
+      { title: '엉덩이', start: 1, captions: [
+        '기둥에 볼을 두고 한쪽 엉덩이(둔근)·윗엉덩이에 댑니다. 무릎은 살짝 굽혀요.',
+        '체중을 천천히 실어 작은 원·위아래로 움직입니다. 좌골이 아닌 근육 위에 올려요.',
+        '반대쪽도 같은 시간으로 하고, 찌릿하면 중단하세요.'
+      ]}
+    ],
+    extra: 'https://m.blog.naver.com/allenjoy/223442108509',
+    extraLabel: '블로그 참고',
+    note: [
+      ['준비', '기둥에 볼을 두고 한쪽 엉덩이 근육에 댑니다. 무릎은 굽혀요.'],
+      ['동작', '체중을 천천히 실어 원을 그리거나 유지합니다.'],
+      ['포인트', '좌골이 아닌 근육 위에 올려요.'],
+      ['주의', '찌릿하면 중단하세요.']
+    ]
+  },
+  {
+    id: 'ball_thigh', tool: 'ball', toolKo: '12센티 마사지볼', name: '허벅지',
+    n: 2, sequences: [
+      { title: '허벅지', start: 1, captions: [
+        '기둥에 볼을 두고 허벅지 근육에 댑니다. 무릎 관절은 피하세요.',
+        '작은 범위로 위아래·원을 그리고, 좌·우 같은 시간으로 마무리해요.'
+      ]}
+    ],
+    note: [
+      ['준비', '기둥에 볼을 두고 허벅지 앞·옆 근육에 댑니다.'],
+      ['동작', '통증 없는 범위에서 천천히 위아래·원을 그립니다.'],
+      ['포인트', '무릎이 아닌 근육 위에 올리고, 호흡을 유지하세요.'],
+      ['주의', '무릎 관절을 직접 누르지 않습니다.']
+    ]
+  }
+];
+
+function $(id){ return document.getElementById(id); }
+function toast(msg){
+  var el = $('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function(){ el.classList.remove('on'); }, 1800);
+}
+function findGuide(id){
+  for (var i=0;i<GUIDE.length;i++) if (GUIDE[i].id===id) return GUIDE[i];
+  return null;
+}
+function cardHtml(g){
+  var img = g.n
+    ? '<img src="'+BASE+g.id+'/01.jpg" alt="'+g.toolKo+' '+g.name+'">'
+    : '<div class="ph">'+(g.video ? '설명 + 영상' : '설명 가이드')+'</div>';
+  var sub = g.n ? ('사진 '+g.n+'장 · 순서대로') : (g.video ? '설명 · 영상 참고' : '설명 참고');
+  return '<a class="card'+(g.n?'':' video')+'" href="#'+g.id+'">'+
+    img+'<div class="meta"><div class="k">'+g.toolKo+'</div><div class="n">'+g.name+'</div><div class="s">'+sub+'</div></div></a>';
+}
+function renderHub(){
+  $('foamGrid').innerHTML = GUIDE.filter(function(g){ return g.tool==='foam'; }).map(cardHtml).join('');
+  $('ballGrid').innerHTML = GUIDE.filter(function(g){ return g.tool==='ball'; }).map(cardHtml).join('');
+}
+function noteHtml(g){
+  return '<div class="note">'+g.note.map(function(row){
+    return '<p><b>'+row[0]+'</b> '+row[1]+'</p>';
+  }).join('')+'</div>';
+}
+function renderDetail(id){
+  var g = findGuide(id);
+  if (!g) { location.hash=''; return; }
+  var extraHref = g.extra || g.video || '';
+  var extraLabel = g.extraLabel || (g.video ? '영상 보기' : '');
+  var html = '<a class="back" href="#">← 목록</a>'+
+    '<div class="ex-kicker">'+g.toolKo+'</div>'+
+    '<h2 class="ex-title">'+g.name+'</h2>'+
+    '<div class="copy-row">'+
+      '<button type="button" onclick="copyLink()">이 링크 복사</button>'+
+      (extraHref ? '<a href="'+extraHref+'" target="_blank" rel="noopener">'+extraLabel+'</a>' : '')+
+    '</div>'+
+    noteHtml(g);
+  (g.sequences || []).forEach(function(seq){
+    html += '<div class="seq-hd">'+seq.title+'</div>';
+    seq.captions.forEach(function(cap, i){
+      var n = seq.start + i;
+      var nn = (n<10?'0':'')+n;
+      html += '<figure class="step"><img src="'+BASE+g.id+'/'+nn+'.jpg" alt="'+g.name+' '+n+'단계" loading="lazy">'+
+        '<figcaption><span class="num">'+n+'</span>'+cap+'</figcaption></figure>';
+    });
+  });
+  html += '<p class="lead" style="margin-top:8px">통증 0~3만. 뼈 위는 피하고, 불편하면 멈추세요.</p>';
+  html += '<a class="back" href="#">← 목록으로</a>';
+  $('detail').innerHTML = html;
+}
+function copyLink(){
+  var url = location.href;
+  function done(){ toast('링크를 복사했습니다'); }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(done).catch(function(){ fallback(); });
+  } else fallback();
+  function fallback(){
+    var ta = document.createElement('textarea');
+    ta.value = url; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+}
+function route(){
+  var id = (location.hash||'').replace(/^#/, '');
+  if (!id) {
+    $('hub').classList.remove('hidden');
+    $('detail').classList.add('hidden');
+    document.title = '셀프 소도구 가이드 | REAL MOVEMENT';
+    window.scrollTo(0,0);
+    return;
+  }
+  var g = findGuide(id);
+  if (!g) { location.hash=''; return; }
+  $('hub').classList.add('hidden');
+  $('detail').classList.remove('hidden');
+  renderDetail(id);
+  document.title = g.toolKo+' · '+g.name+' | REAL MOVEMENT';
+  window.scrollTo(0,0);
+}
+renderHub();
+window.addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
