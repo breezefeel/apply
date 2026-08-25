@@ -2856,21 +2856,25 @@
     }
 
     /* 서버 연결 전에도 표시 — code.gs PSP_PROGRAM_CATALOG_ 와 동기화 */
+    const SELF_GUIDE_PAGE = 'https://breezefeel.github.io/apply/self.html';
     const MOVEMENT_CATALOG_RAW = [
-      { id:'tool_list', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'소도구 목록', label:'소도구 목록', linkUrl:'https://blog.naver.com/allenjoy/222657632345' },
-      { id:'roller_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'엉덩이', alimtalkLabel:'폼롤러 · 엉덩이', coachingNote:'준비: 바닥에 앉아 폼롤러를 엉덩이(둔근) 아래에 둡니다. 손은 뒤로 바닥을 짚어 체중을 조절합니다.\n동작: 통증 없는 범위에서 좌우·앞뒤로 천천히 굴리거나, 압이 느껴지는 지점에서 20~40초 유지합니다.\n포인트: 뼈(좌골)가 아닌 근육 위에 올리고, 호흡을 멈추지 않습니다.\n주의: 찌릿하거나 통증이 세지면 체중을 줄이거나 중단합니다. 영상은 곧 추가 예정입니다.' },
-      { id:'roller_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'허리', alimtalkLabel:'폼롤러 · 허리', coachingNote:'준비: 옆으로 눕거나 기대어, 폼롤러를 허리(요추) 양쪽 근육에 둡니다.\n동작: 체중을 천천히 실어 위아래로 작게 굴리거나, 편한 지점에서 20~40초 유지합니다.\n포인트: 척추 뼈 위가 아닌 옆 근육에 위치시키고, 통증 0~3 정도로 유지합니다.\n주의: 허리 중앙·뼈 위를 직접 누르지 않습니다. 영상은 곧 추가 예정입니다.' },
-      { id:'roller_back', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'등', alimtalkLabel:'폼롤러 · 등', coachingNote:'준비: 폼롤러를 등(견갑 사이·흉추 옆 근육)에 가로로 두고 눕거나 기대어 체중을 조절합니다.\n동작: 엉덩이는 바닥에 가깝게 둔 채 천천히 위아래로 굴립니다. 한 구간에서 멈추어 호흡해도 됩니다.\n포인트: 목은 긴장하지 않게 하고, 허리보다 등 위·중간이 열리게 합니다.\n주의: 통증 부위·뼈 위는 피합니다. 영상은 곧 추가 예정입니다.' },
-      { id:'roller_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'어깨', alimtalkLabel:'폼롤러 · 어깨', coachingNote:'준비: 옆으로 눕거나 기대어 폼롤러를 어깨·견갑 주변 근육에 둡니다.\n동작: 작은 범위로 앞뒤·위아래로 천천히 굴리거나, 뭉친 지점에서 20~40초 유지합니다.\n포인트: 어깨를 귀 쪽으로 올리지 않고, 호흡을 유지합니다.\n주의: 관절·뼈를 직접 누르지 말고 근육만 자극합니다. 영상은 곧 추가 예정입니다.' },
-      { id:'roller_neck', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'목', alimtalkLabel:'폼롤러 · 목', coachingNote:'준비: 누운 자세에서 폼롤러를 목 뒤·옆 근육에 가볍게 둡니다. 머리 무게만으로 압을 조절합니다.\n동작: 아주 작은 범위로 좌우·위아래로 움직이거나, 편한 지점에서 15~30초 유지합니다.\n포인트: 목뼈(경추) 위는 피하고, 옆·뒤 근육만 닿게 합니다.\n주의: 압이 세거나 어지러움·저림이 있으면 즉시 중단합니다. 영상은 곧 추가 예정입니다.' },
-      { id:'roller_calf', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'종아리', alimtalkLabel:'폼롤러 · 종아리', coachingNote:'준비: 앉거나 손으로 몸을 지탱한 채 종아리 근육 아래에 폼롤러를 둡니다.\n동작: 발목에서 무릎 쪽으로 천천히 굴립니다. 뭉친 지점에서 잠시 멈추어 호흡합니다.\n포인트: 정강이뼈가 아닌 근육 위에 올리고, 좌·우 같은 시간으로 합니다.\n주의: 뼈·아킬레스 힘줄을 세게 누르지 않습니다. 영상은 곧 추가 예정입니다.' },
-      { id:'roller_thigh', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'허벅지', alimtalkLabel:'폼롤러 · 허벅지', coachingNote:'준비: 앞·옆·뒤 중 목표 근육을 정한 뒤 그 아래에 폼롤러를 둡니다. 팔·반대 다리로 체중을 조절합니다.\n동작: 천천히 위아래로 굴리며, 통증 없는 범위에서 20~40초 구간을 반복합니다.\n포인트: 무릎 관절·뼈 위는 피하고, 호흡을 유지합니다.\n주의: 통증이 세면 체중을 줄이거나 중단합니다. 영상은 곧 추가 예정입니다.' },
-      { id:'roller_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'복부', alimtalkLabel:'폼롤러 · 복부', coachingNote:'준비: 엎드리거나 옆으로 누워 폼롤러를 복부 근육(배곧은근·옆구리)에 가볍게 둡니다.\n동작: 깊게 누르지 말고 작은 범위로 굴리거나, 호흡에 맞춰 15~30초 유지합니다.\n포인트: 숨을 내쉴 때 배가 부드럽게 내려가게 하고, 힘을 과도하게 주지 않습니다.\n주의: 식사 직후·임신·복통이 있으면 하지 않습니다. 영상은 곧 추가 예정입니다.' },
-      { id:'ball_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'어깨', alimtalkLabel:'마사지볼 · 어깨', linkUrl:'https://www.youtube.com/watch?v=drx2-P2OgpQ', coachingNote:'견갑골 위에 볼을 올리고 통증 없는 범위에서 천천히 원을 그립니다. 호흡을 멈추지 않고 어깨를 들어 올리지 않도록 안내합니다.' },
-      { id:'ball_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'허리', alimtalkLabel:'마사지볼 · 허리', linkUrl:'https://www.youtube.com/watch?v=PgKSRcIW9c4', coachingNote:'요추 양쪽 근육에 볼을 대고 체중을 천천히 실어줍니다. 척추 뼈 위가 아닌 근육 부위에 위치시키는지 확인합니다.' },
-      { id:'ball_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'복부', alimtalkLabel:'마사지볼 · 복부', linkUrl:'https://www.youtube.com/shorts/zjvXLTL9E5A' },
-      { id:'ball_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'엉덩이', alimtalkLabel:'마사지볼 · 엉덩이', linkUrl:'https://m.blog.naver.com/allenjoy/223442108509' },
-      { id:'ball_scapula', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'견갑골', alimtalkLabel:'마사지볼 · 등(견갑)', linkUrl:'https://m.blog.naver.com/allenjoy/223449532242' },
+      { id:'tool_list', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'소도구 목록', label:'소도구 목록', linkUrl:SELF_GUIDE_PAGE },
+      { id:'roller_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'엉덩이', alimtalkLabel:'폼롤러 · 엉덩이', linkUrl:SELF_GUIDE_PAGE+'#roller_hip', thumbUrl:'exercise-thumbs/self_roller_hip.jpg', coachingNote:'준비: 바닥에 앉아 폼롤러를 엉덩이(둔근) 아래에 둡니다. 손은 뒤로 바닥을 짚어 체중을 조절합니다.\n동작: 통증 없는 범위에서 좌우·앞뒤로 천천히 굴리거나, 압이 느껴지는 지점에서 20~40초 유지합니다.\n포인트: 뼈(좌골)가 아닌 근육 위에 올리고, 호흡을 멈추지 않습니다.\n주의: 찌릿하거나 통증이 세지면 체중을 줄이거나 중단합니다. 사진 순서는 링크에서 확인합니다.' },
+      { id:'roller_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'허리', alimtalkLabel:'폼롤러 · 허리', linkUrl:SELF_GUIDE_PAGE+'#roller_waist', thumbUrl:'exercise-thumbs/self_roller_waist.jpg', coachingNote:'준비: 옆으로 눕거나 기대어, 폼롤러를 허리(요추) 양쪽 근육에 둡니다.\n동작: 체중을 천천히 실어 위아래로 작게 굴리거나, 편한 지점에서 20~40초 유지합니다.\n포인트: 척추 뼈 위가 아닌 옆 근육에 위치시키고, 통증 0~3 정도로 유지합니다.\n주의: 허리 중앙·뼈 위를 직접 누르지 않습니다. 사진 순서는 링크에서 확인합니다.' },
+      { id:'roller_back', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'등', alimtalkLabel:'폼롤러 · 등', linkUrl:SELF_GUIDE_PAGE+'#roller_back', thumbUrl:'exercise-thumbs/self_roller_back.jpg', coachingNote:'준비: 폼롤러를 등(견갑 사이·흉추 옆 근육)에 가로로 두고 눕거나 기대어 체중을 조절합니다.\n동작: 엉덩이는 바닥에 가깝게 둔 채 천천히 위아래로 굴립니다. 한 구간에서 멈추어 호흡해도 됩니다.\n포인트: 목은 긴장하지 않게 하고, 허리보다 등 위·중간이 열리게 합니다.\n주의: 통증 부위·뼈 위는 피합니다. 사진 순서는 링크에서 확인합니다.' },
+      { id:'roller_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'어깨', alimtalkLabel:'폼롤러 · 어깨', linkUrl:SELF_GUIDE_PAGE+'#roller_shoulder', thumbUrl:'exercise-thumbs/self_roller_shoulder.jpg', coachingNote:'준비: 옆으로 눕거나 기대어 폼롤러를 어깨·견갑 주변 근육에 둡니다.\n동작: 작은 범위로 앞뒤·위아래로 천천히 굴리거나, 뭉친 지점에서 20~40초 유지합니다.\n포인트: 어깨를 귀 쪽으로 올리지 않고, 호흡을 유지합니다.\n주의: 관절·뼈를 직접 누르지 말고 근육만 자극합니다. 사진 순서는 링크에서 확인합니다.' },
+      { id:'roller_neck', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'목', alimtalkLabel:'폼롤러 · 목', linkUrl:SELF_GUIDE_PAGE+'#roller_neck', coachingNote:'준비: 누운 자세에서 폼롤러를 목 뒤·옆 근육에 가볍게 둡니다. 머리 무게만으로 압을 조절합니다.\n동작: 아주 작은 범위로 좌우·위아래로 움직이거나, 편한 지점에서 15~30초 유지합니다.\n포인트: 목뼈(경추) 위는 피하고, 옆·뒤 근육만 닿게 합니다.\n주의: 압이 세거나 어지러움·저림이 있으면 즉시 중단합니다.' },
+      { id:'roller_calf', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'종아리', alimtalkLabel:'폼롤러 · 종아리', linkUrl:SELF_GUIDE_PAGE+'#roller_calf', thumbUrl:'exercise-thumbs/self_roller_calf.jpg', coachingNote:'준비: 앉거나 손으로 몸을 지탱한 채 종아리 근육 아래에 폼롤러를 둡니다.\n동작: 발목에서 무릎 쪽으로 천천히 굴립니다. 뭉친 지점에서 잠시 멈추어 호흡합니다.\n포인트: 정강이뼈가 아닌 근육 위에 올리고, 좌·우 같은 시간으로 합니다.\n주의: 뼈·아킬레스 힘줄을 세게 누르지 않습니다. 사진 순서는 링크에서 확인합니다.' },
+      { id:'roller_hamstring', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'햄스트링', alimtalkLabel:'폼롤러 · 햄스트링', linkUrl:SELF_GUIDE_PAGE+'#roller_hamstring', thumbUrl:'exercise-thumbs/self_roller_hamstring.jpg', coachingNote:'준비: 앉아 폼롤러를 허벅지 뒤(햄스트링) 아래에 두고 손으로 체중을 조절합니다.\n동작: 무릎 뒤에서 골반 쪽으로 천천히 굴리고, 뭉친 지점에서 호흡합니다.\n포인트: 무릎 관절이 아닌 근육 위에 올리고, 좌·우 같은 시간으로 합니다.\n주의: 뼈·무릎 뒤를 세게 누르지 않습니다. 사진 순서는 링크에서 확인합니다.' },
+      { id:'roller_thigh', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'허벅지', alimtalkLabel:'폼롤러 · 허벅지', linkUrl:SELF_GUIDE_PAGE+'#roller_thigh', thumbUrl:'exercise-thumbs/self_roller_thigh.jpg', coachingNote:'준비: 앞·옆·안쪽 중 목표 근육을 정한 뒤 그 아래에 폼롤러를 둡니다. 팔·반대 다리로 체중을 조절합니다.\n동작: 천천히 위아래로 굴리며, 통증 없는 범위에서 20~40초 구간을 반복합니다.\n포인트: 무릎 관절·뼈 위는 피하고, 호흡을 유지합니다.\n주의: 통증이 세면 체중을 줄이거나 중단합니다. 사진 순서는 링크에서 확인합니다.' },
+      { id:'roller_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'복부', alimtalkLabel:'폼롤러 · 복부', linkUrl:SELF_GUIDE_PAGE+'#roller_abdomen', thumbUrl:'exercise-thumbs/self_roller_abdomen.jpg', coachingNote:'준비: 엎드려 폼롤러를 복부 근육에 가볍게 둡니다.\n동작: 깊게 누르지 말고 작은 범위로 굴리거나, 호흡에 맞춰 15~30초 유지합니다.\n포인트: 숨을 내쉴 때 배가 부드럽게 내려가게 하고, 힘을 과도하게 주지 않습니다.\n주의: 식사 직후·임신·복통이 있으면 하지 않습니다. 사진 순서는 링크에서 확인합니다.' },
+      { id:'ball_scapula', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'등', alimtalkLabel:'마사지볼 · 등', linkUrl:SELF_GUIDE_PAGE+'#ball_scapula', thumbUrl:'exercise-thumbs/self_ball_scapula.jpg', coachingNote:'벽에 등을 대고 볼을 견갑 사이에 둡니다. 팔은 가슴 앞에서 교차하고, 무릎을 굽혀 체중을 실어 천천히 움직입니다. 척추 뼈 위는 피합니다.' },
+      { id:'ball_shoulder', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'견갑·어깨', alimtalkLabel:'마사지볼 · 견갑·어깨', linkUrl:SELF_GUIDE_PAGE+'#ball_shoulder', thumbUrl:'exercise-thumbs/self_ball_shoulder.jpg', coachingNote:'벽에 볼을 두고 뒤 어깨·견갑 근육에 댑니다. 통증 없는 범위에서 천천히 원을 그리거나 위아래로 움직입니다. 호흡을 멈추지 않고 어깨를 귀 쪽으로 올리지 않습니다.' },
+      { id:'ball_chest', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'가슴', alimtalkLabel:'마사지볼 · 가슴', linkUrl:SELF_GUIDE_PAGE+'#ball_chest', thumbUrl:'exercise-thumbs/self_ball_chest.jpg', coachingNote:'기둥에 볼을 두고 가슴 바깥·앞 어깨 근육에 댑니다. 팔을 뒤로 연 채 작은 범위로 움직이고, 쇄골·관절은 피합니다.' },
+      { id:'ball_waist', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'허리', alimtalkLabel:'마사지볼 · 허리', linkUrl:SELF_GUIDE_PAGE+'#ball_waist', coachingNote:'요추 양쪽 근육에 볼을 대고 체중을 천천히 실어줍니다. 척추 뼈 위가 아닌 근육 부위에 위치시키는지 확인합니다.' },
+      { id:'ball_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'복부', alimtalkLabel:'마사지볼 · 복부', linkUrl:SELF_GUIDE_PAGE+'#ball_abdomen', thumbUrl:'exercise-thumbs/self_ball_abdomen.jpg', coachingNote:'볼을 복부 근육에 가볍게 두고 깊게 누르지 않습니다. 호흡에 맞춰 작은 범위로 자극하고, 식사 직후·복통이 있으면 하지 않습니다.' },
+      { id:'ball_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'엉덩이', alimtalkLabel:'마사지볼 · 엉덩이', linkUrl:SELF_GUIDE_PAGE+'#ball_hip', thumbUrl:'exercise-thumbs/self_ball_hip.jpg', coachingNote:'기둥에 볼을 두고 한쪽 엉덩이 근육에 댑니다. 좌골이 아닌 근육 위에 올리고 체중을 천천히 실어 원을 그리거나 유지합니다. 찌릿하면 중단합니다.' },
+      { id:'ball_thigh', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'허벅지', alimtalkLabel:'마사지볼 · 허벅지', linkUrl:SELF_GUIDE_PAGE+'#ball_thigh', thumbUrl:'exercise-thumbs/self_ball_thigh.jpg', coachingNote:'기둥에 볼을 두고 허벅지 근육에 댑니다. 무릎 관절은 피하고, 작은 범위로 위아래·원을 그립니다.' },
       { id:'p1_su_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'② Supine · 상체' },
       { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'① Supine · 하체' },
       { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Position 1 · Lying', program:'Passive Stretching', label:'④ Prone · 상체' },
@@ -2976,7 +2980,10 @@
       return local.map(function(loc) {
         var srv = serverById[loc.id];
         if (!srv) return loc;
-        var url = String(srv.youtubeUrl || loc.youtubeUrl || '').trim();
+        var preferLocalUrl = loc.uiSection === 'self_tool';
+        var url = preferLocalUrl
+          ? String(loc.youtubeUrl || srv.youtubeUrl || '').trim()
+          : String(srv.youtubeUrl || loc.youtubeUrl || '').trim();
         var srvTitle = String(srv.videoTitle || '').trim();
         var shortTitle = String(loc.label || loc.videoTitle || '').trim();
         return Object.assign({}, loc, {
@@ -2987,7 +2994,9 @@
           videoDetailTitle: '',
           videoMatch: srv.videoMatch || loc.videoMatch,
           kind: srv.kind || loc.kind,
-          coachingNote: String(srv.coachingNote || loc.coachingNote || '').trim(),
+          coachingNote: preferLocalUrl
+            ? String(loc.coachingNote || srv.coachingNote || '').trim()
+            : String(srv.coachingNote || loc.coachingNote || '').trim(),
         });
       });
     }
