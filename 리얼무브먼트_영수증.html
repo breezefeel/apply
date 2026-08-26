@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>영수증</title>
+<link rel="icon" href="리얼무브먼트_링크_로고.png">
+<link rel="apple-touch-icon" href="리얼무브먼트_링크_로고.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root {
+    --ink: #0B2048;
+    --mute: #5a6578;
+    --line: #D6CBB6;
+    --gold: #C4A056;
+    --paper: #FBF8F2;
+    --sheet: #FFFEFB;
+    --teal: #00b09b;
+    --app: #f4f1ea;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    min-height: 100%;
+    background: var(--app);
+    color: var(--ink);
+    font-family: Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, select, input, textarea { font-family: inherit; }
+
+  .app {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: calc(12px + env(safe-area-inset-top)) 14px calc(88px + env(safe-area-inset-bottom));
+  }
+
+  .head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+  }
+  .head img {
+    width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #fff;
+  }
+  .head h1 { font-size: 18px; font-weight: 800; letter-spacing: -.03em; }
+  .head p { font-size: 12px; color: var(--mute); font-weight: 600; }
+
+  .tabs {
+    display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px; margin-bottom: 14px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 0 0 auto;
+    border: 1.5px solid #d7d0c4;
+    background: #fff;
+    color: var(--ink);
+    font-size: 13px; font-weight: 700;
+    padding: 9px 12px; border-radius: 999px;
+    cursor: pointer; white-space: nowrap;
+  }
+  .tab.active {
+    background: var(--ink); color: #fff; border-color: var(--ink);
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 16px 14px 18px;
+    box-shadow: 0 8px 28px rgba(11,32,72,.06);
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 800; margin-bottom: 12px;
+    letter-spacing: -.02em;
+  }
+  .grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px 10px;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .field.span2 { grid-column: span 2; }
+  .field label {
+    font-size: 11px; font-weight: 800; color: var(--mute);
+    letter-spacing: .02em;
+  }
+  .field label .req { color: #c45c5c; }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    border: 1px solid #e2ddd3;
+    background: #faf9f6;
+    padding: 10px 11px;
+    font-size: 15px;
+    color: var(--ink);
+    border-radius: 10px;
+  }
+  .field textarea { min-height: 72px; resize: vertical; line-height: 1.45; }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: 2px solid var(--gold); border-color: var(--gold); background: #fff;
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    border: 1px solid #e2ddd3; background: #fff;
+    font-size: 12px; font-weight: 700; padding: 7px 10px; border-radius: 999px;
+    cursor: pointer; color: var(--ink);
+  }
+  .chip.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  .dock {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, transparent, var(--app) 28%);
+    display: flex; justify-content: center;
+  }
+  .dock-inner { width: 100%; max-width: 640px; display: flex; gap: 8px; }
+  .btn {
+    flex: 1; border: 0; cursor: pointer;
+    font-size: 15px; font-weight: 800;
+    padding: 14px 12px; border-radius: 14px;
+  }
+  .btn-print { background: var(--ink); color: #fff; }
+  .btn-ghost { background: #fff; color: var(--ink); border: 1.5px solid #d7d0c4; }
+
+  .preview-label {
+    font-size: 11px; font-weight: 800; letter-spacing: .12em;
+    text-transform: uppercase; color: #8a8378; margin: 0 0 8px 2px;
+  }
+  .preview {
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 12px 36px rgba(18,20,26,.14);
+    background: var(--sheet);
+  }
+  .sheet-frame {
+    width: 100%;
+    overflow: hidden;
+  }
+  .sheet {
+    width: 210mm;
+    min-height: 297mm;
+    background: var(--sheet);
+    color: var(--ink);
+    padding: 16mm 18mm 14mm;
+    display: flex; flex-direction: column;
+    font-family: "Source Sans 3", "Segoe UI", sans-serif;
+    transform-origin: top left;
+  }
+  .top {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 16px; padding-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand img {
+    width: 72px; height: 72px; object-fit: cover;
+    border-radius: 50%; background: #F6E4C4; display: block;
+  }
+  .brand h1 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 26px; font-weight: 700; letter-spacing: .02em; line-height: 1.1;
+  }
+  .brand .tag {
+    margin-top: 4px; font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--mute);
+  }
+  .doc-title { text-align: right; }
+  .doc-title .kicker {
+    font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold);
+    font-weight: 700;
+  }
+  .doc-title h2 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 34px; font-weight: 700; letter-spacing: .08em; line-height: 1;
+    margin: 2px 0 4px;
+  }
+  .doc-title p { font-size: 12px; color: var(--mute); }
+
+  .meta {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px 28px;
+    padding: 14px 0 16px; font-size: 13px;
+  }
+  .meta dt { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); }
+  .meta dd { font-weight: 600; margin-top: 1px; }
+
+  .party {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    padding: 12px 14px;
+    margin-bottom: 16px;
+  }
+  .party .lbl {
+    font-size: 10px; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 4px;
+  }
+  .party .name {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 22px; font-weight: 700;
+  }
+  .party .sub { font-size: 13px; color: var(--mute); margin-top: 2px; }
+
+  table.items { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; }
+  table.items th {
+    text-align: left; font-size: 10px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--mute);
+    border-bottom: 1px solid var(--ink); padding: 0 8px 8px 0; font-weight: 700;
+  }
+  table.items th.num, table.items td.num { text-align: right; padding-right: 0; }
+  table.items td {
+    padding: 12px 8px 12px 0; vertical-align: top;
+    border-bottom: 1px solid var(--line);
+  }
+  table.items .svc { font-weight: 700; }
+  table.items .svc-desc { font-size: 12px; color: var(--mute); font-weight: 400; margin-top: 3px; line-height: 1.45; white-space: pre-wrap; }
+
+  .totals { margin-left: auto; width: 58%; font-size: 13px; }
+  .totals .row { display: flex; justify-content: space-between; gap: 16px; padding: 5px 0; }
+  .totals .grand {
+    border-top: 2px solid var(--ink);
+    margin-top: 6px; padding-top: 8px;
+    font-size: 16px; font-weight: 700;
+  }
+  .words { margin-top: 12px; font-size: 12.5px; line-height: 1.5; font-style: italic; color: var(--mute); }
+  .cert { margin-top: 18px; font-size: 12.5px; line-height: 1.65; }
+  .notes { margin-top: 10px; font-size: 12px; color: var(--mute); line-height: 1.55; min-height: 1.55em; white-space: pre-wrap; }
+
+  .sign { display: flex; justify-content: flex-end; margin-top: auto; padding-top: 28px; }
+  .sign-box { width: 240px; text-align: center; }
+  .sign-line { border-top: 1px solid var(--ink); padding-top: 8px; font-size: 13px; font-weight: 700; }
+  .sign-role { font-size: 11px; color: var(--mute); margin-top: 2px; }
+  .sign-hint { font-size: 10px; color: var(--mute); margin-bottom: 36px; letter-spacing: .08em; text-transform: uppercase; }
+
+  .foot {
+    margin-top: 22px; padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: 11px; color: var(--mute); line-height: 1.55;
+    display: flex; justify-content: space-between; gap: 16px;
+  }
+
+  @media print {
+    @page { size: A4; margin: 12mm; }
+    html, body { background: #fff; }
+    .app { max-width: none; padding: 0; }
+    .no-print { display: none !important; }
+    .preview { overflow: visible; box-shadow: none; border-radius: 0; background: transparent; }
+    .sheet-frame { height: auto !important; width: auto !important; overflow: visible; }
+    .sheet { width: auto; min-height: 0; padding: 0; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="head no-print">
+      <img src="리얼무브먼트_링크_로고.png" alt="">
+      <div>
+        <h1>영문 영수증</h1>
+        <p>발급 기관을 고른 뒤 항목을 입력하세요</p>
+      </div>
+    </header>
+
+    <nav class="tabs no-print" id="tabs" aria-label="발급 기관"></nav>
+
+    <section class="card no-print">
+      <div class="card-title">입력</div>
+      <div class="grid">
+        <div class="field span2">
+          <label>이용권 빠른 선택</label>
+          <div class="chips" id="packChips"></div>
+        </div>
+        <div class="field span2">
+          <label>회원 이름 <span class="req">*</span></label>
+          <input id="clientName" type="text" placeholder="여권 영문 이름" autocomplete="name">
+        </div>
+        <div class="field">
+          <label>국적</label>
+          <input id="nationality" type="text" placeholder="French">
+        </div>
+        <div class="field">
+          <label>결제 방법</label>
+          <select id="payMethod">
+            <option value="Credit / debit card">카드</option>
+            <option value="Cash">현금</option>
+            <option value="Bank transfer">계좌이체</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>발급일</label>
+          <input id="issueDate" type="date">
+        </div>
+        <div class="field">
+          <label>결제일</label>
+          <input id="payDate" type="date">
+        </div>
+        <div class="field span2">
+          <label>서비스명 (영문)</label>
+          <input id="svcName" type="text" placeholder="Single session">
+        </div>
+        <div class="field span2">
+          <label>서비스 내용 (영문)</label>
+          <textarea id="svcDesc" placeholder="What the payment covers"></textarea>
+        </div>
+        <div class="field">
+          <label>회차</label>
+          <input id="sessions" type="number" min="1" max="99" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label>금액 (원) <span class="req">*</span></label>
+          <input id="amount" type="text" inputmode="numeric" placeholder="85,000">
+        </div>
+        <div class="field">
+          <label>유효 시작</label>
+          <input id="validFrom" type="date">
+        </div>
+        <div class="field">
+          <label>유효 종료</label>
+          <input id="validUntil" type="date">
+        </div>
+        <div class="field span2">
+          <label>발급자 영문 이름</label>
+          <input id="issuer" type="text" placeholder="Park Joon Kyu, D.C., P.T.">
+        </div>
+        <div class="field span2">
+          <label>발급자 직함 (영문)</label>
+          <input id="issuerRole" type="text" placeholder="Director">
+        </div>
+        <div class="field span2">
+          <label>주소 (영문)</label>
+          <textarea id="addr" rows="3"></textarea>
+        </div>
+        <div class="field">
+          <label>전화</label>
+          <input id="phone" type="text" inputmode="tel">
+        </div>
+        <div class="field">
+          <label>사업자등록번호</label>
+          <input id="bizNo" type="text" placeholder="000-00-00000" inputmode="numeric">
+        </div>
+        <div class="field span2">
+          <label>메모 (영문)</label>
+          <textarea id="notes" placeholder="Paid in full."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <p class="preview-label no-print">미리보기 · A4</p>
+    <div class="preview">
+      <div class="sheet-frame" id="sheetFrame">
+      <article class="sheet" id="sheet">
+        <header class="top">
+          <div class="brand">
+            <img id="vLogo" src="리얼무브먼트_링크_로고.png" alt="">
+            <div>
+              <h1 id="vOrg">—</h1>
+              <p class="tag" id="vTag"></p>
+            </div>
+          </div>
+          <div class="doc-title">
+            <div class="kicker">Proof of payment</div>
+            <h2>RECEIPT</h2>
+            <p>Republic of Korea</p>
+          </div>
+        </header>
+        <dl class="meta">
+          <div><dt>Receipt no.</dt><dd id="vNo">—</dd></div>
+          <div><dt>Date of issue</dt><dd id="vIssue">—</dd></div>
+          <div><dt>Place of issue</dt><dd id="vPlace">—</dd></div>
+          <div><dt>Payment date</dt><dd id="vPayDate">—</dd></div>
+        </dl>
+        <div class="party">
+          <div class="lbl">Issued to</div>
+          <div class="name" id="vName">—</div>
+          <div class="sub" id="vNation"></div>
+        </div>
+        <table class="items">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="num">Qty</th>
+              <th class="num">Amount (KRW)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="svc" id="vSvc">—</div>
+                <div class="svc-desc" id="vSvcDesc"></div>
+              </td>
+              <td class="num" id="vQty">—</td>
+              <td class="num" id="vAmt">—</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="totals">
+          <div class="row"><span>Payment method</span><span id="vPay">—</span></div>
+          <div class="row" id="vPeriodRow" hidden><span>Validity</span><span id="vPeriod">—</span></div>
+          <div class="row grand"><span>Amount received</span><span id="vTotal">KRW 0</span></div>
+        </div>
+        <p class="words" id="vWords"></p>
+        <p class="cert" id="vCert"></p>
+        <p class="notes" id="vNotes"></p>
+        <div class="sign">
+          <div class="sign-box">
+            <div class="sign-hint">Authorized signature / stamp</div>
+            <div class="sign-line" id="vIssuer">—</div>
+            <div class="sign-role" id="vRole">—</div>
+          </div>
+        </div>
+        <footer class="foot">
+          <div id="vAddr"></div>
+          <div id="vBiz"></div>
+        </footer>
+      </article>
+      </div>
+    </div>
+  </div>
+
+  <div class="dock no-print">
+    <div class="dock-inner">
+      <button type="button" class="btn btn-ghost" id="btnClear">입력 지우기</button>
+      <button type="button" class="btn btn-print" onclick="window.print()">인쇄 / PDF 저장</button>
+    </div>
+  </div>
+
+<script>
+(function () {
+  var DESC = '1:1 personalized functional rehabilitation training (passive stretching, postural correction, and functional exercise).';
+  var ORGS = {
+    hbw: {
+      tab: '홀리스틱 바디워크',
+      name: 'Holistic Bodywork',
+      tag: '1:1 Functional Rehabilitation Training',
+      place: 'Seoul, Republic of Korea',
+      prefix: 'HBW',
+      addr: '4F, The Yaksu Building, 32 Dongho-ro 7-gil, Jung-gu, Seoul',
+      phone: '0507-1359-4596',
+      issuer: 'Park Joon Kyu, D.C., P.T.',
+      role: 'Holistic Bodywork · Director',
+      packs: [
+        { id: 'ys-1', label: '1회 85,000', name: 'Single session', sessions: 1, amount: 85000, desc: DESC },
+        { id: 'ys-1f', label: '근막 1회 40,000', name: 'Single session — myofascial release', sessions: 1, amount: 40000, desc: '1:1 myofascial release session.' },
+        { id: 'ys-w2', label: '주2회 660,000', name: 'Twice-weekly package', sessions: 8, amount: 660000, desc: DESC + ' 8 sessions.' },
+        { id: 'ys-w2f', label: '주2회+근막 760,000', name: 'Twice-weekly package + myofascial release', sessions: 8, amount: 760000, desc: DESC + ' Includes myofascial release. 8 sessions.' },
+        { id: 'ys-m3', label: '3개월 1,920,000', name: '3-month package', sessions: 24, amount: 1920000, desc: DESC + ' 24 sessions over 3 months.' },
+        { id: 'custom', label: '직접 입력', name: '', sessions: 1, amount: 0, desc: DESC }
+      ]
+    },
+    yaksu: {
+      tab: '리얼무브먼트 약수점',
+      name: 'REAL MOVEMENT Yaksu',
+      tag: 'Better Movement, Better Life',
+      place: 'Seoul, Republic of Korea',
+      prefix: 'RMY',
+      addr: 'Yaksu Studio · 4F, The Yaksu Building, 32 Dongho-ro 7-gil, Jung-gu, Seoul',
+      phone: '0507-1359-4596',
+      issuer: 'Park Joon Kyu, D.C., P.T.',
+      role: 'REAL MOVEMENT Yaksu · Director',
+      packs: [
+        { id: 'ys-1', label: '1회 85,000', name: 'Single session', sessions: 1, amount: 85000, desc: DESC },
+        { id: 'ys-1f', label: '근막 1회 40,000', name: 'Single session — myofascial release', sessions: 1, amount: 40000, desc: '1:1 myofascial release session.' },
+        { id: 'ys-w2', label: '주2회 660,000', name: 'Twice-weekly package', sessions: 8, amount: 660000, desc: DESC + ' 8 sessions.' },
+        { id: 'ys-w2f', label: '주2회+근막 760,000', name: 'Twice-weekly package + myofascial release', sessions: 8, amount: 760000, desc: DESC + ' Includes myofascial release. 8 sessions.' },
+        { id: 'ys-m3', label: '3개월 1,920,000', name: '3-month package', sessions: 24, amount: 1920000, desc: DESC + ' 24 sessions over 3 months.' },
+        { id: 'custom', label: '직접 입력', name: '', sessions: 1, amount: 0, desc: DESC }
+      ]
+    },
+    incheon: {
+      tab: '리얼무브먼트 인천점',
+      name: 'REAL MOVEMENT Incheon',
+      tag: 'Better Movement, Better Life',
+      place: 'Incheon, Republic of Korea',
+      prefix: 'RMI',
+      addr: '1F, Hillstate Xi Gyeyang, 9 Bongo-daero 651beon-gil, Gyeyang-gu, Incheon',
+      phone: '0507-1312-4596',
+      issuer: 'Park Joon Kyu, D.C., P.T.',
+      role: 'REAL MOVEMENT Incheon · Director',
+      packs: [
+        { id: 'ic50-1', label: '50분 1회 45,000', name: 'Single session (50 min)', sessions: 1, amount: 45000, desc: DESC + ' 50 minutes.' },
+        { id: 'ic50-8', label: '50분 8회 320,000', name: '8-session pass (50 min)', sessions: 8, amount: 320000, desc: DESC + ' 50 minutes per session. 8 sessions.' },
+        { id: 'ic50-24', label: '50분 24회 900,000', name: '24-session pass (50 min)', sessions: 24, amount: 900000, desc: DESC + ' 50 minutes per session. 24 sessions.' },
+        { id: 'ic80-1', label: '80분 1회 90,000', name: 'Single session (80 min)', sessions: 1, amount: 90000, desc: DESC + ' 80 minutes.' },
+        { id: 'ic80-8', label: '80분 8회 640,000', name: '8-session pass (80 min)', sessions: 8, amount: 640000, desc: DESC + ' 80 minutes per session. 8 sessions.' },
+        { id: 'ic80-24', label: '80분 24회 1,800,000', name: '24-session pass (80 min)', sessions: 24, amount: 1800000, desc: DESC + ' 80 minutes per session. 24 sessions.' },
+        { id: 'custom', label: '직접 입력', name: '', sessions: 1, amount: 0, desc: DESC }
+      ]
+    },
+    tree: {
+      tab: '힐링트리',
+      name: 'Healing Tree',
+      tag: 'Wellness · Rehabilitation Training',
+      place: 'Seoul, Republic of Korea',
+      prefix: 'HT',
+      addr: '4F, The Yaksu Building, 32 Dongho-ro 7-gil, Jung-gu, Seoul',
+      phone: '0507-1359-4596',
+      issuer: 'Park Joon Kyu, D.C., P.T.',
+      role: 'Healing Tree · Director',
+      packs: [
+        { id: 'custom', label: '직접 입력', name: '', sessions: 1, amount: 0, desc: '1:1 wellness and rehabilitation training.' }
+      ]
+    }
+  };
+
+  var FIELDS = ['clientName', 'nationality', 'payMethod', 'issueDate', 'payDate', 'svcName', 'svcDesc', 'sessions', 'amount', 'validFrom', 'validUntil', 'issuer', 'issuerRole', 'addr', 'phone', 'bizNo', 'notes', 'packId'];
+  var STORE = 'receipt-app-v1';
+  var orgId = 'hbw';
+  var filling = false;
+  var $ = function (id) { return document.getElementById(id); };
+
+  var ONES = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+  var TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+  function chunkToWords(n) {
+    if (n < 20) return ONES[n];
+    if (n < 100) return TENS[Math.floor(n / 10)] + (n % 10 ? '-' + ONES[n % 10] : '');
+    return ONES[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + chunkToWords(n % 100) : '');
+  }
+  function toWords(n) {
+    if (!n) return 'zero';
+    var parts = [];
+    var scales = [['', 1], [' thousand', 1000], [' million', 1000000]];
+    for (var i = scales.length - 1; i >= 0; i--) {
+      var unit = scales[i][1], label = scales[i][0];
+      if (n >= unit) {
+        var chunk = Math.floor(n / unit);
+        if (chunk) parts.push(chunkToWords(chunk) + label);
+        n = n % unit;
+      }
+    }
+    return parts.join(' ');
+  }
+  function parseAmount(s) {
+    var n = parseInt(String(s || '').replace(/[^\d]/g, ''), 10);
+    return isNaN(n) ? 0 : n;
+  }
+  function fmtKRW(n) { return 'KRW ' + n.toLocaleString('en-US'); }
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    var d = new Date(iso + 'T00:00:00');
+    if (isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+  function todayISO() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function loadAll() {
+    try { return JSON.parse(localStorage.getItem(STORE) || '{}'); } catch (e) { return {}; }
+  }
+  function saveAll(data) { localStorage.setItem(STORE, JSON.stringify(data)); }
+
+  function defaults(id) {
+    var o = ORGS[id];
+    var first = o.packs[0];
+    var d = {
+      clientName: '',
+      nationality: '',
+      payMethod: 'Credit / debit card',
+      issueDate: todayISO(),
+      payDate: todayISO(),
+      svcName: first.name,
+      svcDesc: first.desc,
+      sessions: String(first.sessions || 1),
+      amount: first.amount ? first.amount.toLocaleString('en-US') : '',
+      validFrom: '',
+      validUntil: '',
+      issuer: o.issuer,
+      issuerRole: o.role,
+      addr: o.addr,
+      phone: o.phone,
+      bizNo: '',
+      notes: '',
+      packId: first.id
+    };
+    if (id === 'hbw') {
+      d.clientName = 'Ory Pierre';
+      d.nationality = 'French';
+      d.packId = 'ys-1';
+      d.svcName = 'Single session';
+      d.sessions = '1';
+      d.amount = '85,000';
+      d.svcDesc = DESC;
+    }
+    return d;
+  }
+
+  function readForm() {
+    var data = {};
+    FIELDS.forEach(function (k) {
+      if (k === 'packId') data.packId = document.querySelector('.chip.active') ? document.querySelector('.chip.active').dataset.id : 'custom';
+      else data[k] = $(k).value;
+    });
+    return data;
+  }
+  function writeForm(data) {
+    filling = true;
+    FIELDS.forEach(function (k) {
+      if (k === 'packId') return;
+      if ($(k)) $(k).value = data[k] != null ? data[k] : '';
+    });
+    filling = false;
+    renderChips(data.packId || 'custom');
+  }
+  function persist() {
+    var all = loadAll();
+    all.orgId = orgId;
+    all[orgId] = readForm();
+    saveAll(all);
+  }
+
+  function renderChips(activeId) {
+    var o = ORGS[orgId];
+    $('packChips').innerHTML = o.packs.map(function (p) {
+      return '<button type="button" class="chip' + (p.id === activeId ? ' active' : '') + '" data-id="' + p.id + '">' + p.label + '</button>';
+    }).join('');
+  }
+  function applyPack(id) {
+    var p = ORGS[orgId].packs.filter(function (x) { return x.id === id; })[0];
+    if (!p) return;
+    renderChips(id);
+    if (id === 'custom') { persist(); render(); return; }
+    filling = true;
+    $('svcName').value = p.name;
+    $('svcDesc').value = p.desc;
+    $('sessions').value = p.sessions;
+    $('amount').value = p.amount ? p.amount.toLocaleString('en-US') : '';
+    filling = false;
+    persist();
+    render();
+  }
+
+  function render() {
+    var o = ORGS[orgId];
+    var amt = parseAmount($('amount').value);
+    var sess = parseInt($('sessions').value, 10) || 0;
+    var name = $('clientName').value.trim() || '________________';
+    var nation = $('nationality').value.trim();
+    var from = $('validFrom').value;
+    var until = $('validUntil').value;
+    var biz = $('bizNo').value.trim();
+    var notes = $('notes').value.trim();
+    var phone = $('phone').value.trim();
+    var addr = $('addr').value.trim();
+    var ymd = ($('issueDate').value || todayISO()).replace(/-/g, '');
+
+    $('vOrg').textContent = o.name;
+    $('vTag').textContent = o.tag;
+    $('vLogo').alt = o.name;
+    $('vNo').textContent = o.prefix + '-' + ymd;
+    $('vIssue').textContent = fmtDate($('issueDate').value);
+    $('vPlace').textContent = o.place;
+    $('vPayDate').textContent = fmtDate($('payDate').value);
+    $('vName').textContent = name;
+    $('vNation').textContent = nation ? 'Nationality: ' + nation : '';
+    $('vSvc').textContent = $('svcName').value.trim() || '—';
+    $('vSvcDesc').textContent = $('svcDesc').value.trim();
+    $('vQty').textContent = sess ? (sess + (sess === 1 ? ' session' : ' sessions')) : '—';
+    $('vAmt').textContent = amt ? fmtKRW(amt) : '—';
+    $('vPay').textContent = $('payMethod').value;
+    $('vTotal').textContent = amt ? fmtKRW(amt) : 'KRW 0';
+    var words = toWords(amt);
+    $('vWords').textContent = amt ? 'Amount in words: ' + words.charAt(0).toUpperCase() + words.slice(1) + ' Korean Won only.' : '';
+    if (from || until) {
+      $('vPeriodRow').hidden = false;
+      $('vPeriod').textContent = (from ? fmtDate(from) : '—') + ' – ' + (until ? fmtDate(until) : '—');
+    } else {
+      $('vPeriodRow').hidden = true;
+    }
+    $('vCert').innerHTML = 'This document certifies that <strong>' + o.name + '</strong> has received the amount stated above in full as payment for the services described. It is issued for the client’s records and may be used for reimbursement or accounting purposes. Amounts are in Korean Won (KRW).';
+    $('vNotes').textContent = notes;
+    $('vIssuer').textContent = $('issuer').value.trim() || o.issuer;
+    $('vRole').textContent = $('issuerRole').value.trim() || o.role;
+    $('vAddr').innerHTML = (addr + (phone ? '\nTel. ' + phone : '')).replace(/\n/g, '<br>');
+    $('vBiz').textContent = biz ? 'Business registration no. ' + biz : '';
+    fitPreview();
+  }
+
+  function fitPreview() {
+    var frame = $('sheetFrame');
+    var sheet = $('sheet');
+    if (!frame || !sheet) return;
+    sheet.style.transform = 'none';
+    var naturalW = sheet.offsetWidth;
+    var naturalH = sheet.offsetHeight;
+    var avail = frame.clientWidth;
+    if (!naturalW || !avail) return;
+    var scale = Math.min(1, avail / naturalW);
+    sheet.style.transform = 'scale(' + scale + ')';
+    frame.style.height = (naturalH * scale) + 'px';
+  }
+
+  function switchOrg(id) {
+    persist();
+    orgId = id;
+    var all = loadAll();
+    all.orgId = id;
+    if (!all[id]) all[id] = defaults(id);
+    saveAll(all);
+    document.querySelectorAll('.tab').forEach(function (t) {
+      t.classList.toggle('active', t.dataset.id === id);
+    });
+    writeForm(all[id]);
+    render();
+  }
+
+  function buildTabs() {
+    $('tabs').innerHTML = Object.keys(ORGS).map(function (id) {
+      return '<button type="button" class="tab" data-id="' + id + '">' + ORGS[id].tab + '</button>';
+    }).join('');
+  }
+
+  buildTabs();
+  var saved = loadAll();
+  orgId = saved.orgId && ORGS[saved.orgId] ? saved.orgId : 'hbw';
+  if (saved.tree) {
+    saved.tree.addr = ORGS.tree.addr;
+    saved.tree.phone = ORGS.tree.phone;
+  }
+  if (!saved[orgId]) {
+    saved[orgId] = defaults(orgId);
+    saved.orgId = orgId;
+    saveAll(saved);
+  }
+  document.querySelectorAll('.tab').forEach(function (t) {
+    t.classList.toggle('active', t.dataset.id === orgId);
+  });
+  writeForm(saved[orgId]);
+  render();
+
+  $('tabs').addEventListener('click', function (e) {
+    var t = e.target.closest('.tab');
+    if (t) switchOrg(t.dataset.id);
+  });
+  $('packChips').addEventListener('click', function (e) {
+    var c = e.target.closest('.chip');
+    if (c) applyPack(c.dataset.id);
+  });
+  $('btnClear').addEventListener('click', function () {
+    var d = defaults(orgId);
+    d.clientName = '';
+    d.nationality = '';
+    d.amount = '';
+    d.svcName = '';
+    d.packId = 'custom';
+    writeForm(d);
+    persist();
+    render();
+  });
+
+  FIELDS.forEach(function (k) {
+    if (k === 'packId') return;
+    var el = $(k);
+    el.addEventListener('input', function () {
+      if (k === 'amount' && !filling) {
+        var n = parseAmount(el.value);
+        el.value = n ? n.toLocaleString('en-US') : '';
+      }
+      if (!filling && (k === 'svcName' || k === 'svcDesc' || k === 'sessions' || k === 'amount')) {
+        renderChips('custom');
+      }
+      persist();
+      render();
+    });
+    el.addEventListener('change', function () { persist(); render(); });
+  });
+
+  window.addEventListener('resize', fitPreview);
+  window.addEventListener('beforeprint', function () {
+    var sheet = $('sheet');
+    var frame = $('sheetFrame');
+    if (sheet) sheet.style.transform = 'none';
+    if (frame) frame.style.height = 'auto';
+  });
+  window.addEventListener('afterprint', fitPreview);
+})();
+</script>
+</body>
+</html>
