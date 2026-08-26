@@ -68,7 +68,10 @@
       border-color:rgba(255,255,255,.4);
     }
     .page-hd-links {
-      display:flex; gap:10px; margin-top:0; flex-wrap:wrap; justify-content:flex-end;
+      display:flex; gap:10px; margin-top:0; flex-wrap:nowrap; justify-content:flex-end; align-items:center;
+    }
+    .page-hd-links-gap {
+      width:14px; flex:0 0 14px; height:1px;
     }
     .page-hd-link {
       font-size:10px; font-weight:700; color:rgba(255,255,255,.88);
@@ -2259,6 +2262,9 @@
       </div>
       <div class="page-hd-side">
         <div class="page-hd-links">
+          <a class="page-hd-link" href="#" onclick="openApplicationForm_(event)">회원등록</a>
+          <a class="page-hd-link" href="영수증.html" onclick="openMemberCare_(event)">회원대응</a>
+          <span class="page-hd-links-gap" aria-hidden="true"></span>
           <a class="page-hd-link" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠</a>
           <a class="page-hd-link" href="#" onclick="openMemberScheduleSheet_(event)" title="보드 날짜의 월 스케줄표로 이동">예약 스케줄</a>
         </div>
@@ -2266,7 +2272,6 @@
           <button type="button" class="page-hd-btn page-hd-btn--refresh" onclick="loadBoard()" title="새로고침" aria-label="새로고침">새로고침</button>
           <button type="button" class="page-hd-btn" onclick="sendWellnessIntakeSms_()">사전평가</button>
           <button type="button" class="page-hd-btn page-hd-btn--eval" onclick="openEvalModal()">초회평가</button>
-          <a class="page-hd-btn" href="#" onclick="openApplicationForm_(event)">회원등록</a>
         </div>
       </div>
     </div>
@@ -5103,8 +5108,9 @@
 
     var COLLAPSIBLE_SECTIONS = ['self_tool', 'pos1_par', 'pos2', 'pos3'];
 
-    /** Lying · Sitting/Quadruped · Standing — Stretching · A 생활습관 · R 기능운동 서브 접기 */
+    /** Lying · Sitting/Quadruped · Standing 서브 + 셀프 소도구(목록·폼롤러·볼) */
     var POSITION_SUB_CATEGORIES = {
+      self_tool: ['list', 'roller', 'ball'],
       pos1_par: ['par', 'lifestyle', 'func'],
       pos2: ['par', 'lifestyle', 'func'],
       pos3: ['par', 'lifestyle', 'func'],
@@ -5120,6 +5126,9 @@
 
     /** Lying: Passive Stretching / Sitting·Standing: Active Stretching */
     function subCategoryLabel(secKey, subKey) {
+      if (subKey === 'list') return '소도구 목록';
+      if (subKey === 'roller') return '폼롤러';
+      if (subKey === 'ball') return '12센티 마사지볼';
       if (subKey === 'lifestyle') return 'A - 생활습관';
       if (subKey === 'func') return 'R - 기능운동';
       if (subKey === 'par') {
@@ -5129,11 +5138,16 @@
       return subKey;
     }
 
-    /** Passive/Active Stretching · A 생활습관 · R 기능운동 분류 */
+    /** Passive/Active Stretching · A 생활습관 · R 기능운동 · 셀프 소도구 분류 */
     function movementSubCategory(item) {
       if (!item) return 'func';
       var sec = item.uiSection || '';
       var prog = String(item.program || '');
+      if (sec === 'self_tool') {
+        if (prog === '폼롤러') return 'roller';
+        if (prog.indexOf('마사지볼') >= 0) return 'ball';
+        return 'list';
+      }
       if (sec === 'pos1_par') {
         if (isP1ParProgram(prog)) return 'par';
         if (prog === '생활습관' || /^1\s*·/.test(prog)) return 'lifestyle';
@@ -7755,6 +7769,7 @@
         if (stats.partial) return false;
       }
       if (secKey === 'pos1_par' && subKey === 'par') return false;
+      if (secKey === 'self_tool' && subKey === 'list') return false;
       return subKey !== 'par';
     }
 
@@ -10271,6 +10286,7 @@
         programsInSection[item.program].push(item);
       });
       var selectAllOnPart = subKey === 'func';
+      var skipPartHd = secKey === 'self_tool';
       var activeStretchingMainShown = false;
       Object.keys(programsInSection).sort(function(a, b) {
         var na = programSortKey(a), nb = programSortKey(b);
@@ -10278,8 +10294,7 @@
         return String(a).localeCompare(String(b), 'ko');
       }).forEach(function(progName) {
         var progItems = programsInSection[progName];
-        var partSelectAll = selectAllOnPart ||
-          (secKey === 'self_tool' && (progName === '폼롤러' || progName.indexOf('마사지볼') >= 0));
+        var partSelectAll = selectAllOnPart;
         if (isActiveStretchingProgram(progName)) {
           if (!activeStretchingMainShown) {
             activeStretchingMainShown = true;
@@ -10287,7 +10302,7 @@
               ACTIVE_STRETCHING_TITLE, progItems, hasMember, false, secKey, progName
             );
           }
-        } else if (!useFlatCheckboxRows(progName)) {
+        } else if (!skipPartHd && !useFlatCheckboxRows(progName)) {
           html += renderProgramPartHdHtml_(
             programCategoryTitle(progName), progItems, hasMember, partSelectAll, secKey, progName
           );
@@ -10498,7 +10513,7 @@
             html += '<div class="psp-subsection collapsible' + (subCollapsed ? ' collapsed' : '') + '">';
             html += '<div class="psp-subsection-hd" onclick="toggleSubSectionCollapse(\'' + secKey + '\',\'' + subKey + '\')">';
             html += '<span class="psp-subsection-hd-main">';
-            if (subKey === 'par' || subKey === 'lifestyle') {
+            if (subKey === 'par' || subKey === 'lifestyle' || subKey === 'roller' || subKey === 'ball') {
               html += renderGroupSelectCheckboxHtml_(
                 subItems, hasMember,
                 'toggleSubCategoryToday(\'' + secKey + '\',\'' + subKey + '\',this)'
@@ -12741,6 +12756,28 @@
       if (careDur) params.set('careDuration', careDur);
 
       return params;
+    }
+
+    function openMemberCare_(ev) {
+      if (ev) ev.preventDefault();
+      var m = state.selected;
+      var params = new URLSearchParams();
+      params.set('tab', 'manual');
+      if (m && String(m.name || '').trim()) {
+        params.set('name', String(m.name).trim());
+        var branch = String(m.branch || '').trim();
+        if (/인천|작전/.test(branch)) params.set('branch', '인천');
+        else if (/약수/.test(branch)) params.set('branch', '약수');
+        var rounds = m.payRounds || (m.applicationPrefill && m.applicationPrefill.payRounds);
+        if (rounds) params.set('sessions', String(rounds));
+        var inst = String(m.instructorName || m.inst || m.memberInstructor || '').trim();
+        if (inst) params.set('instructor', inst);
+        var prog = String(m.program || '').trim();
+        if (prog) params.set('program', prog);
+      }
+      var url = '영수증.html';
+      if (params.toString()) url += '?' + params.toString();
+      window.open(url, '_blank', 'noopener,noreferrer');
     }
 
     async function openApplicationForm_(ev) {
