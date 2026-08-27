@@ -55,19 +55,20 @@
   .head h1 { font-size: 18px; font-weight: 800; letter-spacing: -.03em; }
   .head p { font-size: 12px; color: var(--mute); font-weight: 600; }
   .head-branch { flex: 0 0 auto; }
-  body.mode-receipt #consultBranchChips { display: none; }
+  body.mode-receipt #consultBranchChips,
+  body.mode-docs #consultBranchChips { display: none; }
   body.mode-consult #pageSub { display: none; }
 
   .app-tabs {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    display: grid; grid-template-columns: 1.15fr .85fr 1fr; gap: 8px;
     margin-bottom: 14px;
   }
   .app-tab {
     border: 1.5px solid #d7d0c4;
     background: #fff;
     color: var(--ink);
-    font-size: 15px; font-weight: 800;
-    padding: 12px 10px; border-radius: 14px;
+    font-size: 13.5px; font-weight: 800;
+    padding: 12px 6px; border-radius: 14px;
     cursor: pointer;
   }
   .app-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
@@ -229,7 +230,104 @@
     font-size: 12px; font-weight: 800;
     padding: 6px 10px; border-radius: 999px; cursor: pointer;
   }
-  body.mode-consult .receipt-dock { display: none; }
+  body.mode-consult .receipt-dock,
+  body.mode-docs .receipt-dock { display: none; }
+
+  .doc-steps {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    margin-bottom: 14px;
+  }
+  .doc-step {
+    background: #fff;
+    border: 1.5px solid #e2ddd3;
+    border-radius: 12px;
+    padding: 8px 6px 9px;
+    text-align: center;
+  }
+  .doc-step b {
+    display: block; font-size: 11px; font-weight: 800; color: var(--gold);
+    letter-spacing: .04em; margin-bottom: 2px;
+  }
+  .doc-step span {
+    display: block; font-size: 11.5px; font-weight: 700; line-height: 1.35;
+    color: var(--mute);
+  }
+  .doc-step.on {
+    border-color: var(--ink); background: var(--ink);
+  }
+  .doc-step.on b, .doc-step.on span { color: #fff; }
+  .doc-step.done { border-color: var(--gold); background: #fffaf0; }
+  .doc-note {
+    font-size: 12.5px; line-height: 1.65; color: var(--mute); font-weight: 600;
+    background: #faf9f6; border-radius: 12px; padding: 11px 12px;
+  }
+  .doc-note strong { color: var(--ink); }
+  .doc-dead {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    margin: 10px 0 0;
+  }
+  .doc-dead div {
+    background: #f4f1ea; border-radius: 12px; padding: 10px 11px;
+  }
+  .doc-dead b { display: block; font-size: 11px; color: var(--mute); margin-bottom: 3px; }
+  .doc-dead span { font-size: 14px; font-weight: 800; }
+  .doc-links { display: flex; flex-direction: column; gap: 8px; }
+  .doc-links a.btn { width: 100%; }
+  .doc-path {
+    font-size: 11.5px; color: var(--mute); font-weight: 600;
+    line-height: 1.5; margin-top: 4px;
+  }
+  .hometax-fields { display: flex; flex-direction: column; gap: 8px; }
+  .hometax-fields .field { margin: 0; }
+  .hometax-val {
+    width: 100%;
+    text-align: left;
+    border: 1px solid #e2ddd3;
+    background: #fff;
+    color: var(--ink);
+    font-size: 16px; font-weight: 800;
+    padding: 11px 12px; border-radius: 12px;
+    cursor: pointer;
+  }
+  .hometax-val:active { background: #f4f1ea; }
+  .hometax-sum {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .hometax-sum button {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    border: 0; background: #f4f1ea; color: var(--ink);
+    border-radius: 12px; padding: 12px 14px;
+    cursor: pointer; text-align: left;
+  }
+  .hometax-sum b { font-size: 12px; color: var(--mute); font-weight: 800; }
+  .hometax-sum span { font-size: 16px; font-weight: 800; }
+  .docs-sheet { display: none; }
+  .doc-payer-info {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .doc-payer-info div {
+    background: #f4f1ea; border-radius: 12px; padding: 10px 11px;
+  }
+  .doc-payer-info .span2 { grid-column: span 2; }
+  .doc-payer-info b { display: block; font-size: 11px; color: var(--mute); margin-bottom: 3px; }
+  .doc-payer-info span { font-size: 13.5px; font-weight: 800; line-height: 1.4; }
+  #docPayerTabs, #docStaffTabs { margin-bottom: 12px; }
+  .field input:read-only { background: #f4f1ea; }
+  .doc-folder {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 8px; margin: 0 0 12px;
+  }
+  .doc-folder .hint { margin: 0; flex: 1; }
+  .doc-folder .btn-sm { margin-top: 2px; }
+  @media (max-width: 420px) {
+    .doc-steps { grid-template-columns: 1fr 1fr; }
+    .doc-dead { grid-template-columns: 1fr; }
+    .app-tab { font-size: 12.5px; padding: 11px 4px; }
+    .doc-payer-info { grid-template-columns: 1fr; }
+    .doc-payer-info .span2 { grid-column: span 1; }
+  }
 
   .card {
     background: #fff;
@@ -245,6 +343,7 @@
   .grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 10px 10px;
   }
+  [hidden] { display: none !important; }
   .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
   .field.span2 { grid-column: span 2; }
   .field label {
@@ -419,8 +518,28 @@
     .preview { overflow: visible; box-shadow: none; border-radius: 0; background: transparent; }
     .sheet-frame { height: auto !important; width: auto !important; overflow: visible; }
     .sheet { width: auto; min-height: 0; padding: 0; transform: none !important; }
-    #panelConsult, .app-tabs { display: none !important; }
-    #panelReceipt { display: block !important; }
+    body:not(.printing-docs) #panelConsult,
+    body:not(.printing-docs) #panelDocs,
+    body:not(.printing-docs) .app-tabs { display: none !important; }
+    body:not(.printing-docs) #panelReceipt { display: block !important; }
+    body.printing-docs .head,
+    body.printing-docs .app-tabs,
+    body.printing-docs #panelConsult,
+    body.printing-docs #panelReceipt,
+    body.printing-docs .receipt-dock,
+    body.printing-docs .doc-screen { display: none !important; }
+    body.printing-docs #panelDocs { display: block !important; }
+    body.printing-docs .docs-sheet {
+      display: block !important;
+      background: #fff; color: #111;
+      font-size: 13px; line-height: 1.5;
+    }
+    body.printing-docs .docs-sheet h1 { font-size: 20px; margin-bottom: 4px; }
+    body.printing-docs .docs-sheet .sub { color: #555; margin-bottom: 16px; }
+    body.printing-docs .docs-sheet table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    body.printing-docs .docs-sheet th,
+    body.printing-docs .docs-sheet td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; }
+    body.printing-docs .docs-sheet th { width: 28%; background: #f6f6f6; }
   }
 </style>
 </head>
@@ -443,6 +562,7 @@
     <nav class="app-tabs no-print" aria-label="화면">
       <button type="button" class="app-tab active" data-app="consult" id="appTabConsult">상담 메뉴얼</button>
       <button type="button" class="app-tab" data-app="receipt" id="appTabReceipt">영수증</button>
+      <button type="button" class="app-tab" data-app="docs" id="appTabDocs">관련 서류</button>
     </nav>
 
     <div id="panelConsult" class="panel active">
@@ -493,6 +613,7 @@
           <span>FAQ</span>
           <span class="faq-actions">
             <a class="btn-sm faq-dl" id="btnSavePrice" download hidden>가격표 다운</a>
+            <a class="btn-sm faq-dl" id="btnSaveBrochure">브로셔 다운</a>
             <button type="button" class="btn-sm" id="btnCopyFaq">복사</button>
           </span>
         </div>
@@ -657,6 +778,122 @@
       </article>
       </div>
     </div>
+    </div>
+
+    <div id="panelDocs" class="panel">
+      <div class="doc-screen">
+        <div class="doc-steps" id="docSteps"></div>
+
+        <section class="card">
+          <div class="card-title">1. 지급자 (사업장)</div>
+          <div class="doc-folder">
+            <p class="hint" id="docFolderStatus">네이버 박스 <b>000.코딩\관련서류</b>에 저장하려면 폴더를 한 번 연결하세요.</p>
+            <button type="button" class="btn-sm" id="btnDocFolder">관련서류 폴더 연결</button>
+          </div>
+          <nav class="tabs" id="docPayerTabs" aria-label="지급자"></nav>
+          <div id="docPayerFixed" class="doc-payer-info"></div>
+          <div id="docPayerEdit" class="grid" hidden>
+            <div class="field span2">
+              <label>상호</label>
+              <input id="docPayerName" type="text" placeholder="상호" autocomplete="organization">
+            </div>
+            <div class="field">
+              <label>사업자등록번호</label>
+              <input id="docPayerBiz" type="text" placeholder="000-00-00000" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label>대표자</label>
+              <input id="docPayerOwner" type="text" placeholder="대표자명" autocomplete="name">
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-title">2. 간이지급명세서</div>
+          <p class="hint">홈택스 직접작성 순서입니다. 5·6번 칸을 누르면 복사됩니다.</p>
+          <nav class="tabs" id="docStaffTabs" aria-label="프리랜서"></nav>
+          <div class="field span2" id="docPeopleChipsWrap" hidden style="margin-bottom:10px;">
+            <label>저장된 사람</label>
+            <div class="chips" id="docPeopleChips"></div>
+          </div>
+          <p class="hint" id="docPayEmpty" hidden></p>
+          <div id="docPayFields" class="hometax-fields">
+            <div class="field">
+              <label>1. 성명</label>
+              <input id="docName" type="text" placeholder="홍길동" autocomplete="name">
+            </div>
+            <div class="field">
+              <label>2. 주민등록번호</label>
+              <input id="docRrn" type="text" placeholder="000000-0000000" inputmode="numeric" autocomplete="off">
+            </div>
+            <div class="field">
+              <label>3. 지급연월</label>
+              <input id="docYearMonth" type="month">
+            </div>
+            <div class="field">
+              <label>4. 지급액</label>
+              <input id="docAmount" type="text" inputmode="numeric" value="1,000,000" placeholder="1,000,000">
+            </div>
+            <div class="field">
+              <label>5. 소득세</label>
+              <button type="button" class="hometax-val" id="docIncomeVal">—</button>
+            </div>
+            <div class="field">
+              <label>6. 지방소득세</label>
+              <button type="button" class="hometax-val" id="docLocalVal">—</button>
+            </div>
+          </div>
+          <div class="field" style="margin-top:12px;">
+            <label>연락처 · 보관용</label>
+            <input id="docPhone" type="text" placeholder="010-0000-0000" inputmode="tel">
+          </div>
+          <select id="docRole" hidden>
+            <option value="instructor">강사</option>
+            <option value="promo">매니저 · 홍보</option>
+            <option value="other">기타 인적용역</option>
+          </select>
+          <input id="docJob" type="hidden">
+          <input id="docMemo" type="hidden">
+          <input id="docPayDate" type="hidden">
+          <input id="docPayDesc" type="hidden">
+          <p class="hint" id="docRoleHint" hidden></p>
+          <div class="chat-actions" style="margin-top:12px;">
+            <button type="button" class="btn btn-print" id="btnDocSavePerson">저장</button>
+            <button type="button" class="btn btn-ghost" id="btnDocCopyLine">입력값 복사</button>
+            <button type="button" class="btn btn-ghost" id="btnDocNewPerson">새로 만들기</button>
+            <button type="button" class="btn btn-ghost" id="btnDocDelPerson">삭제</button>
+          </div>
+        </section>
+
+        <section class="card" id="docPayCard">
+          <div class="card-title">3. 원천세 합계</div>
+          <p class="hint">원천징수이행상황신고서에는 사람 이름이 아니라 그달 합계만 넣고 세금을 납부합니다. 칸을 누르면 복사됩니다.</p>
+          <div class="hometax-sum" id="docWithholdSum"></div>
+          <div class="doc-dead">
+            <div><b>원천세 마감</b><span id="docDueWithhold">—</span></div>
+            <div><b>간이지급명세서 마감</b><span id="docDueSimple">—</span></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-title">4. 홈택스 제출</div>
+          <p class="hint">둘 다 해야 합니다. 홈택스에 직접 입력하는 신고이고, 이 화면의 숫자를 옮겨 적습니다.</p>
+          <div class="doc-links">
+            <a class="btn btn-ghost" href="https://www.hometax.go.kr/" target="_blank" rel="noopener noreferrer">홈택스 로그인</a>
+            <a class="btn btn-print" id="linkWithhold" href="https://www.hometax.go.kr/websquare/websquare.html?w2xPath=/ui/pp/index_pp.xml&amp;tmIdx=41" target="_blank" rel="noopener noreferrer">원천징수이행상황신고서</a>
+            <p class="doc-path">세금신고 → 원천세 → 정기신고 · 지급월 다음달 <b>10일</b>까지.<br>사람별 서류가 아니라, 그달 지급 합계·원천세(3.3%)를 넣고 <b>세금만 납부</b>합니다.</p>
+            <a class="btn btn-print" id="linkSimple" href="https://www.hometax.go.kr/websquare/websquare.html?w2xPath=/ui/pp/index_pp.xml&amp;tmIdx=44&amp;tm2lIdx=4401000000&amp;tm3lIdx=4401100000" target="_blank" rel="noopener noreferrer">간이지급명세서 (거주자의 사업소득)</a>
+            <p class="doc-path">신청/제출 → 지급명세서 → 간이지급명세서(거주자의 사업소득) → 직접작성제출 · 지급월 다음달 <b>말일</b>까지.<br>누구에게 얼마 줬는지를 사람별로 입력합니다. 여기서는 세금을 또 내지 않습니다.</p>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-title">참고</div>
+          <div class="doc-note" id="docNotes"></div>
+        </section>
+      </div>
+
+      <article class="docs-sheet" id="docsPrintSheet"></article>
     </div>
   </div>
 
@@ -949,20 +1186,28 @@
     yaksu: {
       price: '1:1 예약제이고, 평가 후 프로그램이 정해집니다.\n\n50분 1회 8만 5천원\n주 2회 8회 66만원\n시그니처 1회 12만 5천원',
       loc: '약수역 5·6·7번 출구에서 도보 3분, 더약수빌딩 4층입니다.\n\n네이버 지도\nhttps://naver.me/x2YstInq\n\n전화 0507-1359-4596',
-      hours: '예약제로 운영합니다.\n평일 09–21시, 토요일 09–18시\n일요일·공휴일은 휴무입니다.\n\n가능하신 요일과 시간대를 알려 주시면 맞춰 볼게요.',
+      hours: '예약제로 운영합니다.\n평일 09–21시, 토요일 09–18시\n일요일·공휴일은 휴무입니다.\n\n예약은 톡톡 아래 메뉴의 예약에서 남겨 주시면 됩니다.\n가능하신 요일과 시간대를 알려 주셔도 맞춰 볼게요.',
       map: 'https://naver.me/x2YstInq',
       phone: '0507-1359-4596',
       priceImg: '가격표  리얼무브먼트 약수.jpg',
-      priceDownload: '가격표-약수.jpg'
+      priceDownload: '가격표-약수.jpg',
+      brochure: [
+        { src: 'print-cmyk/리얼무브먼트_약수_브로셔_CMYK_01.jpg', download: '브로셔-약수-겉면.jpg' },
+        { src: 'print-cmyk/리얼무브먼트_약수_브로셔_CMYK_02.jpg', download: '브로셔-약수-안쪽.jpg' }
+      ]
     },
     incheon: {
       price: '1:1 예약제이고, 평가 후 프로그램이 정해집니다.\n\n50분 1회 4만 5천원\n주 2회 8회 32만원\n80분 주 2회 8회 62만원',
       loc: '힐스테이트자이계양 1층, 도서관 옆입니다.\n\n네이버 지도\nhttps://naver.me/xYNbHrY9\n\n전화 0507-1312-4596',
-      hours: '예약제로 운영합니다.\n평일 09–21시, 토요일 09–18시\n일요일·공휴일은 휴무입니다.\n\n가능하신 요일과 시간대를 알려 주시면 맞춰 볼게요.',
+      hours: '예약제로 운영합니다.\n평일 09–21시, 토요일 09–18시\n일요일·공휴일은 휴무입니다.\n\n예약은 톡톡 아래 메뉴의 예약에서 남겨 주시면 됩니다.\n가능하신 요일과 시간대를 알려 주셔도 맞춰 볼게요.',
       map: 'https://naver.me/xYNbHrY9',
       phone: '0507-1312-4596',
       priceImg: '가격표  리얼무브먼트 인천.jpg',
-      priceDownload: '가격표-인천.jpg'
+      priceDownload: '가격표-인천.jpg',
+      brochure: [
+        { src: 'print-cmyk/리얼무브먼트_인천_브로셔_CMYK_01.jpg', download: '브로셔-인천-겉면.jpg' },
+        { src: 'print-cmyk/리얼무브먼트_인천_브로셔_CMYK_02.jpg', download: '브로셔-인천-안쪽.jpg' }
+      ]
     }
   };
   var consultBranch = 'yaksu';
@@ -1213,7 +1458,7 @@
     var time = timelineBlock(q);
     if (time) pushLine(lines, time);
     pushLine(lines, b.price);
-    pushLine(lines, '가능하신 요일·시간을 알려 주시면 예약을 맞춰 볼게요.');
+    pushLine(lines, '톡톡 아래 메뉴의 예약에서 남겨 주시거나, 가능하신 요일·시간을 알려 주시면 맞춰 볼게요.');
     return lines.join('\n\n');
   }
   function detectIntent(q) {
@@ -1232,7 +1477,7 @@
     var where = consultBranch === 'incheon'
       ? '힐스테이트자이계양 1층, 도서관 옆입니다.'
       : '약수역 5·6·7번 출구에서 도보 3분입니다.';
-    return where + '\n아래 링크로 오시는 길을 확인하시면 됩니다.\n\n' + b.map + '\n전화 ' + b.phone;
+    return where + '\n톡톡 아래 메뉴의 오시는 길에서도 확인하실 수 있습니다.\n\n' + b.map + '\n전화 ' + b.phone;
   }
   function makeGreeting(q) {
     q = String(q || '').trim();
@@ -1353,6 +1598,34 @@
     img.src = priceImgSrc(b, false);
     a.href = img.src;
     a.setAttribute('download', b.priceDownload);
+    syncBrochureLink();
+  }
+  function syncBrochureLink() {
+    var a = $('btnSaveBrochure');
+    var files = (BRANCH[consultBranch].brochure || []);
+    if (!files.length) {
+      a.removeAttribute('href');
+      a.removeAttribute('download');
+      return;
+    }
+    a.href = encodeURI(files[0].src);
+    a.setAttribute('download', files[0].download);
+  }
+  function downloadBrochure(e) {
+    var files = (BRANCH[consultBranch].brochure || []);
+    if (!files.length) return;
+    if (files.length === 1) return;
+    e.preventDefault();
+    files.forEach(function (f, i) {
+      setTimeout(function () {
+        var a = document.createElement('a');
+        a.href = encodeURI(f.src);
+        a.setAttribute('download', f.download);
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }, i * 350);
+    });
   }
   function startGreeting(reason) {
     var q = $('chatQ').value.trim();
@@ -1562,23 +1835,943 @@
     persist();
     render();
   }
+  var DOCS_STORE = 'receipt-docs-v3';
+  var DOCS_STORE_OLD = 'receipt-docs-v2';
+  var DOCS_FILE = '프리랜서.json';
+  var DOCS_FILE_URL = '관련서류/프리랜서.json';
+  var docsSel = '';
+  var docsBound = false;
+  var docsDirHandle = null;
+  var ROLE_JOB = { instructor: '학원강사', promo: '광고선전', other: '기타 인적용역' };
+  var ROLE_LABEL = { instructor: '강사', promo: '매니저·홍보', other: '기타 인적용역' };
+  var DEFAULT_PAY_AMOUNT = 1000000;
+  var DOC_PAYERS = {
+    tree: {
+      tab: '힐링트리',
+      name: '힐링트리 주식회사',
+      bizNo: '801-86-01629',
+      owner: '박준규',
+      type: '법인사업자',
+      addr: '서울특별시 중구 동호로7길 32, 4층(신당동)'
+    },
+    incheon: {
+      tab: '리얼무브먼트 인천점',
+      name: '리얼무브먼트 인천점',
+      bizNo: '311-09-95507',
+      owner: '박준규',
+      type: '간이과세자',
+      addr: '인천광역시 계양구 봉오대로651번길 9, 102동 2505호(작전동, 힐스테이트자이계양)'
+    },
+    other: {
+      tab: '기타',
+      name: '',
+      bizNo: '',
+      owner: '',
+      type: '직접 입력',
+      addr: ''
+    }
+  };
+  var STAFF = {
+    choi: { id: 'p-choi', tab: '최진옥', name: '최진옥', role: 'instructor', rrn: '8106091566810', phone: '010-8869-6056' },
+    sangmin: { id: 'p-sangmin', tab: '이상민', name: '이상민', role: 'instructor', rrn: '', phone: '010-9178-5716' },
+    yuju: { id: 'p-yuju', tab: '이유주', name: '이유주', role: 'promo', rrn: '9202082063122', phone: '010-9518-7785' }
+  };
+  var OTHER_SEED = { id: 'p-youngim', name: '이영임', rrn: '5810122243113', phone: '', role: 'other', job: '기타 인적용역', memo: '' };
+  var TREE_PAY_SEED = [
+    { pid: 'p-youngim', ym: '2026-07', date: '2026-07-31', amount: 800000, desc: '7월 급여 (힐링트리)' },
+    { pid: 'p-yuju', ym: '2026-06', date: '2026-06-30', amount: 1287097, desc: '6월 활동비 (힐링트리 · 법인 이체 실지급 1,244,624원)' }
+  ];
+  var INCHEON_PAY_SEED = [
+    { pid: 'p-choi', ym: '2026-07', date: '2026-07-31', amount: 1610000, desc: '7월 인센티브 (개인 사업자)' },
+    { pid: 'p-yuju', ym: '2026-07', date: '2026-07-31', amount: 1900000, desc: '7월 활동비 (개인 사업자)' }
+  ];
+  function seedPays(list, pays) {
+    list.forEach(function (row) {
+      var exists = pays.some(function (p) { return p.pid === row.pid && p.ym === row.ym; });
+      if (exists) return;
+      var tax = withholdOf(row.amount);
+      pays.push({
+        pid: row.pid, ym: row.ym, date: row.date, amount: row.amount,
+        desc: row.desc, income: tax.income, local: tax.local, net: tax.net
+      });
+    });
+  }
+  function moveJulyChoiYujuToIncheon(d) {
+    if (d.julyChoiYujuToIncheon) return false;
+    var tree = d.buckets.tree.pays;
+    var inch = d.buckets.incheon.pays;
+    var kept = [];
+    tree.forEach(function (p) {
+      if ((p.pid === 'p-choi' || p.pid === 'p-yuju') && p.ym === '2026-07') {
+        var exists = inch.some(function (x) { return x.pid === p.pid && x.ym === p.ym; });
+        if (!exists) {
+          p.desc = p.pid === 'p-choi' ? '7월 인센티브 (개인 사업자)' : '7월 활동비 (개인 사업자)';
+          inch.push(p);
+        }
+      } else kept.push(p);
+    });
+    d.buckets.tree.pays = kept;
+    d.julyChoiYujuToIncheon = true;
+    return true;
+  }
+  function isStaffId(id) {
+    return Object.keys(STAFF).some(function (k) { return STAFF[k].id === id; });
+  }
+  function docsPeople(d) {
+    if (!Array.isArray(d.people)) d.people = [];
+    return d.people;
+  }
+  function otherPeople(d) {
+    return docsPeople(d).filter(function (p) { return !isStaffId(p.id); });
+  }
+  function staffPerson(def) {
+    return {
+      id: def.id,
+      name: def.name,
+      rrn: def.rrn || '',
+      phone: def.phone || '',
+      role: def.role,
+      job: ROLE_JOB[def.role] || ROLE_JOB.instructor,
+      memo: def.memo || ''
+    };
+  }
+  function ensureStaffDocs(d) {
+    var changed = false;
+    if (!Array.isArray(d.people)) { d.people = []; changed = true; }
+    ['tree', 'incheon', 'other'].forEach(function (k) {
+      var b = d.buckets && d.buckets[k];
+      if (!b || !Array.isArray(b.people)) return;
+      b.people.forEach(function (p) {
+        if (!p || !p.id) return;
+        if (!d.people.some(function (x) { return x.id === p.id; })) {
+          d.people.push(p);
+          changed = true;
+        }
+      });
+    });
+    Object.keys(STAFF).forEach(function (k) {
+      var def = STAFF[k];
+      var found = null;
+      for (var i = 0; i < d.people.length; i++) if (d.people[i].id === def.id) found = d.people[i];
+      if (!found) {
+        d.people.push(staffPerson(def));
+        changed = true;
+      } else {
+        found.name = def.name;
+        if (!found.rrn && def.rrn) { found.rrn = def.rrn; changed = true; }
+        if (!found.phone && def.phone) { found.phone = def.phone; changed = true; }
+        if (!found.role) found.role = def.role;
+        if (!found.job) found.job = ROLE_JOB[def.role];
+      }
+    });
+    if (!d.staffSeeded) {
+      if (!d.people.some(function (p) { return p.id === OTHER_SEED.id; })) d.people.push(OTHER_SEED);
+      seedPays(TREE_PAY_SEED, d.buckets.tree.pays);
+      seedPays(INCHEON_PAY_SEED, d.buckets.incheon.pays);
+      d.staffSeeded = true;
+      changed = true;
+    }
+    if (moveJulyChoiYujuToIncheon(d)) changed = true;
+    if (!d.staffTab || (d.staffTab !== 'other' && !STAFF[d.staffTab])) {
+      d.staffTab = 'choi';
+      changed = true;
+    }
+    return changed;
+  }
+
+  function emptyDocBucket() { return { people: [], pays: [], name: '', bizNo: '', owner: '' }; }
+  function loadDocs() {
+    var d = {};
+    try { d = JSON.parse(localStorage.getItem(DOCS_STORE) || '{}'); } catch (e1) { d = {}; }
+    if (!d.buckets) {
+      var old = {};
+      try { old = JSON.parse(localStorage.getItem(DOCS_STORE_OLD) || '{}'); } catch (e2) { old = {}; }
+      d = { payerId: 'tree', buckets: { tree: emptyDocBucket(), incheon: emptyDocBucket(), other: emptyDocBucket() } };
+      if (old && Array.isArray(old.people) && old.people.length) {
+        d.buckets.other.people = old.people;
+        d.buckets.other.pays = old.pays || [];
+        if (old.payer) {
+          d.buckets.other.name = old.payer.name || '';
+          d.buckets.other.bizNo = old.payer.bizNo || '';
+          d.buckets.other.owner = old.payer.owner || '';
+        }
+      }
+    }
+    ['tree', 'incheon', 'other'].forEach(function (k) {
+      if (!d.buckets[k]) d.buckets[k] = emptyDocBucket();
+      if (!Array.isArray(d.buckets[k].people)) d.buckets[k].people = [];
+      if (!Array.isArray(d.buckets[k].pays)) d.buckets[k].pays = [];
+    });
+    if (!DOC_PAYERS[d.payerId]) d.payerId = 'tree';
+    if (ensureStaffDocs(d)) {
+      try { localStorage.setItem(DOCS_STORE, JSON.stringify(d)); } catch (e3) {}
+    }
+    return d;
+  }
+  function saveDocs(d) {
+    localStorage.setItem(DOCS_STORE, JSON.stringify(d));
+    writeDocsFile(d);
+  }
+  function docsIdb() {
+    return new Promise(function (resolve, reject) {
+      var req = indexedDB.open('rm-docs-folder', 1);
+      req.onupgradeneeded = function () { req.result.createObjectStore('kv'); };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+    });
+  }
+  function docsIdbGet(key) {
+    return docsIdb().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var r = db.transaction('kv', 'readonly').objectStore('kv').get(key);
+        r.onsuccess = function () { resolve(r.result); };
+        r.onerror = function () { reject(r.error); };
+      });
+    });
+  }
+  function docsIdbSet(key, val) {
+    return docsIdb().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var r = db.transaction('kv', 'readwrite').objectStore('kv').put(val, key);
+        r.onsuccess = function () { resolve(); };
+        r.onerror = function () { reject(r.error); };
+      });
+    });
+  }
+  function setFolderStatus(kind, extra) {
+    var el = $('docFolderStatus');
+    var btn = $('btnDocFolder');
+    if (!el) return;
+    if (kind === 'ok') {
+      el.innerHTML = '네이버 박스 <b>000.코딩\\관련서류\\프리랜서.json</b>에 저장 중입니다.';
+      if (btn) btn.textContent = '폴더 다시 연결';
+    } else if (kind === 'fail') {
+      el.innerHTML = extra || '폴더 연결이 끊겼습니다. 다시 연결해 주세요.';
+      if (btn) btn.textContent = '관련서류 폴더 연결';
+    } else {
+      el.innerHTML = '네이버 박스 <b>000.코딩\\관련서류</b> 폴더를 한 번 연결하면, 이후 저장이 그 파일로 갑니다.';
+      if (btn) btn.textContent = '관련서류 폴더 연결';
+    }
+  }
+  function parseDocsPayload(raw) {
+    if (!raw || typeof raw !== 'object' || !raw.buckets) return null;
+    ['tree', 'incheon', 'other'].forEach(function (k) {
+      if (!raw.buckets[k]) raw.buckets[k] = emptyDocBucket();
+      if (!Array.isArray(raw.buckets[k].people)) raw.buckets[k].people = [];
+      if (!Array.isArray(raw.buckets[k].pays)) raw.buckets[k].pays = [];
+    });
+    if (!DOC_PAYERS[raw.payerId]) raw.payerId = 'tree';
+    ensureStaffDocs(raw);
+    return raw;
+  }
+  function writeDocsFile(d) {
+    var text = JSON.stringify(d, null, 2);
+    if (!docsDirHandle) return;
+    docsDirHandle.getFileHandle(DOCS_FILE, { create: true }).then(function (fh) {
+      return fh.createWritable().then(function (w) {
+        return w.write(text).then(function () { return w.close(); });
+      });
+    }).then(function () {
+      setFolderStatus('ok');
+    }).catch(function () {
+      docsDirHandle = null;
+      setFolderStatus('fail');
+    });
+  }
+  function readDocsFromHandle() {
+    if (!docsDirHandle) return Promise.resolve(null);
+    return docsDirHandle.getFileHandle(DOCS_FILE, { create: true }).then(function (fh) {
+      return fh.getFile().then(function (file) { return file.text(); });
+    }).then(function (text) {
+      if (!text || !text.trim()) return null;
+      try { return parseDocsPayload(JSON.parse(text)); } catch (e) { return null; }
+    }).catch(function () { return null; });
+  }
+  function fetchDocsFile() {
+    return fetch(DOCS_FILE_URL, { cache: 'no-store' }).then(function (res) {
+      if (!res.ok) return null;
+      return res.json().then(parseDocsPayload);
+    }).catch(function () { return null; });
+  }
+  function applyDocsData(d) {
+    localStorage.setItem(DOCS_STORE, JSON.stringify(d));
+  }
+  function restoreDocsFolder() {
+    if (!window.showDirectoryPicker) {
+      setFolderStatus('fail', '이 브라우저는 폴더 연결을 지원하지 않습니다. Chrome에서 열어 주세요.');
+      return fetchDocsFile().then(function (d) {
+        if (d) applyDocsData(d);
+      });
+    }
+    return docsIdbGet('dir').then(function (handle) {
+      if (!handle) return fetchDocsFile().then(function (d) {
+        if (d) applyDocsData(d);
+      });
+      var opt = { mode: 'readwrite' };
+      return handle.queryPermission(opt).then(function (perm) {
+        if (perm !== 'granted') {
+          setFolderStatus('fail', '권한이 만료됐습니다. 관련서류 폴더를 다시 연결해 주세요.');
+          return fetchDocsFile().then(function (d) {
+            if (d) applyDocsData(d);
+          });
+        }
+        docsDirHandle = handle;
+        setFolderStatus('ok');
+        return readDocsFromHandle().then(function (d) {
+          if (d) applyDocsData(d);
+          else writeDocsFile(loadDocs());
+        });
+      });
+    }).catch(function () {
+      return fetchDocsFile().then(function (d) {
+        if (d) applyDocsData(d);
+      });
+    });
+  }
+  function connectDocsFolder() {
+    if (!window.showDirectoryPicker) {
+      flashToast('Chrome에서 열어 주세요');
+      return;
+    }
+    window.showDirectoryPicker({ id: 'rm-docs', mode: 'readwrite' }).then(function (dir) {
+      docsDirHandle = dir;
+      return docsIdbSet('dir', dir).then(function () {
+        return readDocsFromHandle();
+      }).then(function (fromFile) {
+        var cur = loadDocs();
+        var hasPeople = ['tree', 'incheon', 'other'].some(function (k) {
+          return cur.buckets[k] && cur.buckets[k].people && cur.buckets[k].people.length;
+        });
+        if (fromFile && fromFile.buckets) {
+          applyDocsData(fromFile);
+        } else if (hasPeople) {
+          writeDocsFile(cur);
+        } else {
+          writeDocsFile(cur);
+        }
+        setFolderStatus('ok');
+        applyStaffSelection(loadDocs());
+        renderDocsMeta();
+        flashToast('관련서류 폴더에 저장합니다');
+      });
+    }).catch(function (err) {
+      if (err && err.name === 'AbortError') return;
+      setFolderStatus('fail');
+      flashToast('폴더를 열 수 없습니다');
+    });
+  }
+  function docsBucket(d) { return d.buckets[d.payerId] || d.buckets.tree; }
+  function payerSlug(d) {
+    var p = currentPayerInfo(d);
+    return (p.name || '기타').replace(/\s+/g, '');
+  }
+  function currentPayerInfo(d) {
+    d = d || loadDocs();
+    var def = DOC_PAYERS[d.payerId] || DOC_PAYERS.tree;
+    if (d.payerId === 'other') {
+      var b = d.buckets.other;
+      return {
+        name: (b.name || ($('docPayerName') && $('docPayerName').value.trim()) || ''),
+        bizNo: (b.bizNo || ($('docPayerBiz') && $('docPayerBiz').value.trim()) || ''),
+        owner: (b.owner || ($('docPayerOwner') && $('docPayerOwner').value.trim()) || ''),
+        type: def.type,
+        addr: '',
+        tab: def.tab
+      };
+    }
+    return { name: def.name, bizNo: def.bizNo, owner: def.owner, type: def.type, addr: def.addr, tab: def.tab };
+  }
+  function flashToast(msg) {
+    var el = $('copyToast');
+    el.textContent = msg || '복사됨';
+    showToast();
+    setTimeout(function () { el.textContent = '복사됨'; }, 1600);
+  }
+  function prevMonthValue() {
+    var d = new Date();
+    var y = d.getFullYear();
+    var m = d.getMonth();
+    if (m === 0) { y -= 1; m = 12; }
+    return y + '-' + String(m).padStart(2, '0');
+  }
+  function lastDayOfMonth(ym) {
+    var p = String(ym || '').split('-');
+    var y = parseInt(p[0], 10);
+    var m = parseInt(p[1], 10);
+    if (!y || !m) return todayISO();
+    var last = new Date(y, m, 0).getDate();
+    return y + '-' + String(m).padStart(2, '0') + '-' + String(last).padStart(2, '0');
+  }
+  function shiftMonthLabel(ym, day) {
+    var p = String(ym || '').split('-');
+    var y = parseInt(p[0], 10);
+    var m = parseInt(p[1], 10);
+    if (!y || !m) return '—';
+    m += 1;
+    if (m > 12) { m = 1; y += 1; }
+    if (day === 'end') {
+      var last = new Date(y, m, 0).getDate();
+      return y + '년 ' + m + '월 ' + last + '일';
+    }
+    return y + '년 ' + m + '월 10일';
+  }
+  function formatRrn(s) {
+    var d = String(s || '').replace(/\D/g, '').slice(0, 13);
+    if (d.length <= 6) return d;
+    return d.slice(0, 6) + '-' + d.slice(6);
+  }
+  function formatPhone(s) {
+    var d = String(s || '').replace(/\D/g, '').slice(0, 11);
+    if (d.length <= 3) return d;
+    if (d.length <= 7) return d.slice(0, 3) + '-' + d.slice(3);
+    return d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
+  }
+  function rrnDigits(s) { return String(s || '').replace(/\D/g, ''); }
+  function withholdOf(amount) {
+    var income = Math.floor(amount * 0.03);
+    var local = Math.floor(income * 0.1);
+    return { income: income, local: local, net: amount - income - local };
+  }
+  function fmtWon(n) { return (n || 0).toLocaleString('ko-KR') + '원'; }
+  function findPerson(d, id) {
+    var people = docsPeople(d);
+    for (var i = 0; i < people.length; i++) if (people[i].id === id) return people[i];
+    return null;
+  }
+  function findPay(d, pid, ym) {
+    var pays = docsBucket(d).pays;
+    for (var i = 0; i < pays.length; i++) {
+      if (pays[i].pid === pid && pays[i].ym === ym) return pays[i];
+    }
+    return null;
+  }
+  function persistOtherPayer() {
+    var d = loadDocs();
+    if (d.payerId !== 'other') return;
+    d.buckets.other.name = $('docPayerName').value.trim();
+    d.buckets.other.bizNo = $('docPayerBiz').value.trim();
+    d.buckets.other.owner = $('docPayerOwner').value.trim();
+    saveDocs(d);
+  }
+  function renderPayerTabs() {
+    var d = loadDocs();
+    $('docPayerTabs').innerHTML = ['tree', 'incheon', 'other'].map(function (id) {
+      return '<button type="button" class="org-tab' + (d.payerId === id ? ' active' : '') + '" data-payer="' + id + '">' + DOC_PAYERS[id].tab + '</button>';
+    }).join('');
+    var other = d.payerId === 'other';
+    $('docPayerEdit').hidden = !other;
+    $('docPayerFixed').hidden = other;
+    if (other) {
+      $('docPayerName').value = d.buckets.other.name || '';
+      $('docPayerBiz').value = d.buckets.other.bizNo || '';
+      $('docPayerOwner').value = d.buckets.other.owner || '';
+    } else {
+      var p = DOC_PAYERS[d.payerId];
+      $('docPayerFixed').innerHTML =
+        '<div><b>상호</b><span>' + p.name + '</span></div>' +
+        '<div><b>구분</b><span>' + p.type + '</span></div>' +
+        '<div><b>사업자등록번호</b><span>' + p.bizNo + '</span></div>' +
+        '<div><b>대표자</b><span>' + p.owner + '</span></div>' +
+        '<div class="span2"><b>소재지</b><span>' + p.addr + '</span></div>';
+    }
+  }
+  function switchDocPayer(id) {
+    if (!DOC_PAYERS[id]) return;
+    var d = loadDocs();
+    if (d.payerId === 'other') {
+      d.buckets.other.name = $('docPayerName').value.trim();
+      d.buckets.other.bizNo = $('docPayerBiz').value.trim();
+      d.buckets.other.owner = $('docPayerOwner').value.trim();
+    }
+    d.payerId = id;
+    saveDocs(d);
+    if (docsSel) {
+      fillPerson(findPerson(d, docsSel));
+      fillPay(findPay(d, docsSel, $('docYearMonth').value || prevMonthValue()));
+    }
+    renderDocsMeta();
+  }
+  function roleHint(role) {
+    if (role === 'promo') return '필수: 성명, 주민등록번호, 지급액. 홍보만 하고 출근이 자유로우면 사업소득(인적용역)으로 넣습니다.';
+    if (role === 'other') return '필수: 성명, 주민등록번호, 지급액.';
+    return '필수: 성명, 주민등록번호, 지급액. 수업 용역은 학원강사(인적용역 사업소득)로 넣습니다.';
+  }
+  function currentPayDraft() {
+    var amount = parseAmount($('docAmount').value);
+    var tax = withholdOf(amount);
+    return {
+      ym: $('docYearMonth').value || prevMonthValue(),
+      date: $('docPayDate').value || lastDayOfMonth($('docYearMonth').value || prevMonthValue()),
+      amount: amount,
+      desc: $('docPayDesc').value.trim(),
+      income: tax.income,
+      local: tax.local,
+      net: tax.net
+    };
+  }
+  function personReady() {
+    return $('docName').value.trim() && rrnDigits($('docRrn').value).length === 13;
+  }
+  function payReady() {
+    return personReady() && !!docsSel && parseAmount($('docAmount').value) > 0 && !!$('docYearMonth').value;
+  }
+  function renderDocSteps() {
+    var d = loadDocs();
+    var hasPerson = docsPeople(d).some(function (p) { return rrnDigits(p.rrn).length === 13; });
+    var hasPay = docsBucket(d).pays.length > 0 || (!!docsSel && parseAmount($('docAmount').value) > 0);
+    var items = [
+      { n: '01', t: '입력값 확인' },
+      { n: '02', t: '원천세 신고' },
+      { n: '03', t: '간이지급명세서' }
+    ];
+    var on = !hasPerson ? 0 : !hasPay ? 0 : 1;
+    $('docSteps').innerHTML = items.map(function (it, i) {
+      var cls = 'doc-step';
+      if (i === on) cls += ' on';
+      else if (i < on) cls += ' done';
+      return '<div class="' + cls + '"><b>' + it.n + '</b><span>' + it.t + '</span></div>';
+    }).join('');
+  }
+  function renderStaffTabs() {
+    var d = loadDocs();
+    var tab = d.staffTab || 'choi';
+    var ids = ['choi', 'sangmin', 'yuju', 'other'];
+    $('docStaffTabs').innerHTML = ids.map(function (id) {
+      var label = id === 'other' ? '기타' : STAFF[id].tab;
+      return '<button type="button" class="org-tab' + (tab === id ? ' active' : '') + '" data-staff="' + id + '">' + label + '</button>';
+    }).join('');
+    var named = tab !== 'other';
+    $('docPeopleChipsWrap').hidden = named;
+    $('btnDocNewPerson').hidden = named;
+    $('btnDocDelPerson').hidden = named || !docsSel || isStaffId(docsSel);
+    $('docName').readOnly = named;
+  }
+  function applyStaffSelection(d) {
+    var tab = (d && d.staffTab) || 'choi';
+    if (tab === 'other') {
+      var others = otherPeople(d);
+      docsSel = others[0] ? others[0].id : '';
+    } else {
+      docsSel = STAFF[tab] ? STAFF[tab].id : 'p-choi';
+    }
+    if (docsSel) {
+      fillPerson(findPerson(d, docsSel));
+      fillPay(findPay(d, docsSel, $('docYearMonth').value || prevMonthValue()));
+    } else {
+      fillPerson({ role: 'instructor', job: ROLE_JOB.instructor });
+      fillPay(null);
+    }
+  }
+  function switchStaffTab(id) {
+    if (id !== 'other' && !STAFF[id]) return;
+    var d = loadDocs();
+    d.staffTab = id;
+    saveDocs(d);
+    applyStaffSelection(d);
+    renderDocsMeta();
+  }
+  function renderDocsChips() {
+    var d = loadDocs();
+    if (d.staffTab !== 'other') return;
+    var html = '<button type="button" class="chip' + (!docsSel ? ' active' : '') + '" data-pid="">새로 만들기</button>';
+    html += otherPeople(d).map(function (p) {
+      return '<button type="button" class="chip' + (p.id === docsSel ? ' active' : '') + '" data-pid="' + p.id + '">' +
+        (p.name || '이름 없음') + '</button>';
+    }).join('');
+    $('docPeopleChips').innerHTML = html;
+  }
+  function renderTaxBox() {
+    var tax = withholdOf(parseAmount($('docAmount').value));
+    $('docIncomeVal').textContent = tax.income ? fmtWon(tax.income) : '—';
+    $('docIncomeVal').dataset.copy = tax.income ? String(tax.income) : '';
+    $('docLocalVal').textContent = tax.local ? fmtWon(tax.local) : '—';
+    $('docLocalVal').dataset.copy = tax.local ? String(tax.local) : '';
+    var ym = $('docYearMonth').value || prevMonthValue();
+    $('docDueWithhold').textContent = shiftMonthLabel(ym, 10);
+    $('docDueSimple').textContent = shiftMonthLabel(ym, 'end');
+    renderWithholdSum();
+  }
+  function renderWithholdSum() {
+    var d = loadDocs();
+    var ym = $('docYearMonth').value || prevMonthValue();
+    var amount = 0;
+    var income = 0;
+    var local = 0;
+    var count = 0;
+    var seen = {};
+    docsBucket(d).pays.forEach(function (pay) {
+      if (pay.ym !== ym) return;
+      var tax = withholdOf(pay.amount || 0);
+      amount += pay.amount || 0;
+      income += tax.income;
+      local += tax.local;
+      if (!seen[pay.pid]) { seen[pay.pid] = true; count += 1; }
+    });
+    if (docsSel && parseAmount($('docAmount').value) > 0) {
+      var draft = currentPayDraft();
+      if (draft.ym === ym && !findPay(d, docsSel, ym)) {
+        amount += draft.amount;
+        income += draft.income;
+        local += draft.local;
+        if (!seen[docsSel]) count += 1;
+      }
+    }
+    $('docWithholdSum').innerHTML =
+      '<button type="button" data-copy="' + count + '"><b>인원</b><span>' + count + '명</span></button>' +
+      '<button type="button" data-copy="' + amount + '"><b>총지급액</b><span>' + fmtWon(amount) + '</span></button>' +
+      '<button type="button" data-copy="' + income + '"><b>소득세</b><span>' + fmtWon(income) + '</span></button>' +
+      '<button type="button" data-copy="' + local + '"><b>지방소득세</b><span>' + fmtWon(local) + '</span></button>';
+  }
+  function renderDocNotes() {
+    $('docNotes').innerHTML =
+      '원천세 신고와 간이지급명세서는 <strong>다른 신고</strong>입니다. 10일까지 원천세를 냈어도 말일 명세서는 따로 내야 합니다.<br><br>' +
+      '힐링트리(법인)와 인천점(개인 간이과세)은 홈택스 계정이 다릅니다. 위 지급자 탭을 고른 뒤 그 사업자로 로그인하세요.<br><br>' +
+      '간이지급명세서 입력 순서: 성명 → 주민등록번호 → 지급연월 → 지급액 → 소득세 → 지방소득세.<br><br>' +
+      '그달에 지급이 없으면 간이지급명세서는 내지 않아도 됩니다. 한 달이라도 빠지면 이듬해 3월 일반 지급명세서를 따로 내야 할 수 있습니다.<br><br>' +
+      '입력한 인적사항은 폴더를 연결하면 네이버 박스 <strong>000.코딩\\관련서류\\프리랜서.json</strong>에 저장됩니다.<br><br>' +
+      '기한 내 미제출·사실과 다른 제출은 지급액의 <strong>0.25%</strong> 가산세입니다.';
+  }
+  function rowFor(person, pay, payer) {
+    var tax = withholdOf(pay.amount || 0);
+    return [
+      pay.ym || '',
+      person.name || '',
+      formatRrn(person.rrn),
+      ROLE_LABEL[person.role] || '',
+      person.job || '',
+      person.phone || '',
+      pay.date || '',
+      pay.amount || 0,
+      tax.income,
+      tax.local,
+      tax.net,
+      '거주자 사업소득(인적용역)',
+      pay.desc || '',
+      payer.name || '',
+      payer.bizNo || ''
+    ];
+  }
+  function csvHeader() {
+    return ['지급연월', '성명', '주민등록번호', '역할', '업종', '연락처', '지급일', '지급액', '소득세', '지방소득세', '실지급액', '소득구분', '지급내용', '상호', '사업자등록번호'];
+  }
+  function downloadCsv(filename, rows) {
+    var csv = rows.map(function (r) {
+      return r.map(function (v) {
+        v = String(v == null ? '' : v);
+        if (/[",\n]/.test(v)) return '"' + v.replace(/"/g, '""') + '"';
+        return v;
+      }).join(',');
+    }).join('\r\n');
+    var blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      URL.revokeObjectURL(a.href);
+      a.remove();
+    }, 400);
+  }
+  function buildPrintHtml(peopleRows, payer, ym) {
+    var body = peopleRows.map(function (r) {
+      return '<h2 style="font-size:16px;margin:18px 0 8px;">' + r.person.name + ' · ' + (ROLE_LABEL[r.person.role] || '') + '</h2>' +
+        '<table><tbody>' +
+        '<tr><th>주민등록번호</th><td>' + formatRrn(r.person.rrn) + '</td></tr>' +
+        '<tr><th>연락처</th><td>' + (r.person.phone || '—') + '</td></tr>' +
+        '<tr><th>업종</th><td>' + (r.person.job || '—') + '</td></tr>' +
+        '<tr><th>지급연월</th><td>' + (r.pay.ym || '') + '</td></tr>' +
+        '<tr><th>지급일</th><td>' + (r.pay.date || '') + '</td></tr>' +
+        '<tr><th>지급내용</th><td>' + (r.pay.desc || '인적용역 대가') + '</td></tr>' +
+        '<tr><th>지급액(세전)</th><td>' + fmtWon(r.pay.amount) + '</td></tr>' +
+        '<tr><th>소득세 3%</th><td>' + fmtWon(r.pay.income) + '</td></tr>' +
+        '<tr><th>지방소득세 0.3%</th><td>' + fmtWon(r.pay.local) + '</td></tr>' +
+        '<tr><th>실지급액</th><td>' + fmtWon(r.pay.net) + '</td></tr>' +
+        '</tbody></table>';
+    }).join('');
+    return '<p class="sub">홈택스 제출용 입력 확인서 · 보관용</p>' +
+      '<h1>거주자 사업소득 지급·원천징수 내역</h1>' +
+      '<p class="sub">지급연월 ' + (ym || '') + ' · 상호 ' + (payer.name || '—') + ' · 사업자번호 ' + (payer.bizNo || '—') + ' · 대표 ' + (payer.owner || '—') + '</p>' +
+      body +
+      '<p class="sub" style="margin-top:20px;">소득구분: 거주자의 사업소득(인적용역). 원천세는 지급월 다음달 10일, 간이지급명세서는 다음달 말일까지 홈택스에 제출합니다. 이 문서는 공식 신고서가 아닙니다.</p>';
+  }
+  function renderPrintSheet() {
+    var d = loadDocs();
+    var payer = currentPayerInfo(d);
+    var ym = $('docYearMonth').value || prevMonthValue();
+    var rows = [];
+    if (docsSel) {
+      var person = findPerson(d, docsSel);
+      if (person) {
+        var draft = currentPayDraft();
+        rows.push({ person: person, pay: draft });
+      }
+    } else {
+      docsBucket(d).pays.forEach(function (pay) {
+        if (pay.ym !== ym) return;
+        var person = findPerson(d, pay.pid);
+        if (person) rows.push({ person: person, pay: pay });
+      });
+    }
+    $('docsPrintSheet').innerHTML = rows.length
+      ? buildPrintHtml(rows, payer, ym)
+      : '<h1>거주자 사업소득 지급·원천징수 내역</h1><p class="sub">저장된 지급 내역이 없습니다.</p>';
+  }
+  function renderDocsMeta() {
+    renderPayerTabs();
+    renderStaffTabs();
+    $('docRoleHint').textContent = '';
+    $('docPayEmpty').hidden = true;
+    $('docPayFields').hidden = false;
+    renderDocsChips();
+    renderTaxBox();
+    renderDocSteps();
+    renderDocNotes();
+    renderPrintSheet();
+  }
+  function fillPerson(p) {
+    $('docRole').value = (p && p.role) || 'instructor';
+    $('docName').value = (p && p.name) || '';
+    $('docRrn').value = formatRrn(p && p.rrn);
+    $('docPhone').value = formatPhone((p && p.phone) || '');
+    $('docJob').value = (p && p.job) || ROLE_JOB[$('docRole').value];
+    $('docMemo').value = (p && p.memo) || '';
+  }
+  function fillPay(pay) {
+    var ym = (pay && pay.ym) || $('docYearMonth').value || prevMonthValue();
+    $('docYearMonth').value = ym;
+    $('docPayDate').value = (pay && pay.date) || lastDayOfMonth(ym);
+    $('docAmount').value = pay && pay.amount ? pay.amount.toLocaleString('en-US') : DEFAULT_PAY_AMOUNT.toLocaleString('en-US');
+    $('docPayDesc').value = (pay && pay.desc) || '';
+  }
+  function selectPerson(id) {
+    var d = loadDocs();
+    docsSel = id || '';
+    if (!docsSel) {
+      fillPerson({ role: 'instructor', job: ROLE_JOB.instructor });
+      fillPay(null);
+    } else {
+      var p = findPerson(d, docsSel);
+      fillPerson(p);
+      var ym = $('docYearMonth').value || prevMonthValue();
+      fillPay(findPay(d, docsSel, ym));
+    }
+    renderDocsMeta();
+  }
+  function savePerson() {
+    var name = $('docName').value.trim();
+    var rrn = rrnDigits($('docRrn').value);
+    if (!name) { flashToast('성명을 넣어 주세요'); return; }
+    if (rrn.length !== 13) { flashToast('주민번호 13자리를 넣어 주세요'); return; }
+    var d = loadDocs();
+    if (d.payerId === 'other') {
+      d.buckets.other.name = $('docPayerName').value.trim();
+      d.buckets.other.bizNo = $('docPayerBiz').value.trim();
+      d.buckets.other.owner = $('docPayerOwner').value.trim();
+    }
+    var people = docsPeople(d);
+    var person = {
+      id: docsSel || ('p' + Date.now().toString(36)),
+      name: name,
+      rrn: rrn,
+      phone: $('docPhone').value.trim(),
+      role: $('docRole').value,
+      job: $('docJob').value.trim() || ROLE_JOB[$('docRole').value],
+      memo: $('docMemo').value.trim()
+    };
+    if (d.staffTab && STAFF[d.staffTab]) {
+      person.id = STAFF[d.staffTab].id;
+      person.name = STAFF[d.staffTab].name;
+      person.role = STAFF[d.staffTab].role;
+      person.job = ROLE_JOB[person.role];
+    }
+    var idx = -1;
+    for (var i = 0; i < people.length; i++) if (people[i].id === person.id) idx = i;
+    if (idx >= 0) people[idx] = person;
+    else people.push(person);
+    docsSel = person.id;
+    saveDocs(d);
+    if (!$('docYearMonth').value) $('docYearMonth').value = prevMonthValue();
+    if (!$('docPayDate').value) $('docPayDate').value = lastDayOfMonth($('docYearMonth').value);
+    if (!$('docPayDesc').value) {
+      $('docPayDesc').value = person.role === 'promo' ? '홍보 용역' : '수업 용역';
+    }
+    if (parseAmount($('docAmount').value) > 0) savePay();
+    else {
+      renderDocsMeta();
+      flashToast('프리랜서 저장됨');
+    }
+  }
+  function savePay() {
+    if (!docsSel) { flashToast('프리랜서를 먼저 저장하세요'); return; }
+    var draft = currentPayDraft();
+    if (!draft.amount) { flashToast('지급액을 넣어 주세요'); return; }
+    var d = loadDocs();
+    if (d.payerId === 'other') {
+      d.buckets.other.name = $('docPayerName').value.trim();
+      d.buckets.other.bizNo = $('docPayerBiz').value.trim();
+      d.buckets.other.owner = $('docPayerOwner').value.trim();
+    }
+    var pays = docsBucket(d).pays;
+    var existing = findPay(d, docsSel, draft.ym);
+    var row = { pid: docsSel, ym: draft.ym, date: draft.date, amount: draft.amount, desc: draft.desc, income: draft.income, local: draft.local, net: draft.net };
+    if (existing) {
+      for (var i = 0; i < pays.length; i++) {
+        if (pays[i].pid === docsSel && pays[i].ym === draft.ym) pays[i] = row;
+      }
+    } else pays.push(row);
+    saveDocs(d);
+    renderDocsMeta();
+    flashToast('지급액 저장됨');
+  }
+  function downloadOneCsv() {
+    if (!payReady()) { flashToast('필수값을 먼저 넣어 주세요'); return; }
+    savePay();
+    var d = loadDocs();
+    var person = findPerson(d, docsSel);
+    if (!person) return;
+    downloadCsv(
+      '간이지급명세서_' + payerSlug(d) + '_' + person.name + '_' + ($('docYearMonth').value || '') + '.csv',
+      [csvHeader(), rowFor(person, currentPayDraft(), currentPayerInfo(d))]
+    );
+  }
+  function downloadMonthCsv() {
+    var d = loadDocs();
+    var ym = $('docYearMonth').value || prevMonthValue();
+    if (docsSel && parseAmount($('docAmount').value) > 0) savePay();
+    d = loadDocs();
+    var rows = [csvHeader()];
+    docsBucket(d).pays.forEach(function (pay) {
+      if (pay.ym !== ym) return;
+      var person = findPerson(d, pay.pid);
+      if (person) rows.push(rowFor(person, pay, currentPayerInfo(d)));
+    });
+    if (rows.length < 2) { flashToast('해당 월 지급 내역이 없습니다'); return; }
+    downloadCsv('간이지급명세서_' + payerSlug(d) + '_' + ym + '_전체.csv', rows);
+  }
+  function printDocsSheet() {
+    if (docsSel && parseAmount($('docAmount').value) > 0) savePay();
+    renderPrintSheet();
+    if (!$('docsPrintSheet').innerText.trim()) { flashToast('인쇄할 내역이 없습니다'); return; }
+    document.body.classList.add('printing-docs');
+    window.print();
+  }
+  function copyHometaxLine() {
+    if (!payReady()) { flashToast('필수값을 먼저 넣어 주세요'); return; }
+    var p = currentPayDraft();
+    copyText([
+      $('docName').value.trim(),
+      formatRrn($('docRrn').value),
+      p.ym,
+      p.amount,
+      p.income,
+      p.local
+    ].join('\t'));
+  }
+  function initDocs() {
+    $('docYearMonth').value = prevMonthValue();
+    $('docPayDate').value = lastDayOfMonth(prevMonthValue());
+    restoreDocsFolder().then(function () {
+      applyStaffSelection(loadDocs());
+      renderDocsMeta();
+    });
+    if (docsBound) return;
+    docsBound = true;
+    $('btnDocFolder').addEventListener('click', connectDocsFolder);
+    ['docPayerName', 'docPayerBiz', 'docPayerOwner'].forEach(function (id) {
+      $(id).addEventListener('input', persistOtherPayer);
+    });
+    $('docPayerTabs').addEventListener('click', function (e) {
+      var t = e.target.closest('[data-payer]');
+      if (t) switchDocPayer(t.getAttribute('data-payer'));
+    });
+    $('docStaffTabs').addEventListener('click', function (e) {
+      var t = e.target.closest('[data-staff]');
+      if (t) switchStaffTab(t.getAttribute('data-staff'));
+    });
+    $('docRrn').addEventListener('input', function () {
+      this.value = formatRrn(this.value);
+    });
+    $('docPhone').addEventListener('input', function () {
+      this.value = formatPhone(this.value);
+    });
+    $('docAmount').addEventListener('input', function () {
+      var n = parseAmount(this.value);
+      this.value = n ? n.toLocaleString('en-US') : '';
+      renderTaxBox();
+      renderDocSteps();
+    });
+    $('docYearMonth').addEventListener('change', function () {
+      if (docsSel) {
+        var pay = findPay(loadDocs(), docsSel, this.value);
+        if (pay) fillPay(pay);
+        else {
+          $('docPayDate').value = lastDayOfMonth(this.value);
+          $('docAmount').value = DEFAULT_PAY_AMOUNT.toLocaleString('en-US');
+          $('docPayDesc').value = $('docRole').value === 'promo' ? '홍보 용역' : '수업 용역';
+        }
+      } else {
+        $('docPayDate').value = lastDayOfMonth(this.value);
+      }
+      renderDocsMeta();
+    });
+    $('docPeopleChips').addEventListener('click', function (e) {
+      var c = e.target.closest('[data-pid]');
+      if (!c) return;
+      selectPerson(c.getAttribute('data-pid'));
+    });
+    $('docIncomeVal').addEventListener('click', function () {
+      if (!this.dataset.copy) return;
+      copyText(this.dataset.copy);
+    });
+    $('docLocalVal').addEventListener('click', function () {
+      if (!this.dataset.copy) return;
+      copyText(this.dataset.copy);
+    });
+    $('docWithholdSum').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-copy]');
+      if (!b || !b.getAttribute('data-copy')) return;
+      copyText(b.getAttribute('data-copy'));
+    });
+    $('btnDocSavePerson').addEventListener('click', savePerson);
+    $('btnDocNewPerson').addEventListener('click', function () { selectPerson(''); });
+    $('btnDocDelPerson').addEventListener('click', function () {
+      if (!docsSel) { flashToast('고른 프리랜서가 없습니다'); return; }
+      if (isStaffId(docsSel)) { flashToast('고정 탭은 삭제하지 않습니다'); return; }
+      if (!window.confirm('이 프리랜서와 지급 내역을 지울까요?')) return;
+      var d = loadDocs();
+      d.people = docsPeople(d).filter(function (p) { return p.id !== docsSel; });
+      ['tree', 'incheon', 'other'].forEach(function (k) {
+        d.buckets[k].pays = d.buckets[k].pays.filter(function (p) { return p.pid !== docsSel; });
+      });
+      saveDocs(d);
+      applyStaffSelection(d);
+      renderDocsMeta();
+      flashToast('삭제됨');
+    });
+    $('btnDocCopyLine').addEventListener('click', copyHometaxLine);
+  }
   function setAppTab(which) {
-    var consult = which !== 'receipt';
-    document.body.classList.toggle('mode-consult', consult);
-    document.body.classList.toggle('mode-receipt', !consult);
-    $('panelConsult').classList.toggle('active', consult);
-    $('panelReceipt').classList.toggle('active', !consult);
-    $('appTabConsult').classList.toggle('active', consult);
-    $('appTabReceipt').classList.toggle('active', !consult);
-    $('pageTitle').textContent = consult ? '상담 메뉴얼' : '영문 영수증';
-    $('pageSub').textContent = '발급 기관을 고른 뒤 항목을 입력하세요';
-    if (!consult) {
+    if (which !== 'consult' && which !== 'receipt' && which !== 'docs') which = 'consult';
+    document.body.classList.toggle('mode-consult', which === 'consult');
+    document.body.classList.toggle('mode-receipt', which === 'receipt');
+    document.body.classList.toggle('mode-docs', which === 'docs');
+    $('panelConsult').classList.toggle('active', which === 'consult');
+    $('panelReceipt').classList.toggle('active', which === 'receipt');
+    $('panelDocs').classList.toggle('active', which === 'docs');
+    $('appTabConsult').classList.toggle('active', which === 'consult');
+    $('appTabReceipt').classList.toggle('active', which === 'receipt');
+    $('appTabDocs').classList.toggle('active', which === 'docs');
+    $('pageTitle').textContent = which === 'consult' ? '상담 메뉴얼' : which === 'receipt' ? '영문 영수증' : '관련 서류';
+    $('pageSub').textContent = which === 'receipt' ? '발급 기관을 고른 뒤 항목을 입력하세요' : '프리랜서를 고른 뒤 지급액을 입력하세요';
+    if (which === 'receipt') {
       if (receiptPrefillFromQuery && !receiptPrefillApplied) {
         applyReceiptPrefill(receiptPrefillFromQuery);
         receiptPrefillApplied = true;
       }
       requestAnimationFrame(fitPreview);
     }
+    if (which === 'docs') renderDocsMeta();
   }
   function applyQuery() {
     var q = new URLSearchParams(location.search);
@@ -1593,7 +2786,7 @@
       receiptPrefillFromQuery = { name: name, branch: branch, sessions: sessions, instructor: instructor };
     }
     renderConsultBranch();
-    setAppTab(tab === 'receipt' ? 'receipt' : 'consult');
+    setAppTab(tab === 'receipt' ? 'receipt' : tab === 'docs' ? 'docs' : 'consult');
   }
 
   buildTabs();
@@ -1613,6 +2806,7 @@
   });
   writeForm(saved[orgId]);
   render();
+  initDocs();
   applyQuery();
 
   $('orgTabs').addEventListener('click', function (e) {
@@ -1654,6 +2848,7 @@
 
   document.getElementById('appTabConsult').addEventListener('click', function () { setAppTab('consult'); });
   document.getElementById('appTabReceipt').addEventListener('click', function () { setAppTab('receipt'); });
+  document.getElementById('appTabDocs').addEventListener('click', function () { setAppTab('docs'); });
   $('consultBranchChips').addEventListener('click', function (e) {
     var c = e.target.closest('.chip');
     if (!c) return;
@@ -1752,6 +2947,7 @@
   $('btnCopyReply').addEventListener('click', function () { copyText($('chatReply').value); });
   $('btnCopyFollow').addEventListener('click', function () { copyText($('chatFollow').value); });
   $('btnCopyFaq').addEventListener('click', function () { copyText($('faqText').value); });
+  $('btnSaveBrochure').addEventListener('click', downloadBrochure);
   $('faqTabs').addEventListener('click', function (e) {
     var c = e.target.closest('[data-faq]');
     if (!c) return;
@@ -1763,12 +2959,19 @@
     if (document.body.classList.contains('mode-receipt')) fitPreview();
   });
   window.addEventListener('beforeprint', function () {
+    if (document.body.classList.contains('mode-docs')) {
+      document.body.classList.add('printing-docs');
+      renderPrintSheet();
+    }
     var sheet = $('sheet');
     var frame = $('sheetFrame');
     if (sheet) sheet.style.transform = 'none';
     if (frame) frame.style.height = 'auto';
   });
-  window.addEventListener('afterprint', fitPreview);
+  window.addEventListener('afterprint', function () {
+    document.body.classList.remove('printing-docs');
+    fitPreview();
+  });
 })();
 </script>
 </body>
