@@ -43,12 +43,20 @@
   .head {
     display: flex; align-items: center; gap: 10px;
     margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .head-main {
+    display: flex; align-items: center; gap: 10px;
+    min-width: 0; flex: 1;
   }
   .head img {
     width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #fff;
   }
   .head h1 { font-size: 18px; font-weight: 800; letter-spacing: -.03em; }
   .head p { font-size: 12px; color: var(--mute); font-weight: 600; }
+  .head-branch { flex: 0 0 auto; }
+  body.mode-receipt #consultBranchChips { display: none; }
+  body.mode-consult #pageSub { display: none; }
 
   .app-tabs {
     display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
@@ -90,12 +98,12 @@
     border-radius: 14px;
     background: #faf9f6;
     padding: 6px;
-    min-height: 132px;
+    min-height: 96px;
   }
   .chat-drop.drag { border-color: var(--gold); background: #fff8e8; }
   .chat-drop textarea {
     width: 100%; border: 0; background: transparent;
-    min-height: 120px; resize: vertical; font-size: 15px;
+    min-height: 84px; resize: vertical; font-size: 15px;
     line-height: 1.5; padding: 8px 10px; color: var(--ink);
   }
   .chat-drop textarea:focus { outline: none; }
@@ -139,17 +147,50 @@
   .reply-label span { font-size: 13px; font-weight: 800; }
   .reply-box {
     width: 100%;
-    min-height: 140px;
+    min-height: 108px;
     border: 1px solid #e2ddd3;
     background: #f3f0e8;
     border-radius: 14px;
     padding: 12px 13px;
     font-size: 14.5px;
-    line-height: 1.65;
+    line-height: 1.7;
     color: var(--ink);
     resize: vertical;
     white-space: pre-wrap;
+    word-break: keep-all;
   }
+  #faqText { min-height: 226px; }
+  a.btn-sm {
+    display: inline-flex; align-items: center; justify-content: center;
+    text-decoration: none; color: inherit;
+  }
+  a.btn-sm.faq-dl {
+    background: var(--ink); color: #fff; border-color: var(--ink);
+  }
+  .faq-actions { display: flex; align-items: center; gap: 6px; }
+  .faq-tabs {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+    margin: 8px 0 10px;
+  }
+  .faq-tabs .chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+    border-radius: 10px;
+    padding: 8px 6px;
+    font-size: 12.5px;
+    line-height: 1.25;
+    white-space: normal;
+  }
+  @media (max-width: 420px) {
+    .faq-tabs { gap: 5px; }
+    .faq-tabs .chip { font-size: 11px; padding: 8px 3px; }
+  }
+  .follow-reply { margin-top: 12px; }
   .reply-box:focus { outline: 2px solid var(--gold); background: #fff; }
   .hint {
     font-size: 12px; color: var(--mute); font-weight: 600;
@@ -386,10 +427,16 @@
 <body class="mode-consult">
   <div class="app">
     <header class="head no-print">
-      <img src="리얼무브먼트_링크_로고.png" alt="">
-      <div>
-        <h1 id="pageTitle">상담 메뉴얼</h1>
-        <p id="pageSub">니즈를 먼저 묻고, 가격·예약은 그다음에 안내합니다</p>
+      <div class="head-main">
+        <img src="리얼무브먼트_링크_로고.png" alt="">
+        <div>
+          <h1 id="pageTitle">상담 메뉴얼</h1>
+          <p id="pageSub">발급 기관을 고른 뒤 항목을 입력하세요</p>
+        </div>
+      </div>
+      <div class="chips head-branch" id="consultBranchChips">
+        <button type="button" class="chip active" data-branch="yaksu">약수</button>
+        <button type="button" class="chip" data-branch="incheon">인천</button>
       </div>
     </header>
 
@@ -400,21 +447,6 @@
 
     <div id="panelConsult" class="panel active">
       <section class="card no-print">
-        <div class="card-title">회원 질문 → 상담 멘트</div>
-        <p class="hint">먼저 니즈를 이야기하게끔 묻는 멘트가 나옵니다. 가격·예약은 주고받은 뒤에 아래 버튼으로 안내하세요.</p>
-        <div class="grid" style="margin-bottom:12px">
-          <div class="field">
-            <label>이름</label>
-            <input id="consultName" type="text" placeholder="없으면 안녕하세요." autocomplete="name">
-          </div>
-          <div class="field">
-            <label>상담 지점</label>
-            <div class="chips" id="consultBranchChips">
-              <button type="button" class="chip active" data-branch="yaksu">약수</button>
-              <button type="button" class="chip" data-branch="incheon">인천</button>
-            </div>
-          </div>
-        </div>
         <div class="field">
           <label>회원 질문</label>
           <div class="chat-drop" id="chatDrop">
@@ -426,31 +458,48 @@
           <button type="button" class="btn btn-ghost" id="btnPaste">붙여넣기</button>
           <button type="button" class="btn btn-ghost" id="btnCapture">캡처 넣기</button>
           <label class="btn btn-ghost chat-file">사진 선택<input id="chatFile" type="file" accept="image/*"></label>
-          <button type="button" class="btn btn-print" id="btnMakeReply">니즈 묻기</button>
-          <button type="button" class="btn btn-ghost" id="btnPriceBook">가격·예약 안내</button>
         </div>
         <p class="ocr-status" id="ocrStatus"></p>
-      </section>
-      <section class="card no-print">
-        <div class="reply-label">
-          <span>상담 멘트</span>
+        <div class="reply-label follow-reply">
+          <span>첫 인사</span>
           <span>
             <button type="button" class="btn-sm" id="btnNewConsult">새 상담</button>
             <button type="button" class="btn-sm" id="btnCopyReply">복사</button>
           </span>
         </div>
-        <textarea class="reply-box" id="chatReply" placeholder="질문을 넣으면 니즈를 여쭤보는 멘트가 생깁니다. 대화가 좀 된 뒤 가격·예약을 누르세요."></textarea>
+        <textarea class="reply-box" id="chatReply" placeholder="캡처나 질문을 넣으면 첫 인사가 생깁니다."></textarea>
       </section>
-      <section class="card no-print" id="priceSheetCard">
-        <div class="card-title">가격표</div>
-        <p class="hint">멘트 복사 후, 가격표를 저장하거나 이미지를 복사해 톡에 보내세요.</p>
-        <img class="price-sheet" id="priceSheetImg" alt="가격표">
-        <div class="chat-actions">
-          <a class="btn btn-print" id="btnSavePrice" download>가격표 저장</a>
-          <button type="button" class="btn btn-ghost" id="btnCopyPriceImg">이미지 복사</button>
+      <section class="card no-print">
+        <div class="field">
+          <label>이어서</label>
+          <div class="chat-drop" id="chatDrop2">
+            <textarea id="chatQ2" placeholder="다음 메시지를 붙여 넣거나, 캡처를 넣으세요"></textarea>
+            <div class="chat-thumbs" id="chatThumbs2"></div>
+          </div>
         </div>
+        <div class="chat-actions">
+          <button type="button" class="btn btn-ghost" id="btnPaste2">붙여넣기</button>
+          <button type="button" class="btn btn-ghost" id="btnCapture2">캡처 넣기</button>
+          <label class="btn btn-ghost chat-file">사진 선택<input id="chatFile2" type="file" accept="image/*"></label>
+        </div>
+        <div class="reply-label follow-reply">
+          <span>상담 멘트</span>
+          <button type="button" class="btn-sm" id="btnCopyFollow">복사</button>
+        </div>
+        <textarea class="reply-box" id="chatFollow" placeholder="이어서 넣으면 다음 멘트가 생깁니다."></textarea>
       </section>
-      <section class="card no-print" id="phraseCards"></section>
+      <section class="card no-print" id="faqCard">
+        <div class="reply-label">
+          <span>FAQ</span>
+          <span class="faq-actions">
+            <a class="btn-sm faq-dl" id="btnSavePrice" download hidden>가격표 다운</a>
+            <button type="button" class="btn-sm" id="btnCopyFaq">복사</button>
+          </span>
+        </div>
+        <div class="faq-tabs" id="faqTabs"></div>
+        <textarea class="reply-box" id="faqText" placeholder="버튼을 누르면 멘트가 여기에 나타납니다."></textarea>
+        <img id="priceSheetImg" alt="" hidden>
+      </section>
     </div>
 
     <div id="panelReceipt" class="panel">
@@ -898,22 +947,29 @@
 
   var BRANCH = {
     yaksu: {
-      price: '1:1 예약제. 평가 후 맞춤.\n50분 1회 8.5만 / 주2회 8회 66만.\n시그니처 1회 12.5만.',
-      loc: '약수역 5·6·7 도보 3분, 더약수빌딩 4층.\n0507-1359-4596\nhttps://naver.me/x2YstInq',
-      hours: '예약제.\n평일 09–21 / 토 09–18 / 일·공휴일 휴무.\n가능한 요일·시간을 알려 주세요.',
+      price: '1:1 예약제이고, 평가 후 프로그램이 정해집니다.\n\n50분 1회 8만 5천원\n주 2회 8회 66만원\n시그니처 1회 12만 5천원',
+      loc: '약수역 5·6·7번 출구에서 도보 3분, 더약수빌딩 4층입니다.\n\n네이버 지도\nhttps://naver.me/x2YstInq\n\n전화 0507-1359-4596',
+      hours: '예약제로 운영합니다.\n평일 09–21시, 토요일 09–18시\n일요일·공휴일은 휴무입니다.\n\n가능하신 요일과 시간대를 알려 주시면 맞춰 볼게요.',
+      map: 'https://naver.me/x2YstInq',
+      phone: '0507-1359-4596',
       priceImg: '가격표  리얼무브먼트 약수.jpg',
       priceDownload: '가격표-약수.jpg'
     },
     incheon: {
-      price: '1:1 예약제. 평가 후 맞춤.\n50분 1회 4.5만 / 주2회 8회 32만.\n80분 주2회 8회 62만.',
-      loc: '힐스테이트자이계양 1층, 도서관 옆.\n0507-1312-4596\nhttps://naver.me/xYNbHrY9',
-      hours: '예약제.\n평일 09–21 / 토 09–18 / 일·공휴일 휴무.\n가능한 요일·시간을 알려 주세요.',
+      price: '1:1 예약제이고, 평가 후 프로그램이 정해집니다.\n\n50분 1회 4만 5천원\n주 2회 8회 32만원\n80분 주 2회 8회 62만원',
+      loc: '힐스테이트자이계양 1층, 도서관 옆입니다.\n\n네이버 지도\nhttps://naver.me/xYNbHrY9\n\n전화 0507-1312-4596',
+      hours: '예약제로 운영합니다.\n평일 09–21시, 토요일 09–18시\n일요일·공휴일은 휴무입니다.\n\n가능하신 요일과 시간대를 알려 주시면 맞춰 볼게요.',
+      map: 'https://naver.me/xYNbHrY9',
+      phone: '0507-1312-4596',
       priceImg: '가격표  리얼무브먼트 인천.jpg',
       priceDownload: '가격표-인천.jpg'
     }
   };
   var consultBranch = 'yaksu';
   var chatImages = [];
+  var chatImages2 = [];
+  var faqId = 'start';
+  var consultFollow = 0;
   var ocrWorker = null;
   var tesseractLoading = null;
   var receiptPrefillFromQuery = null;
@@ -931,7 +987,10 @@
   }
   function copyText(text) {
     text = String(text || '');
-    if (!text) return;
+    if (!text) {
+      setStatus('복사할 멘트가 없습니다.');
+      return;
+    }
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(showToast).catch(fallbackCopy);
     } else fallbackCopy();
@@ -946,17 +1005,12 @@
       document.body.removeChild(ta);
     }
   }
-  var BRAND_LINE = '리얼무브먼트. 원장 1:1, 평가 후 움직임.';
-  var VS_LINE = '도수는 문제를 해결하는 데 초점을 둡니다.\n리얼무브먼트는 다시 문제되지 않게 하는 데 초점을 둡니다.\n이후 기능을 강화하는 단계로 진행합니다.';
-  var POSTURE_LINE = '자세 교정은 누운 자세에서 호흡부터입니다. 앉기 → 서기 → 걸음걸이까지 이어갑니다.';
-  var START_LINE = '운동을 시작하려는 사람에게 최적인 프로그램입니다. 누운 자세·호흡부터 기능을 쌓습니다.';
-  var FACE_LINE = '리얼 페이스는 약수·인천 모두 박준규 원장이 진행합니다. 원장이 있는 요일에 오시면 됩니다.';
+  var VS_LINE = '도수는 지금 불편한 부분을 풀어 주는 데 초점을 둡니다.\n리얼무브먼트는 같은 문제가 다시 생기지 않도록, 움직임과 자세를 다시 잡아 드리는 데 초점을 둡니다.\n풀어 주는 것에서 그치지 않고, 이후 기능을 강화하는 단계까지 이어집니다.';
+  var POSTURE_LINE = '자세 교정은 바로 세운 자세에서 시작하지 않습니다.\n가장 안전한 누운 자세에서 호흡부터 잡고, 앉기 → 서기 → 걸음걸이까지 같은 순서로 이어갑니다.';
+  var START_LINE = '운동을 처음 시작하시거나, 안전하게 몸을 만들고 싶으신 분께 맞는 프로그램입니다.\n누운 자세·호흡부터 시작해, 앉고 서서 실제로 쓰는 움직임까지 단계를 쌓아 갑니다.';
+  var FACE_LINE = '리얼 페이스는 약수점·인천점 모두 박준규 원장이 직접 진행합니다.\n원장님이 계신 요일에 맞춰 예약해 드리고 있어요.';
   function helloLine() {
-    var n = ($('consultName').value || '').trim();
-    return n ? n + '님.' : '안녕하세요.';
-  }
-  function greetingBlock() {
-    return helloLine() + '\n' + BRAND_LINE;
+    return '안녕하세요.';
   }
   var consultRound = 0;
   function painPart(q) {
@@ -965,8 +1019,16 @@
       var p = parts[i];
       if (q.indexOf(p) < 0) continue;
       if (p === '목') {
-        var withoutTurtle = q.replace(/거북목/g, '');
-        if (withoutTurtle.indexOf('목') < 0) continue;
+        var neckQ = q
+          .replace(/거북목/g, '')
+          .replace(/목요일/g, '')
+          .replace(/목적/g, '')
+          .replace(/목록/g, '')
+          .replace(/제목/g, '')
+          .replace(/과목/g, '')
+          .replace(/항목/g, '')
+          .replace(/목격/g, '');
+        if (neckQ.indexOf('목') < 0) continue;
       }
       if (p === '등' && /등록|등원|등급/.test(q) && !/등이|등 아|등쪽/.test(q)) continue;
       return p;
@@ -985,12 +1047,6 @@
       if (lines[i] === text) return;
     }
     lines.push(text);
-  }
-  function addFocusLines(lines, q) {
-    if (/도수|마사지|풀리/.test(q)) pushLine(lines, VS_LINE);
-    if (isPostureCase(q)) pushLine(lines, POSTURE_LINE);
-    if (isStartCase(q)) pushLine(lines, START_LINE);
-    if (isFaceCase(q)) pushLine(lines, FACE_LINE);
   }
   function isPainCase(q) {
     if (/아프|통증|뻐근|결리|저림|디스크|찌릿|찢어/.test(q)) return true;
@@ -1028,25 +1084,23 @@
     }
     return tracks;
   }
-  function timelineLine(track, strong) {
+  function timelineLine(track) {
     if (track === 'pain') {
-      return strong
-        ? '불편은 주 2회, 2~3주 안에 변화가 느껴져야 합니다. 아니면 병원 진료를 같이 봅니다.'
-        : '불편: 주 2회, 2~3주.';
+      return '불편하신 부분은 주 2회 기준으로, 보통 2~3주 안에 변화가 느껴지는지를 봅니다. 그 안에 변화가 없으면 병원 진료를 함께 상의드려요.';
     }
     if (track === 'posture') {
-      return strong ? '자세 교정은 3개월 단위로 봅니다.' : '자세 교정: 3개월.';
+      return '자세 교정은 3개월 단위로 봅니다.';
     }
     if (track === 'function') {
-      return strong ? '기능 운동은 6개월 단위로 봅니다.' : '기능 운동: 6개월.';
+      return '기능을 키우는 운동은 6개월 단위로 진행합니다.';
     }
     return '';
   }
   function timelineBlock(q) {
     var tracks = needTracks(q);
     if (!tracks.length) return '';
-    return tracks.map(function (t, i) {
-      return timelineLine(t, i === 0);
+    return tracks.map(function (t) {
+      return timelineLine(t);
     }).join('\n');
   }
   function hasVas(q) {
@@ -1062,193 +1116,225 @@
     return /디스크|협착|진단|mri|초음파|엑스레이|수술/i.test(q);
   }
   function painAskLines(q) {
-    var n = 1;
     var qs = [];
-    if (!painPart(q)) qs.push(n++ + '. 가장 불편한 부위.');
-    if (!hasVas(q)) qs.push(n++ + '. 강도 1~10.');
-    if (!hasQuality(q)) qs.push(n++ + '. 느낌 — 뻐근 / 당김 / 찌릿·저림 / 한 점 / 찢어짐.');
-    if (!hasRadiate(q)) qs.push(n++ + '. 팔·다리로 뻗치거나 힘이 빠지는지.');
-    if (!hasDx(q)) qs.push(n++ + '. 병원 진단 여부.');
+    if (!painPart(q)) qs.push('가장 불편하신 부위가 어디인가요?');
+    if (!hasVas(q)) qs.push('불편하신 정도는 1에서 10 사이라면 어느 정도일까요?');
+    if (!hasQuality(q)) qs.push('뻐근한지, 당기는지, 찌릿하거나 저린지 느낌이 어떠신가요?');
+    if (!hasRadiate(q)) qs.push('팔이나 다리로 뻗치거나, 힘이 빠지지는 않으신가요?');
+    if (!hasDx(q)) qs.push('병원에서 진단을 받아 보신 적 있으실까요?');
     return qs;
   }
   function visitGuide(q) {
     if (/저림|마비|날카롭|힘.?빠|찢어/.test(q)) {
-      return '병원 검사가 우선일 수 있습니다. 먼저 내원해도 됩니다. 평가에서 그 경계를 가릅니다.';
+      return '저림·마비·날카로운 통증이 있거나 힘이 빠지신다면 병원 검사가 먼저일 수 있습니다. 해당되시면 꼭 말씀해 주세요.';
     }
-    return '병원 치료와 병행이 나을 수 있습니다. 먼저 내원해도 됩니다. 평가에서 병원 단계인지, 움직임 단계인지 가릅니다.';
-  }
-  function painScreenBlock(q) {
-    var qs = painAskLines(q);
-    var ask = qs.length ? '확인:\n' + qs.join('\n') : '주 호소는 정리됐습니다.';
-    return ask + '\n\n' + visitGuide(q) + '\n\n' + timelineBlock(q);
+    return '병원 치료와 병행이 나을 수도 있습니다. 방문해 주시면 평가에서 병원 단계인지, 움직임으로 진행할 단계인지를 가려 드립니다.';
   }
   function wantsPrice(q) {
     return /가격|얼마|비용|수강료|패키지|회비|요금/.test(q);
   }
+  function wantsIntro(q) {
+    return /뭐\s*하는|어떤\s*곳|무슨\s*곳|소개|프로그램이|무슨\s*프로그램|PT\s*(인가요|원|센터)|교정하는\s*곳|스트레칭\s*(하는|받)/.test(q);
+  }
+  function wantsVs(q) {
+    return /도수|마사지|카이로|근막/.test(q);
+  }
   function wantsBooking(q) {
-    return /예약|운영시간|휴무|영업시간|가능한 날|방문\s*(하|할|하세|가능)/.test(q);
+    return /예약|운영시간|휴무|영업시간|가능한 날|방문\s*(가능|할 수|하고 싶)|상담\s*(가능|예약)/.test(q);
+  }
+  function wantsLocation(q) {
+    return /위치|주소|오시는 길|찾아가|약수역|계양|지도/.test(q) || (/어디\s*(예요|에요|인가요|인지)/.test(q) && !/아프|통증|뻐근/.test(q));
+  }
+  function wantsHospital(q) {
+    return /병원인가요|보험|실비|실손|의료보험|산재/.test(q);
+  }
+  function wantsOnce(q) {
+    return /한\s*번만|한번만|한 번에|한번에|바로 좋아|금방\s*(교정|좋아)|하루\s*만/.test(q);
+  }
+  function wantsGender(q) {
+    return /여자만|남성만|남자만|여자도|남자도|남녀/.test(q);
+  }
+  function hasWhen(q) {
+    return /부터|어제|그제|최근|오래|주\s*전|한달|한\s*달|\d+\s*달|몇\s*달|달\s*전|달째|\d+\s*년|몇\s*년|년\s*전|작년/.test(q);
+  }
+  function hasTrigger(q) {
+    return /앉아|걷|서 있|일어|잠들|아침에|저녁에|운전|운동할\s*때|운동\s*중|운동하면/.test(q);
+  }
+  function hasGoal(q) {
+    return /고치|교정|빼고|펴고|재활|관리|예방|좋아졌|개선/.test(q);
   }
   function hasNeedDetail(q) {
-    return q.length > 40 && /부터|주|달|년|앉아|걷|일어|밤|아침|디스크|수술|병원|도수|헬스|자세|아프|통증|뻐근/.test(q);
-  }
-  function detectTopics(q) {
-    var t = String(q || '');
-    var found = [];
-    function add(id) { if (found.indexOf(id) < 0) found.push(id); }
-    function has(re) { return re.test(t); }
-    if (has(/아프|통증|뻐근|담 걸|결리|저림|마비|디스크|허리|목|어깨|무릎|골반|손목|발목|고관절|팔꿈치|찌릿|당기/)) add('pain');
-    if (wantsPrice(t)) add('price');
-    if (has(/위치|주소|오시|찾아가|약수역|계양|지도|오시는 길/) || (has(/어디\s*(예요|에요|인가요|인지)/) && !has(/아프|통증|뻐근/))) add('location');
-    if (wantsBooking(t)) add('hours');
-    if (has(/한\s*번만|한번만|효과|바로 좋아|금방/)) add('once');
-    if (has(/초회|첫\s*방|뭐 입|복장|준비물|뭘 하/)) add('first');
-    if (has(/도수|마사지|풀리/)) add('vs');
-    if (has(/병원인가요|보험|실비|진료|의료/)) add('hospital');
-    if (has(/자세|거북|틀어|체형|라운드/) || (has(/교정/) && !isFaceCase(t))) add('posture');
-    if (has(/운동\s*시작|시작해\s*보|입문|왕초보|운동을 못|운동 처음/)) add('beginner');
-    if (has(/여자|여성|남자만|남녀/)) add('gender');
-    if (has(/아이|부모님|시니어|어린이|아이도|어머니|아버지/)) add('family');
-    if (has(/페이스|얼굴|비대칭|리얼 페이스/)) add('face');
-    if (has(/뭐 하는|어떤 곳|소개|프로그램|무슨 곳/)) add('intro');
-    if (found.length > 1) found = found.filter(function (id) { return id !== 'intro'; });
-    return found.slice(0, 2);
-  }
-  function reflectNeed(q) {
-    var part = painPart(q);
-    if (/저림|마비|날카롭|힘.?빠/.test(q)) {
-      return '저림·마비·날카로운 통증이면 병원 검사가 우선입니다. 해당되나요?';
-    }
-    if (/수술/.test(q)) {
-      return '수술 경과는 평가 전에 확인합니다. 문자로 단정하지 않습니다.';
-    }
-    if (part) return '주 호소: ' + part + '.';
-    if (isPostureCase(q)) return POSTURE_LINE;
-    if (isFaceCase(q)) return FACE_LINE;
-    if (/도수|마사지/.test(q)) return VS_LINE;
-    if (/운동을 못|처음|왕초보|운동\s*시작|시작해/.test(q)) return START_LINE;
-    return '';
+    return q.length > 40 && /부터|앉아|걷|일어|아침|디스크|수술|병원|자세|아프|통증|뻐근/.test(q);
   }
   function needsAsk(q) {
     var part = painPart(q);
-    var hasWhen = /부터|주 전|달|년|어제|최근|오래/.test(q);
-    var hasTrigger = /앉아|걷|서 있|일어|운동|잠|아침|저녁|운전/.test(q);
-    var hasGoal = /고치|교정|빼고|펴고|재활|관리|예방|좋아졌/.test(q);
-    if (part && !hasWhen) return part + eunNeun(part) + ' 언제부터인가요?';
-    if (!hasTrigger) return '유발 동작 — 앉기, 서기, 걷기 중 어느 쪽인가요?';
-    if (!hasGoal) return '이번 목표를 한 가지로 말하면.';
-    return '추가로 볼 지점이 있으면 알려 주세요.';
+    if (part && !hasWhen(q)) return part + eunNeun(part) + ' 언제부터 불편하셨나요?';
+    if (isPainCase(q) && !hasTrigger(q)) return '앉기, 서기, 걷기 중에 언제 더 느껴지세요?';
+    if (!hasGoal(q)) return '이번에 가장 개선하고 싶은 걸 한 가지로 말씀해 주시면 맞춰 볼게요.';
+    return '추가로 보시면 좋을 지점이 있으면 알려 주세요.';
   }
-  function topicText(id, q) {
+  function needAskLines(q) {
+    var qs = [];
     var part = painPart(q);
-    var red = /저림|마비|날카롭|힘.?빠|감각/.test(q);
-    if (id === 'intro') {
-      return 'D.C. / P.T. 원장이 평가 후에만 진행합니다.';
+    if (isFaceCase(q) && !isPainCase(q)) {
+      if (!hasWhen(q)) qs.push('어느 쪽이 더 신경 쓰이시는지, 언제부터인지 알려 주세요.');
+      return qs;
     }
-    if (id === 'pain') {
-      if (red) return '저림·마비·날카로운 통증이면 병원 검사가 우선입니다.';
-      return (part ? part + '. ' : '') + '문자는 진단이 아닙니다. 누움 → 앉기 → 서기 → 걷기로 범위를 정합니다.';
+    if ((isStartCase(q) || isFunctionCase(q)) && !isPainCase(q) && !isPostureCase(q)) {
+      qs.push('지금 가장 신경 쓰이는 부위가 있으실까요?');
+      return qs;
     }
-    if (id === 'once') {
-      return '체형은 한 번에 바뀌지 않습니다.';
-    }
-    if (id === 'first') {
-      return '순서: 문진 → 평가 → 당일 안전 범위만. 편한 복장.';
-    }
-    if (id === 'vs') {
-      return VS_LINE;
-    }
-    if (id === 'hospital') {
-      return '병원·보험 기관이 아닙니다. 검사가 필요하면 운동보다 진료가 먼저입니다.';
-    }
-    if (id === 'posture') {
-      return POSTURE_LINE;
-    }
-    if (id === 'beginner') {
-      return START_LINE;
-    }
-    if (id === 'gender') {
-      return '남녀 동일. 기준은 현재 움직임 패턴입니다.';
-    }
-    if (id === 'family') {
-      return '연령보다 당일 안전 범위가 기준입니다. 급성·수술 직후는 병원 확인이 먼저입니다.';
-    }
-    if (id === 'face') {
-      return FACE_LINE;
+    if (part && !hasWhen(q)) qs.push(part + eunNeun(part) + ' 언제부터 불편하셨나요?');
+    else if (!part && !hasWhen(q) && isPainCase(q)) qs.push('그 부분은 언제부터 신경 쓰이셨을까요?');
+    if (isPainCase(q) && !hasTrigger(q)) qs.push('앉기, 서기, 걷기 중에 언제 더 느껴지세요?');
+    if (!hasGoal(q)) qs.push('이번에 가장 개선하고 싶은 걸 한 가지로 말씀해 주시면 맞춰 볼게요.');
+    return qs;
+  }
+  function statedNeed(q) {
+    return !!(painPart(q) || isPostureCase(q) || isFaceCase(q) || isStartCase(q) || isFunctionCase(q) || /불편|아프|통증/.test(q));
+  }
+  function appealLine(q) {
+    if (isFaceCase(q)) return FACE_LINE;
+    if (isPostureCase(q)) return '자세가 신경 쓰이신다면, 누운 자세에서 호흡부터 잡아 앉기·서기까지 이어가는 자세 교정으로 맞춰 볼 수 있습니다.';
+    if (isStartCase(q) || isFunctionCase(q)) return START_LINE;
+    if (isPainCase(q)) {
+      var p = painPart(q);
+      return (p ? p + ' 쪽이 불편하시다면, ' : '불편하신 부분이 있다면, ') + '오늘의 몸을 먼저 보고 안전한 범위부터 진행합니다.';
     }
     return '';
   }
-  function makeReply(q) {
-    q = String(q || '').trim();
-    var opening = consultRound === 0 || !$('chatReply').value.trim();
-    var lines;
-    var safety = /저림|마비|날카롭|힘.?빠|수술/.test(q);
-    if (opening) {
-      consultRound = 1;
-      lines = [greetingBlock()];
-      if (isPainCase(q)) {
-        pushLine(lines, painScreenBlock(q));
-        addFocusLines(lines, q);
-      } else {
-        addFocusLines(lines, q);
-        if (safety) {
-          var reflect = reflectNeed(q);
-          if (reflect) pushLine(lines, reflect);
-        }
-        pushLine(lines, needsAsk(q));
-        pushLine(lines, timelineBlock(q));
-      }
-      if (wantsPrice(q) || wantsBooking(q)) {
-        pushLine(lines, '가격·예약은 호소 확인 후.');
-      }
-      return lines.join('\n\n');
-    }
-    consultRound += 1;
-    lines = [];
-    if (isPainCase(q)) {
-      var remain = painAskLines(q);
-      if (remain.length) {
-        pushLine(lines, '확인:\n' + remain.join('\n'));
-        addFocusLines(lines, q);
-      } else {
-        pushLine(lines, topicText('pain', q));
-        pushLine(lines, visitGuide(q));
-        pushLine(lines, timelineBlock(q));
-        addFocusLines(lines, q);
-      }
-      var readyPain = consultRound >= 2 && hasNeedDetail(q);
-      if ((wantsPrice(q) || wantsBooking(q)) && readyPain) {
-        var bp = BRANCH[consultBranch];
-        if (wantsPrice(q)) pushLine(lines, bp.price);
-        if (wantsBooking(q)) pushLine(lines, bp.hours);
-      } else if (wantsPrice(q) || wantsBooking(q)) {
-        pushLine(lines, '가격·예약은 호소 확인 후.');
-      }
-      return lines.join('\n\n');
-    }
-    var topics = detectTopics(q).filter(function (id) {
-      return id !== 'price' && id !== 'hours' && id !== 'location';
-    });
-    var point = (topics[0] && topicText(topics[0], q)) || reflectNeed(q);
-    if (point) pushLine(lines, point);
-    addFocusLines(lines, q);
-    pushLine(lines, timelineBlock(q));
-    var readyForOffer = consultRound >= 2 && hasNeedDetail(q);
-    if ((wantsPrice(q) || wantsBooking(q)) && readyForOffer) {
-      var b = BRANCH[consultBranch];
-      if (wantsPrice(q)) pushLine(lines, b.price);
-      if (wantsBooking(q)) pushLine(lines, b.hours);
-    } else if (!point || !safety) {
-      pushLine(lines, needsAsk(q));
-      if (wantsPrice(q) || wantsBooking(q)) {
-        pushLine(lines, '가격·예약은 호소 확인 후.');
-      }
-    }
-    if (!lines.length) pushLine(lines, needsAsk(q));
+  function offerBlock(q) {
+    var b = BRANCH[consultBranch];
+    var lines = [];
+    var appeal = appealLine(q);
+    if (appeal) pushLine(lines, appeal);
+    else pushLine(lines, '말씀해 주신 내용을 기준으로, 오늘의 몸을 본 뒤에 필요한 단계부터 진행합니다.');
+    pushLine(lines, '리얼무브먼트는 누운 자세에서 이완부터 시작해, 앉기·서기까지 같은 순서로 갑니다. 바로 세운 자세에서 억지로 맞추지 않습니다.');
+    var time = timelineBlock(q);
+    if (time) pushLine(lines, time);
+    pushLine(lines, b.price);
+    pushLine(lines, '가능하신 요일·시간을 알려 주시면 예약을 맞춰 볼게요.');
     return lines.join('\n\n');
   }
-  function makePriceBookReply() {
+  function detectIntent(q) {
+    if (wantsPrice(q)) return 'price';
+    if (wantsBooking(q)) return 'booking';
+    if (wantsHospital(q)) return 'hospital';
+    if (wantsIntro(q)) return 'intro';
+    if (wantsVs(q)) return 'vs';
+    if (wantsLocation(q)) return 'location';
+    if (wantsOnce(q)) return 'once';
+    if (wantsGender(q)) return 'gender';
+    return 'need';
+  }
+  function mapBlurb() {
     var b = BRANCH[consultBranch];
-    return [helloLine(), b.price, '가격표를 보내 드리겠습니다.', b.hours, b.loc].join('\n\n');
+    var where = consultBranch === 'incheon'
+      ? '힐스테이트자이계양 1층, 도서관 옆입니다.'
+      : '약수역 5·6·7번 출구에서 도보 3분입니다.';
+    return where + '\n아래 링크로 오시는 길을 확인하시면 됩니다.\n\n' + b.map + '\n전화 ' + b.phone;
+  }
+  function makeGreeting(q) {
+    q = String(q || '').trim();
+    var intent = detectIntent(q);
+    var lines = [helloLine()];
+    var part = painPart(q);
+    var need = statedNeed(q);
+    var askNeed = '지금 개선되고 싶은 부분이 있으실까요?';
+    if (intent === 'price') {
+      pushLine(lines, '비용은 회원님 상태를 본 뒤에 프로그램이 정해지고, 그에 따라 달라집니다.');
+      if (need) {
+        if (part) pushLine(lines, part + ' 쪽이 불편하신 거죠.');
+        else {
+          var appeal = appealLine(q);
+          if (appeal) pushLine(lines, appeal);
+        }
+        pushLine(lines, needsAsk(q));
+      } else {
+        pushLine(lines, askNeed);
+      }
+      return lines.join('\n\n');
+    }
+    if (intent === 'booking') {
+      pushLine(lines, '원장님마다 전문 분야가 조금씩 달라서, 회원님 상태에 맞춰 예약을 잡아 드리고 있습니다.');
+      if (need) {
+        if (part) pushLine(lines, part + ' 쪽이 불편하신 거죠.');
+        else {
+          var appealB = appealLine(q);
+          if (appealB) pushLine(lines, appealB);
+        }
+        pushLine(lines, needsAsk(q));
+      } else {
+        pushLine(lines, '개선되고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.');
+      }
+      return lines.join('\n\n');
+    }
+    if (intent === 'intro') {
+      pushLine(lines, '리얼무브먼트는 안전하게 운동하고 싶은 분들을 위한 1:1 프로그램입니다.\n원장님이 오늘의 몸을 먼저 살펴보고, 필요한 단계부터 진행해요.');
+      if (need) {
+        var appealI = appealLine(q);
+        if (appealI) pushLine(lines, appealI);
+        pushLine(lines, '지금 가장 개선하고 싶은 부분을 조금 더 알려 주실 수 있을까요?');
+      } else {
+        pushLine(lines, '지금 개선하고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.');
+      }
+      return lines.join('\n\n');
+    }
+    if (intent === 'vs') {
+      pushLine(lines, VS_LINE);
+      pushLine(lines, need ? needsAsk(q) : '지금 개선하고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.');
+      return lines.join('\n\n');
+    }
+    if (intent === 'hospital') {
+      pushLine(lines, '병원이나 보험 적용 기관은 아닙니다.\n검사가 필요해 보이는 경우에는 운동보다 진료를 먼저 권해 드려요.');
+      pushLine(lines, need ? needsAsk(q) : '개선되고 싶은 부분이 있으시면 알려 주세요.');
+      return lines.join('\n\n');
+    }
+    if (intent === 'location') {
+      pushLine(lines, mapBlurb());
+      pushLine(lines, need ? needsAsk(q) : '개선되고 싶은 부분이 있으시면 알려 주세요.');
+      return lines.join('\n\n');
+    }
+    if (intent === 'once') {
+      pushLine(lines, '체형이나 불편함은 한 번에 바뀌지 않습니다.\n누운 자세에서 호흡부터 잡아, 앉기·서기까지 단계를 쌓아 갑니다.');
+      pushLine(lines, need ? needsAsk(q) : '지금 가장 개선하고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.');
+      return lines.join('\n\n');
+    }
+    if (intent === 'gender') {
+      pushLine(lines, '남녀 구분 없이, 지금 움직임 패턴을 기준으로 맞춰 진행합니다.');
+      pushLine(lines, need ? needsAsk(q) : '개선되고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.');
+      return lines.join('\n\n');
+    }
+    if (part) pushLine(lines, part + ' 쪽이 불편하신 거죠.');
+    else {
+      var appealN = appealLine(q);
+      if (appealN) pushLine(lines, appealN);
+    }
+    if (/저림|마비|날카롭|힘.?빠|수술/.test(q)) pushLine(lines, visitGuide(q));
+    pushLine(lines, need ? needsAsk(q) : '개선되고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.');
+    return lines.join('\n\n');
+  }
+  function allQuestionText() {
+    var a = ($('chatQ').value || '').trim();
+    var b = ($('chatQ2').value || '').trim();
+    return b ? a + '\n\n' + b : a;
+  }
+  function makeFollowup() {
+    var q = allQuestionText();
+    var lines = [];
+    if (!q) return '';
+    var remain = isPainCase(q) ? painAskLines(q) : [];
+    var needRemain = needAskLines(q);
+    var ask = needRemain.slice();
+    remain.forEach(function (line) {
+      if (ask.indexOf(line) < 0) ask.push(line);
+    });
+    if (consultFollow < 2 && ask.length && !hasNeedDetail(q)) {
+      pushLine(lines, ask.slice(0, 3).join('\n'));
+      if (/저림|마비|날카롭|힘.?빠|수술/.test(q)) pushLine(lines, visitGuide(q));
+      return lines.join('\n\n');
+    }
+    return offerBlock(q);
   }
   function priceImgSrc(b, remote) {
     var file = encodeURI((b || BRANCH[consultBranch]).priceImg);
@@ -1268,58 +1354,39 @@
     a.href = img.src;
     a.setAttribute('download', b.priceDownload);
   }
-  function copyPriceImage() {
-    var img = $('priceSheetImg');
-    if (!img || !img.src) return;
-    fetch(img.src).then(function (r) {
-      if (!r.ok) throw new Error('fetch');
-      return r.blob();
-    }).then(function (blob) {
-      if (navigator.clipboard && window.ClipboardItem) {
-        var item = {};
-        item[blob.type || 'image/jpeg'] = blob;
-        return navigator.clipboard.write([new ClipboardItem(item)]);
-      }
-      throw new Error('no-clip');
-    }).then(function () {
-      showToast();
-      setStatus('가격표 이미지를 복사했습니다. 톡에 붙여 넣으세요.');
-    }).catch(function () {
-      setStatus('이미지 복사가 안 되면 저장 후 톡에 첨부하세요.');
-    });
-  }
-  function startFirstReply(reason) {
+  function startGreeting(reason) {
     var q = $('chatQ').value.trim();
     if (!q) {
-      if (reason === 'click') setStatus('질문을 먼저 넣어 주세요.');
+      $('chatReply').value = '';
+      consultRound = 0;
       return;
     }
-    if ((reason === 'paste' || reason === 'ocr') && !$('chatReply').value.trim()) consultRound = 0;
-    if (reason === 'silent') {
-      if (consultRound <= 1) {
-        consultRound = 0;
-        $('chatReply').value = makeReply(q);
-      }
-      return;
-    }
-    $('chatReply').value = makeReply(q);
-    setStatus(consultRound <= 1
-      ? '니즈를 여쭤보는 멘트입니다. 주고받은 뒤 가격·예약을 누르세요.'
-      : '이어서 묻는 멘트입니다. 고친 뒤 복사하세요.');
+    if ($('chatFollow').value.trim() && reason !== 'force') return;
+    consultRound = 1;
+    $('chatReply').value = makeGreeting(q);
   }
-  function appendQuestion(text) {
+  function startFollow(reason) {
+    var q = ($('chatQ2').value || '').trim();
+    if (!q) {
+      $('chatFollow').value = '';
+      consultFollow = 0;
+      return;
+    }
+    if (reason === 'paste' || reason === 'ocr' || reason === 'click') consultFollow += 1;
+    else if (consultFollow < 1) consultFollow = 1;
+    $('chatFollow').value = makeFollowup();
+  }
+  function appendQuestion(text, zone) {
     var add = String(text || '').trim();
     if (!add) return;
-    var cur = $('chatQ').value;
+    var id = zone === 2 ? 'chatQ2' : 'chatQ';
+    var cur = $(id).value;
     if (cur && cur.indexOf(add) >= 0) return;
-    $('chatQ').value = cur && cur.trim() ? cur.replace(/\s+$/, '') + '\n\n' + add : add;
+    $(id).value = cur && cur.trim() ? cur.replace(/\s+$/, '') + '\n\n' + add : add;
   }
-  function autoReplyIfEmpty(reason) {
-    if ($('chatReply').value.trim()) {
-      setStatus('질문이 추가됐습니다. 니즈 묻기를 누르면 이어서 만듭니다.');
-      return;
-    }
-    startFirstReply(reason);
+  function afterQuestion(reason, zone) {
+    if (zone === 2) startFollow(reason);
+    else startGreeting(reason);
   }
   function tidyOcr(text) {
     return String(text || '')
@@ -1330,9 +1397,14 @@
       .replace(/\n{3,}/g, '\n\n')
       .trim();
   }
-  function renderThumbs() {
-    $('chatThumbs').innerHTML = chatImages.map(function (img, i) {
-      return '<div class="chat-thumb"><img src="' + img.url + '" alt="캡처"><button type="button" data-del="' + i + '" aria-label="삭제">×</button></div>';
+  function imagesFor(zone) {
+    return zone === 2 ? chatImages2 : chatImages;
+  }
+  function renderThumbs(zone) {
+    var id = zone === 2 ? 'chatThumbs2' : 'chatThumbs';
+    var images = imagesFor(zone);
+    $(id).innerHTML = images.map(function (img, i) {
+      return '<div class="chat-thumb"><img src="' + img.url + '" alt="캡처"><button type="button" data-del="' + i + '" data-zone="' + (zone || 1) + '" aria-label="삭제">×</button></div>';
     }).join('');
   }
   function loadTesseract() {
@@ -1350,11 +1422,11 @@
     });
     return tesseractLoading;
   }
-  function ingestImage(file) {
+  function ingestImage(file, zone) {
     if (!file) return Promise.resolve();
     var url = URL.createObjectURL(file);
-    chatImages.push({ url: url });
-    renderThumbs();
+    imagesFor(zone).push({ url: url });
+    renderThumbs(zone);
     setStatus('캡처에서 글자를 읽는 중…');
     return loadTesseract().then(function () {
       if (ocrWorker) return ocrWorker;
@@ -1373,8 +1445,8 @@
     }).then(function (result) {
       var text = tidyOcr(result && result.data && result.data.text);
       if (text) {
-        appendQuestion(text);
-        autoReplyIfEmpty('ocr');
+        appendQuestion(text, zone);
+        afterQuestion('ocr', zone);
       } else {
         setStatus('글자를 읽지 못했습니다. 질문을 직접 붙여 넣어 주세요.');
       }
@@ -1382,7 +1454,8 @@
       setStatus('캡처는 넣었습니다. 글자 인식이 안 되면 질문을 직접 붙여 넣어 주세요.');
     });
   }
-  function pasteClipboard() {
+  function pasteClipboard(zone) {
+    var qid = zone === 2 ? 'chatQ2' : 'chatQ';
     setStatus('클립보드를 읽는 중…');
     var readItems = navigator.clipboard && navigator.clipboard.read
       ? navigator.clipboard.read()
@@ -1399,7 +1472,7 @@
           }
           if (imgType) {
             return item.getType(imgType).then(function (blob) {
-              return ingestImage(blob).then(function () { return true; });
+              return ingestImage(blob, zone).then(function () { return true; });
             });
           }
           return false;
@@ -1410,8 +1483,8 @@
         if (navigator.clipboard.readText) {
           return navigator.clipboard.readText().then(function (text) {
             if (text && text.trim()) {
-              appendQuestion(text);
-              autoReplyIfEmpty('paste');
+              appendQuestion(text, zone);
+              afterQuestion('paste', zone);
               return true;
             }
             return false;
@@ -1421,25 +1494,25 @@
       });
     }).then(function (got) {
       if (!got) {
-        $('chatQ').focus();
+        $(qid).focus();
         setStatus('캡처 후 이 칸에서 Ctrl+V, 또는 붙여넣기/캡처 넣기를 다시 눌러 주세요.');
       }
     }).catch(function () {
       if (navigator.clipboard && navigator.clipboard.readText) {
         return navigator.clipboard.readText().then(function (text) {
           if (text && text.trim()) {
-            appendQuestion(text);
-            autoReplyIfEmpty('paste');
+            appendQuestion(text, zone);
+            afterQuestion('paste', zone);
           } else {
-            $('chatQ').focus();
+            $(qid).focus();
             setStatus('이 칸을 누른 뒤 Ctrl+V로 글이나 캡처를 넣으세요.');
           }
         }).catch(function () {
-          $('chatQ').focus();
+          $(qid).focus();
           setStatus('이 칸을 누른 뒤 Ctrl+V로 글이나 캡처를 넣으세요.');
         });
       }
-      $('chatQ').focus();
+      $(qid).focus();
       setStatus('이 칸을 누른 뒤 Ctrl+V로 글이나 캡처를 넣으세요.');
     });
   }
@@ -1448,31 +1521,34 @@
       c.classList.toggle('active', c.dataset.branch === consultBranch);
     });
     syncPriceSheet();
-    renderPhrases();
+    renderFaq();
+    if ($('chatQ').value.trim()) startGreeting('silent');
+    if ($('chatQ2').value.trim()) startFollow('silent');
   }
-  function escapeHtml(s) {
-    return String(s || '').replace(/[&<>"]/g, function (ch) {
-      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch];
-    });
-  }
-  function renderPhrases() {
+  function faqItems() {
     var b = BRANCH[consultBranch];
-    var cards = [
-      ['첫 인사', greetingBlock() + '\n주 호소 부위와 유발 동작을 알려 주세요.'],
-      ['통증 확인', '확인:\n1. 가장 불편한 부위.\n2. 강도 1~10.\n3. 느낌 — 뻐근 / 당김 / 찌릿·저림 / 한 점 / 찢어짐.\n4. 팔·다리로 뻗치거나 힘이 빠지는지.\n5. 병원 진단 여부.\n\n병원 치료와 병행이 나을 수 있습니다. 먼저 내원해도 됩니다.\n불편은 주 2회, 2~3주 안에 변화가 느껴져야 합니다. 아니면 병원 진료를 같이 봅니다.'],
-      ['기간', '불편: 주 2회, 2~3주 안에 변화가 기준. 아니면 병원 같이.\n자세 교정: 3개월.\n기능 운동: 6개월.'],
-      ['도수와 차이', VS_LINE],
-      ['자세 교정', POSTURE_LINE + '\n3개월 단위.'],
-      ['운동 시작', START_LINE + '\n기능 운동은 6개월 단위.'],
-      ['리얼 페이스', FACE_LINE],
-      ['니즈 이어서', '발생 시점.\n유발 동작 — 앉기 / 서기 / 걷기.\n이번 목표 한 가지.'],
-      ['가격', b.price],
-      ['오시는 길', b.loc],
-      ['운영시간·예약', b.hours]
+    return [
+      { id: 'start', label: '운동 시작', text: START_LINE + '\n\n기능 운동은 보통 6개월 단위로 봅니다.\n지금 가장 신경 쓰이는 부분을 알려 주시면, 그에 맞춰 안내해 드릴게요.' },
+      { id: 'period', label: '기간', text: '불편하신 부분은 주 2회 기준으로, 보통 2~3주 안에 변화가 느껴지는지를 봅니다.\n그 안에 변화가 없으면 병원 진료를 함께 상의드려요.\n\n자세 교정은 3개월 단위로 보고,\n이후 기능을 키우는 운동은 6개월 단위로 진행합니다.\n\n시작 단계는 회원님 상태에 따라 달라지니, 방문하시면 평가 후 맞춰 안내해 드릴게요.' },
+      { id: 'price', label: '가격', text: '가격표 이미지를 함께 보내 드립니다.\n\n' + b.price + '\n\n상태에 따라 시작 단계가 달라지니, 개선되고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.' },
+      { id: 'map', label: '오시는 길', text: '첫 방문은 문진 → 평가 → 당일 안전한 범위만 진행합니다.\n운동복처럼 움직이기 편한 복장으로 오시면 됩니다.\n\n' + mapBlurb() },
+      { id: 'hours', label: '운영시간', text: b.hours },
+      { id: 'pain', label: '통증', text: '문자로는 진단을 드리지 않습니다.\n가장 불편한 부위, 언제부터인지, 앉기·서기·걷기 중 언제 더 불편하신지를 알려 주시면 맞춰 안내해 드릴게요.\n\n저림·마비·날카로운 통증이 있거나 힘이 빠지신다면 병원 검사가 먼저일 수 있습니다.\n방문해 주시면 평가에서 병원 단계인지, 움직임으로 진행할 단계인지를 가려 드립니다.' },
+      { id: 'posture', label: '자세교정', text: POSTURE_LINE + '\n\n한 번에 바뀌기보다 3개월 단위로 보면서, 일상에서 유지되는 자세를 만드는 과정입니다.' },
+      { id: 'vs', label: '도수와 차이', text: VS_LINE + '\n\n그래서 방문하시면 오늘의 몸 상태를 먼저 보고, 필요한 단계부터 진행해요.' },
+      { id: 'hospital', label: '병원·보험', text: '병원이나 보험 적용 기관은 아닙니다.\n검사가 필요해 보이는 경우에는 운동보다 진료를 먼저 권해 드려요.\n\n이미 병원에서 진료 중이시라면, 병행 가능 여부는 평가 후 안내해 드립니다.' },
+      { id: 'face', label: '리얼 페이스', text: FACE_LINE + '\n\n원하시는 요일이나 시간대가 있으시면 알려 주세요.' }
     ];
-    $('phraseCards').innerHTML = '<div class="card-title">자주 쓰는 문구</div>' + cards.map(function (c) {
-      return '<div class="phrase"><div class="phrase-hd"><strong>' + c[0] + '</strong><button type="button" class="btn-sm" data-copy-phrase>복사</button></div><p>' + escapeHtml(c[1]) + '</p></div>';
+  }
+  function renderFaq() {
+    var items = faqItems();
+    if (!items.some(function (it) { return it.id === faqId; })) faqId = items[0].id;
+    $('faqTabs').innerHTML = items.map(function (it) {
+      return '<button type="button" class="chip' + (it.id === faqId ? ' active' : '') + '" data-faq="' + it.id + '">' + it.label + '</button>';
     }).join('');
+    var cur = items.filter(function (it) { return it.id === faqId; })[0];
+    $('faqText').value = cur ? cur.text : '';
+    $('btnSavePrice').hidden = faqId !== 'price';
   }
   function applyReceiptPrefill(p) {
     var id = 'hbw';
@@ -1495,9 +1571,7 @@
     $('appTabConsult').classList.toggle('active', consult);
     $('appTabReceipt').classList.toggle('active', !consult);
     $('pageTitle').textContent = consult ? '상담 메뉴얼' : '영문 영수증';
-    $('pageSub').textContent = consult
-      ? '니즈를 먼저 묻고, 가격·예약은 그다음에 안내합니다'
-      : '발급 기관을 고른 뒤 항목을 입력하세요';
+    $('pageSub').textContent = '발급 기관을 고른 뒤 항목을 입력하세요';
     if (!consult) {
       if (receiptPrefillFromQuery && !receiptPrefillApplied) {
         applyReceiptPrefill(receiptPrefillFromQuery);
@@ -1513,7 +1587,6 @@
     var sessions = (q.get('sessions') || '').trim();
     var instructor = (q.get('instructor') || '').trim();
     var tab = (q.get('tab') || '').trim();
-    if (name) $('consultName').value = name;
     if (/인천/.test(branch)) consultBranch = 'incheon';
     else if (/약수/.test(branch)) consultBranch = 'yaksu';
     if (name || branch || sessions) {
@@ -1586,89 +1659,104 @@
     if (!c) return;
     consultBranch = c.dataset.branch;
     renderConsultBranch();
-    if ($('chatQ').value.trim()) startFirstReply('silent');
   });
-  $('consultName').addEventListener('input', function () {
-    renderPhrases();
-    if ($('chatQ').value.trim() && $('chatReply').value) startFirstReply('silent');
-  });
-  $('chatQ').addEventListener('input', function () {
-    if (!this.value.trim()) consultRound = 0;
-  });
-  $('btnNewConsult').addEventListener('click', function () {
-    consultRound = 0;
-    $('chatQ').value = '';
-    $('chatReply').value = '';
-    chatImages.forEach(function (img) { URL.revokeObjectURL(img.url); });
-    chatImages = [];
-    renderThumbs();
-    setStatus('새 상담입니다. 질문을 넣어 주세요.');
-  });
-  $('btnPaste').addEventListener('click', pasteClipboard);
-  $('btnCapture').addEventListener('click', pasteClipboard);
-  $('btnMakeReply').addEventListener('click', function () { startFirstReply('click'); });
-  $('btnPriceBook').addEventListener('click', function () {
-    $('chatReply').value = makePriceBookReply();
-    setStatus('멘트 복사 후, 아래 가격표를 저장하거나 이미지 복사해 톡에 보내세요.');
-    $('priceSheetCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  });
-  $('btnCopyPriceImg').addEventListener('click', copyPriceImage);
-  $('btnCopyReply').addEventListener('click', function () { copyText($('chatReply').value); });
-  $('phraseCards').addEventListener('click', function (e) {
-    var btn = e.target.closest('[data-copy-phrase]');
-    if (!btn) return;
-    var p = btn.closest('.phrase').querySelector('p');
-    copyText(p ? p.textContent : '');
-  });
-  $('chatFile').addEventListener('change', function () {
-    var f = this.files && this.files[0];
-    if (f) ingestImage(f);
-    this.value = '';
-  });
-  $('chatThumbs').addEventListener('click', function (e) {
-    var btn = e.target.closest('[data-del]');
-    if (!btn) return;
-    var i = parseInt(btn.getAttribute('data-del'), 10);
-    if (isNaN(i)) return;
-    URL.revokeObjectURL(chatImages[i].url);
-    chatImages.splice(i, 1);
-    renderThumbs();
-  });
-  var drop = $('chatDrop');
-  drop.addEventListener('dragover', function (e) {
-    e.preventDefault();
-    drop.classList.add('drag');
-  });
-  drop.addEventListener('dragleave', function () { drop.classList.remove('drag'); });
-  drop.addEventListener('drop', function (e) {
-    e.preventDefault();
-    drop.classList.remove('drag');
-    var files = e.dataTransfer.files || [];
-    var hadImg = false;
-    for (var i = 0; i < files.length; i++) {
-      if (files[i].type.indexOf('image/') === 0) {
-        ingestImage(files[i]);
-        hadImg = true;
-      }
-    }
-    var text = e.dataTransfer.getData('text/plain');
-    if (text && text.trim() && !hadImg) {
-      appendQuestion(text);
-      autoReplyIfEmpty('paste');
-    }
-  });
-  $('chatQ').addEventListener('paste', function (e) {
-    var items = e.clipboardData && e.clipboardData.items;
-    if (items) {
-      for (var i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf('image/') === 0) {
-          e.preventDefault();
-          ingestImage(items[i].getAsFile());
-          return;
+  function bindZone(zone) {
+    var drop = $(zone === 2 ? 'chatDrop2' : 'chatDrop');
+    var ta = $(zone === 2 ? 'chatQ2' : 'chatQ');
+    var file = $(zone === 2 ? 'chatFile2' : 'chatFile');
+    var thumbs = $(zone === 2 ? 'chatThumbs2' : 'chatThumbs');
+    $(zone === 2 ? 'btnPaste2' : 'btnPaste').addEventListener('click', function () { pasteClipboard(zone); });
+    $(zone === 2 ? 'btnCapture2' : 'btnCapture').addEventListener('click', function () { pasteClipboard(zone); });
+    file.addEventListener('change', function () {
+      var f = this.files && this.files[0];
+      if (f) ingestImage(f, zone);
+      this.value = '';
+    });
+    thumbs.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-del]');
+      if (!btn) return;
+      var i = parseInt(btn.getAttribute('data-del'), 10);
+      var images = imagesFor(zone);
+      if (isNaN(i) || !images[i]) return;
+      URL.revokeObjectURL(images[i].url);
+      images.splice(i, 1);
+      renderThumbs(zone);
+    });
+    drop.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      drop.classList.add('drag');
+    });
+    drop.addEventListener('dragleave', function () { drop.classList.remove('drag'); });
+    drop.addEventListener('drop', function (e) {
+      e.preventDefault();
+      drop.classList.remove('drag');
+      var files = e.dataTransfer.files || [];
+      var hadImg = false;
+      for (var i = 0; i < files.length; i++) {
+        if (files[i].type.indexOf('image/') === 0) {
+          ingestImage(files[i], zone);
+          hadImg = true;
         }
       }
-    }
-    setTimeout(function () { autoReplyIfEmpty('paste'); }, 0);
+      var text = e.dataTransfer.getData('text/plain');
+      if (text && text.trim() && !hadImg) {
+        appendQuestion(text, zone);
+        afterQuestion('paste', zone);
+      }
+    });
+    ta.addEventListener('paste', function (e) {
+      var items = e.clipboardData && e.clipboardData.items;
+      if (items) {
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image/') === 0) {
+            e.preventDefault();
+            ingestImage(items[i].getAsFile(), zone);
+            return;
+          }
+        }
+      }
+      setTimeout(function () { afterQuestion('paste', zone); }, 0);
+    });
+    ta.addEventListener('input', function () {
+      if (!this.value.trim()) {
+        if (zone === 2) {
+          consultFollow = 0;
+          $('chatFollow').value = '';
+        } else {
+          consultRound = 0;
+          $('chatReply').value = '';
+        }
+        return;
+      }
+      clearTimeout(ta._t);
+      ta._t = setTimeout(function () { afterQuestion('type', zone); }, 450);
+    });
+  }
+  bindZone(1);
+  bindZone(2);
+  $('btnNewConsult').addEventListener('click', function () {
+    consultRound = 0;
+    consultFollow = 0;
+    $('chatQ').value = '';
+    $('chatQ2').value = '';
+    $('chatReply').value = '';
+    $('chatFollow').value = '';
+    chatImages.forEach(function (img) { URL.revokeObjectURL(img.url); });
+    chatImages2.forEach(function (img) { URL.revokeObjectURL(img.url); });
+    chatImages = [];
+    chatImages2 = [];
+    renderThumbs(1);
+    renderThumbs(2);
+    setStatus('');
+  });
+  $('btnCopyReply').addEventListener('click', function () { copyText($('chatReply').value); });
+  $('btnCopyFollow').addEventListener('click', function () { copyText($('chatFollow').value); });
+  $('btnCopyFaq').addEventListener('click', function () { copyText($('faqText').value); });
+  $('faqTabs').addEventListener('click', function (e) {
+    var c = e.target.closest('[data-faq]');
+    if (!c) return;
+    faqId = c.getAttribute('data-faq');
+    renderFaq();
   });
 
   window.addEventListener('resize', function () {
