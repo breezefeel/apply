@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>셀프 소도구 가이드 | REAL MOVEMENT</title>
-<meta name="description" content="폼롤러·12센티 마사지볼 셀프 자극. 사진 순서대로 따라 하세요.">
+<title>셀프 가이드 | REAL MOVEMENT</title>
+<meta name="description" content="호흡·자세와 폼롤러·12센티 마사지볼. 센터에서 배운 순서대로 집에서 따라 하세요.">
 <meta name="theme-color" content="#F6E4C4">
 <link rel="icon" href="리얼무브먼트_링크_로고.png">
 <link rel="apple-touch-icon" href="리얼무브먼트_링크_로고.png">
@@ -48,6 +48,78 @@
     font-size: 12px; font-weight: 800; letter-spacing: .12em;
     color: var(--navy); margin: 8px 0 10px;
   }
+  .sec-lead {
+    font-size: 12.5px; line-height: 1.65; color: var(--mute);
+    word-break: keep-all; margin: -2px 0 14px;
+  }
+  .sec-sub {
+    font-size: 13px; font-weight: 800; color: var(--ink);
+    margin: 2px 0 8px; letter-spacing: -.02em;
+  }
+  .cat {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .cat > summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 14px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+  .cat > summary::-webkit-details-marker { display: none; }
+  .cat-k {
+    font-size: 10px; font-weight: 800; letter-spacing: .08em;
+    min-width: 22px;
+  }
+  .cat-name {
+    font-size: 15px; font-weight: 800; letter-spacing: -.03em;
+    word-break: keep-all;
+  }
+  .cat-sub {
+    display: block; font-size: 11px; font-weight: 600; margin-top: 2px; opacity: .75;
+  }
+  .cat-chev {
+    margin-left: auto; font-size: 12px; transition: transform .2s ease;
+  }
+  .cat[open] .cat-chev { transform: rotate(180deg); }
+  .cat-tools > summary { background: #1e3a6e; color: #fff; }
+  .cat-lie > summary { background: #d8efe4; color: #1a5c40; }
+  .cat-sit > summary { background: #f3e6c4; color: #6b4e16; }
+  .cat-stand > summary { background: #dce6f5; color: #1e3a6e; }
+  .cat-body { padding: 12px 12px 6px; }
+  .cat-body .sec-lead { margin: 0 0 12px; }
+  .cat-body .grid { margin-bottom: 14px; }
+  .subcat {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .subcat > summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 12px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--navy);
+  }
+  .subcat > summary::-webkit-details-marker { display: none; }
+  .subcat .sub-chev {
+    margin-left: auto; font-size: 11px; transition: transform .2s ease;
+  }
+  .subcat[open] .sub-chev { transform: rotate(180deg); }
+  .subcat .grid { margin: 0; padding: 0 10px 10px; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
   .card {
     display: block; text-decoration: none; color: inherit;
@@ -57,12 +129,13 @@
   .card img { width: 100%; height: 132px; object-fit: cover; display: block; background: #eee; }
   .card .meta { padding: 10px 11px 12px; }
   .card .k { font-size: 11px; font-weight: 800; color: var(--accent); }
-  .card .n { font-size: 15px; font-weight: 800; letter-spacing: -.03em; margin-top: 2px; }
+  .card .n { font-size: 15px; font-weight: 800; letter-spacing: -.03em; margin-top: 2px; word-break: keep-all; }
   .card .s { font-size: 11px; color: var(--mute); margin-top: 3px; }
   .card.video .ph {
     height: 132px; display: flex; align-items: center; justify-content: center;
     background: #1e3a6e; color: #fff; font-size: 12px; font-weight: 800;
   }
+  .card.video .ph.short { height: 88px; }
   .back {
     display: inline-flex; align-items: center; gap: 4px;
     font-size: 13px; font-weight: 800; color: var(--navy);
@@ -82,6 +155,8 @@
     overflow: hidden; margin-bottom: 14px;
   }
   .step img { width: 100%; display: block; background: #111; }
+  .hero-shot { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
+  .hero-shot img { width: 100%; height: 200px; object-fit: cover; display: block; background: #111; }
   .step figcaption {
     padding: 11px 13px 13px; font-size: 13.5px; line-height: 1.6; word-break: keep-all;
   }
@@ -91,11 +166,25 @@
     background: var(--navy); color: #fff; font-size: 11px; font-weight: 800;
     margin-right: 6px; vertical-align: 1px;
   }
+  .step.text figcaption { padding: 14px 15px; }
+  .chain {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 14px;
+    padding: 12px 14px; margin-bottom: 16px;
+  }
+  .chain span {
+    font-size: 12.5px; font-weight: 800; color: var(--navy);
+    background: #fff; border: 1px solid var(--line); border-radius: 999px;
+    padding: 5px 10px;
+  }
+  .chain i {
+    font-style: normal; color: var(--mute); font-size: 12px; font-weight: 800;
+  }
   .seq-hd {
     font-size: 13px; font-weight: 800; color: var(--navy);
     margin: 18px 0 8px; letter-spacing: -.02em;
   }
-  .copy-row { display: flex; gap: 8px; margin: 8px 0 18px; }
+  .copy-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 18px; }
   .copy-row button {
     flex: 1; border: 0; background: var(--navy); color: #fff;
     font: inherit; font-weight: 800; font-size: 13px;
@@ -125,13 +214,76 @@
   </div>
 
   <div id="hub">
-    <h1>셀프 소도구 가이드</h1>
-    <p class="lead">센터에서 배운 폼롤러·12센티 마사지볼을 집에서 같은 순서로 따라 하세요. 사진은 방향·순서대로 찍어 두었습니다.</p>
+    <h1>셀프 가이드</h1>
+    <p class="lead">강사앱과 같은 순서입니다. 오늘 센터에서 한 카테고리만 열어, 장면으로 확인하고 영상으로 복습하세요.</p>
     <div class="warn">통증 0~3 정도만 유지하세요. 찌릿함·저림·어지러움이 있으면 즉시 멈추고, 뼈 위는 누르지 마세요.</div>
-    <div class="sec-title">FORM ROLLER</div>
-    <div class="grid" id="foamGrid"></div>
-    <div class="sec-title">12CM MASSAGE BALL</div>
-    <div class="grid" id="ballGrid"></div>
+
+    <details class="cat cat-tools" id="catTools">
+      <summary>
+        <span class="cat-k">01</span>
+        <span><span class="cat-name">셀프 소도구 자극</span><span class="cat-sub">폼롤러 · 12센티 마사지볼</span></span>
+        <span class="cat-chev">▾</span>
+      </summary>
+      <div class="cat-body">
+        <p class="sec-lead">센터에서 배운 부위만, 사진 순서대로 따라 하세요.</p>
+        <details class="subcat" id="subFoam">
+          <summary>폼롤러<span class="sub-chev">▾</span></summary>
+          <div class="grid" id="foamGrid"></div>
+        </details>
+        <details class="subcat" id="subBall">
+          <summary>12센티 마사지볼<span class="sub-chev">▾</span></summary>
+          <div class="grid" id="ballGrid"></div>
+        </details>
+      </div>
+    </details>
+
+    <details class="cat cat-lie" id="catLie">
+      <summary>
+        <span class="cat-k">02</span>
+        <span><span class="cat-name">Lying</span><span class="cat-sub">누움 · Passive · 호흡 · 기능 운동</span></span>
+        <span class="cat-chev">▾</span>
+      </summary>
+      <div class="cat-body">
+        <div class="sec-sub">Passive Stretching</div>
+        <div class="grid" id="pGrid"></div>
+        <div class="sec-sub">A · 생활습관</div>
+        <div class="grid" id="lieGrid"></div>
+        <div class="sec-sub">기능 운동</div>
+        <div class="grid" id="lieExGrid"></div>
+      </div>
+    </details>
+
+    <details class="cat cat-sit" id="catSit">
+      <summary>
+        <span class="cat-k">03</span>
+        <span><span class="cat-name">Sitting / Quadruped</span><span class="cat-sub">앉기 · Active · 호흡 · 기능 운동</span></span>
+        <span class="cat-chev">▾</span>
+      </summary>
+      <div class="cat-body">
+        <div class="sec-sub">Active Stretching</div>
+        <div class="grid" id="aSitGrid"></div>
+        <div class="sec-sub">A · 생활습관</div>
+        <div class="grid" id="sitGrid"></div>
+        <div class="sec-sub">기능 운동</div>
+        <div class="grid" id="sitExGrid"></div>
+      </div>
+    </details>
+
+    <details class="cat cat-stand" id="catStand">
+      <summary>
+        <span class="cat-k">04</span>
+        <span><span class="cat-name">Standing</span><span class="cat-sub">서기 · Active · 호흡 · 걷기 · 밸런스</span></span>
+        <span class="cat-chev">▾</span>
+      </summary>
+      <div class="cat-body">
+        <div class="sec-sub">Active Stretching</div>
+        <div class="grid" id="aStandGrid"></div>
+        <div class="sec-sub">A · 생활습관</div>
+        <div class="grid" id="standGrid"></div>
+        <div class="sec-sub">기능 운동</div>
+        <div class="grid" id="standExGrid"></div>
+      </div>
+    </details>
   </div>
 
   <div id="detail" class="hidden"></div>
@@ -141,6 +293,470 @@
 <script>
 var BASE = 'self-photos/';
 var GUIDE = [
+  {
+    id: 'p_supine_lower', tool: 'stretch', pos: 'passive', kind: 'stretch',
+    toolKo: 'Passive · 누움', name: 'Supine 하체',
+    video: 'https://www.youtube.com/watch?v=_-BQl8Zzfec', thumb: true, n: 0,
+    sequences: [
+      { title: '영상 장면', start: 1, imgStart: 2, captions: [
+        '무릎을 가슴·반대 어깨 쪽으로 당깁니다. 반대 다리는 테이블에 붙인 채, 골반이 들리지 않게.',
+        '한쪽 다리를 곧게 들어 뒤쪽(햄스트링)을 열어 줍니다. 무릎이 굽지 않게, 억지로 당기지 마세요.',
+        '무릎을 가슴 쪽으로 모아 고관절·무릎을 풀어 줍니다. 호흡을 멈추지 마세요.',
+        '한쪽 무릎을 바깥으로 열어 골반을 풀어 줍니다. 반대 다리는 바닥에 붙인 채.'
+      ]}
+    ],
+    videos: [
+      { url: 'https://www.youtube.com/watch?v=_-BQl8Zzfec', label: '영상 · 1편' },
+      { url: 'https://www.youtube.com/watch?v=xCfoLvzjido', label: '영상 · 2편' },
+      { url: 'https://www.youtube.com/watch?v=Tyyj13K1VS4', label: '영상 · 3편' }
+    ],
+    chain: ['발', '발목', '무릎', '고관절'],
+    note: [
+      ['준비', '오늘 누워서 하체를 풀어 준 동작입니다. 사진으로 장면을 확인하고, 디테일은 영상으로.'],
+      ['동작', '발 → 발목 → 무릎 → 고관절. 영상이 3편입니다.'],
+      ['포인트', '억지로 늘리지 마세요. 센터에서 받은 각도만.'],
+      ['주의', '찌릿함·날카로운 통증이 있으면 중단하고 다음 수업에 말씀하세요.']
+    ]
+  },
+  {
+    id: 'p_supine_upper', tool: 'stretch', pos: 'passive', kind: 'stretch',
+    toolKo: 'Passive · 누움', name: 'Supine 상체',
+    video: 'https://www.youtube.com/watch?v=-xMSIyh0XNE', thumb: true, n: 0,
+    sequences: [
+      { title: '영상 장면', start: 1, imgStart: 2, captions: [
+        '어깨를 고정한 채 손목·손을 잡고 팔을 옆으로 엽니다. 목이 긴장하지 않게.',
+        '팔을 약 90도로 벌리고, 손목과 팔꿈치를 받쳐 천천히 움직입니다.',
+        '위팔을 잡고 어깨가 열리는 범위를 찾습니다. 억지로 당기지 마세요.',
+        '팔을 머리 위쪽으로 올려 어깨·가슴이 늘어나게 합니다. 통증 없는 범위만.'
+      ]}
+    ],
+    chain: ['손가락', '손목', '팔꿈치', '어깨'],
+    note: [
+      ['준비', '오늘 누워서 상체를 풀어 준 동작입니다.'],
+      ['동작', '손가락 → 손목 → 팔꿈치 → 어깨.'],
+      ['포인트', '통증 없는 범위. 센터에서 받은 느낌이 기준입니다.'],
+      ['주의', '찌릿하면 멈추세요.']
+    ]
+  },
+  {
+    id: 'p_prone_lower', tool: 'stretch', pos: 'passive', kind: 'stretch',
+    toolKo: 'Passive · 누움', name: 'Prone 하체',
+    video: 'https://www.youtube.com/watch?v=kcsdkZazWFw', thumb: true, n: 0,
+    sequences: [
+      { title: '영상 장면', start: 1, imgStart: 2, captions: [
+        '엎드려 발목을 잡고 무릎을 굽힙니다. 얼굴·목은 편하게.',
+        '발뒤꿈치를 엉덩이 쪽으로 당기며 허벅지 앞을 열어 줍니다. 골반은 테이블에.',
+        '골반을 손으로 고정한 채 같은 방향으로 조금 더 굽힙니다. 허리가 젖혀지지 않게.',
+        '반대쪽도 같은 시간으로. 찌릿하면 각도를 줄이거나 멈추세요.'
+      ]}
+    ],
+    chain: ['발가락', '발목', '무릎', '고관절'],
+    note: [
+      ['준비', '오늘 엎드려 하체를 풀어 준 동작입니다.'],
+      ['동작', '발가락 → 발목 → 무릎 → 고관절.'],
+      ['포인트', '얼굴·목을 편하게. 허리에 힘을 주지 마세요.'],
+      ['주의', '찌릿하면 멈추세요.']
+    ]
+  },
+  {
+    id: 'p_prone_upper', tool: 'stretch', pos: 'passive', kind: 'stretch',
+    toolKo: 'Passive · 누움', name: 'Prone 상체',
+    video: 'https://www.youtube.com/watch?v=X3Fj3flL7PY', thumb: true, n: 0,
+    sequences: [
+      { title: '영상 장면', start: 1, imgStart: 2, captions: [
+        '엎드려 팔을 잡고 어깨·가슴이 열리게 합니다. 고개는 들지 마세요.',
+        '견갑·등 위를 안정시킨 채 어깨를 풀어 줍니다. 호흡을 멈추지 마세요.',
+        '굽힌 팔을 천천히 움직이며 어깨 가동 범위를 찾습니다.',
+        '등 중간을 열어 주며 상체를 풀어 줍니다. 한 번에 꺾지 마세요.',
+        '목·등 위를 편하게 둔 채, 센터에서 받은 범위만 유지합니다.'
+      ]}
+    ],
+    chain: ['손가락', '손목', '팔꿈치', '어깨', '척추'],
+    note: [
+      ['준비', '오늘 엎드려 상체를 풀어 준 동작입니다.'],
+      ['동작', '손가락 → 손목 → 팔꿈치 → 어깨 → 척추.'],
+      ['포인트', '척추는 한 번에 꺾지 말고, 센터에서 받은 범위만.'],
+      ['주의', '찌릿하면 멈추세요.']
+    ]
+  },
+  {
+    id: 'a_sit', tool: 'stretch', pos: 'sitA', kind: 'stretch',
+    toolKo: 'Active · 앉기', name: '경선별 4동작',
+    video: 'https://www.youtube.com/watch?v=AmRJNZGpIx4', thumb: true, n: 0,
+    sequences: [
+      { title: '경선별 4동작', start: 1, captions: [
+        '전방(앞라인) — 엎드려 손바닥을 어깨 옆에 두고, 팔꿈치를 펴며 상체를 천천히 듭니다. 곡선이 자연스러운지, 통증은 없는지 확인하세요.',
+        '후방(뒷라인) — 다리를 펴고 앉아, 내쉬며 앞으로 숙입니다. 손끝이 발끝에 닿고, 무릎이 펴지며 척추가 부드러운 곡선인지 보세요.',
+        '측방(옆라인) — 한 발은 양반다리, 한 발은 뒤로 두고 앉아 한팔을 들고 옆으로 숙입니다. 좌우를 바꿔 비교하세요.',
+        '회전 라인 — 무릎 꿇고 엎드려 팔꿈치로 지지한 뒤, 한손을 뒤통수(또는 허리)에 두고 고개·몸통을 같은 쪽으로 최대한 돌립니다. 좌우 비교.'
+      ]}
+    ],
+    note: [
+      ['준비', '앉아서 직접 움직이는 Active Stretching입니다. 사진으로 장면을 확인하고, 디테일은 영상으로.'],
+      ['동작', '영상과 같은 네 장면입니다. 앞라인(엎드려 들기) · 뒷라인(다리 펴고 숙이기) · 옆라인(한팔 들고 옆 숙이기) · 회전(무릎 꿇고 몸통 돌리기).'],
+      ['포인트', '통증 없는 범위. 좌우를 비교해 보세요.'],
+      ['주의', '어지럽거나 찌릿하면 멈추세요.']
+    ]
+  },
+  {
+    id: 'a_stand_upper', tool: 'stretch', pos: 'standA', kind: 'stretch',
+    toolKo: 'Active · 서기', name: '상체 4가지',
+    video: 'https://www.youtube.com/watch?v=r99GPLDSWlo', thumb: true, n: 0,
+    sequences: [
+      { title: '상체 4가지', start: 1, captions: [
+        '① 상지 — 팔을 앞으로 펴고 손목을 당겨 놓은 뒤, 좌우로 회전해 여러 섬유가 늘어나게 합니다.',
+        '② 목 — 깍지 끼고 고개를 숙인 뒤, 턱을 좌우로 밀거나 머리 잡고 아래·위를 봅니다. 어깨는 올라가지 않게.',
+        '③ 어깨 — 팔을 가로로 당기고 시선은 반대로, 늘려 놓은 상태에서 손을 회전합니다. 팔꿈치로 살짝 눌러 주세요.',
+        '④ 몸통 — 깍지를 위로 올린 뒤 손바닥을 축으로 팔꿈치·척추·골반까지 좌우로 틀어 줍니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '서서 하는 상체 Active Stretching입니다.'],
+      ['동작', '손·손목·팔 → 목 → 어깨 → 몸통 순.'],
+      ['포인트', '밸런스를 잡고 천천히. 허리를 한 번에 꺾지 마세요.'],
+      ['주의', '어지러우면 멈추고 앉으세요.']
+    ]
+  },
+  {
+    id: 'a_stand_lower', tool: 'stretch', pos: 'standA', kind: 'stretch',
+    toolKo: 'Active · 서기', name: '하체 4가지',
+    video: 'https://www.youtube.com/watch?v=xBVvsnbTTuI', thumb: true, n: 0,
+    sequences: [
+      { title: '하체 4가지', start: 1, captions: [
+        '⑤ 고관절 — 발·발끝을 바깥으로 두고 앉아 안쪽을 밀거나, 옆으로 앉아 발끝을 안·밖으로 움직입니다.',
+        '⑥ 무릎 — 앉아 무릎을 지지한 채 누르고 좌우·회전으로 풀어 줍니다. 엉덩이가 뒤로 빠지지 않게.',
+        '⑦ 종아리 — 한 발을 앞에 두고 뒤꿈치는 바닥에 붙인 채 앞무릎을 굽힙니다. 몸통을 좌우로 틀면 다른 섬유가 늘어납니다.',
+        '⑧ 발목 — 발끝을 구부리고 바깥·안쪽으로 돌립니다. 돌아올 때는 엄지발가락이 꺾이지 않게.'
+      ]}
+    ],
+    note: [
+      ['준비', '서서 하는 하체 Active Stretching입니다.'],
+      ['동작', '고관절 → 무릎 → 종아리 → 발목 순.'],
+      ['포인트', '무릎과 발끝이 같은 방향을 보게.'],
+      ['주의', '균형이 무너지면 벽에 손을 가볍게.']
+    ]
+  },
+  {
+    id: 'lie_easy', tool: 'posture', pos: 'lie', kind: 'habit',
+    toolKo: '누움 · 생활습관', name: '편안한 호흡',
+    video: 'https://www.youtube.com/watch?v=K5ueK1AiWu0', thumb: true, n: 0, sequences: [],
+    steps: [
+      '무릎을 세우고 편하게 눕습니다.',
+      '한 손은 아랫배, 한 손은 윗배에 둡니다.',
+      '코로 천천히 들이쉴 때 아랫배가 먼저, 또는 위·아래가 비슷하게 부풀게 합니다.',
+      '앞배만 나오지 않게, 옆·뒤도 같이 부풀게 합니다. 배가 나오면서 허리가 들리면 안 됩니다.',
+      '내쉴 때는 완전히 힘을 빼세요. 허리 근육이 말랑해진 상태가 편안한 호흡입니다.'
+    ],
+    note: [
+      ['준비', '힘을 쓰는 운동이 아닙니다. 허리 힘을 빼고 숨 쉬는 연습입니다.'],
+      ['동작', '들이쉴 때 아랫배·옆·뒤가 같이 부풀고, 내쉴 때 완전히 힘 뺍니다.'],
+      ['포인트', '윗배만 먼저 올라오면, 아랫배를 살짝 밀어 내는 느낌을 먼저 익히세요.'],
+      ['주의', '하루 3~5분이면 충분합니다. 어지럽거나 허리가 세게 아프면 바로 멈추세요.']
+    ]
+  },
+  {
+    id: 'lie_breath', tool: 'posture', pos: 'lie', kind: 'ex',
+    toolKo: '누움 · 자세 교정', name: '호흡 운동',
+    video: 'https://www.youtube.com/watch?v=ghANSeGvJmg', thumb: true, n: 0, sequences: [],
+    steps: [
+      '들이쉴 때는 편안한 호흡과 같습니다.',
+      '내쉴 때 배 왕자를 만들며 끝까지 내뱉습니다. 갈비뼈가 모아지는 느낌이 나야 합니다.',
+      '숨을 참지 마세요. 내쉬면서 힘을 줍니다.',
+      '이게 되면, 조여 둔 상태를 호흡 3번 동안 유지했다가 마지막에 완전히 힘 뺍니다.'
+    ],
+    note: [
+      ['준비', '편안한 호흡이 된 다음에 하세요. 같은 날에 섞지 마세요.'],
+      ['동작', '들이쉬는 건 같고, 내쉴 때 힘을 씁니다. 편하면 운동이 아닙니다.'],
+      ['포인트', '갈비뼈가 모이는지 양손으로 확인해 보세요.'],
+      ['주의', '하루 5회 안팎이면 됩니다. 허리가 들리면 힘을 줄이거나 편안한 호흡으로 돌아가세요.']
+    ]
+  },
+  {
+    id: 'lie_align', tool: 'posture', pos: 'lie', kind: 'ex',
+    toolKo: '누움 · 자세 교정', name: '호흡 운동 + 등척성 정렬',
+    video: 'https://www.youtube.com/watch?v=2lUIWCMuBKE', thumb: true, n: 0, sequences: [],
+    chain: ['엉덩이', '발', '무릎', '척추', '어깨', '손끝'],
+    steps: [
+      '내쉴 때 호흡 운동(배 왕자)을 유지한 채, 아래부터 맞춰 갑니다.',
+      '양쪽 엉덩이·발끝이 비슷하게 맞춰지게 합니다.',
+      '턱을 살짝 당기며 목을 누르지 말고, 척추가 길어지는 느낌으로 둡니다.',
+      '어깨는 뒤로 밀지 말고 바깥으로 늘리고, 손끝은 발 쪽으로 뻗습니다.',
+      '그 자세를 호흡 3번 유지한 뒤, 내쉴 때 완전히 힘 뺍니다.'
+    ],
+    note: [
+      ['준비', '누워서 호흡 운동이 된 다음에 정렬을 얹습니다.'],
+      ['동작', '내쉴 때 힘을 주며 엉덩이 → 발 → 무릎 → 척추 → 어깨 → 손끝 순으로 맞춥니다.'],
+      ['포인트', '한쪽에만 신경 쓰이면 다른 쪽이 빠집니다. 한 호흡에 하나씩 더하세요.'],
+      ['주의', '턱을 누르거나 어깨를 뒤로 밀지 마세요. 길어지게, 바깥으로 늘립니다.']
+    ]
+  },
+  {
+    id: 'sit_habit', tool: 'posture', pos: 'sit', kind: 'habit',
+    toolKo: '앉기 · 생활습관', name: '바르게 앉는 법',
+    video: 'https://www.youtube.com/watch?v=htThowr2dRw', thumb: true, n: 0, sequences: [],
+    steps: [
+      '의자·바닥에 좌골(앉은뼈)로 앉습니다.',
+      '몸을 앞뒤로 살짝 움직여, 무게가 뼈의 앞·뒤로 이동하는 걸 느껴 보세요.',
+      '너무 앞(허리 힘줌)도, 너무 뒤(구부정)도 아닌 중간에서 허리 힘을 뺍니다.',
+      '좌우도 같이. 한쪽이 쉬우면 그쪽에 기대고 있는 겁니다. 초반에는 반대쪽이 조금 더 실리게 앉아 보세요.',
+      '자리를 찾았으면 편안한 호흡으로 유지합니다.'
+    ],
+    note: [
+      ['준비', '똑바로 힘주는 자세가 아닙니다. 힘을 뺄 수 있는 자리를 찾습니다.'],
+      ['동작', '앞뒤·좌우로 무게를 옮긴 뒤, 허리 힘이 빠지는 중간을 찾습니다.'],
+      ['포인트', '같은 자리라도 힘 준 것과 뺀 것이 다릅니다. 힘 빼는 것까지가 완성입니다.'],
+      ['주의', '오래 앉아 허리가 아픈 날은 자세를 세게 잡지 말고, 이 중간 자리를 다시 찾으세요.']
+    ]
+  },
+  {
+    id: 'sit_breath', tool: 'posture', pos: 'sit', kind: 'ex',
+    toolKo: '앉기 · 자세 교정', name: '바르게 앉아서 호흡 운동',
+    video: 'https://www.youtube.com/watch?v=Q_vVpCRiA7k', thumb: true, n: 0, sequences: [],
+    chain: ['골반', '척추', '어깨', '팔꿈치'],
+    steps: [
+      '바르게 앉은 다음, 내쉴 때 배 왕자로 끝까지 내뱉습니다.',
+      '턱을 살짝 당기며, 머리 꼭대기가 천장으로 끌려 올라가는 느낌으로 척추를 늘립니다.',
+      '어깨는 바깥으로 늘리고, 팔꿈치는 바닥 쪽으로 뻗습니다. 어깨를 귀 쪽으로 올리지 마세요.',
+      '호흡 3번 유지한 뒤 힘 빼고, 그 부드러운 자세로 앉아 있습니다.'
+    ],
+    note: [
+      ['준비', '바르게 앉는 법이 된 다음에 하세요. 누워서 하던 호흡 운동과 같고, 상체에 더 집중합니다.'],
+      ['동작', '내쉴 때 골반 → 척추 → 어깨 → 팔꿈치 순으로 맞춥니다.'],
+      ['포인트', '아래 등을 펴려고 배를 내밀면 안 됩니다. 배 힘을 먼저 잡고, 그다음 펴세요.'],
+      ['주의', '어깨가 이미 많이 내려가 있으면 밑으로 내리지 말고, 옆으로만 늘리세요.']
+    ]
+  },
+  {
+    id: 'stand_habit', tool: 'posture', pos: 'stand', kind: 'habit',
+    toolKo: '서기 · 생활습관', name: '바르게 서기',
+    video: 'https://www.youtube.com/watch?v=Eez9dWBshmU', thumb: true, n: 0, sequences: [],
+    steps: [
+      '발에서 앞·뒤, 안·밖, 좌우로 무게를 옮겨 본 뒤, 뒤꿈치 중앙보다 약 1cm 앞에 양쪽이 비슷하게 실리게 섭니다.',
+      '고개만 숙여 발등이 보이면 골반이 잘 온 겁니다. 발등이 안 보이면 배를 내밀고 있는 경우가 많습니다.',
+      '무릎은 굽히지 않으면서, 허리 힘을 뺄 수 있는 자리를 찾습니다.',
+      '들이쉴 때 허리가 살짝 부풀면 힘이 빠진 겁니다.',
+      '옆에서 보면 복숭아뼈–고관절–어깨–귀가 한 줄에 가깝게. 앞에서 보면 골반·어깨·머리가 한쪽으로 치우치지 않게.'
+    ],
+    note: [
+      ['준비', '라인만 맞추고 허리 힘을 빼는 것이 핵심입니다.'],
+      ['동작', '발 무게 → 골반 → 허리 힘 빼기 → 좌우 균형 순으로 찾습니다.'],
+      ['포인트', '라인이 잡혀도 허리가 올라가 있으면 다시 내려놓고 힘을 빼세요.'],
+      ['주의', '골반을 뒤로 둘 때 어깨까지 같이 뒤로 가면 넘어질 것 같습니다. 몸통은 두고 골반만 옮기세요.']
+    ]
+  },
+  {
+    id: 'stand_breath', tool: 'posture', pos: 'stand', kind: 'ex',
+    toolKo: '서기 · 자세 교정', name: '바르게 서서 호흡 운동',
+    video: 'https://www.youtube.com/watch?v=gMPxYOKGDgs', thumb: true, n: 0, sequences: [],
+    chain: ['발', '골반', '척추', '어깨', '목'],
+    steps: [
+      '들이쉴 때 허리도 같이 부풀게, 내쉴 때 배 왕자로 갈비뼈를 모읍니다.',
+      '엉덩이 힘, 뒤꿈치끼리 밀고, 무릎은 서로 모으되 무릎뼈가 앞을 보게 합니다.',
+      '엉덩이를 앞으로 밀지 마세요. 무게는 뒤에 두고 조입니다.',
+      '턱을 당기며 길어지고, 어깨는 바깥, 손끝은 아래로.',
+      '호흡 3번 유지 후 완전히 힘 뺍니다.'
+    ],
+    note: [
+      ['준비', '바르게 서기가 된 다음에 하세요. 이 자세를 유지하는 근육을 키우는 단계입니다.'],
+      ['동작', '내쉴 때 발 → 골반 → 척추 → 어깨 → 목 순으로 맞춥니다.'],
+      ['포인트', '엉덩이에 힘 준다고 허리가 꺾이면, 골반을 살짝 뒤로 두고 다시 하세요.'],
+      ['주의', '한쪽에만 골반이 튀어나오면 반대쪽이 덜 나온 겁니다. 양쪽을 비슷하게 맞추세요.']
+    ]
+  },
+  {
+    id: 'walk_habit', tool: 'posture', pos: 'stand', kind: 'habit',
+    toolKo: '걷기 · 생활습관', name: '바르게 걷기',
+    video: 'https://www.youtube.com/watch?v=UWrajCt_oaQ', thumb: true, n: 0, sequences: [],
+    steps: [
+      '바르게 선 뒤, 힘 빼고 시작합니다.',
+      '발은 자기 라인만 따라갑니다. 발이 바깥으로 열리지 않게.',
+      '발을 뗄 때 발목으로 들지 말고 무릎을 살짝 들어, 발목은 힘 빼 둡니다.',
+      '뒤꿈치가 먼저 닿고, 무게가 앞으로 옮길 때 엄지발가락 쪽이 바닥에 남는지 봅니다. 새끼발가락만 남으면 발목이 꺾인 겁니다.',
+      '무게가 오른발이면 오른쪽 골반이, 왼발이면 왼쪽 골반이 살짝 나옵니다. 한쪽만 나오면 그 패턴을 걸을 때도 쓰는 겁니다.',
+      '팔은 일부러 흔들지 마세요. 어깨·팔 힘만 빼면 반대쪽 발과 자연스럽게 같이 갑니다.'
+    ],
+    note: [
+      ['준비', '서기와 호흡이 된 다음에 하세요. 빨리 걷지 말고 한 걸음씩 확인합니다.'],
+      ['동작', '무릎으로 발을 떼고, 뒤꿈치 → 엄지발가락 순으로 무게를 옮깁니다.'],
+      ['포인트', '골반이 움직이는 사람은 머리·어깨가 덜 흔들립니다. 상체를 일부러 흔들지 마세요.'],
+      ['주의', '허리를 들고 걷던 분은, 걸을 때도 허리가 올라가는지 한 걸음마다 확인하세요.']
+    ]
+  },
+  {
+    id: 'move_situp', tool: 'posture', pos: 'lie', kind: 'move',
+    toolKo: '누움 · 기능 운동', name: 'Sit-up 6단계',
+    video: 'https://www.youtube.com/watch?v=-GWfCMCKGiE', thumb: true, n: 0,
+    videos: [
+      { url: 'https://www.youtube.com/watch?v=-GWfCMCKGiE', label: '영상 · 1단계' },
+      { url: 'https://www.youtube.com/watch?v=TL9Kmi5-3vA', label: '영상 · 2~6단계' }
+    ],
+    sequences: [
+      { title: 'Sit-up 6단계', start: 1, captions: [
+        '1단계 · 상체 — 무릎을 세우고 편하게 눕습니다. 상체를 약 45° 들어 올립니다. 견갑이 바닥에서 떨어질 정도면 됩니다. 목을 당기지 마세요.',
+        '2단계 · 하체 — 견갑을 살짝 띄운 채 다리를 한쪽씩 번갈아 든 뒤, 양쪽을 동시에 듭니다.',
+        '3단계 · 상체 — 무릎 굽혀 앉은 자세(90°)에서 45° 정도까지 내려갔다가 다시 올라옵니다.',
+        '4단계 · 하체 — 등(견갑·흉추)이 바닥에 닿은 상태에서 다리를 한쪽씩, 이어서 양쪽 동시에 듭니다.',
+        '5단계 · 정식 Sit-up — 통증 없는 범위에서 정상적인 Sit-up.',
+        '6단계 · 구르기 — 무릎을 잡고 앉은 뒤 천천히 뒤로 굴렀다가, 앞으로 돌아오며 무릎을 펴고 손끝으로 발끝에 닿습니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '호흡·정렬이 된 다음에 하세요. 1단계가 안정된 뒤에 다음 단계로.'],
+      ['동작', '상체·하체를 번갈아 분절한 뒤, 정식 Sit-up과 구르기로 마무리합니다.'],
+      ['포인트', '매 단계에서 좌우·전후 밸런스를 확인합니다. 호흡을 멈추지 마세요.'],
+      ['주의', '목이 아프거나 허리가 들리면 각도를 줄이거나 이전 단계로 돌아가세요.']
+    ]
+  },
+  {
+    id: 'move_super', tool: 'posture', pos: 'lie', kind: 'move',
+    toolKo: '누움 · 기능 운동', name: 'Superman 6단계',
+    video: 'https://www.youtube.com/watch?v=UkIrqA9rAxk', thumb: true, n: 0,
+    videos: [
+      { url: 'https://www.youtube.com/watch?v=UkIrqA9rAxk', label: '영상 · 1단계' },
+      { url: 'https://www.youtube.com/watch?v=BfihGG8aNNY', label: '영상 · 2~6단계' }
+    ],
+    sequences: [
+      { title: 'Superman 6단계', start: 1, captions: [
+        '1단계 · 척추 — 엎드려 이마를 가볍게 둡니다. 경추부터 척추를 분절 순으로 천천히 들어 올립니다. 허리만 꺾지 마세요.',
+        '2단계 · 대각선 — 한 손과 반대 발을 동시에 듭니다. 좌·우 교대.',
+        '3단계 · 양손·양발 — 낮게 동시에 듭니다. (기본 Superman에 가깝습니다)',
+        '4단계 · 접영 — 양손·양발을 든 채 접영 동작과 발 벌림.',
+        '5단계 · 팔 신전·무릎 굴곡 — 든 상태에서 견갑을 모으고, 양쪽 무릎을 높게 굽힙니다.',
+        '6단계 · 팔꿈치·회전 — 든 상태에서 한쪽 팔꿈치부터 번갈아 더 높이 들며 몸통을 회전합니다.'
+      ]}
+    ],
+    note: [
+      ['준비', 'Sit-up이 된 다음, 엎드린 후방 경선 단계입니다. 한 단계씩.'],
+      ['동작', '목→등 분절 들기 → 대각선 → 양손양발 → 접영 → 무릎 밴딩 → 회전 순입니다.'],
+      ['포인트', '높이보다 좌우 대칭과 호흡이 먼저입니다. 허리를 한 번에 젖히지 마세요.'],
+      ['주의', '허리·목 통증이 세지면 즉시 멈추세요. 어깨가 귀로 올라가면 낮게, 천천히.']
+    ]
+  },
+  {
+    id: 'move_pushup', tool: 'posture', pos: 'sit', kind: 'move',
+    toolKo: '앉기 · 기능 운동', name: 'Push-up 6단계',
+    video: 'https://www.youtube.com/watch?v=aWdI65Sd-jY', thumb: true, n: 0,
+    sequences: [
+      { title: 'Push-up 6단계', start: 1, captions: [
+        '1단계 · 무릎 네발 — 머리→몸통→골반 웨이브로 하강·상승.',
+        '2단계 · 무릎 지지 — 몸통을 먼저 내린 뒤, 웨이브로 올라옵니다.',
+        '3단계 · 무릎 지지 — 몸통과 골반을 동시에 하강·상승.',
+        '4단계 · 무릎 뗀 네발 — 웨이브로 하강·상승.',
+        '5단계 · 무릎 뗀 네발 — 몸통을 먼저 내린 뒤 웨이브로 상승.',
+        '6단계 · 정상 Push-up — 통증 없는 범위에서 완성 동작.'
+      ]}
+    ],
+    note: [
+      ['준비', '무릎 지지 네발부터. 무릎을 뗀 네발은 그다음입니다.'],
+      ['동작', '웨이브(머리→몸통→골반)와 동시 하강을 번갈아 익힙니다.'],
+      ['포인트', '어깨가 귀로 올라가지 않게, 허리가 꺾이지 않게.'],
+      ['주의', '손목·어깨가 아프면 무릎 지지 단계에 머무르세요.']
+    ]
+  },
+  {
+    id: 'move_plank', tool: 'posture', pos: 'sit', kind: 'move',
+    toolKo: '앉기 · 기능 운동', name: 'Plank 6단계',
+    video: 'https://www.youtube.com/watch?v=LGlZysDLB44', thumb: true, n: 0,
+    sequences: [
+      { title: 'Plank 6단계', start: 1, captions: [
+        '1단계 · 무릎 대고 네발 — 머리 회전.',
+        '2단계 · 무릎 떼고 네발 — 머리 회전.',
+        '3단계 · 네발 — 골반 좌우 움직임.',
+        '4단계 · 한 팔을 앞으로 뻗었다가 복귀. 좌·우.',
+        '5단계 · 한 손을 뒤통수에 두고 몸통 회전. 좌·우.',
+        '6단계 · 다리를 접었다가 바깥 회전한 뒤 복귀. 좌·우.'
+      ]}
+    ],
+    note: [
+      ['준비', '어깨와 골반이 한 줄, 복부는 가볍게 잡아 둡니다. 호흡은 계속.'],
+      ['동작', '무릎 지지 → 정식 네발 → 골반 → 팔·몸통·다리 순으로 올립니다.'],
+      ['포인트', '오래 버티기보다 정렬과 호흡이 먼저입니다.'],
+      ['주의', '허리가 처지거나 엉덩이가 너무 올라가면 무릎 지지로 돌아가세요.']
+    ]
+  },
+  {
+    id: 'move_sideplank', tool: 'posture', pos: 'sit', kind: 'move',
+    toolKo: '앉기 · 기능 운동', name: 'Side Plank 6단계',
+    thumb: true, n: 0,
+    sequences: [
+      { title: 'Side Plank 6단계', start: 1, captions: [
+        '1단계 · 한발 지지 사이드. 좌·우.',
+        '2단계 · 지지 없이 사이드. 좌·우.',
+        '3단계 · 골반 좌우 움직임. 좌·우.',
+        '4단계 · 위쪽 다리를 벌렸다가 모읍니다. 좌·우.',
+        '5단계 · 위쪽 다리로 원을 그립니다.',
+        '6단계 · 다리를 앞·뒤로 스윙합니다. 달리기 동작. 좌·우.'
+      ]}
+    ],
+    note: [
+      ['준비', '골반을 들어 올리고 측면이 한 줄이 되게 합니다. 호흡은 계속.'],
+      ['동작', '한발 지지 → 완전 사이드 → 골반·다리 움직임 순으로 올립니다.'],
+      ['포인트', '높이보다 측면 일직선이 먼저입니다. 좌·우 같은 시간으로.'],
+      ['주의', '어깨·손목이 아프면 한발 지지 단계에 머무르세요.']
+    ]
+  },
+  {
+    id: 'move_spine', tool: 'posture', pos: 'sit', kind: 'ex',
+    toolKo: '앉기 · 생활습관', name: '척추+상지 분절 운동',
+    video: 'https://www.youtube.com/watch?v=j5dC_Y3wU_Y', thumb: true, n: 0, sequences: [],
+    steps: [
+      '바르게 앉아 양팔을 벌립니다. 호흡과 함께 천천히.',
+      '1단계 · 골반을 앞뒤로 굴리며 척추가 따라 움직이게 합니다.',
+      '2단계 · 1단계에 상지 움직임을 더합니다.',
+      '3단계 · 좌우로 숙이며, 머리에서 골반 방향으로 척추를 분절합니다.',
+      '4단계 · 3단계에 상지를 더합니다.',
+      '5단계 · 머리에서 골반 방향으로 척추를 분절하며 회전합니다.',
+      '6단계 · 5단계에 상지를 더합니다.'
+    ],
+    note: [
+      ['준비', '바르게 앉은 상태·앉아서 호흡 운동이 된 다음에 하세요.'],
+      ['동작', '골반 → 상지 → 좌우숙임 → 상지 → 회전 → 상지 순입니다.'],
+      ['포인트', '한 덩어리로 움직이지 말고, 척추를 마디마디 움직입니다.'],
+      ['주의', '허리에 힘을 주고 꺾지 마세요. 어지러우면 멈추세요.']
+    ]
+  },
+  {
+    id: 'move_squat', tool: 'posture', pos: 'sit', kind: 'move',
+    toolKo: '앉기 · 기능 운동', name: '스쿼트 6단계',
+    video: 'https://www.youtube.com/watch?v=M82gXAlC29M', thumb: true, n: 0,
+    sequences: [
+      { title: '스쿼트 6단계', start: 1, captions: [
+        '1단계 · 의자에 살짝 걸터앉아, 엉덩이를 앞으로 떼었다가 다시 앉습니다.',
+        '2단계 · 엉덩이를 앞으로 뗀 뒤 일어났다가 다시 앉습니다.',
+        '3단계 · 일어났다가 깊게 앉았다가, 의자 높이까지 일어난 뒤 다시 앉습니다.',
+        '4단계 · 한쪽 다리에 중심을 싣고 1번 동작. 좌·우.',
+        '5단계 · 한쪽 다리에 중심을 싣고 2번 동작. 좌·우.',
+        '6단계 · 한쪽 다리에 중심을 싣고 3번 동작. 좌·우.'
+      ]}
+    ],
+    note: [
+      ['준비', '의자 또는 벽을 활용합니다. 앉아서 바르게 일어설 힘을 만드는 단계입니다.'],
+      ['동작', '엉덩이 앞으로 떼기 → 기립 → 앉기 순으로 난이도를 올립니다.'],
+      ['포인트', '골반 중립, 무릎과 발끝이 같은 방향을 보게. 매 단계 확인.'],
+      ['주의', '무릎이 안쪽으로 무너지거나 허리가 꺾이면 이전 단계로.']
+    ]
+  },
+  {
+    id: 'move_balance', tool: 'posture', pos: 'stand', kind: 'move',
+    toolKo: '서기 · 기능 운동', name: '밸런스 6단계',
+    video: 'https://www.youtube.com/watch?v=4df-nhY-w_Y', thumb: true, n: 0,
+    sequences: [
+      { title: '밸런스 6단계', start: 1, captions: [
+        '1단계 · 일어선 채 한 발을 살짝 들고 돌리며 30초 유지. 발은 엄지·새끼·뒤꿈치 삼각으로 지지합니다.',
+        '2단계 · 무릎 높이까지 들어 올리고 돌리며 30초 유지.',
+        '3단계 · 한 발 지지, 반대 다리를 뒤로 뻗고(발은 바닥에 안 닿게) 후굴.',
+        '4단계 · 뒤뻗기(후굴)와 무릎 들기(전굴)를 사이클로.',
+        '5단계 · 무릎을 들고 몸통·골반 회전.',
+        '6단계 · 뒤뻗기 하며 몸통·골반 회전.'
+      ]}
+    ],
+    note: [
+      ['준비', '바르게 서기와 서서 호흡이 된 다음에 하세요. 벽 근처에 두세요.'],
+      ['동작', '한 발 지지 → 무릎 높이 → 뒤뻗기 → 전후 사이클 → 회전 순입니다.'],
+      ['포인트', '높이보다 발 삼각 지지와 골반이 정면을 유지하는지가 먼저입니다.'],
+      ['주의', '흔들려 넘어질 것 같으면 손을 벽에 가볍게. 어지러우면 멈추세요.']
+    ]
+  },
   {
     id: 'roller_hip', tool: 'foam', toolKo: '폼롤러', name: '엉덩이',
     n: 7, sequences: [
@@ -438,18 +1054,31 @@ function toast(msg){
   toast._t = setTimeout(function(){ el.classList.remove('on'); }, 1800);
 }
 function findGuide(id){
+  var aliases = { move_situp1:'move_situp', move_situp26:'move_situp', move_super1:'move_super', move_super26:'move_super' };
+  if (aliases[id]) id = aliases[id];
   for (var i=0;i<GUIDE.length;i++) if (GUIDE[i].id===id) return GUIDE[i];
   return null;
 }
 function cardHtml(g){
-  var img = g.n
+  var hasImg = !!(g.n || g.thumb);
+  var ph = g.kind==='habit' ? '생활습관' : (g.kind==='move' ? '기능 운동' : ((g.kind==='ex' || g.kind==='stretch') ? '자세 교정' : (g.video ? '설명 + 영상' : '설명 가이드')));
+  var img = hasImg
     ? '<img src="'+BASE+g.id+'/01.jpg" alt="'+g.toolKo+' '+g.name+'">'
-    : '<div class="ph">'+(g.video ? '설명 + 영상' : '설명 가이드')+'</div>';
-  var sub = g.n ? ('사진 '+g.n+'장 · 순서대로') : (g.video ? '설명 · 영상 참고' : '설명 참고');
-  return '<a class="card'+(g.n?'':' video')+'" href="#'+g.id+'">'+
+    : '<div class="ph">'+ph+'</div>';
+  var sub = g.n ? ('사진 '+g.n+'장 · 순서대로') : (g.kind==='stretch' ? '장면 확인 · 영상 복습' : (g.video ? '설명 · 영상 보기' : '설명 참고'));
+  return '<a class="card'+(hasImg?'':' video')+'" href="#'+g.id+'">'+
     img+'<div class="meta"><div class="k">'+g.toolKo+'</div><div class="n">'+g.name+'</div><div class="s">'+sub+'</div></div></a>';
 }
 function renderHub(){
+  $('pGrid').innerHTML = GUIDE.filter(function(g){ return g.pos==='passive'; }).map(cardHtml).join('');
+  $('aSitGrid').innerHTML = GUIDE.filter(function(g){ return g.pos==='sitA'; }).map(cardHtml).join('');
+  $('aStandGrid').innerHTML = GUIDE.filter(function(g){ return g.pos==='standA'; }).map(cardHtml).join('');
+  $('lieGrid').innerHTML = GUIDE.filter(function(g){ return g.pos==='lie' && g.kind!=='move'; }).map(cardHtml).join('');
+  $('sitGrid').innerHTML = GUIDE.filter(function(g){ return g.pos==='sit' && g.kind!=='move'; }).map(cardHtml).join('');
+  $('standGrid').innerHTML = GUIDE.filter(function(g){ return g.pos==='stand' && g.kind!=='move'; }).map(cardHtml).join('');
+  $('lieExGrid').innerHTML = GUIDE.filter(function(g){ return g.pos==='lie' && g.kind==='move'; }).map(cardHtml).join('');
+  $('sitExGrid').innerHTML = GUIDE.filter(function(g){ return g.pos==='sit' && g.kind==='move'; }).map(cardHtml).join('');
+  $('standExGrid').innerHTML = GUIDE.filter(function(g){ return g.pos==='stand' && g.kind==='move'; }).map(cardHtml).join('');
   $('foamGrid').innerHTML = GUIDE.filter(function(g){ return g.tool==='foam'; }).map(cardHtml).join('');
   $('ballGrid').innerHTML = GUIDE.filter(function(g){ return g.tool==='ball'; }).map(cardHtml).join('');
 }
@@ -461,26 +1090,57 @@ function noteHtml(g){
 function renderDetail(id){
   var g = findGuide(id);
   if (!g) { location.hash=''; return; }
-  var extraHref = g.extra || g.video || '';
-  var extraLabel = g.extraLabel || (g.video ? '영상 보기' : '');
+  var videoBtns = '';
+  if (g.videos && g.videos.length) {
+    g.videos.forEach(function(v){
+      videoBtns += '<a href="'+v.url+'" target="_blank" rel="noopener">'+(v.label || '영상 보기')+'</a>';
+    });
+  } else {
+    var extraHref = g.extra || g.video || '';
+    var extraLabel = g.extraLabel || (g.video ? '영상 보기' : '');
+    if (extraHref) videoBtns = '<a href="'+extraHref+'" target="_blank" rel="noopener">'+extraLabel+'</a>';
+  }
   var html = '<a class="back" href="#">← 목록</a>'+
     '<div class="ex-kicker">'+g.toolKo+'</div>'+
     '<h2 class="ex-title">'+g.name+'</h2>'+
     '<div class="copy-row">'+
       '<button type="button" onclick="copyLink()">이 링크 복사</button>'+
-      (extraHref ? '<a href="'+extraHref+'" target="_blank" rel="noopener">'+extraLabel+'</a>' : '')+
-    '</div>'+
-    noteHtml(g);
+      videoBtns+
+    '</div>';
+  var hasSeq = !!(g.sequences && g.sequences.length);
+  if (g.thumb && !hasSeq) {
+    html += '<figure class="hero-shot"><img src="'+BASE+g.id+'/01.jpg" alt="'+g.name+'"></figure>';
+  }
+  html += noteHtml(g);
+  if (g.chain && g.chain.length) {
+    html += '<div class="seq-hd">'+(g.tool==='stretch' ? '오늘 순서' : '내쉴 때 순서')+'</div><div class="chain">';
+    g.chain.forEach(function(c, i){
+      if (i) html += '<i>→</i>';
+      html += '<span>'+c+'</span>';
+    });
+    html += '</div>';
+  }
+  if (g.steps && g.steps.length && !hasSeq) {
+    html += '<div class="seq-hd">순서</div>';
+    g.steps.forEach(function(cap, i){
+      html += '<figure class="step text"><figcaption><span class="num">'+(i+1)+'</span>'+cap+'</figcaption></figure>';
+    });
+  }
   (g.sequences || []).forEach(function(seq){
     html += '<div class="seq-hd">'+seq.title+'</div>';
     seq.captions.forEach(function(cap, i){
       var n = seq.start + i;
-      var nn = (n<10?'0':'')+n;
+      var imgN = (seq.imgStart != null ? seq.imgStart : seq.start) + i;
+      var nn = (imgN<10?'0':'')+imgN;
       html += '<figure class="step"><img src="'+BASE+g.id+'/'+nn+'.jpg" alt="'+g.name+' '+n+'단계" loading="lazy">'+
         '<figcaption><span class="num">'+n+'</span>'+cap+'</figcaption></figure>';
     });
   });
-  html += '<p class="lead" style="margin-top:8px">통증 0~3만. 뼈 위는 피하고, 불편하면 멈추세요.</p>';
+  html += '<p class="lead" style="margin-top:8px">'+(g.tool==='stretch'
+    ? '사진으로 오늘 한 동작을 확인하고, 자세한 건 영상을 보세요. 통증 없는 범위만. 찌릿하면 멈추세요.'
+    : (g.tool==='posture'
+    ? '센터에서 배운 느낌이 기준입니다. 어지럽거나 통증이 세지면 바로 멈추세요.'
+    : '통증 0~3만. 뼈 위는 피하고, 불편하면 멈추세요.'))+'</p>';
   html += '<a class="back" href="#">← 목록으로</a>';
   $('detail').innerHTML = html;
 }
@@ -497,17 +1157,56 @@ function copyLink(){
     document.body.removeChild(ta);
   }
 }
+function catId(g){
+  if (!g) return '';
+  if (g.tool==='foam' || g.tool==='ball') return 'catTools';
+  if (g.pos==='passive' || g.pos==='lie') return 'catLie';
+  if (g.pos==='sitA' || g.pos==='sit') return 'catSit';
+  if (g.pos==='standA' || g.pos==='stand') return 'catStand';
+  return '';
+}
+function subCatId(g){
+  if (!g) return '';
+  if (g.tool==='foam') return 'subFoam';
+  if (g.tool==='ball') return 'subBall';
+  return '';
+}
+function openCat(cid, sid){
+  ['catTools','catLie','catSit','catStand'].forEach(function(id){
+    var el = $(id);
+    if (el) el.open = (id===cid);
+  });
+  ['subFoam','subBall'].forEach(function(id){
+    var el = $(id);
+    if (el) el.open = (id===sid);
+  });
+}
 function route(){
   var id = (location.hash||'').replace(/^#/, '');
   if (!id) {
     $('hub').classList.remove('hidden');
     $('detail').classList.add('hidden');
-    document.title = '셀프 소도구 가이드 | REAL MOVEMENT';
+    document.title = '셀프 가이드 | REAL MOVEMENT';
+    var cid = '', sid = '';
+    try {
+      cid = sessionStorage.getItem('selfCat') || '';
+      sid = sessionStorage.getItem('selfSubCat') || '';
+    } catch(e) {}
+    openCat(cid, sid);
     window.scrollTo(0,0);
+    return;
+  }
+  var aliases = { move_situp1:'move_situp', move_situp26:'move_situp', move_super1:'move_super', move_super26:'move_super' };
+  if (aliases[id] && location.hash !== '#'+aliases[id]) {
+    location.replace('#'+aliases[id]);
     return;
   }
   var g = findGuide(id);
   if (!g) { location.hash=''; return; }
+  try {
+    sessionStorage.setItem('selfCat', catId(g));
+    sessionStorage.setItem('selfSubCat', subCatId(g));
+  } catch(e) {}
   $('hub').classList.add('hidden');
   $('detail').classList.remove('hidden');
   renderDetail(id);
