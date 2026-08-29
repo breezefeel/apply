@@ -1287,7 +1287,8 @@
       overflow:hidden; text-overflow:ellipsis;
     }
     .psp-part-card.self-tool-compact .method-thumb,
-    .psp-part-card.self-tool-compact .method-cue { display:none; }
+    .psp-part-card.self-tool-compact .method-cue,
+    .psp-part-card.p1-kind-card .method-cue { display:none; }
     .psp-part-card.self-tool-compact .method-badge-row { grid-column:3; }
     .method-row {
       display:grid; grid-template-columns:24px 1fr auto;
@@ -2753,7 +2754,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-08-21-roller-extra';
+    const INSTRUCTOR_HTML_BUILD = '2026-08-29-no-card-cue';
     const PROGRAM_PLAN_SLOT_COUNT = 5;
     var _programPlanSaveSlot = 1;
     const BOARD_LOAD_TIMEOUT_MS = 90000;
@@ -8876,6 +8877,17 @@
             clearSelectedMember_();
           }
         }
+      } catch (loadErr) {
+        state.boardOnline = false;
+        var errMsg = (loadErr && loadErr.message) ? String(loadErr.message) : '회원 목록 처리 중 오류';
+        try { document.getElementById('dateLine').textContent = '오프라인 · 프로그램만 표시'; } catch (ignoreDate) {}
+        setMemberChipsMessage(formatBoardLoadErrorMessage_(errMsg));
+        if (!state.program.length) {
+          try { state.program = getProgramCatalog(state.activeProgramTab); } catch (ignoreProg) {}
+        }
+        try { renderProgramTabs(); } catch (ignoreTabs) {}
+        try { renderProgramList(); } catch (ignoreList) {}
+        if (!opts.silent) toast(formatBoardLoadErrorMessage_(errMsg));
       } finally {
         clearLoadCountdown();
         _boardSyncInFlight = false;
@@ -10392,22 +10404,26 @@
       const badgeRow = renderMethodBadges_(item, secKey);
       var compact = secKey === 'self_tool' && isSelfToolCompactProgram_(item.program);
       var thumb = compact ? '' : String(item.thumbUrl || '').trim();
-      var cue = compact ? '' : String(item.cue || extractHongtaekCue_(item.coachingNote) || '').trim();
       var stage = hongtaekStageFromProgram_(item.program);
-      var searchBits = [label, cue, item.coachingNote || '', item.program || '', item.sectionTitle || '']
+      var searchCue = '';
+      var searchNote = '';
+      if (state.activeProgramTab === 'hongtaek') {
+        searchCue = String(item.cue || extractHongtaekCue_(item.coachingNote) || '').trim();
+        searchNote = String(item.coachingNote || '').trim();
+      }
+      var searchBits = [label, searchCue, searchNote, item.program || '', item.sectionTitle || '']
         .join(' ').replace(/\s+/g, ' ').trim();
       var thumbHtml = thumb
         ? '<img class="method-thumb" src="' + escapeHtml(thumb) + '" alt="" loading="lazy" onclick="openHongtaekLightbox_(event, this.src, \'' +
           escapeHtml(label).replace(/&#39;/g, '') + '\')">'
         : '';
-      var cueHtml = cue ? '<div class="method-cue"><b>큐</b> · ' + escapeHtml(cue) + '</div>' : '';
       return '<label class="method-row' + rowCls + (thumb ? ' has-thumb' : '') +
         '" data-ht-stage="' + escapeHtml(stage) + '" data-ht-search="' + escapeHtml(searchBits) + '">' +
         '<input type="checkbox"' + (checked ? ' checked' : '') +
         ' onchange="toggleToday(\'' + item.id + '\',this)">' +
         thumbHtml +
-        '<div><div class="method-label">' + escapeHtml(label) + '</div>' + cueHtml +
-        '</div>' + badgeRow + '</label>';
+        '<div><div class="method-label">' + escapeHtml(label) + '</div></div>' +
+        badgeRow + '</label>';
     }
 
     function cacheExerciseMeta_(item, displayLabel) {
@@ -14910,12 +14926,12 @@
       tryAutoSyncBoard();
     });
     refreshSectionCollapseDefaults();
-    renderProgramList();
-    renderProgramTabs();
-    initSessionCheckPanel();
     paintInstructorBuildBadge_();
     syncBoardDateUi_(seoulTodayYmd_());
     loadBoard();
+    renderProgramTabs();
+    initSessionCheckPanel();
+    renderProgramList();
   </script>
 </body>
 </html>
