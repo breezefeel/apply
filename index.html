@@ -2009,6 +2009,16 @@
     .eval-report-label {
       font-size:11px; font-weight:800; color:var(--blue); margin:4px 0 6px;
     }
+    .eval-consult-summary {
+      white-space:pre-wrap; font-size:13px; line-height:1.65;
+      background:#fff; padding:12px; border-radius:8px;
+      border:1px solid var(--border); margin-bottom:12px;
+      max-height:28vh; overflow:auto;
+    }
+    .eval-ai-status {
+      font-size:11px; font-weight:700; color:#64748b; margin:0 0 8px; line-height:1.45;
+    }
+    .eval-ai-status.is-pending { color:#b45309; }
     .pin-overlay { position:fixed; inset:0; z-index:200; background:rgba(15,23,42,.55); display:none; align-items:center; justify-content:center; padding:20px; }
     .pin-overlay.open { display:flex; }
     .pin-card { background:#fff; border-radius:16px; padding:24px 20px; width:100%; max-width:300px; }
@@ -2537,11 +2547,14 @@
         <p class="eval-submit-status" id="evalSubmitStatus" hidden aria-live="polite"></p>
       </div>
       <div class="eval-pane" id="evalView">
-        <p id="evalViewEmpty" class="empty-hint">저장된 초회 평가가 없습니다.</p>
+        <p id="evalViewEmpty" class="empty-hint">작성 탭에서 평가한 뒤 「AI 리포트 생성」을 누르면 상담 요약과 프로그램 추천이 바로 나옵니다.</p>
         <div id="evalViewContent" hidden>
           <p style="font-size:11px;color:var(--dim);margin-bottom:8px;" id="evalViewDate"></p>
+          <div class="eval-report-label">상담 요약</div>
+          <div class="eval-consult-summary" id="evalConsultSummary"></div>
           <div id="evalProgramRecommendation"></div>
           <div class="eval-report-label">AI 회원 리포트</div>
+          <p class="eval-ai-status" id="evalAiStatus" hidden></p>
           <div class="report-box" id="evalReportBody"></div>
           <div class="eval-send-row">
             <p style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.5;">
@@ -2880,6 +2893,9 @@
 
     /* 서버 연결 전에도 표시 — code.gs PSP_PROGRAM_CATALOG_ 와 동기화 */
     const SELF_GUIDE_PAGE = 'https://breezefeel.github.io/apply/self.html';
+    function isSelfGuideUrl_(url) {
+      return String(url || '').indexOf(SELF_GUIDE_PAGE) === 0;
+    }
     const MOVEMENT_CATALOG_RAW = [
       { id:'tool_list', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'소도구 목록', label:'소도구 목록', linkUrl:SELF_GUIDE_PAGE },
       { id:'roller_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'폼롤러', label:'엉덩이', alimtalkLabel:'폼롤러 · 엉덩이', linkUrl:SELF_GUIDE_PAGE+'#roller_hip', thumbUrl:'exercise-thumbs/self_roller_hip.jpg', coachingNote:'준비: 바닥에 앉아 폼롤러를 엉덩이(둔근) 아래에 둡니다. 손은 뒤로 바닥을 짚어 체중을 조절합니다.\n동작: 통증 없는 범위에서 좌우·앞뒤로 천천히 굴리거나, 압이 느껴지는 지점에서 20~40초 유지합니다.\n포인트: 뼈(좌골)가 아닌 근육 위에 올리고, 호흡을 멈추지 않습니다.\n주의: 찌릿하거나 통증이 세지면 체중을 줄이거나 중단합니다. 사진 순서는 링크에서 확인합니다.' },
@@ -2898,83 +2914,83 @@
       { id:'ball_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'복부', alimtalkLabel:'마사지볼 · 복부', linkUrl:SELF_GUIDE_PAGE+'#ball_abdomen', thumbUrl:'exercise-thumbs/self_ball_abdomen.jpg', coachingNote:'볼을 복부 근육에 가볍게 두고 깊게 누르지 않습니다. 호흡에 맞춰 작은 범위로 자극하고, 식사 직후·복통이 있으면 하지 않습니다.' },
       { id:'ball_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'엉덩이', alimtalkLabel:'마사지볼 · 엉덩이', linkUrl:SELF_GUIDE_PAGE+'#ball_hip', thumbUrl:'exercise-thumbs/self_ball_hip.jpg', coachingNote:'기둥에 볼을 두고 한쪽 엉덩이 근육에 댑니다. 좌골이 아닌 근육 위에 올리고 체중을 천천히 실어 원을 그리거나 유지합니다. 찌릿하면 중단합니다.' },
       { id:'ball_thigh', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'허벅지', alimtalkLabel:'마사지볼 · 허벅지', linkUrl:SELF_GUIDE_PAGE+'#ball_thigh', thumbUrl:'exercise-thumbs/self_ball_thigh.jpg', coachingNote:'기둥에 볼을 두고 허벅지 근육에 댑니다. 무릎 관절은 피하고, 작은 범위로 위아래·원을 그립니다.' },
-      { id:'p1_su_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'② Supine · 상체' },
-      { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'① Supine · 하체' },
-      { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'④ Prone · 상체' },
-      { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'③ Prone · 하체' },
+      { id:'p1_su_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'② Supine · 상체', linkUrl:SELF_GUIDE_PAGE+'#p_supine_upper', coachingNote:'준비: 오늘 누워서 상체를 풀어 준 동작입니다.\n동작: 손가락 → 손목 → 팔꿈치 → 어깨.\n포인트: 통증 없는 범위. 센터에서 받은 느낌이 기준입니다.\n주의: 찌릿하면 멈추세요.' },
+      { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'① Supine · 하체', linkUrl:SELF_GUIDE_PAGE+'#p_supine_lower', coachingNote:'준비: 오늘 누워서 하체를 풀어 준 동작입니다. 사진으로 장면을 확인하고, 디테일은 영상으로.\n동작: 발 → 발목 → 무릎 → 고관절. 영상이 3편입니다.\n포인트: 억지로 늘리지 마세요. 센터에서 받은 각도만.\n주의: 찌릿함·날카로운 통증이 있으면 중단하고 다음 수업에 말씀하세요.' },
+      { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'④ Prone · 상체', linkUrl:SELF_GUIDE_PAGE+'#p_prone_upper', coachingNote:'준비: 오늘 엎드려 상체를 풀어 준 동작입니다.\n동작: 손가락 → 손목 → 팔꿈치 → 어깨 → 척추.\n포인트: 척추는 한 번에 꺾지 말고, 센터에서 받은 범위만.\n주의: 찌릿하면 멈추세요.' },
+      { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'③ Prone · 하체', linkUrl:SELF_GUIDE_PAGE+'#p_prone_lower', coachingNote:'준비: 오늘 엎드려 하체를 풀어 준 동작입니다.\n동작: 발가락 → 발목 → 무릎 → 고관절.\n포인트: 얼굴·목을 편하게. 허리에 힘을 주지 마세요.\n주의: 찌릿하면 멈추세요.' },
       { id:'p1_fl_ue_flex', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'상지 Flexion', alimtalkLabel:'Force Line · 상지 Flexion' },
       { id:'p1_fl_ue_ext', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'상지 Extension', alimtalkLabel:'Force Line · 상지 Extension' },
       { id:'p1_fl_ue_rot', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'상지 Rotation', alimtalkLabel:'Force Line · 상지 Rotation' },
       { id:'p1_fl_le_flex', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'하지 Flexion', alimtalkLabel:'Force Line · 하지 Flexion' },
       { id:'p1_fl_le_ext', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'하지 Extension', alimtalkLabel:'Force Line · 하지 Extension' },
       { id:'p1_fl_le_rot', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'하지 Rotation', alimtalkLabel:'Force Line · 하지 Rotation' },
-      { id:'post_breath_relax', uiSection:'pos1_par', sectionTitle:'Lying', program:'1 · 누워서 호흡 운동', label:'편안한 호흡', alimtalkLabel:'누워서 편안한 호흡' },
-      { id:'post_breath', uiSection:'pos1_par', sectionTitle:'Lying', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬', alimtalkLabel:'누워서 호흡 · 자세 정렬' },
-      { id:'post_super_1', uiSection:'pos1_par', sectionTitle:'Lying', program:'3 · Prone Superman 6단계', label:'① 척추 — 경추→척추분절 순 펴기', alimtalkLabel:'엎드려서 ① 등 펴기 · 목부터 하나씩' },
-      { id:'post_super_2', uiSection:'pos1_par', sectionTitle:'Lying', program:'3 · Prone Superman 6단계', label:'② 대각선 — 한 손 + 반대 발 동시 들기', alimtalkLabel:'엎드려서 ② 대각선 · 한 팔·반대 발 들기' },
-      { id:'post_super_3', uiSection:'pos1_par', sectionTitle:'Lying', program:'3 · Prone Superman 6단계', label:'③ 양손·양발 — 낮게 동시 들기', alimtalkLabel:'엎드려서 ③ 양팔·양발 · 낮게 들기' },
-      { id:'post_super_4', uiSection:'pos1_par', sectionTitle:'Lying', program:'3 · Prone Superman 6단계', label:'④ 접영 — 양손·양발 들고 접영+발벌림', alimtalkLabel:'엎드려서 ④ 접영 · 팔·다리 들고 접영' },
-      { id:'post_super_5', uiSection:'pos1_par', sectionTitle:'Lying', program:'3 · Prone Superman 6단계', label:'⑤ 팔신전·무릎굴곡 — 견갑모음→무릎밴딩', alimtalkLabel:'엎드려서 ⑤ 팔 펴기 · 무릎 구부리기' },
-      { id:'post_super_6', uiSection:'pos1_par', sectionTitle:'Lying', program:'3 · Prone Superman 6단계', label:'⑥ 팔꿈치·회전 — 좌우 팔꿈치 들며 회전', alimtalkLabel:'엎드려서 ⑥ 팔꿈치 들며 좌우 회전' },
-      { id:'post_situp_1', uiSection:'pos1_par', sectionTitle:'Lying', program:'2 · Supine Sit-up 6단계', label:'① 상체 — 분절별 굽힘 0°→45°', alimtalkLabel:'누워서 ① 상체 · 천천히 일어나기' },
-      { id:'post_situp_2', uiSection:'pos1_par', sectionTitle:'Lying', program:'2 · Supine Sit-up 6단계', label:'② 하체 — 견갑 띄워 다리 1→2쪽', alimtalkLabel:'누워서 ② 다리 · 하나씩 들기' },
-      { id:'post_situp_3', uiSection:'pos1_par', sectionTitle:'Lying', program:'2 · Supine Sit-up 6단계', label:'③ 상체 — 90°→45° 하강·복귀', alimtalkLabel:'누워서 ③ 상체 · 반쯤 내렸다 올리기' },
-      { id:'post_situp_4', uiSection:'pos1_par', sectionTitle:'Lying', program:'2 · Supine Sit-up 6단계', label:'④ 하체 — 등닿고 다리 1→2쪽', alimtalkLabel:'누워서 ④ 다리 · 등 대고 번갈아 들기' },
-      { id:'post_situp_5', uiSection:'pos1_par', sectionTitle:'Lying', program:'2 · Supine Sit-up 6단계', label:'⑤ 정식 Sit-up — 통증 없는 범위', alimtalkLabel:'누워서 ⑤ 복근 · 통증 없는 범위' },
-      { id:'post_situp_6', uiSection:'pos1_par', sectionTitle:'Lying', program:'2 · Supine Sit-up 6단계', label:'⑥ 구르기 — 뒤굴림·복귀, 발끝 닿기', alimtalkLabel:'누워서 ⑥ 구르기 · 뒤로 젖혔다 복귀' },
-      { id:'p2_pushup_1', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Push-up 6단계', label:'① 무릎 네발 — 웨이브 하강·상승', alimtalkLabel:'무릎 대고 ① 팔굽혀펴기 · 천천히' },
-      { id:'p2_pushup_2', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Push-up 6단계', label:'② 무릎지지 — 몸통 먼저→웨이브 상승', alimtalkLabel:'무릎 대고 ② 몸통 먼저 움직이기' },
-      { id:'p2_pushup_3', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Push-up 6단계', label:'③ 무릎지지 — 몸통+골반 동시 하강·상승', alimtalkLabel:'무릎 대고 ③ 몸통·골반 함께' },
-      { id:'p2_pushup_4', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Push-up 6단계', label:'④ 무릎 뗀 네발 — 웨이브 하강·상승', alimtalkLabel:'네발 ④ 팔굽혀펴기 · 천천히' },
-      { id:'p2_pushup_5', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Push-up 6단계', label:'⑤ 무릎 뗀 — 몸통 먼저→웨이브 상승', alimtalkLabel:'네발 ⑤ 몸통 먼저 움직이기' },
-      { id:'p2_pushup_6', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Push-up 6단계', label:'⑥ 정상 Push-up — 통증 없는 범위', alimtalkLabel:'네발 ⑥ 팔굽혀펴기 · 통증 없는 범위' },
-      { id:'p2_plank_1', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Plank 6단계', label:'① 무릎 대고 네발 — 머리 회전', alimtalkLabel:'플랭크 ① 무릎 대고 · 머리 회전' },
-      { id:'p2_plank_2', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Plank 6단계', label:'② 무릎 떼고 네발 — 머리 회전', alimtalkLabel:'플랭크 ② 무릎 떼고 · 머리 회전' },
-      { id:'p2_plank_3', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Plank 6단계', label:'③ 네발 — 골반 좌우 움직임', alimtalkLabel:'플랭크 ③ 골반 좌우 움직이기' },
-      { id:'p2_plank_4', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Plank 6단계', label:'④ 한 팔 앞으로 뻗기 → 복귀', alimtalkLabel:'플랭크 ④ 한 팔 앞으로 뻗기' },
-      { id:'p2_plank_5', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Plank 6단계', label:'⑤ 한 손 뒤통수 — 몸통 회전', alimtalkLabel:'플랭크 ⑤ 손 뒤통수 · 몸통 회전' },
-      { id:'p2_plank_6', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Plank 6단계', label:'⑥ 다리 접기 → 바깥 회전 → 복귀', alimtalkLabel:'플랭크 ⑥ 다리 접어 바깥으로 돌리기' },
-      { id:'p2_side_plank_1', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Side Plank 6단계', label:'① 한발 지지 사이드 (좌·우)', alimtalkLabel:'옆 플랭크 ① 한 발 지지 (좌·우)' },
-      { id:'p2_side_plank_2', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Side Plank 6단계', label:'② 지지 없이 사이드 (좌·우)', alimtalkLabel:'옆 플랭크 ② 지지 없이 (좌·우)' },
-      { id:'p2_side_plank_3', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Side Plank 6단계', label:'③ 골반 좌우 움직임 (좌·우)', alimtalkLabel:'옆 플랭크 ③ 골반 좌우 움직이기' },
-      { id:'p2_side_plank_4', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Side Plank 6단계', label:'④ 위쪽 다리 벌렸다 모음 (좌·우)', alimtalkLabel:'옆 플랭크 ④ 위쪽 다리 벌렸다 모음' },
-      { id:'p2_side_plank_5', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Side Plank 6단계', label:'⑤ 위쪽 다리 원그리기 (circumduction)', alimtalkLabel:'옆 플랭크 · 다리 크게 돌리기' },
-      { id:'p2_side_plank_6', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Side Plank 6단계', label:'⑥ 다리 앞·뒤 스윙 (달리기 동작)', alimtalkLabel:'옆 플랭크 ⑥ 다리 앞·뒤 스윙' },
-      { id:'p2_a_front', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Active Stretching', label:'전방 — 경·흉·고관절 굴곡·발목배굴', alimtalkLabel:'앉아서 앞으로 숙이기 · 고개·등·다리' },
-      { id:'p2_a_back', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Active Stretching', label:'후방 — 경·흉 신전·햄·발목저굴', alimtalkLabel:'앉아서 뒤로 젖히기 · 고개·등·다리' },
-      { id:'p2_a_lat', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Active Stretching', label:'측방 — 경·흉 측굴·고관절 외전·발목', alimtalkLabel:'앉아서 옆으로 기울이기' },
-      { id:'p2_a_spiral', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Active Stretching', label:'나선 — 경·흉 회전·견갑·GH', alimtalkLabel:'앉아서 몸통 비틀기 · 어깨·등 돌리기' },
-      { id:'p2_sit_posture', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'생활습관', label:'바르게 앉는 방법', alimtalkLabel:'앉아서 바른 자세 연습' },
-      { id:'p2_sit_breath', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'생활습관', label:'호흡 운동 + 등척성 정렬', alimtalkLabel:'앉아서 호흡 · 자세 정렬' },
-      { id:'p2_seg_1', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'척추+상지 분절 운동 6단계', label:'① 골반 전/후방 굴리며 척추 움직임', alimtalkLabel:'앉아서 ① 골반 굴리며 척추 움직이기' },
-      { id:'p2_seg_2', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'척추+상지 분절 운동 6단계', label:'② + 상지 움직임 추가', alimtalkLabel:'앉아서 ② 척추 + 팔 움직이기' },
-      { id:'p2_seg_3', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'척추+상지 분절 운동 6단계', label:'③ 머리→골반 좌우숙임·척추분절', alimtalkLabel:'앉아서 ③ 좌우로 숙이기 · 척추 하나씩' },
-      { id:'p2_seg_4', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'척추+상지 분절 운동 6단계', label:'④ + 상지 움직임 추가', alimtalkLabel:'앉아서 ④ 좌우 숙임 + 팔 움직이기' },
-      { id:'p2_seg_5', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'척추+상지 분절 운동 6단계', label:'⑤ 머리→골반 회전·척추분절', alimtalkLabel:'앉아서 ⑤ 몸통 돌리기 · 척추 하나씩' },
-      { id:'p2_seg_6', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'척추+상지 분절 운동 6단계', label:'⑥ + 상지 움직임 추가', alimtalkLabel:'앉아서 ⑥ 몸통 돌림 + 팔 움직이기' },
-      { id:'p3_squat_1', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'스쿼트 6단계', label:'① 걸터앉기 — 엉덩 앞으로 떼었다 앉기', alimtalkLabel:'스쿼트 ① 걸터앉기 · 엉덩 앞으로' },
-      { id:'p3_squat_2', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'스쿼트 6단계', label:'② 엉덩 앞으로 뗀 뒤 — 일어섰다 앉기', alimtalkLabel:'스쿼트 ② 일어섰다 앉기' },
-      { id:'p3_squat_3', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'스쿼트 6단계', label:'③ 일어섰다 깊게 앉았다 앉기', alimtalkLabel:'스쿼트 ③ 깊게 앉았다 일어서기' },
-      { id:'p3_squat_4', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'스쿼트 6단계', label:'④ 한쪽 다리에 중심 — ①번 동작 (좌·우)', alimtalkLabel:'스쿼트 ④ 한쪽 다리 · 걸터앉기 (좌·우)' },
-      { id:'p3_squat_5', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'스쿼트 6단계', label:'⑤ 한쪽 다리에 중심 — ②번 동작 (좌·우)', alimtalkLabel:'스쿼트 ⑤ 한쪽 다리 · 일어섰다 앉기 (좌·우)' },
-      { id:'p3_squat_6', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'스쿼트 6단계', label:'⑥ 한쪽 다리에 중심 — ③번 동작 (좌·우)', alimtalkLabel:'스쿼트 ⑥ 한쪽 다리 · 깊게 앉기 (좌·우)' },
-      { id:'p3_a_upper_1', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 상체', label:'① 상지 — 손·손목·팔 연쇄', alimtalkLabel:'서서 팔·손 스트레칭' },
-      { id:'p3_a_upper_2', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 상체', label:'② 목 — 경추 굴곡·신전·측굴·회전', alimtalkLabel:'서서 목 스트레칭' },
-      { id:'p3_a_upper_3', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 상체', label:'③ 어깨 — GH·견갑 연쇄', alimtalkLabel:'서서 어깨·견갑뼈 움직이기' },
-      { id:'p3_a_upper_4', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 상체', label:'④ 몸통 — 흉·요추 분절 (Roll down/up)', alimtalkLabel:'서서 척추 굽혔다 펴기' },
-      { id:'p3_a_lower_2', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 하체', label:'⑤ 고관절 — 굴곡·신전·회전', alimtalkLabel:'서서 고관절 스트레칭' },
-      { id:'p3_a_lower_3', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 하체', label:'⑥ 무릎 — 슬관절 가동', alimtalkLabel:'서서 무릎 스트레칭' },
-      { id:'p3_a_lower_4', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 하체', label:'⑦ 종아리 — 스트레칭', alimtalkLabel:'서서 종아리 스트레칭' },
-      { id:'p3_a_lower_5', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 하체', label:'⑧ 발목 — 발가락·발목 연쇄', alimtalkLabel:'서서 발·발목 스트레칭' },
-      { id:'p3_stand_posture', uiSection:'pos3', sectionTitle:'Standing', program:'생활습관', label:'바르게 서기', alimtalkLabel:'서서 바른 자세 연습' },
-      { id:'p3_stand_breath', uiSection:'pos3', sectionTitle:'Standing', program:'생활습관', label:'호흡 정렬 운동', alimtalkLabel:'서서 호흡 · 자세 정렬' },
-      { id:'p3_stand_walk', uiSection:'pos3', sectionTitle:'Standing', program:'생활습관', label:'바르게 걷기', alimtalkLabel:'바르게 걷기 연습' },
-      { id:'p3_balance_1', uiSection:'pos3', sectionTitle:'Standing', program:'밸런스 트레이닝 6단계', label:'① 일어선 상태 한발 살짝 들고 돌리기 — 30초 유지', alimtalkLabel:'밸런스 ① 한 발 살짝 들고 30초' },
-      { id:'p3_balance_2', uiSection:'pos3', sectionTitle:'Standing', program:'밸런스 트레이닝 6단계', label:'② 무릎 높이까지 들어 올리고 돌리기 — 30초 유지', alimtalkLabel:'밸런스 ② 무릎 높이 들고 30초' },
-      { id:'p3_balance_3', uiSection:'pos3', sectionTitle:'Standing', program:'밸런스 트레이닝 6단계', label:'③ 한 발 지지 · 반대 다리 뒤로 뻗기(발 미접지) + 후굴', alimtalkLabel:'밸런스 ③ 한 발 서고 다리 뒤로 뻗기' },
-      { id:'p3_balance_4', uiSection:'pos3', sectionTitle:'Standing', program:'밸런스 트레이닝 6단계', label:'④ 뒤뻗기(후굴)→무릎들기(전굴) 사이클', alimtalkLabel:'밸런스 ④ 다리 뒤로·무릎 들기 반복' },
-      { id:'p3_balance_5', uiSection:'pos3', sectionTitle:'Standing', program:'밸런스 트레이닝 6단계', label:'⑤ 무릎 들고 몸통-골반 회전', alimtalkLabel:'밸런스 ⑤ 무릎 들고 몸통 돌리기' },
-      { id:'p3_balance_6', uiSection:'pos3', sectionTitle:'Standing', program:'밸런스 트레이닝 6단계', label:'⑥ 뒤뻗기 하며 몸통-골반 회전', alimtalkLabel:'밸런스 ⑥ 다리 뒤로 뻗으며 몸통 돌리기' },
+      { id:'post_breath_relax', uiSection:'pos1_par', sectionTitle:'Lying', program:'1 · 누워서 호흡 운동', label:'편안한 호흡', alimtalkLabel:'누워서 편안한 호흡', linkUrl:SELF_GUIDE_PAGE+'#lie_easy', coachingNote:'준비: 힘을 쓰는 운동이 아닙니다. 허리 힘을 빼고 숨 쉬는 연습입니다.\n동작: 들이쉴 때 아랫배·옆·뒤가 같이 부풀고, 내쉴 때 완전히 힘 뺍니다.\n포인트: 윗배만 먼저 올라오면, 아랫배를 살짝 밀어 내는 느낌을 먼저 익히세요.\n주의: 하루 3~5분이면 충분합니다. 어지럽거나 허리가 세게 아프면 바로 멈추세요.' },
+      { id:'post_breath', uiSection:'pos1_par', sectionTitle:'Lying', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬', alimtalkLabel:'누워서 호흡 · 자세 정렬', linkUrl:SELF_GUIDE_PAGE+'#lie_align', coachingNote:'준비: 누워서 호흡 운동이 된 다음에 정렬을 얹습니다.\n동작: 내쉴 때 힘을 주며 엉덩이 → 발 → 무릎 → 척추 → 어깨 → 손끝 순으로 맞춥니다.\n포인트: 한쪽에만 신경 쓰이면 다른 쪽이 빠집니다. 한 호흡에 하나씩 더하세요.\n주의: 턱을 누르거나 어깨를 뒤로 밀지 마세요. 길어지게, 바깥으로 늘립니다.' },
+      { id:'post_super_1', uiSection:'pos1_par', sectionTitle:'Lying', program:'3 · Prone Superman 6단계', label:'① 척추 — 경추→척추분절 순 펴기', alimtalkLabel:'엎드려서 ① 등 펴기 · 목부터 하나씩', linkUrl:SELF_GUIDE_PAGE+'#move_super', coachingNote:'준비: Sit-up이 된 다음, 엎드린 후방 경선 단계입니다. 한 단계씩.\n동작: 엎드려 이마를 가볍게 둡니다. 경추부터 척추를 분절 순으로 천천히 들어 올립니다. 허리만 꺾지 마세요.\n포인트: 높이보다 좌우 대칭과 호흡이 먼저입니다. 허리를 한 번에 젖히지 마세요.\n주의: 허리·목 통증이 세지면 즉시 멈추세요. 어깨가 귀로 올라가면 낮게, 천천히.' },
+      { id:'post_super_2', uiSection:'pos1_par', sectionTitle:'Lying', program:'3 · Prone Superman 6단계', label:'② 대각선 — 한 손 + 반대 발 동시 들기', alimtalkLabel:'엎드려서 ② 대각선 · 한 팔·반대 발 들기', linkUrl:SELF_GUIDE_PAGE+'#move_super', coachingNote:'준비: Sit-up이 된 다음, 엎드린 후방 경선 단계입니다. 한 단계씩.\n동작: 한 손과 반대 발을 동시에 듭니다. 좌·우 교대.\n포인트: 높이보다 좌우 대칭과 호흡이 먼저입니다. 허리를 한 번에 젖히지 마세요.\n주의: 허리·목 통증이 세지면 즉시 멈추세요. 어깨가 귀로 올라가면 낮게, 천천히.' },
+      { id:'post_super_3', uiSection:'pos1_par', sectionTitle:'Lying', program:'3 · Prone Superman 6단계', label:'③ 양손·양발 — 낮게 동시 들기', alimtalkLabel:'엎드려서 ③ 양팔·양발 · 낮게 들기', linkUrl:SELF_GUIDE_PAGE+'#move_super', coachingNote:'준비: Sit-up이 된 다음, 엎드린 후방 경선 단계입니다. 한 단계씩.\n동작: 양손·양발을 낮게 동시에 듭니다. (기본 Superman에 가깝습니다)\n포인트: 높이보다 좌우 대칭과 호흡이 먼저입니다. 허리를 한 번에 젖히지 마세요.\n주의: 허리·목 통증이 세지면 즉시 멈추세요. 어깨가 귀로 올라가면 낮게, 천천히.' },
+      { id:'post_super_4', uiSection:'pos1_par', sectionTitle:'Lying', program:'3 · Prone Superman 6단계', label:'④ 접영 — 양손·양발 들고 접영+발벌림', alimtalkLabel:'엎드려서 ④ 접영 · 팔·다리 들고 접영', linkUrl:SELF_GUIDE_PAGE+'#move_super', coachingNote:'준비: Sit-up이 된 다음, 엎드린 후방 경선 단계입니다. 한 단계씩.\n동작: 양손·양발을 든 채 접영 동작과 발 벌림.\n포인트: 높이보다 좌우 대칭과 호흡이 먼저입니다. 허리를 한 번에 젖히지 마세요.\n주의: 허리·목 통증이 세지면 즉시 멈추세요. 어깨가 귀로 올라가면 낮게, 천천히.' },
+      { id:'post_super_5', uiSection:'pos1_par', sectionTitle:'Lying', program:'3 · Prone Superman 6단계', label:'⑤ 팔신전·무릎굴곡 — 견갑모음→무릎밴딩', alimtalkLabel:'엎드려서 ⑤ 팔 펴기 · 무릎 구부리기', linkUrl:SELF_GUIDE_PAGE+'#move_super', coachingNote:'준비: Sit-up이 된 다음, 엎드린 후방 경선 단계입니다. 한 단계씩.\n동작: 든 상태에서 견갑을 모으고, 양쪽 무릎을 높게 굽힙니다.\n포인트: 높이보다 좌우 대칭과 호흡이 먼저입니다. 허리를 한 번에 젖히지 마세요.\n주의: 허리·목 통증이 세지면 즉시 멈추세요. 어깨가 귀로 올라가면 낮게, 천천히.' },
+      { id:'post_super_6', uiSection:'pos1_par', sectionTitle:'Lying', program:'3 · Prone Superman 6단계', label:'⑥ 팔꿈치·회전 — 좌우 팔꿈치 들며 회전', alimtalkLabel:'엎드려서 ⑥ 팔꿈치 들며 좌우 회전', linkUrl:SELF_GUIDE_PAGE+'#move_super', coachingNote:'준비: Sit-up이 된 다음, 엎드린 후방 경선 단계입니다. 한 단계씩.\n동작: 든 상태에서 한쪽 팔꿈치부터 번갈아 더 높이 들며 몸통을 회전합니다.\n포인트: 높이보다 좌우 대칭과 호흡이 먼저입니다. 허리를 한 번에 젖히지 마세요.\n주의: 허리·목 통증이 세지면 즉시 멈추세요. 어깨가 귀로 올라가면 낮게, 천천히.' },
+      { id:'post_situp_1', uiSection:'pos1_par', sectionTitle:'Lying', program:'2 · Supine Sit-up 6단계', label:'① 상체 — 분절별 굽힘 0°→45°', alimtalkLabel:'누워서 ① 상체 · 천천히 일어나기', linkUrl:SELF_GUIDE_PAGE+'#move_situp', coachingNote:'준비: 호흡·정렬이 된 다음에 하세요. 1단계가 안정된 뒤에 다음 단계로.\n동작: 무릎을 세우고 편하게 눕습니다. 상체를 약 45° 들어 올립니다. 견갑이 바닥에서 떨어질 정도면 됩니다. 목을 당기지 마세요.\n포인트: 매 단계에서 좌우·전후 밸런스를 확인합니다. 호흡을 멈추지 마세요.\n주의: 목이 아프거나 허리가 들리면 각도를 줄이거나 이전 단계로 돌아가세요.' },
+      { id:'post_situp_2', uiSection:'pos1_par', sectionTitle:'Lying', program:'2 · Supine Sit-up 6단계', label:'② 하체 — 견갑 띄워 다리 1→2쪽', alimtalkLabel:'누워서 ② 다리 · 하나씩 들기', linkUrl:SELF_GUIDE_PAGE+'#move_situp', coachingNote:'준비: 호흡·정렬이 된 다음에 하세요. 1단계가 안정된 뒤에 다음 단계로.\n동작: 견갑을 살짝 띄운 채 다리를 한쪽씩 번갈아 든 뒤, 양쪽을 동시에 듭니다.\n포인트: 매 단계에서 좌우·전후 밸런스를 확인합니다. 호흡을 멈추지 마세요.\n주의: 목이 아프거나 허리가 들리면 각도를 줄이거나 이전 단계로 돌아가세요.' },
+      { id:'post_situp_3', uiSection:'pos1_par', sectionTitle:'Lying', program:'2 · Supine Sit-up 6단계', label:'③ 상체 — 90°→45° 하강·복귀', alimtalkLabel:'누워서 ③ 상체 · 반쯤 내렸다 올리기', linkUrl:SELF_GUIDE_PAGE+'#move_situp', coachingNote:'준비: 호흡·정렬이 된 다음에 하세요. 1단계가 안정된 뒤에 다음 단계로.\n동작: 무릎 굽혀 앉은 자세(90°)에서 45° 정도까지 내려갔다가 다시 올라옵니다.\n포인트: 매 단계에서 좌우·전후 밸런스를 확인합니다. 호흡을 멈추지 마세요.\n주의: 목이 아프거나 허리가 들리면 각도를 줄이거나 이전 단계로 돌아가세요.' },
+      { id:'post_situp_4', uiSection:'pos1_par', sectionTitle:'Lying', program:'2 · Supine Sit-up 6단계', label:'④ 하체 — 등닿고 다리 1→2쪽', alimtalkLabel:'누워서 ④ 다리 · 등 대고 번갈아 들기', linkUrl:SELF_GUIDE_PAGE+'#move_situp', coachingNote:'준비: 호흡·정렬이 된 다음에 하세요. 1단계가 안정된 뒤에 다음 단계로.\n동작: 등(견갑·흉추)이 바닥에 닿은 상태에서 다리를 한쪽씩, 이어서 양쪽 동시에 듭니다.\n포인트: 매 단계에서 좌우·전후 밸런스를 확인합니다. 호흡을 멈추지 마세요.\n주의: 목이 아프거나 허리가 들리면 각도를 줄이거나 이전 단계로 돌아가세요.' },
+      { id:'post_situp_5', uiSection:'pos1_par', sectionTitle:'Lying', program:'2 · Supine Sit-up 6단계', label:'⑤ 정식 Sit-up — 통증 없는 범위', alimtalkLabel:'누워서 ⑤ 복근 · 통증 없는 범위', linkUrl:SELF_GUIDE_PAGE+'#move_situp', coachingNote:'준비: 호흡·정렬이 된 다음에 하세요. 1단계가 안정된 뒤에 다음 단계로.\n동작: 통증 없는 범위에서 정상적인 Sit-up.\n포인트: 매 단계에서 좌우·전후 밸런스를 확인합니다. 호흡을 멈추지 마세요.\n주의: 목이 아프거나 허리가 들리면 각도를 줄이거나 이전 단계로 돌아가세요.' },
+      { id:'post_situp_6', uiSection:'pos1_par', sectionTitle:'Lying', program:'2 · Supine Sit-up 6단계', label:'⑥ 구르기 — 뒤굴림·복귀, 발끝 닿기', alimtalkLabel:'누워서 ⑥ 구르기 · 뒤로 젖혔다 복귀', linkUrl:SELF_GUIDE_PAGE+'#move_situp', coachingNote:'준비: 호흡·정렬이 된 다음에 하세요. 1단계가 안정된 뒤에 다음 단계로.\n동작: 무릎을 잡고 앉은 뒤 천천히 뒤로 굴렀다가, 앞으로 돌아오며 무릎을 펴고 손끝으로 발끝에 닿습니다.\n포인트: 매 단계에서 좌우·전후 밸런스를 확인합니다. 호흡을 멈추지 마세요.\n주의: 목이 아프거나 허리가 들리면 각도를 줄이거나 이전 단계로 돌아가세요.' },
+      { id:'p2_pushup_1', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Push-up 6단계', label:'① 무릎 네발 — 웨이브 하강·상승', alimtalkLabel:'무릎 대고 ① 팔굽혀펴기 · 천천히', linkUrl:SELF_GUIDE_PAGE+'#move_pushup', coachingNote:'준비: 무릎 지지 네발부터. 무릎을 뗀 네발은 그다음입니다.\n동작: 머리→몸통→골반 웨이브로 하강·상승.\n포인트: 어깨가 귀로 올라가지 않게, 허리가 꺾이지 않게.\n주의: 손목·어깨가 아프면 무릎 지지 단계에 머무르세요.' },
+      { id:'p2_pushup_2', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Push-up 6단계', label:'② 무릎지지 — 몸통 먼저→웨이브 상승', alimtalkLabel:'무릎 대고 ② 몸통 먼저 움직이기', linkUrl:SELF_GUIDE_PAGE+'#move_pushup', coachingNote:'준비: 무릎 지지 네발부터. 무릎을 뗀 네발은 그다음입니다.\n동작: 무릎 지지 — 몸통을 먼저 내린 뒤, 웨이브로 올라옵니다.\n포인트: 어깨가 귀로 올라가지 않게, 허리가 꺾이지 않게.\n주의: 손목·어깨가 아프면 무릎 지지 단계에 머무르세요.' },
+      { id:'p2_pushup_3', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Push-up 6단계', label:'③ 무릎지지 — 몸통+골반 동시 하강·상승', alimtalkLabel:'무릎 대고 ③ 몸통·골반 함께', linkUrl:SELF_GUIDE_PAGE+'#move_pushup', coachingNote:'준비: 무릎 지지 네발부터. 무릎을 뗀 네발은 그다음입니다.\n동작: 무릎 지지 — 몸통과 골반을 동시에 하강·상승.\n포인트: 어깨가 귀로 올라가지 않게, 허리가 꺾이지 않게.\n주의: 손목·어깨가 아프면 무릎 지지 단계에 머무르세요.' },
+      { id:'p2_pushup_4', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Push-up 6단계', label:'④ 무릎 뗀 네발 — 웨이브 하강·상승', alimtalkLabel:'네발 ④ 팔굽혀펴기 · 천천히', linkUrl:SELF_GUIDE_PAGE+'#move_pushup', coachingNote:'준비: 무릎 지지 네발부터. 무릎을 뗀 네발은 그다음입니다.\n동작: 무릎 뗀 네발 — 웨이브로 하강·상승.\n포인트: 어깨가 귀로 올라가지 않게, 허리가 꺾이지 않게.\n주의: 손목·어깨가 아프면 무릎 지지 단계에 머무르세요.' },
+      { id:'p2_pushup_5', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Push-up 6단계', label:'⑤ 무릎 뗀 — 몸통 먼저→웨이브 상승', alimtalkLabel:'네발 ⑤ 몸통 먼저 움직이기', linkUrl:SELF_GUIDE_PAGE+'#move_pushup', coachingNote:'준비: 무릎 지지 네발부터. 무릎을 뗀 네발은 그다음입니다.\n동작: 무릎 뗀 네발 — 몸통을 먼저 내린 뒤 웨이브로 상승.\n포인트: 어깨가 귀로 올라가지 않게, 허리가 꺾이지 않게.\n주의: 손목·어깨가 아프면 무릎 지지 단계에 머무르세요.' },
+      { id:'p2_pushup_6', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Push-up 6단계', label:'⑥ 정상 Push-up — 통증 없는 범위', alimtalkLabel:'네발 ⑥ 팔굽혀펴기 · 통증 없는 범위', linkUrl:SELF_GUIDE_PAGE+'#move_pushup', coachingNote:'준비: 무릎 지지 네발부터. 무릎을 뗀 네발은 그다음입니다.\n동작: 통증 없는 범위에서 정상 Push-up.\n포인트: 어깨가 귀로 올라가지 않게, 허리가 꺾이지 않게.\n주의: 손목·어깨가 아프면 무릎 지지 단계에 머무르세요.' },
+      { id:'p2_plank_1', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Plank 6단계', label:'① 무릎 대고 네발 — 머리 회전', alimtalkLabel:'플랭크 ① 무릎 대고 · 머리 회전', linkUrl:SELF_GUIDE_PAGE+'#move_plank', coachingNote:'준비: 어깨와 골반이 한 줄, 복부는 가볍게 잡아 둡니다. 호흡은 계속.\n동작: 무릎 대고 네발 — 머리 회전.\n포인트: 오래 버티기보다 정렬과 호흡이 먼저입니다.\n주의: 허리가 처지거나 엉덩이가 너무 올라가면 무릎 지지로 돌아가세요.' },
+      { id:'p2_plank_2', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Plank 6단계', label:'② 무릎 떼고 네발 — 머리 회전', alimtalkLabel:'플랭크 ② 무릎 떼고 · 머리 회전', linkUrl:SELF_GUIDE_PAGE+'#move_plank', coachingNote:'준비: 어깨와 골반이 한 줄, 복부는 가볍게 잡아 둡니다. 호흡은 계속.\n동작: 무릎 떼고 네발 — 머리 회전.\n포인트: 오래 버티기보다 정렬과 호흡이 먼저입니다.\n주의: 허리가 처지거나 엉덩이가 너무 올라가면 무릎 지지로 돌아가세요.' },
+      { id:'p2_plank_3', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Plank 6단계', label:'③ 네발 — 골반 좌우 움직임', alimtalkLabel:'플랭크 ③ 골반 좌우 움직이기', linkUrl:SELF_GUIDE_PAGE+'#move_plank', coachingNote:'준비: 어깨와 골반이 한 줄, 복부는 가볍게 잡아 둡니다. 호흡은 계속.\n동작: 네발 — 골반 좌우 움직임.\n포인트: 오래 버티기보다 정렬과 호흡이 먼저입니다.\n주의: 허리가 처지거나 엉덩이가 너무 올라가면 무릎 지지로 돌아가세요.' },
+      { id:'p2_plank_4', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Plank 6단계', label:'④ 한 팔 앞으로 뻗기 → 복귀', alimtalkLabel:'플랭크 ④ 한 팔 앞으로 뻗기', linkUrl:SELF_GUIDE_PAGE+'#move_plank', coachingNote:'준비: 어깨와 골반이 한 줄, 복부는 가볍게 잡아 둡니다. 호흡은 계속.\n동작: 한 팔을 앞으로 뻗었다가 복귀. 좌·우.\n포인트: 오래 버티기보다 정렬과 호흡이 먼저입니다.\n주의: 허리가 처지거나 엉덩이가 너무 올라가면 무릎 지지로 돌아가세요.' },
+      { id:'p2_plank_5', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Plank 6단계', label:'⑤ 한 손 뒤통수 — 몸통 회전', alimtalkLabel:'플랭크 ⑤ 손 뒤통수 · 몸통 회전', linkUrl:SELF_GUIDE_PAGE+'#move_plank', coachingNote:'준비: 어깨와 골반이 한 줄, 복부는 가볍게 잡아 둡니다. 호흡은 계속.\n동작: 한 손을 뒤통수에 두고 몸통 회전. 좌·우.\n포인트: 오래 버티기보다 정렬과 호흡이 먼저입니다.\n주의: 허리가 처지거나 엉덩이가 너무 올라가면 무릎 지지로 돌아가세요.' },
+      { id:'p2_plank_6', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Plank 6단계', label:'⑥ 다리 접기 → 바깥 회전 → 복귀', alimtalkLabel:'플랭크 ⑥ 다리 접어 바깥으로 돌리기', linkUrl:SELF_GUIDE_PAGE+'#move_plank', coachingNote:'준비: 어깨와 골반이 한 줄, 복부는 가볍게 잡아 둡니다. 호흡은 계속.\n동작: 다리를 접었다가 바깥 회전한 뒤 복귀. 좌·우.\n포인트: 오래 버티기보다 정렬과 호흡이 먼저입니다.\n주의: 허리가 처지거나 엉덩이가 너무 올라가면 무릎 지지로 돌아가세요.' },
+      { id:'p2_side_plank_1', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Side Plank 6단계', label:'① 한발 지지 사이드 (좌·우)', alimtalkLabel:'옆 플랭크 ① 한 발 지지 (좌·우)', linkUrl:SELF_GUIDE_PAGE+'#move_sideplank', coachingNote:'준비: 골반을 들어 올리고 측면이 한 줄이 되게 합니다. 호흡은 계속.\n동작: 한발 지지 사이드. 좌·우.\n포인트: 높이보다 측면 일직선이 먼저입니다. 좌·우 같은 시간으로.\n주의: 어깨·손목이 아프면 한발 지지 단계에 머무르세요.' },
+      { id:'p2_side_plank_2', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Side Plank 6단계', label:'② 지지 없이 사이드 (좌·우)', alimtalkLabel:'옆 플랭크 ② 지지 없이 (좌·우)', linkUrl:SELF_GUIDE_PAGE+'#move_sideplank', coachingNote:'준비: 골반을 들어 올리고 측면이 한 줄이 되게 합니다. 호흡은 계속.\n동작: 지지 없이 사이드. 좌·우.\n포인트: 높이보다 측면 일직선이 먼저입니다. 좌·우 같은 시간으로.\n주의: 어깨·손목이 아프면 한발 지지 단계에 머무르세요.' },
+      { id:'p2_side_plank_3', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Side Plank 6단계', label:'③ 골반 좌우 움직임 (좌·우)', alimtalkLabel:'옆 플랭크 ③ 골반 좌우 움직이기', linkUrl:SELF_GUIDE_PAGE+'#move_sideplank', coachingNote:'준비: 골반을 들어 올리고 측면이 한 줄이 되게 합니다. 호흡은 계속.\n동작: 골반 좌우 움직임. 좌·우.\n포인트: 높이보다 측면 일직선이 먼저입니다. 좌·우 같은 시간으로.\n주의: 어깨·손목이 아프면 한발 지지 단계에 머무르세요.' },
+      { id:'p2_side_plank_4', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Side Plank 6단계', label:'④ 위쪽 다리 벌렸다 모음 (좌·우)', alimtalkLabel:'옆 플랭크 ④ 위쪽 다리 벌렸다 모음', linkUrl:SELF_GUIDE_PAGE+'#move_sideplank', coachingNote:'준비: 골반을 들어 올리고 측면이 한 줄이 되게 합니다. 호흡은 계속.\n동작: 위쪽 다리를 벌렸다가 모읍니다. 좌·우.\n포인트: 높이보다 측면 일직선이 먼저입니다. 좌·우 같은 시간으로.\n주의: 어깨·손목이 아프면 한발 지지 단계에 머무르세요.' },
+      { id:'p2_side_plank_5', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Side Plank 6단계', label:'⑤ 위쪽 다리 원그리기 (circumduction)', alimtalkLabel:'옆 플랭크 · 다리 크게 돌리기', linkUrl:SELF_GUIDE_PAGE+'#move_sideplank', coachingNote:'준비: 골반을 들어 올리고 측면이 한 줄이 되게 합니다. 호흡은 계속.\n동작: 위쪽 다리로 원을 그립니다.\n포인트: 높이보다 측면 일직선이 먼저입니다. 좌·우 같은 시간으로.\n주의: 어깨·손목이 아프면 한발 지지 단계에 머무르세요.' },
+      { id:'p2_side_plank_6', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Side Plank 6단계', label:'⑥ 다리 앞·뒤 스윙 (달리기 동작)', alimtalkLabel:'옆 플랭크 ⑥ 다리 앞·뒤 스윙', linkUrl:SELF_GUIDE_PAGE+'#move_sideplank', coachingNote:'준비: 골반을 들어 올리고 측면이 한 줄이 되게 합니다. 호흡은 계속.\n동작: 다리를 앞·뒤로 스윙합니다. 달리기 동작. 좌·우.\n포인트: 높이보다 측면 일직선이 먼저입니다. 좌·우 같은 시간으로.\n주의: 어깨·손목이 아프면 한발 지지 단계에 머무르세요.' },
+      { id:'p2_a_front', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Active Stretching', label:'전방 — 경·흉·고관절 굴곡·발목배굴', alimtalkLabel:'앉아서 앞으로 숙이기 · 고개·등·다리', linkUrl:SELF_GUIDE_PAGE+'#a_sit', coachingNote:'준비: 앉아서 직접 움직이는 Active Stretching입니다. 사진으로 장면을 확인하고, 디테일은 영상으로.\n동작: 전방(앞라인) — 엎드려 손바닥을 어깨 옆에 두고, 팔꿈치를 펴며 상체를 천천히 듭니다. 곡선이 자연스러운지, 통증은 없는지 확인하세요.\n포인트: 통증 없는 범위. 좌우를 비교해 보세요.\n주의: 어지럽거나 찌릿하면 멈추세요.' },
+      { id:'p2_a_back', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Active Stretching', label:'후방 — 경·흉 신전·햄·발목저굴', alimtalkLabel:'앉아서 뒤로 젖히기 · 고개·등·다리', linkUrl:SELF_GUIDE_PAGE+'#a_sit', coachingNote:'준비: 앉아서 직접 움직이는 Active Stretching입니다. 사진으로 장면을 확인하고, 디테일은 영상으로.\n동작: 후방(뒷라인) — 다리를 펴고 앉아, 내쉬며 앞으로 숙입니다. 손끝이 발끝에 닿고, 무릎이 펴지며 척추가 부드러운 곡선인지 보세요.\n포인트: 통증 없는 범위. 좌우를 비교해 보세요.\n주의: 어지럽거나 찌릿하면 멈추세요.' },
+      { id:'p2_a_lat', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Active Stretching', label:'측방 — 경·흉 측굴·고관절 외전·발목', alimtalkLabel:'앉아서 옆으로 기울이기', linkUrl:SELF_GUIDE_PAGE+'#a_sit', coachingNote:'준비: 앉아서 직접 움직이는 Active Stretching입니다. 사진으로 장면을 확인하고, 디테일은 영상으로.\n동작: 측방(옆라인) — 한 발은 양반다리, 한 발은 뒤로 두고 앉아 한팔을 들고 옆으로 숙입니다. 좌우를 바꿔 비교하세요.\n포인트: 통증 없는 범위. 좌우를 비교해 보세요.\n주의: 어지럽거나 찌릿하면 멈추세요.' },
+      { id:'p2_a_spiral', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'Active Stretching', label:'나선 — 경·흉 회전·견갑·GH', alimtalkLabel:'앉아서 몸통 비틀기 · 어깨·등 돌리기', linkUrl:SELF_GUIDE_PAGE+'#a_sit', coachingNote:'준비: 앉아서 직접 움직이는 Active Stretching입니다. 사진으로 장면을 확인하고, 디테일은 영상으로.\n동작: 회전 라인 — 무릎 꿇고 엎드려 팔꿈치로 지지한 뒤, 한손을 뒤통수(또는 허리)에 두고 고개·몸통을 같은 쪽으로 최대한 돌립니다. 좌우 비교.\n포인트: 통증 없는 범위. 좌우를 비교해 보세요.\n주의: 어지럽거나 찌릿하면 멈추세요.' },
+      { id:'p2_sit_posture', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'생활습관', label:'바르게 앉는 방법', alimtalkLabel:'앉아서 바른 자세 연습', linkUrl:SELF_GUIDE_PAGE+'#sit_habit', coachingNote:'준비: 똑바로 힘주는 자세가 아닙니다. 힘을 뺄 수 있는 자리를 찾습니다.\n동작: 앞뒤·좌우로 무게를 옮긴 뒤, 허리 힘이 빠지는 중간을 찾습니다.\n포인트: 같은 자리라도 힘 준 것과 뺀 것이 다릅니다. 힘 빼는 것까지가 완성입니다.\n주의: 오래 앉아 허리가 아픈 날은 자세를 세게 잡지 말고, 이 중간 자리를 다시 찾으세요.' },
+      { id:'p2_sit_breath', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'생활습관', label:'호흡 운동 + 등척성 정렬', alimtalkLabel:'앉아서 호흡 · 자세 정렬', linkUrl:SELF_GUIDE_PAGE+'#sit_breath', coachingNote:'준비: 바르게 앉는 법이 된 다음에 하세요. 누워서 하던 호흡 운동과 같고, 상체에 더 집중합니다.\n동작: 내쉴 때 골반 → 척추 → 어깨 → 팔꿈치 순으로 맞춥니다.\n포인트: 아래 등을 펴려고 배를 내밀면 안 됩니다. 배 힘을 먼저 잡고, 그다음 펴세요.\n주의: 어깨가 이미 많이 내려가 있으면 밑으로 내리지 말고, 옆으로만 늘리세요.' },
+      { id:'p2_seg_1', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'척추+상지 분절 운동 6단계', label:'① 골반 전/후방 굴리며 척추 움직임', alimtalkLabel:'앉아서 ① 골반 굴리며 척추 움직이기', linkUrl:SELF_GUIDE_PAGE+'#move_spine', coachingNote:'준비: 바르게 앉은 상태·앉아서 호흡 운동이 된 다음에 하세요.\n동작: 골반을 앞뒤로 굴리며 척추가 따라 움직이게 합니다.\n포인트: 한 덩어리로 움직이지 말고, 척추를 마디마디 움직입니다.\n주의: 허리에 힘을 주고 꺾지 마세요. 어지러우면 멈추세요.' },
+      { id:'p2_seg_2', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'척추+상지 분절 운동 6단계', label:'② + 상지 움직임 추가', alimtalkLabel:'앉아서 ② 척추 + 팔 움직이기', linkUrl:SELF_GUIDE_PAGE+'#move_spine', coachingNote:'준비: 바르게 앉은 상태·앉아서 호흡 운동이 된 다음에 하세요.\n동작: 1단계에 상지 움직임을 더합니다.\n포인트: 한 덩어리로 움직이지 말고, 척추를 마디마디 움직입니다.\n주의: 허리에 힘을 주고 꺾지 마세요. 어지러우면 멈추세요.' },
+      { id:'p2_seg_3', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'척추+상지 분절 운동 6단계', label:'③ 머리→골반 좌우숙임·척추분절', alimtalkLabel:'앉아서 ③ 좌우로 숙이기 · 척추 하나씩', linkUrl:SELF_GUIDE_PAGE+'#move_spine', coachingNote:'준비: 바르게 앉은 상태·앉아서 호흡 운동이 된 다음에 하세요.\n동작: 좌우로 숙이며, 머리에서 골반 방향으로 척추를 분절합니다.\n포인트: 한 덩어리로 움직이지 말고, 척추를 마디마디 움직입니다.\n주의: 허리에 힘을 주고 꺾지 마세요. 어지러우면 멈추세요.' },
+      { id:'p2_seg_4', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'척추+상지 분절 운동 6단계', label:'④ + 상지 움직임 추가', alimtalkLabel:'앉아서 ④ 좌우 숙임 + 팔 움직이기', linkUrl:SELF_GUIDE_PAGE+'#move_spine', coachingNote:'준비: 바르게 앉은 상태·앉아서 호흡 운동이 된 다음에 하세요.\n동작: 좌우 숙임에 상지를 더합니다.\n포인트: 한 덩어리로 움직이지 말고, 척추를 마디마디 움직입니다.\n주의: 허리에 힘을 주고 꺾지 마세요. 어지러우면 멈추세요.' },
+      { id:'p2_seg_5', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'척추+상지 분절 운동 6단계', label:'⑤ 머리→골반 회전·척추분절', alimtalkLabel:'앉아서 ⑤ 몸통 돌리기 · 척추 하나씩', linkUrl:SELF_GUIDE_PAGE+'#move_spine', coachingNote:'준비: 바르게 앉은 상태·앉아서 호흡 운동이 된 다음에 하세요.\n동작: 머리에서 골반 방향으로 척추를 분절하며 회전합니다.\n포인트: 한 덩어리로 움직이지 말고, 척추를 마디마디 움직입니다.\n주의: 허리에 힘을 주고 꺾지 마세요. 어지러우면 멈추세요.' },
+      { id:'p2_seg_6', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'척추+상지 분절 운동 6단계', label:'⑥ + 상지 움직임 추가', alimtalkLabel:'앉아서 ⑥ 몸통 돌림 + 팔 움직이기', linkUrl:SELF_GUIDE_PAGE+'#move_spine', coachingNote:'준비: 바르게 앉은 상태·앉아서 호흡 운동이 된 다음에 하세요.\n동작: 회전에 상지를 더합니다.\n포인트: 한 덩어리로 움직이지 말고, 척추를 마디마디 움직입니다.\n주의: 허리에 힘을 주고 꺾지 마세요. 어지러우면 멈추세요.' },
+      { id:'p3_squat_1', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'스쿼트 6단계', label:'① 걸터앉기 — 엉덩 앞으로 떼었다 앉기', alimtalkLabel:'스쿼트 ① 걸터앉기 · 엉덩 앞으로', linkUrl:SELF_GUIDE_PAGE+'#move_squat', coachingNote:'준비: 의자 또는 벽을 활용합니다. 앉아서 바르게 일어설 힘을 만드는 단계입니다.\n동작: 의자에 살짝 걸터앉아, 엉덩이를 앞으로 떼었다가 다시 앉습니다.\n포인트: 골반 중립, 무릎과 발끝이 같은 방향을 보게. 매 단계 확인.\n주의: 무릎이 안쪽으로 무너지거나 허리가 꺾이면 이전 단계로.' },
+      { id:'p3_squat_2', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'스쿼트 6단계', label:'② 엉덩 앞으로 뗀 뒤 — 일어섰다 앉기', alimtalkLabel:'스쿼트 ② 일어섰다 앉기', linkUrl:SELF_GUIDE_PAGE+'#move_squat', coachingNote:'준비: 의자 또는 벽을 활용합니다. 앉아서 바르게 일어설 힘을 만드는 단계입니다.\n동작: 엉덩이를 앞으로 뗀 뒤 일어났다가 다시 앉습니다.\n포인트: 골반 중립, 무릎과 발끝이 같은 방향을 보게. 매 단계 확인.\n주의: 무릎이 안쪽으로 무너지거나 허리가 꺾이면 이전 단계로.' },
+      { id:'p3_squat_3', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'스쿼트 6단계', label:'③ 일어섰다 깊게 앉았다 앉기', alimtalkLabel:'스쿼트 ③ 깊게 앉았다 일어서기', linkUrl:SELF_GUIDE_PAGE+'#move_squat', coachingNote:'준비: 의자 또는 벽을 활용합니다. 앉아서 바르게 일어설 힘을 만드는 단계입니다.\n동작: 일어났다가 깊게 앉았다가, 의자 높이까지 일어난 뒤 다시 앉습니다.\n포인트: 골반 중립, 무릎과 발끝이 같은 방향을 보게. 매 단계 확인.\n주의: 무릎이 안쪽으로 무너지거나 허리가 꺾이면 이전 단계로.' },
+      { id:'p3_squat_4', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'스쿼트 6단계', label:'④ 한쪽 다리에 중심 — ①번 동작 (좌·우)', alimtalkLabel:'스쿼트 ④ 한쪽 다리 · 걸터앉기 (좌·우)', linkUrl:SELF_GUIDE_PAGE+'#move_squat', coachingNote:'준비: 의자 또는 벽을 활용합니다. 앉아서 바르게 일어설 힘을 만드는 단계입니다.\n동작: 한쪽 다리에 중심을 싣고 1번 동작. 좌·우.\n포인트: 골반 중립, 무릎과 발끝이 같은 방향을 보게. 매 단계 확인.\n주의: 무릎이 안쪽으로 무너지거나 허리가 꺾이면 이전 단계로.' },
+      { id:'p3_squat_5', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'스쿼트 6단계', label:'⑤ 한쪽 다리에 중심 — ②번 동작 (좌·우)', alimtalkLabel:'스쿼트 ⑤ 한쪽 다리 · 일어섰다 앉기 (좌·우)', linkUrl:SELF_GUIDE_PAGE+'#move_squat', coachingNote:'준비: 의자 또는 벽을 활용합니다. 앉아서 바르게 일어설 힘을 만드는 단계입니다.\n동작: 한쪽 다리에 중심을 싣고 2번 동작. 좌·우.\n포인트: 골반 중립, 무릎과 발끝이 같은 방향을 보게. 매 단계 확인.\n주의: 무릎이 안쪽으로 무너지거나 허리가 꺾이면 이전 단계로.' },
+      { id:'p3_squat_6', uiSection:'pos2', sectionTitle:'Sitting/Quadruped', program:'스쿼트 6단계', label:'⑥ 한쪽 다리에 중심 — ③번 동작 (좌·우)', alimtalkLabel:'스쿼트 ⑥ 한쪽 다리 · 깊게 앉기 (좌·우)', linkUrl:SELF_GUIDE_PAGE+'#move_squat', coachingNote:'준비: 의자 또는 벽을 활용합니다. 앉아서 바르게 일어설 힘을 만드는 단계입니다.\n동작: 한쪽 다리에 중심을 싣고 3번 동작. 좌·우.\n포인트: 골반 중립, 무릎과 발끝이 같은 방향을 보게. 매 단계 확인.\n주의: 무릎이 안쪽으로 무너지거나 허리가 꺾이면 이전 단계로.' },
+      { id:'p3_a_upper_1', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 상체', label:'① 상지 — 손·손목·팔 연쇄', alimtalkLabel:'서서 팔·손 스트레칭', linkUrl:SELF_GUIDE_PAGE+'#a_stand_upper', coachingNote:'준비: 서서 하는 상체 Active Stretching입니다.\n동작: 팔을 앞으로 펴고 손목을 당겨 놓은 뒤, 좌우로 회전해 여러 섬유가 늘어나게 합니다.\n포인트: 밸런스를 잡고 천천히. 허리를 한 번에 꺾지 마세요.\n주의: 어지러우면 멈추고 앉으세요.' },
+      { id:'p3_a_upper_2', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 상체', label:'② 목 — 경추 굴곡·신전·측굴·회전', alimtalkLabel:'서서 목 스트레칭', linkUrl:SELF_GUIDE_PAGE+'#a_stand_upper', coachingNote:'준비: 서서 하는 상체 Active Stretching입니다.\n동작: 깍지 끼고 고개를 숙인 뒤, 턱을 좌우로 밀거나 머리 잡고 아래·위를 봅니다. 어깨는 올라가지 않게.\n포인트: 밸런스를 잡고 천천히. 허리를 한 번에 꺾지 마세요.\n주의: 어지러우면 멈추고 앉으세요.' },
+      { id:'p3_a_upper_3', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 상체', label:'③ 어깨 — GH·견갑 연쇄', alimtalkLabel:'서서 어깨·견갑뼈 움직이기', linkUrl:SELF_GUIDE_PAGE+'#a_stand_upper', coachingNote:'준비: 서서 하는 상체 Active Stretching입니다.\n동작: 팔을 가로로 당기고 시선은 반대로, 늘려 놓은 상태에서 손을 회전합니다. 팔꿈치로 살짝 눌러 주세요.\n포인트: 밸런스를 잡고 천천히. 허리를 한 번에 꺾지 마세요.\n주의: 어지러우면 멈추고 앉으세요.' },
+      { id:'p3_a_upper_4', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 상체', label:'④ 몸통 — 흉·요추 분절 (Roll down/up)', alimtalkLabel:'서서 척추 굽혔다 펴기', linkUrl:SELF_GUIDE_PAGE+'#a_stand_upper', coachingNote:'준비: 서서 하는 상체 Active Stretching입니다.\n동작: 깍지를 위로 올린 뒤 손바닥을 축으로 팔꿈치·척추·골반까지 좌우로 틀어 줍니다.\n포인트: 밸런스를 잡고 천천히. 허리를 한 번에 꺾지 마세요.\n주의: 어지러우면 멈추고 앉으세요.' },
+      { id:'p3_a_lower_2', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 하체', label:'⑤ 고관절 — 굴곡·신전·회전', alimtalkLabel:'서서 고관절 스트레칭', linkUrl:SELF_GUIDE_PAGE+'#a_stand_lower', coachingNote:'준비: 서서 하는 하체 Active Stretching입니다.\n동작: 발·발끝을 바깥으로 두고 앉아 안쪽을 밀거나, 옆으로 앉아 발끝을 안·밖으로 움직입니다.\n포인트: 무릎과 발끝이 같은 방향을 보게.\n주의: 균형이 무너지면 벽에 손을 가볍게.' },
+      { id:'p3_a_lower_3', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 하체', label:'⑥ 무릎 — 슬관절 가동', alimtalkLabel:'서서 무릎 스트레칭', linkUrl:SELF_GUIDE_PAGE+'#a_stand_lower', coachingNote:'준비: 서서 하는 하체 Active Stretching입니다.\n동작: 앉아 무릎을 지지한 채 누르고 좌우·회전으로 풀어 줍니다. 엉덩이가 뒤로 빠지지 않게.\n포인트: 무릎과 발끝이 같은 방향을 보게.\n주의: 균형이 무너지면 벽에 손을 가볍게.' },
+      { id:'p3_a_lower_4', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 하체', label:'⑦ 종아리 — 스트레칭', alimtalkLabel:'서서 종아리 스트레칭', linkUrl:SELF_GUIDE_PAGE+'#a_stand_lower', coachingNote:'준비: 서서 하는 하체 Active Stretching입니다.\n동작: 한 발을 앞에 두고 뒤꿈치는 바닥에 붙인 채 앞무릎을 굽힙니다. 몸통을 좌우로 틀면 다른 섬유가 늘어납니다.\n포인트: 무릎과 발끝이 같은 방향을 보게.\n주의: 균형이 무너지면 벽에 손을 가볍게.' },
+      { id:'p3_a_lower_5', uiSection:'pos3', sectionTitle:'Standing', program:'Active Stretching · 하체', label:'⑧ 발목 — 발가락·발목 연쇄', alimtalkLabel:'서서 발·발목 스트레칭', linkUrl:SELF_GUIDE_PAGE+'#a_stand_lower', coachingNote:'준비: 서서 하는 하체 Active Stretching입니다.\n동작: 발끝을 구부리고 바깥·안쪽으로 돌립니다. 돌아올 때는 엄지발가락이 꺾이지 않게.\n포인트: 무릎과 발끝이 같은 방향을 보게.\n주의: 균형이 무너지면 벽에 손을 가볍게.' },
+      { id:'p3_stand_posture', uiSection:'pos3', sectionTitle:'Standing', program:'생활습관', label:'바르게 서기', alimtalkLabel:'서서 바른 자세 연습', linkUrl:SELF_GUIDE_PAGE+'#stand_habit', coachingNote:'준비: 라인만 맞추고 허리 힘을 빼는 것이 핵심입니다.\n동작: 발 무게 → 골반 → 허리 힘 빼기 → 좌우 균형 순으로 찾습니다.\n포인트: 라인이 잡혀도 허리가 올라가 있으면 다시 내려놓고 힘을 빼세요.\n주의: 골반을 뒤로 둘 때 어깨까지 같이 뒤로 가면 넘어질 것 같습니다. 몸통은 두고 골반만 옮기세요.' },
+      { id:'p3_stand_breath', uiSection:'pos3', sectionTitle:'Standing', program:'생활습관', label:'호흡 정렬 운동', alimtalkLabel:'서서 호흡 · 자세 정렬', linkUrl:SELF_GUIDE_PAGE+'#stand_breath', coachingNote:'준비: 바르게 서기가 된 다음에 하세요. 이 자세를 유지하는 근육을 키우는 단계입니다.\n동작: 내쉴 때 발 → 골반 → 척추 → 어깨 → 목 순으로 맞춥니다.\n포인트: 엉덩이에 힘 준다고 허리가 꺾이면, 골반을 살짝 뒤로 두고 다시 하세요.\n주의: 한쪽에만 골반이 튀어나오면 반대쪽이 덜 나온 겁니다. 양쪽을 비슷하게 맞추세요.' },
+      { id:'p3_stand_walk', uiSection:'pos3', sectionTitle:'Standing', program:'생활습관', label:'바르게 걷기', alimtalkLabel:'바르게 걷기 연습', linkUrl:SELF_GUIDE_PAGE+'#walk_habit', coachingNote:'준비: 서기와 호흡이 된 다음에 하세요. 빨리 걷지 말고 한 걸음씩 확인합니다.\n동작: 무릎으로 발을 떼고, 뒤꿈치 → 엄지발가락 순으로 무게를 옮깁니다.\n포인트: 골반이 움직이는 사람은 머리·어깨가 덜 흔들립니다. 상체를 일부러 흔들지 마세요.\n주의: 허리를 들고 걷던 분은, 걸을 때도 허리가 올라가는지 한 걸음마다 확인하세요.' },
+      { id:'p3_balance_1', uiSection:'pos3', sectionTitle:'Standing', program:'밸런스 트레이닝 6단계', label:'① 일어선 상태 한발 살짝 들고 돌리기 — 30초 유지', alimtalkLabel:'밸런스 ① 한 발 살짝 들고 30초', linkUrl:SELF_GUIDE_PAGE+'#move_balance', coachingNote:'준비: 바르게 서기와 서서 호흡이 된 다음에 하세요. 벽 근처에 두세요.\n동작: 일어선 채 한 발을 살짝 들고 돌리며 30초 유지. 발은 엄지·새끼·뒤꿈치 삼각으로 지지합니다.\n포인트: 높이보다 발 삼각 지지와 골반이 정면을 유지하는지가 먼저입니다.\n주의: 흔들려 넘어질 것 같으면 손을 벽에 가볍게. 어지러우면 멈추세요.' },
+      { id:'p3_balance_2', uiSection:'pos3', sectionTitle:'Standing', program:'밸런스 트레이닝 6단계', label:'② 무릎 높이까지 들어 올리고 돌리기 — 30초 유지', alimtalkLabel:'밸런스 ② 무릎 높이 들고 30초', linkUrl:SELF_GUIDE_PAGE+'#move_balance', coachingNote:'준비: 바르게 서기와 서서 호흡이 된 다음에 하세요. 벽 근처에 두세요.\n동작: 무릎 높이까지 들어 올리고 돌리며 30초 유지.\n포인트: 높이보다 발 삼각 지지와 골반이 정면을 유지하는지가 먼저입니다.\n주의: 흔들려 넘어질 것 같으면 손을 벽에 가볍게. 어지러우면 멈추세요.' },
+      { id:'p3_balance_3', uiSection:'pos3', sectionTitle:'Standing', program:'밸런스 트레이닝 6단계', label:'③ 한 발 지지 · 반대 다리 뒤로 뻗기(발 미접지) + 후굴', alimtalkLabel:'밸런스 ③ 한 발 서고 다리 뒤로 뻗기', linkUrl:SELF_GUIDE_PAGE+'#move_balance', coachingNote:'준비: 바르게 서기와 서서 호흡이 된 다음에 하세요. 벽 근처에 두세요.\n동작: 한 발 지지, 반대 다리를 뒤로 뻗고(발은 바닥에 안 닿게) 후굴.\n포인트: 높이보다 발 삼각 지지와 골반이 정면을 유지하는지가 먼저입니다.\n주의: 흔들려 넘어질 것 같으면 손을 벽에 가볍게. 어지러우면 멈추세요.' },
+      { id:'p3_balance_4', uiSection:'pos3', sectionTitle:'Standing', program:'밸런스 트레이닝 6단계', label:'④ 뒤뻗기(후굴)→무릎들기(전굴) 사이클', alimtalkLabel:'밸런스 ④ 다리 뒤로·무릎 들기 반복', linkUrl:SELF_GUIDE_PAGE+'#move_balance', coachingNote:'준비: 바르게 서기와 서서 호흡이 된 다음에 하세요. 벽 근처에 두세요.\n동작: 뒤뻗기(후굴)와 무릎 들기(전굴)를 사이클로.\n포인트: 높이보다 발 삼각 지지와 골반이 정면을 유지하는지가 먼저입니다.\n주의: 흔들려 넘어질 것 같으면 손을 벽에 가볍게. 어지러우면 멈추세요.' },
+      { id:'p3_balance_5', uiSection:'pos3', sectionTitle:'Standing', program:'밸런스 트레이닝 6단계', label:'⑤ 무릎 들고 몸통-골반 회전', alimtalkLabel:'밸런스 ⑤ 무릎 들고 몸통 돌리기', linkUrl:SELF_GUIDE_PAGE+'#move_balance', coachingNote:'준비: 바르게 서기와 서서 호흡이 된 다음에 하세요. 벽 근처에 두세요.\n동작: 무릎을 들고 몸통·골반 회전.\n포인트: 높이보다 발 삼각 지지와 골반이 정면을 유지하는지가 먼저입니다.\n주의: 흔들려 넘어질 것 같으면 손을 벽에 가볍게. 어지러우면 멈추세요.' },
+      { id:'p3_balance_6', uiSection:'pos3', sectionTitle:'Standing', program:'밸런스 트레이닝 6단계', label:'⑥ 뒤뻗기 하며 몸통-골반 회전', alimtalkLabel:'밸런스 ⑥ 다리 뒤로 뻗으며 몸통 돌리기', linkUrl:SELF_GUIDE_PAGE+'#move_balance', coachingNote:'준비: 바르게 서기와 서서 호흡이 된 다음에 하세요. 벽 근처에 두세요.\n동작: 뒤뻗기 하며 몸통·골반 회전.\n포인트: 높이보다 발 삼각 지지와 골반이 정면을 유지하는지가 먼저입니다.\n주의: 흔들려 넘어질 것 같으면 손을 벽에 가볍게. 어지러우면 멈추세요.' },
     ];
     function buildLocalProgram() {
       return MOVEMENT_CATALOG_RAW.map(function(item) {
@@ -3003,7 +3019,7 @@
       return local.map(function(loc) {
         var srv = serverById[loc.id];
         if (!srv) return loc;
-        var preferLocalUrl = loc.uiSection === 'self_tool';
+        var preferLocalUrl = loc.uiSection === 'self_tool' || isSelfGuideUrl_(loc.youtubeUrl);
         var url = preferLocalUrl
           ? String(loc.youtubeUrl || srv.youtubeUrl || '').trim()
           : String(srv.youtubeUrl || loc.youtubeUrl || '').trim();
@@ -7560,6 +7576,7 @@
       saveProgressToMemberStore();
       rebindMemberProgressKey_(m, state.selectedKey);
       m.provisional = true;
+      attachPendingEvalToMember_(m);
       if (!m.payRounds) {
         m.payRounds = 1;
         m.attend = m.attend || 0;
@@ -10021,6 +10038,7 @@
       m.conditionHistory = member.conditionHistory != null ? member.conditionHistory : (m.conditionHistory || []);
       m.firstEvalBrief = member.firstEvalBrief || m.firstEvalBrief || null;
       m.wellnessIntake = member.wellnessIntake || detail.wellnessIntake || null;
+      attachPendingEvalToMember_(m);
       if (!opts.historyOnly && member.currentSessionCheck && !hasSessionCheckEdits_()) {
         m.currentSessionCheck = member.currentSessionCheck;
         state.sessionCheck.areas = (member.currentSessionCheck.areas || []).slice();
@@ -10153,6 +10171,7 @@
         stopMemberDetailCountdown();
       }
       renderSelectedMemberUi();
+      attachPendingEvalToMember_(m);
       if (m.suffix8) {
         if (state.nextBooking) state.nextBooking.forceReload = true;
         fetchNextBookingForMember_(m);
@@ -10412,7 +10431,7 @@
         html += '<button type="button" class="method-badge-btn method-badge-btn--coach has-note" onclick="openCoachingNoteModal_(event,\'' + item.id + '\')">설명</button>';
       }
       if (hasUrl) {
-        var tagLabel = secKey === 'self_tool' ? '링크' : '영상';
+        var tagLabel = (secKey === 'self_tool' || isSelfGuideUrl_(item.youtubeUrl)) ? '링크' : '영상';
         html += '<button type="button" class="method-badge-btn method-badge-btn--link" onclick="copyExerciseLink_(event,\'' + item.id + '\')">' + escapeHtml(tagLabel) + '</button>';
       }
       return html + '</span>';
@@ -12834,6 +12853,161 @@
       };
     }
 
+    var EVAL_DRAFT_LS_KEY = 'rm-first-eval-draft-v1';
+
+    function loadEvalDraftStore_() {
+      try {
+        var raw = JSON.parse(localStorage.getItem(EVAL_DRAFT_LS_KEY) || '{}');
+        return raw && typeof raw === 'object' ? raw : {};
+      } catch (e) { return {}; }
+    }
+
+    function saveEvalDraftStore_(store) {
+      try { localStorage.setItem(EVAL_DRAFT_LS_KEY, JSON.stringify(store || {})); } catch (e) { /* ignore */ }
+    }
+
+    function evalDraftKeysForMember_(m) {
+      var keys = [];
+      if (!m) return keys;
+      var phone = String(m.phoneDigits || '').replace(/\D/g, '');
+      var name = String(m.name || '').trim();
+      if (phone.length >= 10) keys.push('p:' + phone);
+      var mk = '';
+      try { mk = memberKey(m); } catch (e) { mk = ''; }
+      if (mk) keys.push('k:' + mk);
+      if (name) keys.push('n:' + name);
+      return keys;
+    }
+
+    function findEvalDraftForMember_(m) {
+      var store = loadEvalDraftStore_();
+      var keys = evalDraftKeysForMember_(m);
+      for (var i = 0; i < keys.length; i++) {
+        if (store[keys[i]]) return store[keys[i]];
+      }
+      var name = String((m && m.name) || '').trim();
+      if (name) {
+        var ids = Object.keys(store);
+        for (var j = 0; j < ids.length; j++) {
+          var d = store[ids[j]];
+          if (d && String(d.name || '').trim() === name) return d;
+        }
+      }
+      return null;
+    }
+
+    function persistEvalDraft_(snap, memberOpt) {
+      var m = memberOpt || state.selected;
+      var info = m
+        ? { name: String(m.name || '').trim(), phone: String(m.phoneDigits || '').replace(/\D/g, '') }
+        : evalMemberInfo();
+      var keys = evalDraftKeysForMember_(m);
+      if (!keys.length && info.name) keys = ['n:' + info.name];
+      if (!keys.length) return snap || null;
+      var store = loadEvalDraftStore_();
+      var prev = findEvalDraftForMember_(m) || {};
+      var next = Object.assign({}, prev, snap || {}, {
+        name: info.name || prev.name || '',
+        phone: info.phone || prev.phone || '',
+        suffix8: (m && m.suffix8) || (snap && snap.suffix8) || prev.suffix8 || '',
+        memberKey: (m && (function () { try { return memberKey(m); } catch (e) { return ''; } })()) || prev.memberKey || '',
+        savedAt: new Date().toISOString(),
+      });
+      keys.forEach(function (k) { store[k] = next; });
+      saveEvalDraftStore_(store);
+      return next;
+    }
+
+    function evalDraftHasContent_(draft) {
+      if (!draft) return false;
+      if (draft.aiRequested || draft.aiSubmitted || String(draft.aiReport || '').trim()) return true;
+      if (String(draft.consultSummary || draft.history || draft.inspection || draft.movement || draft.palpation || draft.memo || '').trim()) return true;
+      var hs = draft.historyState || {};
+      if (Object.keys(hs).some(function (k) {
+        if (k === 'extraMemo') return !!String(hs[k] || '').trim();
+        return Array.isArray(hs[k]) && hs[k].length > 0;
+      })) return true;
+      var chips = draft.examChips || {};
+      return Object.keys(chips).some(function (k) { return (chips[k] || []).length > 0; });
+    }
+
+    function attachPendingEvalToMember_(m) {
+      if (!m) return;
+      var draft = findEvalDraftForMember_(m);
+      if (!draft) return;
+      var phone = String(m.phoneDigits || '').replace(/\D/g, '');
+      var prevPhone = String(draft.phone || '').replace(/\D/g, '');
+      var prevSuffix = String(draft.suffix8 || '');
+      var identityUpgraded = (phone.length >= 10 && prevPhone.length < 10) ||
+        !!(m.suffix8 && !prevSuffix);
+      persistEvalDraft_(Object.assign({}, draft, { phone: phone, suffix8: m.suffix8 || '' }), m);
+      draft = findEvalDraftForMember_(m) || draft;
+      var brief = String(draft.conciseBrief || draft.consultSummary || '').trim();
+      var serverHas = !!(m.firstEvalBrief && m.firstEvalBrief.has && (m.firstEvalBrief.conciseBrief || m.firstEvalBrief.fullText));
+      if (!serverHas && brief) applyFirstEvalBriefToMemberUi_(m, brief, { persist: true });
+      if (phone.length < 10) return;
+      if (_evalSaveInFlight) return;
+      var shouldSubmit = !draft.aiSubmitted && (draft.history || draft.consultSummary) &&
+        (draft.aiRequested || identityUpgraded);
+      if (shouldSubmit) {
+        submitEvalDraftToServer_(m, draft);
+        return;
+      }
+      if (m.suffix8 && draft.aiSubmitted && !draft.linkedToSuffix8) {
+        persistEvalDraft_({ linkedToSuffix8: m.suffix8 }, m);
+        api({
+          action: 'instructorSaveFirstEvalBrief',
+          phone: phone,
+          name: String(m.name || draft.name || '').trim(),
+          suffix8: m.suffix8,
+        }).then(function (data) {
+          if (data && data.ok) {
+            var brief2 = String(data.memberBriefNotes || data.conciseBrief || draft.conciseBrief || '').trim();
+            if (brief2) applyFirstEvalBriefToMemberUi_(m, brief2, { persist: true });
+          }
+        }).catch(function () { /* 로컬 연결은 유지 */ });
+      }
+    }
+
+    function submitEvalDraftToServer_(m, draft) {
+      var phone = String((m && m.phoneDigits) || (draft && draft.phone) || '').replace(/\D/g, '');
+      if (!m || phone.length < 10 || !draft) return;
+      _evalSaveInFlight = true;
+      startEvalSubmitCountdown_({ estSec: EVAL_AI_REPORT_EST_SEC, label: 'AI 리포트 연결 중' });
+      api({
+        action: 'submitInstructorFirstEval',
+        name: String(m.name || draft.name || '').trim(),
+        phone: phone,
+        suffix8: m.suffix8 || '',
+        history: draft.history || '',
+        inspection: draft.inspection || '',
+        movement: draft.movement || '',
+        palpation: draft.palpation || '',
+        memo: draft.memo || '',
+        sendToMember: !!draft.sendToMember,
+        programRecommendation: draft.programRecommendation || null,
+      }, { timeoutMs: EVAL_AI_REPORT_TIMEOUT_MS }).then(function (data) {
+        if (data && data.ok) {
+          var brief2 = String(data.memberBriefNotes || data.conciseBrief || draft.consultSummary || '').trim();
+          persistEvalDraft_({
+            aiSubmitted: true,
+            aiReport: data.report || draft.aiReport || '',
+            conciseBrief: brief2,
+            linkedToSuffix8: m.suffix8 || '',
+          }, m);
+          if (brief2) applyFirstEvalBriefToMemberUi_(m, brief2, { persist: true });
+          if (state.selected === m) {
+            paintEvalConsultView_(findEvalDraftForMember_(m) || draft, {
+              aiReport: String(data.report || '').trim() || null,
+            });
+          }
+        }
+      }).catch(function () { /* 로컬은 유지 */ }).then(function () {
+        _evalSaveInFlight = false;
+        stopEvalSubmitCountdown_();
+      });
+    }
+
     async function sendWellnessIntakeSms_() {
       const m = state.selected;
       if (!m || !String(m.name || '').trim()) {
@@ -12918,11 +13092,11 @@
       title: 'Inspection',
       items: [
         evalHistItem('insp_findings', '자세·관찰', '부위별 다중 선택', [
-          { group: '목', options: ['거북목', '일자목'] },
-          { group: '어깨', options: ['라운드 숄더', '어깨 비대칭'] },
-          { group: '등', options: ['굽은 등', '척추 측만 의심'] },
-          { group: '허리', options: ['허리 전만', '요추전만'] },
-          { group: '골반', options: ['골반 틀어짐', '골반 높이 차'] },
+          { group: '목', options: ['거북목', '일자목', 'Lt 기울어짐', 'Rt 기울어짐'] },
+          { group: '어깨', options: ['라운드 숄더', 'Lt 내려감', 'Rt 내려감'] },
+          { group: '등', options: ['굽은 등', 'Lt 좁아짐', 'Rt 좁아짐', '척추 측만 의심'] },
+          { group: '허리', options: ['허리 전만', '요추전만', 'Lt 좁아짐', 'Rt 좁아짐'] },
+          { group: '골반', options: ['골반 틀어짐', 'Lt 낮음', 'Rt 낮음'] },
           { group: '무릎·다리', options: ['오다리', 'X자 다리'] },
         ], true),
       ],
@@ -12940,6 +13114,7 @@
           '코어', '목', '어깨', '등', '허리', '골반·고관절', '하체·무릎·발목',
         ], true),
         evalHistItem('mov_pattern', '문제 동작·상황', '선택한 부위별로 다중 선택', [
+          { id: '통증', label: '통증', reportLabel: '움직일 때 통증' },
           { id: '가동성 저하', label: '가동성 저하', reportLabel: '움직임이 잘 안 되거나 뻣뻣함' },
           { id: '굴곡', label: '굴곡', reportLabel: '앞으로 숙일 때 불편' },
           { id: '신전', label: '신전', reportLabel: '뒤로 젖힐 때 불편' },
@@ -12959,9 +13134,9 @@
           { group: '어깨', options: ['승모근', '견갑 주변', '회전근개', '삼각근'] },
           { group: '상지', options: ['상완', '팔꿈치', '전완', '손목·손'] },
           { group: '등', options: ['상부 등', '견갑 사이', '중부 등', '하부 등'] },
-          { group: '허리', options: ['요추 옆', '허리 중앙', '옆구리'] },
-          { group: '골반·고관절', options: ['장골능', '장요근', '둔근', '이상근', '고관절 앞'] },
-          { group: '하지', options: ['허벅지 앞', '허벅지 뒤', '무릎 주변', '종아리', '발목'] },
+          { group: '허리', options: ['허리 중앙', '허리 기립근', '옆구리'] },
+          { group: '골반·고관절', options: ['장골능', '둔근', '이상근', '고관절 옆', '고관절 앞', '장요근'] },
+          { group: '하지', options: ['허벅지 앞', '허벅지 뒤', '허벅지 옆'] },
         ], true),
         evalHistItem('palp_quality', '촉진 소견', '', [
           '근막 점착', '근 긴장', '관절 제한', '부종', '열감',
@@ -14019,6 +14194,164 @@
         '</div>';
     }
 
+    function buildEvalConsultSummaryText_(parts) {
+      parts = parts || {};
+      var blocks = [];
+      if (parts.history) blocks.push('[History Taking]\n' + parts.history);
+      if (parts.inspection) blocks.push('[Inspection]\n' + parts.inspection);
+      if (parts.movement) blocks.push('[Movement Test]\n' + parts.movement);
+      if (parts.palpation) blocks.push('[Palpation]\n' + parts.palpation);
+      if (parts.memo) blocks.push('[추가 메모]\n' + parts.memo);
+      return blocks.join('\n\n').trim();
+    }
+
+    function gatherEvalChipNotes_() {
+      var chipNotes = {};
+      document.querySelectorAll('.eval-hist-chip-note').forEach(function (ta) {
+        var sec = ta.getAttribute('data-sec');
+        var opt = ta.getAttribute('data-opt') || '';
+        var text = String(ta.value || '').trim();
+        if (!sec || !text) return;
+        if (!chipNotes[sec]) chipNotes[sec] = {};
+        chipNotes[sec][opt] = text;
+      });
+      return chipNotes;
+    }
+
+    function gatherEvalConsultSnapshot_() {
+      var histState = gatherEvalHistoryState();
+      var rec = computeEvalProgramRecommendation(histState);
+      var history = compileEvalHistoryText();
+      var inspection = compileEvalExamText(EVAL_INSPECTION_SECTION);
+      var movement = compileEvalExamText(EVAL_MOVEMENT_SECTION);
+      var palpation = compileEvalExamText(EVAL_PALPATION_SECTION);
+      var memoEl = document.getElementById('evalMemo');
+      var memo = memoEl ? String(memoEl.value || '').trim() : '';
+      var sendEl = document.getElementById('evalSendMember');
+      var examChips = {};
+      evalExamBlocks_().forEach(function (block) {
+        (block.items || []).forEach(function (sec) {
+          examChips[sec.id] = evalChipSelectionsForSec(sec.id);
+        });
+      });
+      return {
+        history: history,
+        inspection: inspection,
+        movement: movement,
+        palpation: palpation,
+        memo: memo,
+        sendToMember: !!(sendEl && sendEl.checked),
+        historyState: histState,
+        examChips: examChips,
+        movementPairs: JSON.parse(JSON.stringify(_evalMovementPairs || {})),
+        examDetailNotes: JSON.parse(JSON.stringify(_evalExamDetailNotes || {})),
+        chipNotes: gatherEvalChipNotes_(),
+        programRecommendation: rec,
+        consultSummary: buildEvalConsultSummaryText_({
+          history: history,
+          inspection: inspection,
+          movement: movement,
+          palpation: palpation,
+          memo: memo,
+        }),
+      };
+    }
+
+    function applyEvalFormSnapshot_(snap) {
+      if (!snap) return;
+      var prefill = [];
+      function addSec(map) {
+        if (!map) return;
+        Object.keys(map).forEach(function (sec) {
+          if (sec === 'extraMemo') return;
+          (map[sec] || []).forEach(function (val) {
+            if (val) prefill.push({ sec: sec, val: val });
+          });
+        });
+      }
+      addSec(snap.historyState);
+      addSec(snap.examChips);
+      applyEvalChipPrefill_(prefill);
+      if (snap.movementPairs) {
+        try { _evalMovementPairs = JSON.parse(JSON.stringify(snap.movementPairs)); }
+        catch (e) { _evalMovementPairs = snap.movementPairs || {}; }
+      }
+      if (snap.examDetailNotes) {
+        try { _evalExamDetailNotes = JSON.parse(JSON.stringify(snap.examDetailNotes)); }
+        catch (e2) { _evalExamDetailNotes = snap.examDetailNotes || {}; }
+      }
+      evalExamBlocks_().forEach(function (block) {
+        if (block.pairRegionPattern) renderEvalMovementPatternRows_(block);
+        renderEvalExamDetails_(block);
+      });
+      if (snap.chipNotes) {
+        Object.keys(snap.chipNotes).forEach(function (sec) {
+          Object.keys(snap.chipNotes[sec] || {}).forEach(function (opt) {
+            document.querySelectorAll('.eval-hist-chip-note[data-sec="' + sec + '"]').forEach(function (ta) {
+              if ((ta.getAttribute('data-opt') || '') === opt) {
+                ta.value = snap.chipNotes[sec][opt];
+                ta.hidden = false;
+              }
+            });
+          });
+        });
+      }
+      var extra = document.getElementById('evalHistoryExtraMemo');
+      if (extra && snap.historyState && snap.historyState.extraMemo) extra.value = snap.historyState.extraMemo;
+      var memo = document.getElementById('evalMemo');
+      if (memo && snap.memo) memo.value = snap.memo;
+      var sendEl = document.getElementById('evalSendMember');
+      if (sendEl) sendEl.checked = !!snap.sendToMember;
+    }
+
+    function paintEvalConsultView_(snap, opts) {
+      opts = opts || {};
+      var empty = document.getElementById('evalViewEmpty');
+      var content = document.getElementById('evalViewContent');
+      var summaryEl = document.getElementById('evalConsultSummary');
+      var dateEl = document.getElementById('evalViewDate');
+      var aiStatus = document.getElementById('evalAiStatus');
+      var body = document.getElementById('evalReportBody');
+      if (!content) return;
+      var info = evalMemberInfo();
+      var summary = String((snap && (snap.consultSummary || snap.history)) || '').trim();
+      if (empty) empty.hidden = true;
+      content.hidden = false;
+      if (dateEl) {
+        var when = (snap && snap.savedAt) ? String(snap.savedAt).slice(0, 16).replace('T', ' ') : '';
+        dateEl.textContent = [info.name, when || '상담 요약'].filter(Boolean).join(' · ');
+      }
+      if (summaryEl) summaryEl.textContent = summary || '(작성된 상담 항목이 없습니다)';
+      renderEvalProgramRecommendation((snap && snap.programRecommendation) || null);
+      var report = String(opts.aiReport || (snap && snap.aiReport) || '').trim();
+      if (report) {
+        if (aiStatus) {
+          aiStatus.hidden = true;
+          aiStatus.textContent = '';
+          aiStatus.classList.remove('is-pending');
+        }
+        if (body) body.textContent = report;
+        state.evalAiReport = report;
+        state.evalReportText = report;
+      } else if (opts.aiPending) {
+        if (aiStatus) {
+          aiStatus.hidden = false;
+          aiStatus.classList.add('is-pending');
+          aiStatus.textContent = 'AI 리포트 생성 중… 상담은 위 요약으로 진행해 주세요.';
+        }
+        if (body) body.textContent = 'AI 리포트는 생성되는 대로 여기에 표시됩니다.';
+      } else if (opts.aiWaitingPhone) {
+        if (aiStatus) {
+          aiStatus.hidden = false;
+          aiStatus.classList.remove('is-pending');
+          aiStatus.textContent = '임시 저장됨 · 회원등록 후 AI 리포트가 연결됩니다.';
+        }
+        if (body) body.textContent = '';
+      } else if (aiStatus) {
+        aiStatus.hidden = true;
+      }
+    }
+
     var _evalFormBaseline = '';
 
     function getEvalFormSignature_() {
@@ -14069,36 +14402,48 @@
     }
 
     function requestCloseEvalModal() {
-      if (isEvalSubmitInProgress_()) {
-        closeEvalModal();
-        return;
-      }
-      if (!isEvalFormDirty_()) {
-        closeEvalModal();
-        return;
-      }
-      openEvalLeaveModal_();
+      try {
+        if (isEvalFormDirty_()) persistEvalDraft_(gatherEvalConsultSnapshot_());
+      } catch (e) { /* ignore */ }
+      closeEvalModal();
     }
 
     async function openEvalModal() {
       if (_evalSaveInFlight) {
-        toast('이전 저장이 진행 중입니다. 회원 선택 화면에서 남은 시간을 확인할 수 있어요.');
+        toast('AI 리포트 생성 중입니다. 기록·리포트 탭에서 확인할 수 있어요.');
       }
       const info = evalMemberInfo();
-      if (!info.name || info.phone.length < 10) {
+      if (!info.name) {
         toast('회원을 먼저 선택해 주세요');
         return;
       }
-      document.getElementById('evalMemberHint').textContent = info.name + ' · ' + formatPhone(info.phone);
+      var hint = document.getElementById('evalMemberHint');
+      if (hint) {
+        hint.textContent = info.phone.length >= 10
+          ? info.name + ' · ' + formatPhone(info.phone)
+          : info.name + ' · 연락처 없음 (임시 저장)';
+      }
       renderEvalHistoryForm();
       clearEvalFormSelections_();
-      await loadWellnessIntakePrefill_(info.phone);
-      loadFirstEvalView(info.phone, info.name);
+      var draft = findEvalDraftForMember_(state.selected);
+      if (evalDraftHasContent_(draft)) {
+        applyEvalFormSnapshot_(draft);
+      } else {
+        await loadWellnessIntakePrefill_(info.phone);
+      }
       markEvalFormClean_();
       closeEvalLeaveModal_();
       document.getElementById('evalModal').classList.add('open');
       document.body.style.overflow = 'hidden';
       setupEvalModalViewport_();
+      if (info.phone.length >= 10) {
+        loadFirstEvalView(info.phone, info.name);
+      } else if (evalDraftHasContent_(draft)) {
+        paintEvalConsultView_(draft, {
+          aiReport: draft.aiReport || '',
+          aiWaitingPhone: !draft.aiReport,
+        });
+      }
     }
     function closeEvalModal() {
       closeEvalLeaveModal_();
@@ -14189,36 +14534,73 @@
     }
 
     function switchEvalTab(paneId, btn) {
-      document.querySelectorAll('.eval-tab').forEach(function(t){ t.classList.remove('on'); });
-      document.querySelectorAll('.eval-pane').forEach(function(p){ p.classList.remove('on'); });
-      btn.classList.add('on');
-      document.getElementById(paneId).classList.add('on');
+      document.querySelectorAll('#evalModal .eval-tab').forEach(function(t){ t.classList.remove('on'); });
+      document.querySelectorAll('#evalModal .eval-pane').forEach(function(p){ p.classList.remove('on'); });
+      var tabBtn = btn || document.querySelector('#evalModal .eval-tab[data-pane="' + paneId + '"]');
+      if (tabBtn) tabBtn.classList.add('on');
+      var pane = document.getElementById(paneId);
+      if (pane) pane.classList.add('on');
+      if (paneId === 'evalView') {
+        var snap = gatherEvalConsultSnapshot_();
+        var draft = findEvalDraftForMember_(state.selected);
+        if (snap.consultSummary || snap.programRecommendation) {
+          paintEvalConsultView_(snap, {
+            aiPending: _evalSaveInFlight,
+            aiWaitingPhone: evalMemberInfo().phone.length < 10 && !_evalSaveInFlight && !(draft && draft.aiReport),
+            aiReport: _evalSaveInFlight ? '' : ((draft && draft.aiReport) || ''),
+          });
+        }
+        var info = evalMemberInfo();
+        if (info.phone.length >= 10 && !_evalSaveInFlight) loadFirstEvalView(info.phone, info.name);
+      }
     }
 
     async function loadFirstEvalView(phone, name) {
-      if (!phone) return;
-      const data = await api({ action:'instructorGetFirstEval', phone:phone, name:name || '' });
-      const empty = document.getElementById('evalViewEmpty');
-      const content = document.getElementById('evalViewContent');
-      if (data.ok && data.found && data.eval) {
-        empty.hidden = true; content.hidden = false;
-        const ev = data.eval;
-        document.getElementById('evalViewDate').textContent = (ev.name||'')+' · '+String(ev.date||'').slice(0,16);
-        renderEvalProgramRecommendation(ev.programRecommendation || null);
-        let body = '';
-        if (ev.summary) body += '[평가 요약]\n'+ev.summary+'\n\n';
-        if (ev.memo) body += '[상세 메모]\n'+ev.memo+'\n\n';
-        if (ev.report) body += '[AI 리포트]\n'+ev.report;
-        state.evalAiReport = String(ev.report || '').trim();
-        state.evalConciseBrief = String(ev.conciseBrief || '').trim();
-        state.evalReportText = body || ev.report || '';
-        document.getElementById('evalReportBody').textContent = state.evalReportText || '(내용 없음)';
-      } else {
-        state.evalReportText = '';
-        state.evalAiReport = '';
-        state.evalConciseBrief = '';
-        renderEvalProgramRecommendation(null);
-        empty.hidden = false; content.hidden = true;
+      var localSnap = null;
+      try { localSnap = gatherEvalConsultSnapshot_(); } catch (e) { localSnap = null; }
+      var draft = findEvalDraftForMember_(state.selected);
+      var hasLocal = !!(localSnap && (localSnap.consultSummary || (localSnap.programRecommendation && localSnap.programRecommendation.programName)));
+      if (hasLocal) {
+        paintEvalConsultView_(localSnap, {
+          aiPending: _evalSaveInFlight,
+          aiReport: (!_evalSaveInFlight && draft && draft.aiReport) ? draft.aiReport : '',
+        });
+      } else if (draft && (draft.consultSummary || draft.aiReport)) {
+        paintEvalConsultView_(draft, {
+          aiPending: _evalSaveInFlight,
+          aiWaitingPhone: !phone || String(phone).replace(/\D/g, '').length < 10,
+          aiReport: draft.aiReport || '',
+        });
+        hasLocal = true;
+      }
+      if (!phone || String(phone).replace(/\D/g, '').length < 10) return;
+      try {
+        const data = await api({ action: 'instructorGetFirstEval', phone: phone, name: name || '' });
+        if (_evalSaveInFlight) return;
+        const empty = document.getElementById('evalViewEmpty');
+        const content = document.getElementById('evalViewContent');
+        if (data && data.ok && data.found && data.eval) {
+          const ev = data.eval;
+          var localConsult = localSnap && localSnap.consultSummary;
+          paintEvalConsultView_({
+            consultSummary: localConsult || String(ev.summary || '').trim(),
+            programRecommendation: (localConsult && localSnap.programRecommendation) || ev.programRecommendation || null,
+            savedAt: ev.date,
+            aiReport: ev.report || (draft && draft.aiReport) || '',
+          }, {
+            aiReport: String((draft && draft.aiReport) || ev.report || '').trim(),
+          });
+          state.evalConciseBrief = String(ev.conciseBrief || '').trim();
+        } else if (!hasLocal) {
+          state.evalReportText = '';
+          state.evalAiReport = '';
+          state.evalConciseBrief = '';
+          renderEvalProgramRecommendation(null);
+          if (empty) empty.hidden = false;
+          if (content) content.hidden = true;
+        }
+      } catch (err) {
+        /* 로컬 상담 요약 유지 */
       }
     }
 
@@ -14325,6 +14707,7 @@
       return {
         bar: document.getElementById('evalSaveProgressBar'),
         statusEl: document.getElementById('evalSubmitStatus'),
+        aiStatus: document.getElementById('evalAiStatus'),
         btn: document.getElementById('evalSubmitBtn'),
       };
     }
@@ -14373,6 +14756,12 @@
         els.statusEl.classList.toggle('is-over', left <= 0);
         els.statusEl.innerHTML = html;
       }
+      if (els.aiStatus) {
+        els.aiStatus.hidden = false;
+        els.aiStatus.classList.add('is-pending');
+        els.aiStatus.classList.toggle('is-over', left <= 0);
+        els.aiStatus.innerHTML = html + '<br>상담은 위 요약으로 진행해 주세요.';
+      }
       if (els.btn) {
         els.btn.disabled = true;
         els.btn.textContent = left > 0 ? (label + '… (' + left + '초)') : (label + '…');
@@ -14410,45 +14799,84 @@
       if (_evalSaveInFlight) { toast('이미 저장이 진행 중입니다'); return; }
       const info = evalMemberInfo();
       const member = state.selected;
-      if (!info.name || info.phone.length < 10) { toast('회원을 선택해 주세요'); return; }
-      var memoEl = document.getElementById('evalMemo');
-      var sendEl = document.getElementById('evalSendMember');
+      if (!info.name) { toast('회원을 선택해 주세요'); return; }
+      var snap = gatherEvalConsultSnapshot_();
+      var hasPhone = info.phone.length >= 10;
+      persistEvalDraft_(Object.assign({}, snap, { aiRequested: true }), member);
+      markEvalFormClean_();
+      if (hasPhone) _evalSaveInFlight = true;
+      switchEvalTab('evalView');
+      paintEvalConsultView_(snap, {
+        aiPending: hasPhone,
+        aiWaitingPhone: !hasPhone,
+      });
+      if (snap.consultSummary) {
+        applyFirstEvalBriefToMemberUi_(member, snap.consultSummary, { persist: true });
+      }
+      if (!hasPhone) {
+        toast('임시 저장했습니다. 상담을 이어서 진행해 주세요.');
+        return;
+      }
+      startEvalSubmitCountdown_({
+        estSec: EVAL_AI_REPORT_EST_SEC,
+        label: 'AI 리포트 생성 중',
+      });
       var payload = {
         action: 'submitInstructorFirstEval',
         name: info.name,
         phone: info.phone,
-        history: compileEvalHistoryText(),
-        inspection: compileEvalExamText(EVAL_INSPECTION_SECTION),
-        movement: compileEvalExamText(EVAL_MOVEMENT_SECTION),
-        palpation: compileEvalExamText(EVAL_PALPATION_SECTION),
-        memo: memoEl ? String(memoEl.value || '').trim() : '',
-        sendToMember: !!(sendEl && sendEl.checked),
-        programRecommendation: computeEvalProgramRecommendation(gatherEvalHistoryState()),
+        suffix8: member && member.suffix8,
+        history: snap.history,
+        inspection: snap.inspection,
+        movement: snap.movement,
+        palpation: snap.palpation,
+        memo: snap.memo,
+        sendToMember: snap.sendToMember,
+        programRecommendation: snap.programRecommendation,
       };
-      beginEvalBackgroundSave_({
-        estSec: EVAL_AI_REPORT_EST_SEC,
-        label: 'AI 리포트 저장 중',
-      });
       try {
         const data = await api(payload, { timeoutMs: EVAL_AI_REPORT_TIMEOUT_MS });
         if (data.ok) {
-          var msg = '저장 완료';
+          var msg = 'AI 리포트 저장 완료';
           if (data.send && data.send.ok) {
             msg += ' · ' + (data.send.channel === 'alimtalk' ? '알림톡' : '문자') + ' 발송됨';
           }
           toast(msg);
-          var briefAfter = String(data.memberBriefNotes || data.conciseBrief || '').trim();
+          var report = String(data.report || '').trim();
+          var briefAfter = String(data.memberBriefNotes || data.conciseBrief || snap.consultSummary || '').trim();
+          persistEvalDraft_({
+            aiSubmitted: true,
+            aiReport: report,
+            conciseBrief: briefAfter,
+            linkedToSuffix8: (member && member.suffix8) || '',
+          }, member);
+          paintEvalConsultView_(findEvalDraftForMember_(member) || snap, { aiReport: report || null });
           if (briefAfter) {
             state.evalConciseBrief = briefAfter;
             applyFirstEvalBriefToMemberUi_(member, briefAfter, {
               forceSessionNote: !!(state.selected && state.selected === member),
             });
           }
-        } else toast(data.message || '실패');
+        } else {
+          toast(data.message || '실패');
+          var aiFail = document.getElementById('evalAiStatus');
+          if (aiFail) {
+            aiFail.hidden = false;
+            aiFail.classList.remove('is-pending');
+            aiFail.textContent = data.message || 'AI 리포트 생성에 실패했습니다. 상담 요약은 저장되어 있습니다.';
+          }
+        }
       } catch (err) {
         toast((err && err.message) || 'AI 리포트 생성에 실패했습니다.');
+        var aiErr = document.getElementById('evalAiStatus');
+        if (aiErr) {
+          aiErr.hidden = false;
+          aiErr.classList.remove('is-pending');
+          aiErr.textContent = 'AI 리포트 생성에 실패했습니다. 상담 요약은 임시 저장되어 있습니다.';
+        }
       } finally {
-        endEvalBackgroundSave_();
+        _evalSaveInFlight = false;
+        stopEvalSubmitCountdown_();
       }
     }
 
