@@ -1352,6 +1352,46 @@
     .psp-part-card.p1-kind-card .method-row.done-prior { border-left-width:1px; border-left-color:#bbf7d0; }
     .psp-part-card.p1-kind-card .method-row.done-recent { border-left-width:1px; border-left-color:var(--green); }
     .psp-part-card.p1-kind-card .method-row.done { border-left-width:1px; border-left-color:var(--green); }
+    /* 이상민 등 단순 목록 — 폭에 따라 2열~다열 칩 */
+    .psp-part-card.ex-chip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 188px), 1fr));
+      gap: 6px;
+      padding: 8px;
+    }
+    .psp-part-card.ex-chip-grid .method-row,
+    .psp-part-card.ex-chip-grid .method-row.has-thumb {
+      display: grid;
+      grid-template-columns: 16px 36px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 7px 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fafbfc;
+      min-width: 0;
+    }
+    .psp-part-card.ex-chip-grid .method-row input { margin-top: 0; width: 16px; height: 16px; }
+    .psp-part-card.ex-chip-grid .method-thumb {
+      width: 36px; height: 28px; border-radius: 6px;
+    }
+    .psp-part-card.ex-chip-grid .method-row > div { min-width: 0; }
+    .psp-part-card.ex-chip-grid .method-label {
+      font-size: 11px; font-weight: 700;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .psp-part-card.ex-chip-grid .method-cue,
+    .psp-part-card.ex-chip-grid .method-vid { display: none; }
+    .psp-part-card.ex-chip-grid .method-badge-btn { font-size: 9px; padding: 2px 5px; }
+    .psp-part-card.ex-chip-grid .method-row.done-prior { border-left-width: 2px; }
+    .psp-part-card.ex-chip-grid .method-row.done-recent { border-left-width: 2px; }
+    .psp-part-card.ex-chip-grid .method-row.done { border-left-width: 2px; }
+    .psp-part-card.ex-chip-grid .method-row.done-planned { border-left-width: 2px; }
+    .program-plan-preset-label {
+      font-size: 11px; font-weight: 800; color: var(--dim);
+      margin: 4px 0 6px; letter-spacing: .02em;
+    }
     .method-vid { font-size:10px; color:var(--green); margin-top:2px; }
     .vid-tag { font-size:10px; padding:2px 6px; border-radius:5px; background:#f1f5f9; color:#94a3b8; }
     .vid-tag.ok { background:var(--green-bg); color:var(--green); }
@@ -1597,6 +1637,8 @@
     }
     .program-tab:hover { border-color:#93c5fd; color:var(--blue); }
     .program-tab.on { background:var(--blue); color:#fff; border-color:var(--blue); }
+    .program-plan-load-tabs { display:flex; gap:6px; margin:0 0 10px; }
+    .program-plan-load-tabs .program-tab { flex:1; text-align:center; padding:8px 8px; }
     .program-card-title { font-size:14px; font-weight:800; color:var(--blue); }
     .program-tab-sub { font-size:11px; color:var(--dim); margin-top:2px; line-height:1.35; }
 
@@ -2743,7 +2785,8 @@
         <h2>프로그램 불러오기</h2>
         <button type="button" class="modal-close" onclick="closeProgramPlanLoadModal_()">×</button>
       </div>
-      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;">슬롯을 선택하거나 우측 <strong>고정</strong> / <strong>비우기</strong>를 사용하세요.</p>
+      <p id="programPlanLoadHint" style="font-size:13px;color:var(--dim);margin-bottom:8px;">원장 탭을 고른 뒤 주차 슬롯을 누르면 해당 운동이 체크됩니다. 저장된 슬롯은 아래에서 고정·비우기할 수 있습니다.</p>
+      <div class="program-tabs program-plan-load-tabs" id="programPlanLoadTabs"></div>
       <div id="programPlanLoadSlotList"></div>
       <button type="button" class="btn btn-ghost" style="width:100%;margin-top:8px;" onclick="closeProgramPlanLoadModal_()">취소</button>
     </div>
@@ -2754,9 +2797,10 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-08-29-no-card-cue';
+    const INSTRUCTOR_HTML_BUILD = '2026-08-31-load-director-tabs';
     const PROGRAM_PLAN_SLOT_COUNT = 5;
     var _programPlanSaveSlot = 1;
+    var _programPlanLoadDirectorTab = 'sangmin';
     const BOARD_LOAD_TIMEOUT_MS = 90000;
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
     /** 회원 목록 UI 카운트다운용 예상 시간(초) — 실제 API 타임아웃과 별도 */
@@ -2791,6 +2835,8 @@
         '폼롤러': 1,
         '12센티 마사지볼': 2,
         'Force Line 연결': 0.5,
+        'Supine': 1,
+        'Prone': 2,
         '생활습관': 20,
         '스쿼트 6단계': 31,
         '밸런스 트레이닝 6단계': 22,
@@ -4330,8 +4376,10 @@
       return clean + (clean.indexOf('?') >= 0 ? '&' : '?') + 't=' + t;
     }
 
-    function sangminItem_(id, group, sectionTitle, program, label, alimtalkLabel, tRel, coachingNote, cue, videoGroup) {
+    function sangminItem_(id, group, sectionTitle, program, label, alimtalkLabel, tRel, coachingNote, cue, videoGroup, thumbFile) {
       var url = sangminYoutubeUrl_(videoGroup || group, tRel);
+      var thumb = String(thumbFile || '').trim() || ('sangmin/' + id + '.jpg');
+      if (thumb.indexOf('exercise-thumbs/') !== 0) thumb = 'exercise-thumbs/' + thumb;
       return {
         id: id,
         uiSection: 'sangmin_' + group,
@@ -4342,39 +4390,68 @@
         coachingNote: coachingNote || '',
         cue: cue || '',
         group: sectionTitle,
-        thumbUrl: 'exercise-thumbs/sangmin/' + id + '.jpg',
+        thumbUrl: thumb,
         linkUrl: url,
       };
     }
 
     var SANGMIN_CATALOG_RAW = [
-      /* ── Lying (01_누워서.mp4 챕터 시각) ── */
-      sangminItem_('sm_lie_breath', 'lie', 'Lying', 'Lying', '바로 누워 호흡·정렬', '누워서 호흡·자세 정렬', 0,
-        '준비: 바로 누워 무릎을 세우고 발바닥을 바닥에 둡니다. 한 손은 갈비 아래, 한 손은 아랫배에 둡니다.\n동작: 코로 들이쉬며 배가 먼저 부풀고 옆구리가 벌어지게 합니다. 내쉬며 갈비뼈를 모아 허리가 과도하게 뜨지 않게 합니다.\n포인트: 갈비뼈를 모으고, 허리가 과도하게 뜨지 않게.\n주의: 어깨를 으쓱하거나 숨을 참지 않습니다.',
+      /* ── Lying · Supine (01_누워서.mp4 + 8회차 프로그램) ── */
+      sangminItem_('sm_lie_breath', 'lie', 'Lying', 'Supine', '바로 누워 호흡·정렬', '누워서 호흡·자세 정렬', 0,
+        '준비: 바로 누워 무릎을 세우고 발바닥을 바닥에 둡니다. 한 손은 갈비 아래, 한 손은 아랫배에 둡니다.\n동작: 코로 들이쉬며 배가 먼저 부풀고 옆구리가 벌어지게 합니다. 내쉬며 갈비뼈를 모아 허리가 과도하게 뜨지 않게 합니다.\n진행: 1·2회 기본 → 3·4회 러버볼 → 5·6회 러버볼+폼롤러.\n포인트: 갈비뼈를 모으고, 허리가 과도하게 뜨지 않게.\n주의: 어깨를 으쓱하거나 숨을 참지 않습니다.',
         '갈비뼈를 모으고, 허리가 과도하게 뜨지 않게'),
-      sangminItem_('sm_lie_tabletop', 'lie', 'Lying', 'Lying', '테이블탑', '누워서 테이블탑', 56,
+      sangminItem_('sm_lie_tabletop', 'lie', 'Lying', 'Supine', '테이블탑', '누워서 테이블탑', 56,
         '준비: 바로 누워 무릎·엉덩이를 90도로 들어 정강이가 바닥과 평행이 되게 합니다.\n동작: 그 자세를 유지하며 호흡합니다. 허리가 바닥에서 뜨면 다리를 조금 내립니다.\n포인트: 무릎 90도, 허리는 바닥에 가깝게.\n주의: 목을 들고 보지 않습니다.',
         '무릎 90도, 허리는 바닥에 가깝게'),
-      sangminItem_('sm_lie_deadbug', 'lie', 'Lying', 'Lying', '데드버그', '누워서 데드버그', 70,
-        '준비: 바로 누워 팔·무릎을 천장 쪽으로 90도로 듭니다.\n동작: 반대쪽 팔과 다리를 천천히 길게 뻗었다가 돌아옵니다. 좌우 교대.\n포인트: 허리가 뜨지 않게, 반대 팔·다리만 천천히.\n주의: 허리가 뜨면 다리를 덜 뻗습니다.',
+      sangminItem_('sm_lie_deadbug', 'lie', 'Lying', 'Supine', '데드버그', '누워서 데드버그', 70,
+        '준비: 바로 누워 팔·무릎을 천장 쪽으로 90도로 듭니다.\n동작: 반대쪽 팔과 다리를 천천히 길게 뻗었다가 돌아옵니다. 좌우 교대.\n진행: 1·2회 기본 → 3·4회 CLX 밴드 → 5·6회 CLX+폼롤러.\n포인트: 허리가 뜨지 않게, 반대 팔·다리만 천천히.\n주의: 허리가 뜨면 다리를 덜 뻗습니다.',
         '허리가 뜨지 않게, 반대 팔·다리만 천천히'),
-      sangminItem_('sm_lie_bridge', 'lie', 'Lying', 'Lying', '글루트 브릿지', '누워서 브릿지', 118,
-        '준비: 바로 누워 무릎을 세우고 발바닥을 바닥에 둡니다. 팔은 몸 옆에 둡니다.\n동작: 발바닥으로 밀어 엉덩이를 들어 무릎~어깨가 한 줄이 되게 한 뒤, 천천히 내립니다.\n포인트: 발바닥으로 밀고, 허리가 아닌 엉덩이로 올리기.\n주의: 허리를 과하게 젖히지 않습니다.',
+      sangminItem_('sm_lie_wallpush', 'lie', 'Lying', 'Supine', '데드버그 월 푸시', '누워서 월 푸시', 70,
+        '준비: 폼롤러 위에 바로 누워 테이블탑·데드버그 자세를 만듭니다. 양손 또는 한 손을 벽에 댑니다.\n동작: 허리를 안정시킨 채 벽을 가볍게 밀어 어깨·코어를 연결합니다. 5·6회차에서 데드버그와 함께 씁니다.\n포인트: 밀어내는 힘보다 허리·골반이 흔들리지 않게.\n주의: 목이 긴장되면 손을 내리고 호흡만 유지합니다.',
+        '벽을 밀 때 허리·골반이 흔들리지 않게', '', 'sangmin/sm_lie_deadbug.jpg'),
+      sangminItem_('sm_lie_bridge', 'lie', 'Lying', 'Supine', '글루트 브릿지', '누워서 브릿지', 118,
+        '준비: 바로 누워 무릎을 세우고 발바닥을 바닥에 둡니다. 팔은 몸 옆에 둡니다.\n동작: 발바닥으로 밀어 엉덩이를 들어 무릎~어깨가 한 줄이 되게 한 뒤, 천천히 내립니다.\n진행: 1·2회 양발 → 3·4회 원레그 → 5·6회 폼롤러 위.\n포인트: 발바닥으로 밀고, 허리가 아닌 엉덩이로 올리기.\n주의: 허리를 과하게 젖히지 않습니다.',
         '발바닥으로 밀고, 허리가 아닌 엉덩이로 올리기'),
-      sangminItem_('sm_lie_ball', 'lie', 'Lying', 'Lying', '짐볼 코어', '누워서 짐볼 코어', 156,
-        '준비: 바로 누워 무릎을 테이블탑으로 두고, 짐볼을 손과 무릎(또는 정강이) 사이에 둡니다.\n동작: 볼을 가볍게 누른 채 호흡하거나, 반대 팔·다리를 천천히 움직입니다.\n포인트: 볼을 손·무릎으로 가볍게 눌러 코어만.\n주의: 목을 들고 볼을 세게 찌그러뜨리지 않습니다.',
+      sangminItem_('sm_lie_bridge_1leg', 'lie', 'Lying', 'Supine', '원레그 브릿지', '한쪽 다리 브릿지', 118,
+        '준비: 양발 브릿지가 안정된 뒤, 한쪽 무릎을 테이블탑으로 들거나 다리를 길게 뻗습니다.\n동작: 지지 발바닥으로 밀어 엉덩이를 올리고, 골반이 한쪽으로 떨어지지 않게 유지합니다. 좌우 실시. 3·4회차.\n포인트: 올린 골반 높이를 좌우 같게.\n주의: 허리가 꺾이면 양발로 돌아갑니다.',
+        '골반이 한쪽으로 떨어지지 않게', '', 'sangmin/sm_lie_bridge.jpg'),
+      sangminItem_('sm_lie_ball', 'lie', 'Lying', 'Supine', '짐볼 코어', '누워서 짐볼 코어', 156,
+        '준비: 바로 누워 무릎을 테이블탑으로 두고, 짐볼을 손과 무릎(또는 정강이) 사이에 둡니다.\n동작: 볼을 가볍게 누른 채 호흡하거나, 반대 팔·다리를 천천히 움직입니다. 3·4회 회전+짐볼, 5·6회 짐볼 프레스로 올립니다.\n포인트: 볼을 손·무릎으로 가볍게 눌러 코어만.\n주의: 목을 들고 볼을 세게 찌그러뜨리지 않습니다.',
         '볼을 손·무릎으로 가볍게 눌러 코어만'),
-      sangminItem_('sm_lie_cobra', 'lie', 'Lying', 'Lying', '엎드려 상체 들기', '엎드려서 상체 들기', 236,
+      sangminItem_('sm_lie_rotation', 'lie', 'Lying', 'Supine', '누워서 회전', '누워서 몸통 회전', 156,
+        '준비: 바로 누워 무릎을 세우거나 테이블탑으로 둡니다. 팔은 천장 또는 옆으로.\n동작: 골반은 두고 가슴·팔을 한쪽으로 천천히 돌렸다가 돌아옵니다. 좌우 교대.\n진행: 1·2회 기본 → 3·4회 짐볼 → 5·6회 짐볼 프레스.\n포인트: 골반이 따라 돌아가지 않게, 호흡을 멈추지 않기.\n주의: 허리에 찌릿함이 있으면 각도를 줄입니다.',
+        '골반은 두고 가슴만 천천히 돌리기', '', 'sangmin/sm_lie_ball.jpg'),
+      sangminItem_('sm_lie_abd', 'lie', 'Lying', 'Supine', '복부 운동', '누워서 복부 운동', 0,
+        '준비: 7·8회차. 호흡·데드버그·브릿지가 안정된 뒤 진행합니다. 바로 누워 무릎을 세우거나 테이블탑.\n동작: 내쉬며 갈비뼈를 모은 채 상체를 조금 말거나, 다리를 통제하며 내립니다. 반동 없이.\n포인트: 목을 당기지 말고 갈비뼈를 모은 상태로.\n주의: 허리가 뜨면 범위를 줄이거나 데드버그로 돌아갑니다.',
+        '목을 당기지 말고 갈비뼈를 모은 채로', '', 'sangmin/sm_lie_tabletop.jpg'),
+      sangminItem_('sm_lie_hipthrust', 'lie', 'Lying', 'Supine', '힙 쓰러스트', '힙 쓰러스트', 118,
+        '준비: 7·8회차. 어깨를 벤치·박스에 기대거나 매트에서 브릿지보다 큰 고관절 신전으로 진행합니다.\n동작: 발바닥으로 밀어 엉덩이를 위로 밀어 올린 뒤, 천천히 내립니다. 허리가 아닌 둔근.\n포인트: 턱 끝에서 무릎까지 한 줄, 허리는 과신전하지 않기.\n주의: 목·허리가 불편하면 매트 브릿지로 낮춥니다.',
+        '허리가 아닌 엉덩이로 위로 밀기', '', 'sangmin/sm_lie_bridge.jpg'),
+
+      /* ── Lying · Prone ── */
+      sangminItem_('sm_lie_prone_breath', 'lie', 'Lying', 'Prone', '엎드려 호흡', '엎드려서 호흡', 236,
+        '준비: 1·2회차. 엎드려 이마를 매트 또는 밸런스패드에 가볍게 둡니다. 팔은 몸 옆 또는 이마 아래.\n동작: 들이쉬며 배가 매트를 살짝 밀고, 내쉬며 복부를 매트에서 가볍게 들어 올리는 느낌을 만듭니다.\n포인트: 목을 들고 보지 말고, 호흡으로 코어만.\n주의: 허리를 과하게 조이지 않습니다.',
+        '목을 들지 말고 호흡으로 코어만', '', 'sangmin/sm_lie_cobra.jpg'),
+      sangminItem_('sm_lie_extrem', 'lie', 'Lying', 'Prone', '엎드려 사지 운동', '엎드려서 팔·다리 들기', 236,
+        '준비: 1·2회차. 엎드려 호흡이 된 뒤, 팔·다리를 바닥에 길게 둡니다.\n동작: 한쪽 팔, 한쪽 다리, 또는 반대 팔·다리를 낮게 들었다가 내립니다. 높이보다 정렬.\n포인트: 낮게, 골반이 좌우로 돌지 않게.\n주의: 허리가 젖혀지면 한쪽만 하거나 범위를 줄입니다.',
+        '낮게 들고 골반이 돌지 않게', '', 'sangmin/sm_lie_cobra.jpg'),
+      sangminItem_('sm_lie_cobra', 'lie', 'Lying', 'Prone', '엎드려 상체 들기', '엎드려서 상체 들기', 236,
         '준비: 엎드려 손바닥을 어깨 옆에 둡니다.\n동작: 손바닥으로 바닥을 밀며 상체를 천천히 듭니다. 골반은 매트에 가깝게 둡니다.\n포인트: 손바닥으로 밀되 허리는 과신전하지 않기.\n주의: 허리 통증이 있으면 팔꿈치를 낮춥니다.',
         '손바닥으로 밀되 허리는 과신전하지 않기'),
-      sangminItem_('sm_lie_superman', 'lie', 'Lying', 'Lying', '슈퍼맨', '엎드려서 슈퍼맨', 256,
-        '준비: 엎드려 팔은 앞으로 또는 Y자로 둡니다.\n동작: 팔·가슴·다리를 낮게 동시에 들었다가 내립니다. 목은 길게 유지합니다.\n포인트: 팔·다리는 낮게, 목은 긴장하지 않기.\n주의: 허리를 과하게 젖히며 높이 들지 않습니다.',
+      sangminItem_('sm_lie_superman', 'lie', 'Lying', 'Prone', '슈퍼맨', '엎드려서 슈퍼맨', 256,
+        '준비: 엎드려 팔은 앞으로 또는 Y자로 둡니다.\n동작: 팔·가슴·다리를 낮게 동시에 들었다가 내립니다. 목은 길게 유지합니다.\n진행: 1·2회 매트 → 3·4회 짐볼 위 호흡·슈퍼맨.\n포인트: 팔·다리는 낮게, 목은 긴장하지 않기.\n주의: 허리를 과하게 젖히며 높이 들지 않습니다.',
         '팔·다리는 낮게, 목은 긴장하지 않기'),
+      sangminItem_('sm_lie_pelvis_foot', 'lie', 'Lying', 'Prone', '골반·발 운동', '골반·발 운동', 256,
+        '준비: 3·4회차. 엎드리거나 바로 누워 골반·발 정렬을 확인합니다.\n동작: 골반을 좌우·전후로 작게 움직이거나, 발끝·발뒤꿈치로 바닥을 밀어 발 삼각 지지를 느낍니다.\n포인트: 큰 동작보다 좌우가 같게.\n주의: 허리로 밀지 말고 골반·발만 움직입니다.',
+        '허리로 밀지 말고 골반·발만', '', 'sangmin/sm_std_balance.jpg'),
 
-      /* ── Sitting/Quadruped (02_네발.mp4 챕터 시각) ── */
+      /* ── Sitting/Quadruped (02_네발.mp4 + 8회차 프로그램) ── */
       sangminItem_('sm_quad_neutral', 'quad', 'Sitting/Quadruped', 'Sitting/Quadruped', '네발기기', '네발기기', 0,
         '준비: 손·무릎을 어깨·골반 아래에 두고 네발기기를 만듭니다.\n동작: 등을 평평하게 유지한 채 호흡합니다.\n포인트: 손·무릎은 어깨·골반 아래, 등 평평하게.\n주의: 허리가 처지거나 등이 과도하게 둥글지 않게 합니다.',
         '손·무릎은 어깨·골반 아래, 등 평평하게'),
+      sangminItem_('sm_quad_catcamel', 'quad', 'Sitting/Quadruped', 'Sitting/Quadruped', '캣카멜', '네발 캣카멜', 0,
+        '준비: 1·2회차. 네발기기에서 호흡을 연결합니다.\n동작: 내쉬며 등을 둥글게(캣), 들이쉬며 가슴을 열고 허리를 부드럽게 펴기(카멜). 천천히 반복.\n포인트: 머리·꼬리뼈가 같이 움직이게, 한 마디씩.\n주의: 끝범위에서 멈추며 허리를 꺾지 않습니다.',
+        '머리·꼬리뼈가 같이, 한 마디씩', '', 'sangmin/sm_quad_neutral.jpg'),
       sangminItem_('sm_quad_child', 'quad', 'Sitting/Quadruped', 'Sitting/Quadruped', '차일드 포즈', '네발 차일드 포즈', 20,
         '준비: 네발기기에서 무릎을 조금 벌립니다.\n동작: 엉덩이를 뒤꿈치 쪽으로 보내며 상체를 앞으로 낮춥니다. 팔은 앞으로 뻗거나 몸 옆에 둡니다.\n포인트: 엉덩이를 뒤꿈치 쪽으로, 호흡은 편하게.\n주의: 무릎이 불편하면 패드를 깝니다.',
         '엉덩이를 뒤꿈치 쪽으로, 호흡은 편하게'),
@@ -4382,38 +4459,240 @@
         '준비: 네발기기, 척추 중립.\n동작: 한쪽 다리를 뒤로 길게 들어 엉덩이를 수축했다가 내립니다. 좌우 교대.\n포인트: 허리가 꺾이지 않게 엉덩이만 들기.\n주의: 지지 골반이 한쪽으로 기울지 않게 합니다.',
         '허리가 꺾이지 않게 엉덩이만 들기'),
       sangminItem_('sm_quad_birddog', 'quad', 'Sitting/Quadruped', 'Sitting/Quadruped', '버드독', '네발 버드독', 60,
-        '준비: 네발기기, 손·무릎은 어깨·골반 아래.\n동작: 반대 팔과 다리를 길게 뻗어 유지했다가 돌아옵니다. 좌우 교대.\n포인트: 반대 팔·다리, 골반이 좌우로 돌지 않게.\n주의: 균형이 어려우면 팔만 또는 다리만 합니다.',
+        '준비: 네발기기, 손·무릎은 어깨·골반 아래.\n동작: 반대 팔과 다리를 길게 뻗어 유지했다가 돌아옵니다. 좌우 교대.\n진행: 1·2회 기본 → 3·4회 CLX 밴드 → 5·6회 짐볼 푸시.\n포인트: 반대 팔·다리, 골반이 좌우로 돌지 않게.\n주의: 균형이 어려우면 팔만 또는 다리만 합니다.',
         '반대 팔·다리, 골반이 좌우로 돌지 않게'),
       sangminItem_('sm_quad_ball', 'quad', 'Sitting/Quadruped', 'Sitting/Quadruped', '네발 + 짐볼', '네발 짐볼', 90,
-        '준비: 네발기기에서 짐볼을 몸 뒤 또는 손앞에 둡니다.\n동작: 볼이 있어도 손·무릎 정렬과 등 평평함을 유지한 채 천천히 움직입니다.\n포인트: 볼이 있어도 손·무릎 정렬 유지.\n주의: 볼에 기대어 허리가 처지지 않게 합니다.',
+        '준비: 네발기기에서 짐볼을 몸 뒤 또는 손앞에 둡니다.\n동작: 볼이 있어도 손·무릎 정렬과 등 평평함을 유지한 채 천천히 움직입니다. 5·6회차는 버드독+짐볼 푸시.\n포인트: 볼이 있어도 손·무릎 정렬 유지.\n주의: 볼에 기대어 허리가 처지지 않게 합니다.',
         '볼이 있어도 손·무릎 정렬 유지'),
+      sangminItem_('sm_quad_plank', 'quad', 'Sitting/Quadruped', 'Sitting/Quadruped', '플랭크', '플랭크', 298,
+        '준비: 엎드려 팔꿈치 또는 손, 무릎 또는 발로 지지합니다.\n동작: 머리~골반~무릎(또는 발)이 한 줄이 되게 유지하며 호흡합니다.\n진행: 1·2회 엘보우–니 → 3·4회 팜–니 → 5·6회 팜–풋.\n포인트: 엉덩이가 처지거나 너무 올라가지 않게.\n주의: 허리·어깨가 불편하면 무릎 지지로 낮춥니다.',
+        '엉덩이가 처지거나 너무 올라가지 않게', 'lie', 'sfl_ball_plank.png'),
       sangminItem_('sm_lie_sideplank', 'quad', 'Sitting/Quadruped', 'Sitting/Quadruped', '사이드 플랭크', '옆 플랭크', 298,
         '준비: 옆으로 누워 아래쪽 팔꿈치·무릎(또는 발)로 지지합니다.\n동작: 골반을 들어 머리~골반이 한 줄이 되게 유지합니다. 위쪽 팔을 뻗거나 위쪽 다리를 들어 난이도를 올립니다.\n포인트: 골반이 처지지 않게, 머리~골반 한 줄.\n주의: 어깨가 불편하면 무릎 지지로 낮춥니다.',
         '골반이 처지지 않게, 머리~골반 한 줄', 'lie'),
+      sangminItem_('sm_quad_pushrot', 'quad', 'Sitting/Quadruped', 'Sitting/Quadruped', '푸시업 + 회전', '푸시업 후 회전', 298,
+        '준비: 7·8회차. 무릎 또는 발 지지 푸시업 자세.\n동작: 푸시업 한 번 후, 한 손을 천장 쪽으로 열어 몸통을 회전합니다. 좌우 교대.\n포인트: 골반이 먼저 열리지 않게, 가슴이 같이 돌아가게.\n주의: 손목·어깨가 아프면 무릎 지지·작은 회전만.',
+        '푸시업 후 가슴이 같이 돌아가게', 'lie', 'sangmin/sm_lie_cobra.jpg'),
+      sangminItem_('sm_quad_animal', 'quad', 'Sitting/Quadruped', 'Sitting/Quadruped', '애니멀 플로우', '애니멀 플로우', 90,
+        '준비: 7·8회차. 네발·버드독이 안정된 뒤. 손·발로 체중을 나눕니다.\n동작: 네발 이동, 엉덩이 들기, 사이드 이동 등 이어지는 흐름으로 천천히 이동합니다. 속도보다 정렬.\n포인트: 손·발 사이에서 허리가 처지지 않게.\n주의: 손목이 불편하면 주먹 지지 또는 짧게.',
+        '이동 중에도 허리가 처지지 않게', '', 'sangmin/sm_quad_birddog.jpg'),
+      sangminItem_('sm_quad_tiger', 'quad', 'Sitting/Quadruped', 'Sitting/Quadruped', '타이거 워킹', '타이거 워킹', 90,
+        '준비: 7·8회차. 네발기기에서 무릎을 살짝 띄웁니다(가능한 범위).\n동작: 반대 손·발이 같이 나가며 앞으로 걷습니다. 골반 높이를 유지합니다.\n포인트: 골반 높이 유지, 손·발 반대 패턴.\n주의: 무릎을 못 띄우면 바닥 네발 걷기로 낮춥니다.',
+        '골반 높이 유지, 손·발 반대로', '', 'sangmin/sm_quad_birddog.jpg'),
 
-      /* ── Standing (03_서서.mp4 챕터 시각) ── */
+      /* ── Standing (03_서서.mp4 + 8회차 프로그램) ── */
+      sangminItem_('sm_std_hinge', 'stand', 'Standing', 'Standing', '힙 힌지', '서서 힙 힌지', 144,
+        '준비: 1·2회차. 발은 골반 너비, 무릎은 살짝만 굽힙니다. 봉이나 손을 허벅지 앞에.\n동작: 무릎 각도는 거의 두고 엉덩이를 뒤로 밀며 상체를 숙였다가, 발바닥으로 밀어 일어납니다.\n포인트: 무릎이 앞으로 나가지 않고 엉덩이가 뒤로.\n주의: 허리가 둥글게 말리면 범위를 줄입니다.',
+        '무릎은 두고 엉덩이를 뒤로', '', 'gen_hip_hinge.png'),
       sangminItem_('sm_std_balance', 'stand', 'Standing', 'Standing', '서서 한발 밸런스', '서서 한발 밸런스', 0,
         '준비: 두 발로 서서 무게를 고르게 나눕니다.\n동작: 한쪽 발을 살짝 들거나 무릎 높이까지 들어 균형을 유지합니다. 좌우 실시.\n포인트: 지지 무릎이 안쪽으로 무너지지 않게.\n주의: 흔들리면 벽·의자를 가볍게 짚습니다.',
         '지지 무릎이 안쪽으로 무너지지 않게'),
-      sangminItem_('sm_std_side_lunge', 'stand', 'Standing', 'Standing', '케틀벨 사이드 런지', '서서 사이드 런지', 56,
-        '준비: 케틀벨을 가슴 앞에 안고 섭니다.\n동작: 한쪽으로 앉아 무릎을 발끝 방향으로 굽히고 반대 다리는 폅니다. 돌아와 반대쪽.\n포인트: 무릎은 발끝 방향, 반대 다리는 펴기.\n주의: 상체가 과도하게 숙여지지 않게 합니다.',
-        '무릎은 발끝 방향, 반대 다리는 펴기'),
+      sangminItem_('sm_std_sitstand', 'stand', 'Standing', 'Standing', '의자에서 일어서기', '앉았다 일어서기', 120,
+        '준비: 의자 끝에 앉아 팔은 가슴 앞에 교차합니다.\n동작: 엉덩이를 뒤로 보내며 일어났다가, 통제하며 다시 앉습니다. 스쿼트 전 단계로 쓸 수 있습니다.\n포인트: 엉덩이를 뒤로, 상체는 세운 채.\n주의: 반동으로 일어나지 않습니다.',
+        '엉덩이를 뒤로, 상체는 세운 채'),
+      sangminItem_('sm_std_squat', 'stand', 'Standing', 'Standing', '스쿼트', '서서 스쿼트', 144,
+        '준비: 발은 어깨너비, 팔은 가슴 앞에 교차하거나 앞으로 둡니다.\n동작: 엉덩이를 뒤로 보내며 앉았다가 발바닥으로 밀어 일어납니다.\n진행: 1·2회 체중 → 3·4회 CLX 밴드 → 5·6회 PI 밴드.\n포인트: 무릎·발끝 같은 방향, 발바닥 전체.\n주의: 통증이 있으면 깊이를 줄입니다.',
+        '무릎·발끝 같은 방향, 발바닥 전체'),
+      sangminItem_('sm_std_lunge', 'stand', 'Standing', 'Standing', '런지', '서서 런지', 80,
+        '준비: 1·2회차 기본. 두 발로 서서 골반은 정면.\n동작: 한 발을 앞 또는 뒤로 보내 양쪽 무릎을 약 90도로 굽혔다가 앞발로 밀어 돌아옵니다. 좌우 실시.\n진행: 1·2회 체중 → 3·4회 CLX 밴드 → 5·6회 PI 밴드.\n포인트: 앞무릎은 발끝 방향, 상체는 세우기.\n주의: 앞무릎이 안쪽으로 무너지지 않게 합니다.',
+        '앞무릎은 발끝 방향, 상체는 세우기', '', 'sangmin/sm_std_rev_lunge.jpg'),
       sangminItem_('sm_std_rev_lunge', 'stand', 'Standing', 'Standing', '리버스 런지 · 하이니', '서서 리버스 런지·하이니', 80,
         '준비: 제자리에 섭니다. 팔은 걷는 리듬으로 둡니다.\n동작: 한 발을 뒤로 보내 런지한 뒤, 앞발로 밀어 반대 무릎을 앞으로 들어 올립니다.\n포인트: 앞무릎 정렬, 올라오며 무릎 들기.\n주의: 앞무릎이 발끝보다 많이 안쪽으로 무너지지 않게 합니다.',
         '앞무릎 정렬, 올라오며 무릎 들기'),
-      sangminItem_('sm_std_sitstand', 'stand', 'Standing', 'Standing', '의자에서 일어서기', '앉았다 일어서기', 120,
-        '준비: 의자 끝에 앉아 팔은 가슴 앞에 교차합니다.\n동작: 엉덩이를 뒤로 보내며 일어났다가, 통제하며 다시 앉습니다.\n포인트: 엉덩이를 뒤로, 상체는 세운 채.\n주의: 반동으로 일어나지 않습니다.',
-        '엉덩이를 뒤로, 상체는 세운 채'),
-      sangminItem_('sm_std_squat', 'stand', 'Standing', 'Standing', '스쿼트', '서서 스쿼트', 144,
-        '준비: 발은 어깨너비, 팔은 가슴 앞에 교차하거나 앞으로 둡니다.\n동작: 엉덩이를 뒤로 보내며 앉았다가 발바닥으로 밀어 일어납니다.\n포인트: 무릎·발끝 같은 방향, 발바닥 전체.\n주의: 통증이 있으면 깊이를 줄입니다.',
-        '무릎·발끝 같은 방향, 발바닥 전체'),
+      sangminItem_('sm_std_side_lunge', 'stand', 'Standing', 'Standing', '케틀벨 사이드 런지', '서서 사이드 런지', 56,
+        '준비: 케틀벨을 가슴 앞에 안고 섭니다.\n동작: 한쪽으로 앉아 무릎을 발끝 방향으로 굽히고 반대 다리는 폅니다. 돌아와 반대쪽.\n포인트: 무릎은 발끝 방향, 반대 다리는 펴기.\n주의: 상체가 과도하게 숙여지지 않게 합니다.',
+        '무릎은 발끝 방향, 반대 다리는 펴기'),
       sangminItem_('sm_std_lat_lunge', 'stand', 'Standing', 'Standing', '케틀벨 래터럴 런지', '서서 래터럴 런지', 200,
         '준비: 케틀벨을 가슴 앞에 안고 섭니다.\n동작: 옆으로 크게 앉아 체중을 한쪽 다리에 실었다가 돌아옵니다. 좌우 실시.\n포인트: 골반 높이 유지, 무게는 가슴 앞에.\n주의: 무릎이 발끝 안쪽으로 무너지지 않게 합니다.',
         '골반 높이 유지, 무게는 가슴 앞에'),
+      sangminItem_('sm_std_plyo', 'stand', 'Standing', 'Standing', '플라이오메트릭', '플라이오메트릭', 144,
+        '준비: 7·8회차. 스쿼트·런지·힌지가 안정되고, 착지가 조용한 뒤에만.\n동작: 작은 스쿼트 점프, 스플릿 점프, 또는 제자리 홉. 높이보다 부드러운 착지.\n포인트: 착지 시 무릎이 안쪽으로 무너지지 않게, 소리가 크지 않게.\n주의: 통증·불안정하면 점프 없이 빠르게 일어서기만.',
+        '높이보다 착지가 조용하고 무릎 정렬', '', 'gen_hop.png'),
     ];
 
     function buildSangminCatalog() {
       return buildDirectorCatalogItems_(SANGMIN_CATALOG_RAW);
+    }
+
+    var SANGMIN_WEEK_PRESETS = [
+      {
+        key: 'w12',
+        label: '1/2주차',
+        summary: '기본 움직임 · 호흡·코어·힌지',
+        ids: [
+          'sm_lie_breath', 'sm_lie_tabletop', 'sm_lie_deadbug', 'sm_lie_bridge', 'sm_lie_rotation',
+          'sm_lie_prone_breath', 'sm_lie_extrem', 'sm_quad_plank',
+          'sm_quad_neutral', 'sm_quad_catcamel', 'sm_quad_birddog',
+          'sm_std_hinge', 'sm_std_squat', 'sm_std_lunge'
+        ]
+      },
+      {
+        key: 'w34',
+        label: '3/4주차',
+        summary: '저항 추가 · 러버볼·CLX·원레그',
+        ids: [
+          'sm_lie_breath', 'sm_lie_deadbug', 'sm_lie_bridge_1leg', 'sm_lie_ball', 'sm_lie_rotation',
+          'sm_lie_superman', 'sm_lie_pelvis_foot', 'sm_quad_plank',
+          'sm_quad_birddog',
+          'sm_std_squat', 'sm_std_lunge'
+        ]
+      },
+      {
+        key: 'w56',
+        label: '5/6주차',
+        summary: '불안정 · 폼롤러·월 푸시·PI 밴드',
+        ids: [
+          'sm_lie_breath', 'sm_lie_deadbug', 'sm_lie_wallpush', 'sm_lie_bridge', 'sm_lie_ball', 'sm_lie_rotation',
+          'sm_quad_plank', 'sm_quad_birddog', 'sm_quad_ball',
+          'sm_std_squat', 'sm_std_lunge'
+        ]
+      },
+      {
+        key: 'w78',
+        label: '7/8주차',
+        summary: '기능·동적 · 힙 쓰러스트·애니멀·플라이오',
+        ids: [
+          'sm_lie_breath', 'sm_lie_abd', 'sm_lie_hipthrust',
+          'sm_quad_pushrot', 'sm_quad_animal', 'sm_quad_tiger',
+          'sm_std_plyo'
+        ]
+      }
+    ];
+
+    var JINOK_WEEK_PRESETS = [
+      {
+        key: 'w12',
+        label: '1/2주차',
+        summary: '기본 · 코어·가동·브릿지',
+        ids: [
+          'func_core_cat_camel', 'func_core_bird_dog', 'func_core_dying_bugs',
+          'func_trunk_t4_mob',
+          'func_hip_joint_mob', 'func_hip_waiters_bow', 'func_hip_clam', 'func_hip_double_leg_bridge'
+        ]
+      },
+      {
+        key: 'w34',
+        label: '3/4주차',
+        summary: '저항 · 플랭크·박스 스쿼트',
+        ids: [
+          'func_core_wall_bug', 'func_core_front_plank', 'func_core_side_bridge',
+          'func_trunk_sphinx_t4', 'func_trunk_quad_thoracic_rot',
+          'func_hip_quad_leg_raise', 'func_hip_box_squat', 'func_hip_monster_walk'
+        ]
+      },
+      {
+        key: 'w56',
+        label: '5/6주차',
+        summary: '불안정 · 폼롤러·캐리',
+        ids: [
+          'func_core_foam_challenges', 'func_core_front_plank_shoulder_touch', 'func_core_carry',
+          'func_trunk_upper_back_cat',
+          'func_hip_quad_side_leg_raise', 'func_hip_split_squat', 'func_hip_lateral_squat', 'func_hip_one_leg_dl'
+        ]
+      },
+      {
+        key: 'w78',
+        label: '7/8주차',
+        summary: '기능 · 팔로프·에어플레인',
+        ids: [
+          'func_core_pallof_press', 'func_core_stir_the_pot', 'func_core_plank_rolls', 'func_core_barrel_roll',
+          'func_trunk_stability_ball_leg_curl',
+          'func_hip_airplane', 'func_hip_single_leg_dl'
+        ]
+      }
+    ];
+
+    var PROGRAM_PLAN_LOAD_DIRECTOR_TABS = [
+      { id: 'sangmin', label: '이상민 원장', heading: '이상민 8회차 프로그램', presets: SANGMIN_WEEK_PRESETS },
+      { id: 'func', label: '최진옥 원장', heading: '최진옥 8회차 프로그램', presets: JINOK_WEEK_PRESETS }
+    ];
+
+    var SANGMIN_DIFFICULTY = {
+      sm_lie_breath: 10, sm_lie_tabletop: 20, sm_lie_deadbug: 30, sm_lie_rotation: 40,
+      sm_lie_bridge: 50, sm_lie_ball: 60, sm_lie_bridge_1leg: 70, sm_lie_wallpush: 80,
+      sm_lie_abd: 90, sm_lie_hipthrust: 100,
+      sm_lie_prone_breath: 10, sm_lie_extrem: 20, sm_lie_cobra: 30, sm_lie_pelvis_foot: 40,
+      sm_lie_superman: 50,
+      sm_quad_child: 10, sm_quad_catcamel: 20, sm_quad_neutral: 30, sm_quad_hipext: 40,
+      sm_quad_birddog: 50, sm_quad_ball: 60, sm_quad_plank: 70, sm_lie_sideplank: 80,
+      sm_quad_tiger: 90, sm_quad_animal: 100, sm_quad_pushrot: 110,
+      sm_std_sitstand: 10, sm_std_balance: 20, sm_std_hinge: 30, sm_std_squat: 40,
+      sm_std_lunge: 50, sm_std_rev_lunge: 60, sm_std_side_lunge: 70, sm_std_lat_lunge: 80,
+      sm_std_plyo: 90
+    };
+
+    function sangminDifficulty_(id) {
+      var n = SANGMIN_DIFFICULTY[id];
+      return n == null ? 999 : n;
+    }
+
+    function directorWeekPresets_(tabId) {
+      var i;
+      for (i = 0; i < PROGRAM_PLAN_LOAD_DIRECTOR_TABS.length; i++) {
+        if (PROGRAM_PLAN_LOAD_DIRECTOR_TABS[i].id === tabId) return PROGRAM_PLAN_LOAD_DIRECTOR_TABS[i];
+      }
+      return PROGRAM_PLAN_LOAD_DIRECTOR_TABS[0];
+    }
+
+    function weekPresetByKey_(presets, key) {
+      var i;
+      for (i = 0; i < (presets || []).length; i++) {
+        if (presets[i].key === key) return presets[i];
+      }
+      return null;
+    }
+
+    function sangminWeekPreset_(key) {
+      return weekPresetByKey_(SANGMIN_WEEK_PRESETS, key);
+    }
+
+    function defaultLoadPresetTab_(m) {
+      var tab = resolveDefaultProgramTab(m);
+      if (tab === 'func') return 'func';
+      return 'sangmin';
+    }
+
+    function applyDirectorWeekPreset_(tabId, weekKey) {
+      var meta = directorWeekPresets_(tabId);
+      var preset = weekPresetByKey_(meta.presets, weekKey);
+      if (!preset) return;
+      if (!state.selected) { toast('회원을 먼저 선택해 주세요'); return; }
+      if (state.activeProgramTab !== tabId) switchProgramTab(tabId);
+      Object.keys(state.todayProgress || {}).forEach(function(id) {
+        applyTodayCheck_(id, false);
+      });
+      preset.ids.forEach(function(id) {
+        applyTodayCheck_(id, true);
+      });
+      saveProgressToMemberStore();
+      closeProgramPlanLoadModal_();
+      renderProgramList();
+      renderSessionWrapPanel();
+      updateSendBar();
+      updateProgramPlanBar_();
+      toast(meta.label + ' · ' + preset.label + ' · ' + preset.ids.length + '개 선택');
+    }
+
+    function applySangminWeekPreset_(weekKey) {
+      applyDirectorWeekPreset_('sangmin', weekKey);
+    }
+
+    function switchProgramPlanLoadTab_(tabId) {
+      _programPlanLoadDirectorTab = tabId === 'func' ? 'func' : 'sangmin';
+      renderProgramPlanLoadTabs_();
+      renderProgramPlanLoadSlotList_(memberProgramPlanSlots_(state.selected));
+    }
+
+    function renderProgramPlanLoadTabs_() {
+      var root = document.getElementById('programPlanLoadTabs');
+      if (!root) return;
+      var html = '';
+      PROGRAM_PLAN_LOAD_DIRECTOR_TABS.forEach(function(tab) {
+        var cls = tab.id === _programPlanLoadDirectorTab ? 'program-tab on' : 'program-tab';
+        html += '<button type="button" class="' + cls + '" onclick="switchProgramPlanLoadTab_(\'' + tab.id + '\')">' +
+          escapeHtml(tab.label) + '</button>';
+      });
+      root.innerHTML = html;
     }
 
     function normalizeProgramKeyClient(raw) {
@@ -4453,7 +4732,7 @@
     function resolveDefaultProgramTab(m) {
       if (!m) return 'movement';
       var prog = normalizeProgramKeyClient(m.program || '');
-      var instName = String(m.instructorName || '').trim();
+      var instName = String(m.instructorName || m.inst || '').trim();
       var instIdx = m.instructorIndex;
       if (prog === '작은얼굴') return 'face';
       if (instName.indexOf('최진옥') >= 0 || instIdx === 1) return 'func';
@@ -4756,35 +5035,46 @@
       if (!root) return;
       slots = normalizeProgramPlanSlots_(slots || memberProgramPlanSlots_(state.selected));
       var pinnedSlot = activePinnedSlotIndex_(state.selected);
+      var meta = directorWeekPresets_(_programPlanLoadDirectorTab);
       var html = '';
       var i;
+      var savedHtml = '';
       var hasAny = false;
+      html += '<div class="program-plan-preset-label">' + escapeHtml(meta.heading) + '</div>';
+      (meta.presets || []).forEach(function(preset) {
+        html += '<div class="program-plan-slot-row">';
+        html += '<button type="button" class="program-plan-slot-load-item" onclick="applyDirectorWeekPreset_(\'' + meta.id + '\',\'' + preset.key + '\')">';
+        html += '<div class="slot-hd"><span>' + escapeHtml(preset.label) + '</span><span>' + preset.ids.length + '개</span></div>';
+        html += '<div class="slot-meta">' + escapeHtml(preset.summary) + '</div>';
+        html += '</button></div>';
+      });
       for (i = 1; i <= PROGRAM_PLAN_SLOT_COUNT; i++) {
         var key = String(i);
         var slot = slots[key];
         var count = countProgramPlanSlotItems_(slot);
-        if (count) hasAny = true;
-        var summary = slot && slot.summary ? slot.summary : '요약 없음';
-        var when = slot && slot.savedAt ? formatProgramPlanSlotSavedAt_(slot.savedAt) : '';
+        if (!count) continue;
+        hasAny = true;
+        var summary = slot.summary ? slot.summary : '요약 없음';
+        var when = slot.savedAt ? formatProgramPlanSlotSavedAt_(slot.savedAt) : '';
         var pinnedCls = pinnedSlot === i ? ' is-pinned' : '';
-        html += '<div class="program-plan-slot-row">';
-        html += '<button type="button" class="program-plan-slot-load-item' + pinnedCls + '"' +
-          (count ? ' onclick="confirmProgramPlanLoad_(' + i + ')"' : ' disabled') + '>' +
+        savedHtml += '<div class="program-plan-slot-row">';
+        savedHtml += '<button type="button" class="program-plan-slot-load-item' + pinnedCls + '" onclick="confirmProgramPlanLoad_(' + i + ')">' +
           '<div class="slot-hd"><span>' + i + '번 슬롯' + (pinnedSlot === i ? ' · 고정중' : '') + '</span><span>' +
-          (count ? count + '개' : '비어 있음') + '</span></div>' +
+          count + '개</span></div>' +
           '<div class="slot-meta">' + escapeHtml(summary) + (when ? ' · ' + escapeHtml(when) : '') + '</div>' +
           '</button>';
-        html += '<div class="program-plan-slot-actions">';
-        html += '<button type="button" class="program-plan-slot-action pin' + (pinnedSlot === i ? ' is-active' : '') + '"' +
-          (count ? ' onclick="event.stopPropagation();confirmProgramPlanLoad_(' + i + ')"' : ' disabled') +
+        savedHtml += '<div class="program-plan-slot-actions">';
+        savedHtml += '<button type="button" class="program-plan-slot-action pin' + (pinnedSlot === i ? ' is-active' : '') + '"' +
+          ' onclick="event.stopPropagation();confirmProgramPlanLoad_(' + i + ')"' +
           ' title="이 슬롯을 고정 프로그램으로 적용">' + (pinnedSlot === i ? '고정중' : '고정') + '</button>';
-        html += '<button type="button" class="program-plan-slot-action clear"' +
-          (count ? ' onclick="event.stopPropagation();clearProgramPlanSlot_(' + i + ')"' : ' disabled') +
+        savedHtml += '<button type="button" class="program-plan-slot-action clear"' +
+          ' onclick="event.stopPropagation();clearProgramPlanSlot_(' + i + ')"' +
           ' title="이 슬롯 내용 삭제">비우기</button>';
-        html += '</div></div>';
+        savedHtml += '</div></div>';
       }
-      if (!hasAny) {
-        html = '<p class="member-search-empty">저장된 슬롯이 없습니다. 운동을 선택한 뒤 「프로그램 저장」을 눌러 주세요.</p>';
+      if (hasAny) {
+        html += '<div class="program-plan-preset-label" style="margin-top:12px;">저장된 슬롯</div>';
+        html += savedHtml;
       }
       root.innerHTML = html;
     }
@@ -4797,6 +5087,8 @@
       var m = state.selected;
       if (!m || !m.suffix8) { toast('회원을 먼저 선택해 주세요'); return; }
       if (_programPlanLoadInFlight || _programPlanSaveInFlight) return;
+      _programPlanLoadDirectorTab = defaultLoadPresetTab_(m);
+      renderProgramPlanLoadTabs_();
       renderProgramPlanLoadSlotList_(memberProgramPlanSlots_(m));
       document.getElementById('programPlanLoadModal').classList.add('open');
       if (!hasAnyProgramPlanSlot_(m)) {
@@ -5285,10 +5577,7 @@
 
     function shouldAutoIncludeSessionLink_(itemId) {
       var p = state.program.find(function(x) { return x.id === itemId; });
-      if (!p || !p.youtubeUrl) return false;
-      if (p.uiSection === 'self_tool') return true;
-      if (/^sm_/.test(String(p.id || '')) || String(p.uiSection || '').indexOf('sangmin_') === 0) return true;
-      return false;
+      return !!(p && p.youtubeUrl);
     }
 
     function getSessionIncludedIds() {
@@ -10373,6 +10662,7 @@
 
     function renderSimpleProgramList(root, list) {
       const hasMember = !!state.selected;
+      var useChips = state.activeProgramTab === 'sangmin';
       var grouped = {};
       var sectionOrder = [];
       list.forEach(function(item) {
@@ -10386,11 +10676,43 @@
       var html = '';
       sectionOrder.forEach(function(secKey) {
         var g = grouped[secKey];
-        html += '<div class="psp-section"><div class="psp-section-hd">' + escapeHtml(g.title) + sectionHeaderMeta(secKey) + '</div><div class="psp-section-body"><div class="psp-part-card">';
+        html += '<div class="psp-section"><div class="psp-section-hd">' + escapeHtml(g.title) + sectionHeaderMeta(secKey) + '</div><div class="psp-section-body">';
+        var byProg = {};
+        var progOrder = [];
         g.items.forEach(function(item) {
-          html += renderMethodRowHtml(item, secKey, hasMember, methodDisplayLabel(item));
+          var p = item.program || g.title || '기타';
+          if (!byProg[p]) { byProg[p] = []; progOrder.push(p); }
+          byProg[p].push(item);
         });
-        html += '</div></div></div>';
+        progOrder.sort(function(a, b) {
+          var na = programSortKey(a), nb = programSortKey(b);
+          if (na !== nb) return na - nb;
+          return String(a).localeCompare(String(b), 'ko');
+        });
+        var showSub = progOrder.length > 1;
+        progOrder.forEach(function(pName) {
+          var items = byProg[pName];
+          if (useChips) {
+            items.sort(function(a, b) {
+              var da = sangminDifficulty_(a.id), db = sangminDifficulty_(b.id);
+              if (da !== db) return da - db;
+              return String(a.label || '').localeCompare(String(b.label || ''), 'ko');
+            });
+          }
+          if (showSub) {
+            html += '<div class="psp-subsection collapsible">';
+            html += '<div class="psp-subsection-hd" onclick="this.parentNode.classList.toggle(\'collapsed\')">';
+            html += '<span class="psp-subsection-hd-main"><span>' + escapeHtml(pName) + '</span></span>';
+            html += '</div><div class="psp-subsection-body">';
+          }
+          html += '<div class="psp-part-card' + (useChips ? ' ex-chip-grid' : '') + '">';
+          items.forEach(function(item) {
+            html += renderMethodRowHtml(item, secKey, hasMember, methodDisplayLabel(item));
+          });
+          html += '</div>';
+          if (showSub) html += '</div></div>';
+        });
+        html += '</div></div>';
       });
       root.innerHTML = html;
     }
