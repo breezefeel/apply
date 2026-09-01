@@ -1324,34 +1324,43 @@
     .method-row.done input[type="checkbox"]:checked { accent-color: var(--green); }
     .method-row input { width:18px; height:18px; margin-top:2px; cursor:pointer; flex-shrink:0; }
     .method-label { font-size:12px; font-weight:500; line-height:1.45; }
-    /* Lying PAR — 4부위 한 줄(넓은 화면) / 2×2(모바일) */
+    /* Lying Passive Stretching — 이름·설명·링크가 한 줄에 보이도록 */
     .psp-part-card.p1-kind-card {
-      display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px;
-      padding:8px;
-    }
-    @media (min-width:520px) {
-      .psp-part-card.p1-kind-card { grid-template-columns:repeat(4, minmax(0, 1fr)); }
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 4px 6px 6px;
     }
     .psp-part-card.p1-kind-card .method-row {
-      display:flex; align-items:center; gap:5px;
-      grid-template-columns:none;
-      margin:0; padding:7px 6px;
-      border:1px solid var(--border); border-radius:8px; background:#fafbfc;
-      min-width:0;
+      display: grid;
+      grid-template-columns: 18px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      padding: 8px 6px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      min-width: 0;
     }
-    .psp-part-card.p1-kind-card .method-row input { margin-top:0; flex-shrink:0; width:16px; height:16px; }
-    .psp-part-card.p1-kind-card .method-row > div { flex:1; min-width:0; }
+    .psp-part-card.p1-kind-card .method-row input { margin-top: 0; width: 18px; height: 18px; }
+    .psp-part-card.p1-kind-card .method-row > div { min-width: 0; flex: unset; }
     .psp-part-card.p1-kind-card .method-label {
-      font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: normal;
+      overflow: visible;
+      line-height: 1.45;
     }
+    .psp-part-card.p1-kind-card .method-thumb,
     .psp-part-card.p1-kind-card .method-vid,
-    .psp-part-card.self-tool-compact .method-vid { display:none; }
+    .psp-part-card.self-tool-compact .method-vid { display: none; }
     .psp-part-card.p1-kind-card .vid-tag {
-      flex-shrink:0; font-size:8px; padding:1px 3px; white-space:nowrap;
+      flex-shrink: 0; font-size: 8px; padding: 1px 3px; white-space: nowrap;
     }
-    .psp-part-card.p1-kind-card .method-row.done-prior { border-left-width:1px; border-left-color:#bbf7d0; }
-    .psp-part-card.p1-kind-card .method-row.done-recent { border-left-width:1px; border-left-color:var(--green); }
-    .psp-part-card.p1-kind-card .method-row.done { border-left-width:1px; border-left-color:var(--green); }
+    .psp-part-card.p1-kind-card .method-row.done-prior { border-left-width: 3px; }
+    .psp-part-card.p1-kind-card .method-row.done-recent { border-left-width: 3px; }
+    .psp-part-card.p1-kind-card .method-row.done { border-left-width: 3px; }
     /* 이상민 등 단순 목록 — 폭에 따라 2열~다열 칩 */
     .psp-part-card.ex-chip-grid {
       display: grid;
@@ -1408,7 +1417,7 @@
     .method-badge-btn--link.is-disabled,
     .method-badge-btn--link:disabled { opacity:.5; cursor:default; border-color:#e2e8f0; color:#94a3b8; background:#f1f5f9; }
     .psp-part-card.self-tool-compact .method-badge-btn { font-size:10px; padding:3px 7px; }
-    .psp-part-card.p1-kind-card .method-badge-btn { font-size:9px; padding:2px 5px; }
+    .psp-part-card.p1-kind-card .method-badge-btn { font-size: 10px; padding: 3px 7px; }
     .coach-note-body {
       font-size:13px; line-height:1.65; white-space:pre-wrap;
       background:#f8fafc; border:1px solid var(--border); border-radius:10px;
@@ -2875,11 +2884,13 @@
       return String(progName || '') === FORCE_LINE_PROGRAM;
     }
 
-    /** Lying Passive Stretching 컴팩트 칩 — Supine 하체 / Prone 상체 */
-    function p1CompactLabel(item) {
-      var label = String(item.label || '');
-      var m = label.match(/^[①②③④]\s*(Supine|Prone)\s*·\s*(하체|상체)/);
-      if (m) return m[1] + ' ' + m[2];
+    /** Lying Passive Stretching — ① 하체 → ② 상체 순 */
+    function p1ItemOrder_(item) {
+      var m = String(item && item.label || '').match(/^[①②③④]/);
+      var order = { '①': 1, '②': 2, '③': 3, '④': 4 };
+      return m ? (order[m[0]] || 99) : 99;
+    }
+    function p1RowLabel(item) {
       return methodDisplayLabel(item);
     }
 
@@ -10649,10 +10660,15 @@
         if (secKey === 'self_tool' && isSelfToolCompactProgram_(progName)) cardCls += ' self-tool-compact';
         else if (isP1ParProgram(progName)) cardCls += ' p1-kind-card';
         html += '<div class="' + cardCls + '">';
+        if (isP1ParProgram(progName)) {
+          progItems = progItems.slice().sort(function(a, b) {
+            return p1ItemOrder_(a) - p1ItemOrder_(b);
+          });
+        }
         progItems.forEach(function(item) {
           html += renderMethodRowHtml(
             item, secKey, hasMember,
-            isP1ParProgram(progName) ? p1CompactLabel(item) : null
+            isP1ParProgram(progName) ? p1RowLabel(item) : null
           );
         });
         html += '</div>';
@@ -10725,7 +10741,7 @@
       const rowCls = methodRowProgressClass(item, hasMember);
       const badgeRow = renderMethodBadges_(item, secKey);
       var compact = secKey === 'self_tool' && isSelfToolCompactProgram_(item.program);
-      var thumb = compact ? '' : String(item.thumbUrl || '').trim();
+      var thumb = (compact || isP1ParItem(item)) ? '' : String(item.thumbUrl || '').trim();
       var stage = hongtaekStageFromProgram_(item.program);
       var searchCue = '';
       var searchNote = '';
