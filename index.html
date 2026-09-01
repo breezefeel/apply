@@ -3107,7 +3107,7 @@
       { id: 'sangmin', label: '이상민 원장', sub: 'Lying · Sitting/Quadruped · Standing' },
       { id: 'hongtaek', label: '최홍택 원장', sub: '근막 경선 · Strength & Coordination' },
       { id: 'injun', label: '김인준 원장', sub: '고관절·코어 · 흉추 가동성' },
-      { id: 'face', label: '리얼 페이스', sub: '작은얼굴 · 안면비대칭 프로그램' },
+      { id: 'face', label: '리얼 페이스', sub: 'Manual · 스마일 6단계 · 호흡' },
     ];
 
     var SCHEDULE_PROGRAM_COLORS_FALLBACK = {
@@ -3115,16 +3115,25 @@
       '약수': { '기능 운동': '#2563eb', 'P-스트레칭': '#059669', '작은얼굴': '#d97706' },
     };
 
+    /** 예전 단건 스마일 진도 → 스마일 ① */
+    function canonicalFaceProgressId_(id) {
+      return id === 'face_ex_smile' ? 'face_ex_smile_1' : id;
+    }
+
     function buildFaceCatalog() {
-      function faceItem(id, uiSection, sectionTitle, label) {
+      function faceItem(id, uiSection, sectionTitle, label, extra) {
+        extra = extra || {};
+        var program = extra.program || sectionTitle;
         return {
           id: id,
           uiSection: uiSection,
           sectionTitle: sectionTitle,
-          program: sectionTitle,
+          program: program,
           label: label,
-          group: sectionTitle,
+          group: program,
           hasVideo: false,
+          alimtalkLabel: extra.alimtalkLabel || label,
+          coachingNote: extra.coachingNote || '',
         };
       }
       return [
@@ -3141,9 +3150,71 @@
         faceItem('face_self_heart', 'face_self', '셀프 관리', '하트 라인'),
         faceItem('face_self_cheek', 'face_self', '셀프 관리', '광대 리프팅'),
         faceItem('face_self_jawline', 'face_self', '셀프 관리', '턱 라인 정리'),
-        faceItem('face_ex_smile', 'face_exercise', 'Exercise', '스마일 운동'),
-        faceItem('face_ex_jaw', 'face_exercise', 'Exercise', '턱 관절 운동'),
-        faceItem('face_ex_scalp', 'face_exercise', 'Exercise', '두피 이완 운동'),
+        faceItem('face_ex_smile_1', 'face_exercise', 'Exercise', '① 관찰 스마일 (평가)', {
+          program: '1 · 스마일 6단계',
+          alimtalkLabel: '스마일 ① 관찰 · 좌우만 보기',
+          coachingNote: '준비: 거울 정면. 턱·어깨 힘 빼고 앉거나 섭니다. 이 동작이 평가입니다.\n동작: 힘을 빼고 천천히 스마일합니다. 좌우 입꼬리 높이·볼 볼륨만 봅니다.\n포인트: 과한 표정·목 꺾임을 확인합니다.\n주의: 아픈 범위까지 올리지 않습니다.',
+        }),
+        faceItem('face_ex_smile_2', 'face_exercise', 'Exercise', '② 입술 봉인 스마일', {
+          program: '1 · 스마일 6단계',
+          alimtalkLabel: '스마일 ② 입술 봉인',
+          coachingNote: '준비: ①에서 과긴장을 확인한 뒤입니다.\n동작: 입술이 만나게 스마일합니다. 이가 보이지 않아도 됩니다. 턱 끝은 힘 뺍니다.\n포인트: 휴식 때도 입이 쉽게 다물어지는지 봅니다.\n주의: 턱밑을 당겨 입술을 붙이지 않습니다.',
+        }),
+        faceItem('face_ex_smile_3', 'face_exercise', 'Exercise', '③ 좌우 분리 스마일', {
+          program: '1 · 스마일 6단계',
+          alimtalkLabel: '스마일 ③ 좌우 분리',
+          coachingNote: '준비: 약한 쪽을 말로 정합니다.\n동작: 한쪽에만 스마일 → 반대. 약한 쪽이 같은 높이까지 올라가게 합니다.\n포인트: 목이 따라가지 않게 합니다.\n주의: 강한 쪽을 더 올리지 않습니다.',
+        }),
+        faceItem('face_ex_smile_4', 'face_exercise', 'Exercise', '④ 혀 구개 + 스마일', {
+          program: '1 · 스마일 6단계',
+          alimtalkLabel: '스마일 ④ 혀 구개',
+          coachingNote: '준비: 혀 끝을 앞 구개(앞니 뒤)에 둡니다.\n동작: 혀를 구개에 둔 채 스마일합니다. 혀가 이 사이로 나오지 않게 합니다.\n포인트: 혀가 앞으로 밀리면 스마일을 줄입니다.\n주의: 구역·통증이 있으면 중단합니다.',
+        }),
+        faceItem('face_ex_smile_5', 'face_exercise', 'Exercise', '⑤ 코어 호흡 + 스마일', {
+          program: '1 · 스마일 6단계',
+          alimtalkLabel: '스마일 ⑤ 코어 호흡과 함께',
+          coachingNote: '준비: 코로 들이쉽니다. 아랫배가 먼저 움직이게 합니다.\n동작: 날숨에 스마일, 들숨에 이완. 표정과 숨이 같이 흔들리지 않게 합니다.\n포인트: 어깨가 올라가면 숨을 더 작게 합니다.\n주의: 어지러움이 있으면 멈춥니다.',
+        }),
+        faceItem('face_ex_smile_6', 'face_exercise', 'Exercise', '⑥ 일상 유지 스마일', {
+          program: '1 · 스마일 6단계',
+          alimtalkLabel: '스마일 ⑥ 일상 유지',
+          coachingNote: '준비: 세션이 끝난 뒤, 인사·대화 장면을 떠올립니다.\n동작: 말한 뒤·씹은 뒤 ① 자세로 돌아옵니다. 입이 벌어져 있지 않게 합니다.\n포인트: 하루 몇 번만 짧게 확인합니다.\n주의: 하루 종일 얼굴에 힘을 주지 않습니다.',
+        }),
+        faceItem('face_ex_breath', 'face_exercise', 'Exercise', '코어 호흡 (얼굴 세션)', {
+          program: '2 · 호흡-코어',
+          alimtalkLabel: '얼굴 · 코어 호흡',
+          coachingNote: '준비: 얼굴 세션에서 합니다. 턱·어깨를 내리고 코로 쉽니다.\n동작: 들숨에 아랫배·옆이 부풀고, 날숨에 완전히 힘 뺍니다. 스마일 ⑤의 바탕입니다.\n포인트: 윗배·어깨만 먼저 올라오면 아랫배를 먼저 씁니다.\n주의: 어지러우면 중단합니다.',
+        }),
+        faceItem('face_ex_tongue_rest', 'face_exercise', 'Exercise', '혀 구개 안착', {
+          program: '3 · 혀-구개',
+          alimtalkLabel: '혀 · 구개 안착',
+          coachingNote: '준비: 입술을 가볍게 다뭅니다.\n동작: 혀 전체를 구개에 가볍게 올려 둡니다. 이를 악물지 않습니다.\n포인트: 앞만 붙이고 뒤가 떨어지지 않게 합니다.\n주의: 구역이 있으면 앞만 올립니다.',
+        }),
+        faceItem('face_ex_tongue_press', 'face_exercise', 'Exercise', '혀 흡착', {
+          program: '3 · 혀-구개',
+          alimtalkLabel: '혀 · 흡착',
+          coachingNote: '준비: 혀 구개 안착이 된 다음입니다.\n동작: 혀 전체를 구개에 살짝 흡착했다 뗍니다. 10~20회.\n포인트: 턱을 움직이지 않고 혀만 씁니다.\n주의: 통증·클릭이 있으면 중단합니다.',
+        }),
+        faceItem('face_ex_jaw', 'face_exercise', 'Exercise', '턱 관절 운동', {
+          program: '4 · 턱-저작',
+          alimtalkLabel: '턱 관절 운동',
+          coachingNote: '준비: 거울 정면. 혀는 구개 또는 편한 위치입니다.\n동작: 입을 통증 없는 범위에서 열고 닫습니다. 좌우로 작게 미끄러뜨려도 됩니다.\n포인트: 턱이 한쪽으로 새면 범위를 줄입니다.\n주의: 소리·통증이 세지면 중단합니다.',
+        }),
+        faceItem('face_ex_chew', 'face_exercise', 'Exercise', '좌우 저작 균형', {
+          program: '4 · 턱-저작',
+          alimtalkLabel: '좌우 저작 균형',
+          coachingNote: '준비: 어느 쪽으로 더 씹는지 확인합니다.\n동작: 약한 쪽으로 천천히 씹는 느낌을 연습합니다. 실제 음식은 세션에서 안내한 경우만.\n포인트: 고개가 약한 쪽으로 기울지 않게 합니다.\n주의: 턱 통증이 있으면 빈 동작만 합니다.',
+        }),
+        faceItem('face_ex_scalp', 'face_exercise', 'Exercise', '두피 이완 운동', {
+          program: '5 · 두피-경추',
+          alimtalkLabel: '두피 이완 운동',
+          coachingNote: '준비: 손가락으로 두피를 가볍게 둡니다.\n동작: 정수리·옆머리를 작은 원으로 움직입니다. 목을 꺾지 않습니다.\n포인트: 얼굴 표정이 따라가지 않게 합니다.\n주의: 두통이 세지면 중단합니다.',
+        }),
+        faceItem('face_ex_neck', 'face_exercise', 'Exercise', '경추 정렬 + 표정', {
+          program: '5 · 두피-경추',
+          alimtalkLabel: '경추 정렬 · 표정',
+          coachingNote: '준비: 턱을 살짝 당기고 정수리가 위로 가게 합니다.\n동작: 스마일 ①을 유지한 채 목이 따라붙는지 확인합니다. 목 앞·옆이 과하게 뜨면 표정을 줄입니다.\n포인트: 얼굴만 움직이고 목은 안정시킵니다.\n주의: 어지러움·팔 저림이 있으면 중단합니다.',
+        }),
       ];
     }
 
@@ -4806,6 +4877,7 @@
       Object.keys(progressMap || {}).forEach(function(id) {
         var val = progressMap[id];
         if (!val) return;
+        id = canonicalFaceProgressId_(id);
         var tabId = catalogTabForItemId(id);
         if (!bucket[tabId]) bucket[tabId] = emptyMemberProgressBucket_();
         bucket[tabId][field][id] = true;
@@ -4853,6 +4925,7 @@
     }
 
     function labelForProgramItemId_(id) {
+      id = canonicalFaceProgressId_(id);
       var meta = exerciseMetaById_[id];
       if (meta && meta.label) return meta.label;
       var catalogs = [
@@ -5207,13 +5280,15 @@
           store[tab.id].recent = {};
         });
       }
-      Object.keys(prog).forEach(function(id) {
-        if (!prog[id] || !prog[id].length) return;
+      Object.keys(prog).forEach(function(rawId) {
+        if (!prog[rawId] || !prog[rawId].length) return;
+        var id = canonicalFaceProgressId_(rawId);
         var tab = catalogTabForItemId(id);
         if (!store[tab]) {
           store[tab] = { saved: {}, recent: {}, today: {}, planned: {}, sectionCollapsed: {}, sectionCollapsedTouched: {} };
         }
-        if (recent[id] && recent[id].length) {
+        var isRecent = (recent[rawId] && recent[rawId].length) || (recent[id] && recent[id].length);
+        if (isRecent) {
           store[tab].recent[id] = true;
           delete store[tab].saved[id];
         } else {
@@ -5223,13 +5298,22 @@
       });
     }
 
+    function remapFaceProgressMap_(map) {
+      var out = {};
+      Object.keys(map || {}).forEach(function(id) {
+        if (!map[id]) return;
+        out[canonicalFaceProgressId_(id)] = map[id];
+      });
+      return out;
+    }
+
     function loadProgressFromMemberStore(tabId) {
       var bucket = state.progressByMember[state.selectedKey];
       var data = bucket && bucket[tabId] ? bucket[tabId] : null;
-      state.savedProgress = data ? Object.assign({}, data.saved) : {};
-      state.recentSessionProgress = data ? Object.assign({}, data.recent) : {};
-      state.todayProgress = data ? Object.assign({}, data.today) : {};
-      state.plannedProgress = data ? Object.assign({}, data.planned) : {};
+      state.savedProgress = data ? remapFaceProgressMap_(data.saved) : {};
+      state.recentSessionProgress = data ? remapFaceProgressMap_(data.recent) : {};
+      state.todayProgress = data ? remapFaceProgressMap_(data.today) : {};
+      state.plannedProgress = data ? remapFaceProgressMap_(data.planned) : {};
       state.progressOrigin = {};
       state.sectionCollapsed = data ? Object.assign({}, data.sectionCollapsed) : {};
       state.sectionCollapsedTouched = data ? Object.assign({}, data.sectionCollapsedTouched) : {};
@@ -5950,12 +6034,12 @@
         '턱·어깨 힘 빼고, 천천히 반복!',
         '좌·우 균형, 같은 범위로.',
         '호흡 멈추지 않고, 얼굴·목 이완.',
-        '통증·어지러움 있으면 중단.',
+        '스마일은 날숨, 들숨에 이완.',
+        '약한 쪽만 올리고 강한 쪽은 유지.',
+        '혀는 구개, 이가 벌어지지 않게.',
         '거울로 과한 표정·긴장 확인.',
-        '작은 범위부터 정확도 우선.',
         '목을 꺾지 않고 정면 유지.',
-        '세트 사이 턱·목 스트레칭.',
-        '빠른 반복보다 천천히 컨트롤.',
+        '통증·어지러움 있으면 중단.',
         '마지막은 가볍게 마무리.'
       ),
       default: coachMemoPresetList(
@@ -13590,6 +13674,15 @@
           items: [
             evalHistItem('face_focus', '개선 우선', '', [
               '안면 비대칭', '얼굴 축소·붓기', '턱·목 라인', '전체 균형',
+            ], true),
+            evalHistItem('face_smile_screen', '스마일 스크린', '스마일 한 장면에서 깨지는 항목 · 오늘 운동 축', [
+              '입술이 벌어진 채 휴식',
+              '좌우 스마일 높이·볼륨 다름',
+              '스마일 때 턱이 앞·옆으로',
+              '혀가 바닥에 깔림',
+              '입으로 숨·어깨 들림',
+              '표정 때 목·두피가 따라옴',
+              '스마일 때 호흡이 멈춤',
             ], true),
             evalHistItem('face_symptom', '동반 증상', '', [
               '두통·어깨 결림', '턱·저작 불편', '특별히 없음(미용·균형)',
