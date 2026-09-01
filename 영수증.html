@@ -326,22 +326,6 @@
   }
   .hometax-fields { display: flex; flex-direction: column; gap: 8px; }
   .hometax-fields .field { margin: 0; }
-  .hometax-copy-row {
-    display: flex; gap: 8px; align-items: stretch;
-  }
-  .hometax-copy-row .hometax-val,
-  .hometax-copy-row input { flex: 1; min-width: 0; }
-  .hometax-copy-btn {
-    flex: 0 0 auto;
-    border: 1.5px solid #d7d0c4;
-    background: #fff;
-    color: var(--ink);
-    font-size: 13px; font-weight: 800;
-    padding: 0 14px; border-radius: 12px;
-    cursor: pointer;
-  }
-  .hometax-copy-btn:active { background: #f4f1ea; }
-  .copy-tap { cursor: pointer; }
   .hometax-val {
     width: 100%;
     text-align: left;
@@ -350,6 +334,7 @@
     color: var(--ink);
     font-size: 16px; font-weight: 800;
     padding: 11px 12px; border-radius: 12px;
+    cursor: pointer;
   }
   .hometax-val:active { background: #f4f1ea; }
   .hometax-sum {
@@ -377,6 +362,7 @@
   .doc-payer-info span { font-size: 13.5px; font-weight: 800; line-height: 1.4; }
   #docPayerTabs, #docStaffTabs { margin-bottom: 12px; }
   .field input:read-only { background: #f4f1ea; }
+  #docCaseHint { margin: 2px 0 0; }
   .doc-folder {
     display: flex; align-items: flex-start; justify-content: space-between;
     gap: 8px; margin: 0 0 12px;
@@ -873,7 +859,7 @@
 
         <section class="card">
           <div class="card-title">2. 간이지급명세서</div>
-          <p class="hint">홈택스 직접작성 순서입니다. 성명·주민번호는 칸을 누르면 복사되고, 금액은 오른쪽 복사를 누릅니다. 업종은 강사 <b>940903 학원강사</b>, 매니저·홍보는 <b>940909 기타인적용역자</b>입니다.</p>
+          <p class="hint">홈택스 직접작성 순서입니다. 소득세·지방소득세 칸을 누르면 복사됩니다.</p>
           <nav class="tabs" id="docStaffTabs" aria-label="프리랜서"></nav>
           <div class="field span2" id="docPeopleChipsWrap" hidden style="margin-bottom:10px;">
             <label>저장된 사람</label>
@@ -883,36 +869,32 @@
           <div id="docPayFields" class="hometax-fields">
             <div class="field">
               <label>1. 성명</label>
-              <input id="docName" class="copy-tap" type="text" placeholder="홍길동" autocomplete="name">
+              <input id="docName" type="text" placeholder="홍길동" autocomplete="name">
             </div>
             <div class="field">
               <label>2. 주민등록번호</label>
-              <input id="docRrn" class="copy-tap" type="text" placeholder="000000-0000000" inputmode="numeric" autocomplete="off">
+              <input id="docRrn" type="text" placeholder="000000-0000000" inputmode="numeric" autocomplete="off">
             </div>
             <div class="field">
               <label>3. 지급연월</label>
               <input id="docYearMonth" type="month">
             </div>
-            <div class="field">
-              <label>4. 지급액</label>
-              <div class="hometax-copy-row">
-                <input id="docAmount" type="text" inputmode="numeric" value="1,000,000" placeholder="1,000,000">
-                <button type="button" class="hometax-copy-btn" id="btnCopyAmount">복사</button>
-              </div>
+            <div class="field" id="docCaseWrap" hidden>
+              <label>4. 총 회원 건수</label>
+              <input id="docCaseCount" type="text" inputmode="numeric" placeholder="건수 입력">
+              <p class="hint" id="docCaseHint"></p>
             </div>
             <div class="field">
-              <label>5. 소득세</label>
-              <div class="hometax-copy-row">
-                <div class="hometax-val" id="docIncomeVal">—</div>
-                <button type="button" class="hometax-copy-btn" id="btnCopyIncome">복사</button>
-              </div>
+              <label id="lblDocAmount">4. 지급액</label>
+              <input id="docAmount" type="text" inputmode="numeric" value="1,000,000" placeholder="1,000,000">
             </div>
             <div class="field">
-              <label>6. 지방소득세</label>
-              <div class="hometax-copy-row">
-                <div class="hometax-val" id="docLocalVal">—</div>
-                <button type="button" class="hometax-copy-btn" id="btnCopyLocal">복사</button>
-              </div>
+              <label id="lblDocIncome">5. 소득세</label>
+              <button type="button" class="hometax-val" id="docIncomeVal">—</button>
+            </div>
+            <div class="field">
+              <label id="lblDocLocal">6. 지방소득세</label>
+              <button type="button" class="hometax-val" id="docLocalVal">—</button>
             </div>
           </div>
           <div class="field" style="margin-top:12px;">
@@ -939,7 +921,7 @@
 
         <section class="card" id="docPayCard">
           <div class="card-title">3. 원천세 합계</div>
-          <p class="hint">원천징수이행상황신고서에는 사람 이름이 아니라 그달 합계만 넣고 세금을 납부합니다. 칸을 누르면 복사됩니다. 홈택스에는 인원·총지급액·소득세만 넣습니다. 지방소득세는 가산세가 아닙니다. 위택스에 따로 냅니다.</p>
+          <p class="hint">원천징수이행상황신고서에는 사람 이름이 아니라 그달 합계만 넣고 세금을 납부합니다. 칸을 누르면 복사됩니다.</p>
           <div class="hometax-sum" id="docWithholdSum"></div>
           <div class="doc-dead">
             <div><b>원천세 마감</b><span id="docDueWithhold">—</span></div>
@@ -975,35 +957,9 @@
                 <span>사업소득만 체크</span>
                 <em>근로소득·기타소득은 켜지 마세요. 강사·매니저 3.3%는 사업소득입니다. 세무대리인은 비우고 저장 후 다음이동.</em>
               </div>
-              <div class="htx-pick">
-                <b>신고서 소득 종류 선택</b>
-                <span>아무것도 체크하지 않음</span>
-                <em>앞에서 사업소득을 이미 골랐습니다. 이 화면은 이자·배당·파견근로·비거주자용입니다. 해당 없으면 비운 채 저장 후 다음이동.</em>
-              </div>
-              <div class="htx-pick">
-                <b>표 입력</b>
-                <span>매월징수 (코드 A25)만</span>
-                <em>연말정산 줄은 비웁니다. (4)인원 (5)총지급액 (6)소득세만 3번 합계를 넣습니다.</em>
-              </div>
-              <div class="htx-pick">
-                <b>넣지 말 것</b>
-                <span>가산세 · 농어촌특별세 · 환급 칸은 비움</span>
-                <em>지방소득세(소득세의 10%)는 가산세가 아닙니다. 환급 화면은 전부 0인 채로 저장 후 다음이동.</em>
-              </div>
-              <div class="htx-pick">
-                <b>신고 후</b>
-                <span>납부서 보기 → 납부, 그다음 지방소득세 이동</span>
-                <em>납부서는 소득세(이번 7월 105,300원). 납부여부가 N이면 아직 안 낸 것입니다. 지방소득세 이동은 위택스로 넘어가 특별징수(10,530원)를 신고·납부합니다. 삭제요청은 누르지 마세요.</em>
-              </div>
             </div>
-            <a class="btn btn-ghost" href="https://www.wetax.go.kr/" target="_blank" rel="noopener noreferrer">위택스 (지방소득세)</a>
             <a class="btn btn-print" id="linkSimple" href="https://www.hometax.go.kr/websquare/websquare.html?w2xPath=/ui/pp/index_pp.xml&amp;tmIdx=44&amp;tm2lIdx=4401000000&amp;tm3lIdx=4401100000" target="_blank" rel="noopener noreferrer">간이지급명세서 (거주자의 사업소득)</a>
-            <p class="doc-path">지급명세서·자료·공익법인 → (일용·간이·용역)직접작성 제출 → 간이지급명세서(거주자의 사업소득) · 지급월 다음달 <b>말일</b>까지.<br>예전 메뉴 이름 신청/제출은 없어졌습니다. 누구에게 얼마 줬는지를 사람별로 입력합니다. 여기서는 세금을 또 내지 않습니다.</p>
-            <div class="htx-pick" style="margin-top:10px;">
-              <b>소득자에게 줄 것</b>
-              <span>원천징수영수증 · 간이지급명세서는 보내지 않음</span>
-              <em>사람별 PDF 메뉴는 없습니다. 지금 목록의 접수번호(제출명세 보기)를 눌러 두 사람이 들어갔는지 확인하고, 인쇄가 있으면 그걸 보관합니다. 상대에게 줄 원천징수영수증은 상대가 본인 홈택스 My홈택스 → 지급명세서 등 제출내역에서 조회합니다. 지금은 바로 안 뜰 수 있고, 급하면 2번 화면 숫자를 알려 주면 됩니다.</em>
-            </div>
+            <p class="doc-path">신청/제출 → 지급명세서 → 간이지급명세서(거주자의 사업소득) → 직접작성제출 · 지급월 다음달 <b>말일</b>까지.<br>누구에게 얼마 줬는지를 사람별로 입력합니다. 여기서는 세금을 또 내지 않습니다.</p>
           </div>
         </section>
 
@@ -1989,6 +1945,16 @@
   var ROLE_JOB = { instructor: '학원강사', promo: '광고선전', other: '기타 인적용역' };
   var ROLE_LABEL = { instructor: '강사', promo: '매니저·홍보', other: '기타 인적용역' };
   var DEFAULT_PAY_AMOUNT = 1000000;
+  var CASE_RATES = {
+    choi: {
+      tiers: [[80, 35000], [120, 37000], [Infinity, 40000]],
+      hint: '80건 이하 35,000원 · 81~120건 37,000원 · 121건 이상 40,000원'
+    },
+    sangmin: {
+      tiers: [[160, 17500], [240, 18500], [Infinity, 20000]],
+      hint: '160건 이하 17,500원 · 161~240건 18,500원 · 241건 이상 20,000원'
+    }
+  };
   var DOC_PAYERS = {
     tree: {
       tab: '힐링트리',
@@ -2376,6 +2342,68 @@
     var local = Math.floor(income * 0.1);
     return { income: income, local: local, net: amount - income - local };
   }
+  function staffTabOf(d) {
+    d = d || loadDocs();
+    return d.staffTab || 'choi';
+  }
+  function usesCasePay(d) {
+    var t = staffTabOf(d);
+    return t === 'choi' || t === 'sangmin';
+  }
+  function parseCaseCount(s) {
+    var n = parseInt(String(s || '').replace(/[^\d]/g, ''), 10);
+    return isNaN(n) ? 0 : n;
+  }
+  function caseUnitPrice(tab, count) {
+    var spec = CASE_RATES[tab];
+    if (!spec || count <= 0) return 0;
+    for (var i = 0; i < spec.tiers.length; i++) {
+      if (count <= spec.tiers[i][0]) return spec.tiers[i][1];
+    }
+    return 0;
+  }
+  function payFromCases(tab, count) {
+    return count > 0 ? count * caseUnitPrice(tab, count) : 0;
+  }
+  function updateCaseHint() {
+    var el = $('docCaseHint');
+    if (!el) return;
+    var tab = staffTabOf();
+    var spec = CASE_RATES[tab];
+    if (!spec) { el.textContent = ''; return; }
+    var n = parseCaseCount($('docCaseCount').value);
+    if (n > 0) {
+      var unit = caseUnitPrice(tab, n);
+      el.textContent = n.toLocaleString('ko-KR') + '건 × ' + unit.toLocaleString('ko-KR') + '원';
+    } else el.textContent = spec.hint;
+  }
+  function syncCasePayUi() {
+    var on = usesCasePay();
+    $('docCaseWrap').hidden = !on;
+    $('lblDocAmount').textContent = on ? '5. 지급액' : '4. 지급액';
+    $('lblDocIncome').textContent = on ? '6. 소득세' : '5. 소득세';
+    $('lblDocLocal').textContent = on ? '7. 지방소득세' : '6. 지방소득세';
+    var n = parseCaseCount($('docCaseCount').value);
+    $('docAmount').readOnly = on && n > 0;
+    updateCaseHint();
+  }
+  function applyCasePay() {
+    if (!usesCasePay()) {
+      $('docAmount').readOnly = false;
+      return;
+    }
+    var n = parseCaseCount($('docCaseCount').value);
+    $('docCaseCount').value = n ? String(n) : '';
+    if (n > 0) {
+      $('docAmount').value = payFromCases(staffTabOf(), n).toLocaleString('en-US');
+      $('docAmount').readOnly = true;
+    } else {
+      $('docAmount').readOnly = false;
+    }
+    updateCaseHint();
+    renderTaxBox();
+    renderDocSteps();
+  }
   function fmtWon(n) { return (n || 0).toLocaleString('ko-KR') + '원'; }
   function findPerson(d, id) {
     var people = docsPeople(d);
@@ -2447,6 +2475,7 @@
       ym: $('docYearMonth').value || prevMonthValue(),
       date: $('docPayDate').value || lastDayOfMonth($('docYearMonth').value || prevMonthValue()),
       amount: amount,
+      cases: usesCasePay() ? parseCaseCount($('docCaseCount').value) : 0,
       desc: $('docPayDesc').value.trim(),
       income: tax.income,
       local: tax.local,
@@ -2489,6 +2518,7 @@
     $('btnDocNewPerson').hidden = named;
     $('btnDocDelPerson').hidden = named || !docsSel || isStaffId(docsSel);
     $('docName').readOnly = named;
+    syncCasePayUi();
   }
   function applyStaffSelection(d) {
     var tab = (d && d.staffTab) || 'choi';
@@ -2570,7 +2600,7 @@
     $('docNotes').innerHTML =
       '원천세 신고와 간이지급명세서는 <strong>다른 신고</strong>입니다. 10일까지 원천세를 냈어도 말일 명세서는 따로 내야 합니다.<br><br>' +
       '힐링트리(법인)와 인천점(개인 간이과세)은 홈택스 계정이 다릅니다. 위 지급자 탭을 고른 뒤 그 사업자로 로그인하세요.<br><br>' +
-      '간이지급명세서 입력 순서: 성명 → 주민등록번호 → 지급연월 → 지급액 → 소득세 → 지방소득세.<br><br>' +
+      '간이지급명세서 입력 순서: 성명 → 주민등록번호 → 지급연월 → 총 회원 건수(최진옥·이상민) → 지급액 → 소득세 → 지방소득세.<br><br>' +
       '그달에 지급이 없으면 간이지급명세서는 내지 않아도 됩니다. 한 달이라도 빠지면 이듬해 3월 일반 지급명세서를 따로 내야 할 수 있습니다.<br><br>' +
       '입력한 인적사항은 폴더를 연결하면 네이버 박스 <strong>000.코딩\\관련서류\\프리랜서.json</strong>에 저장됩니다.<br><br>' +
       '기한 내 미제출·사실과 다른 제출은 지급액의 <strong>0.25%</strong> 가산세입니다.';
@@ -2625,6 +2655,7 @@
         '<tr><th>연락처</th><td>' + (r.person.phone || '—') + '</td></tr>' +
         '<tr><th>업종</th><td>' + (r.person.job || '—') + '</td></tr>' +
         '<tr><th>지급연월</th><td>' + (r.pay.ym || '') + '</td></tr>' +
+        (r.pay.cases ? '<tr><th>총 회원 건수</th><td>' + r.pay.cases + '건</td></tr>' : '') +
         '<tr><th>지급일</th><td>' + (r.pay.date || '') + '</td></tr>' +
         '<tr><th>지급내용</th><td>' + (r.pay.desc || '인적용역 대가') + '</td></tr>' +
         '<tr><th>지급액(세전)</th><td>' + fmtWon(r.pay.amount) + '</td></tr>' +
@@ -2685,8 +2716,22 @@
     var ym = (pay && pay.ym) || $('docYearMonth').value || prevMonthValue();
     $('docYearMonth').value = ym;
     $('docPayDate').value = (pay && pay.date) || lastDayOfMonth(ym);
-    $('docAmount').value = pay && pay.amount ? pay.amount.toLocaleString('en-US') : DEFAULT_PAY_AMOUNT.toLocaleString('en-US');
     $('docPayDesc').value = (pay && pay.desc) || '';
+    if (usesCasePay()) {
+      var cases = pay && pay.cases ? pay.cases : 0;
+      $('docCaseCount').value = cases ? String(cases) : '';
+      if (cases > 0) {
+        $('docAmount').value = payFromCases(staffTabOf(), cases).toLocaleString('en-US');
+      } else if (pay && pay.amount) {
+        $('docAmount').value = pay.amount.toLocaleString('en-US');
+      } else {
+        $('docAmount').value = '';
+      }
+    } else {
+      $('docCaseCount').value = '';
+      $('docAmount').value = pay && pay.amount ? pay.amount.toLocaleString('en-US') : DEFAULT_PAY_AMOUNT.toLocaleString('en-US');
+    }
+    syncCasePayUi();
   }
   function selectPerson(id) {
     var d = loadDocs();
@@ -2749,7 +2794,10 @@
   function savePay() {
     if (!docsSel) { flashToast('프리랜서를 먼저 저장하세요'); return; }
     var draft = currentPayDraft();
-    if (!draft.amount) { flashToast('지급액을 넣어 주세요'); return; }
+    if (!draft.amount) {
+      flashToast(usesCasePay() ? '총 회원 건수를 넣어 주세요' : '지급액을 넣어 주세요');
+      return;
+    }
     var d = loadDocs();
     if (d.payerId === 'other') {
       d.buckets.other.name = $('docPayerName').value.trim();
@@ -2758,7 +2806,7 @@
     }
     var pays = docsBucket(d).pays;
     var existing = findPay(d, docsSel, draft.ym);
-    var row = { pid: docsSel, ym: draft.ym, date: draft.date, amount: draft.amount, desc: draft.desc, income: draft.income, local: draft.local, net: draft.net };
+    var row = { pid: docsSel, ym: draft.ym, date: draft.date, amount: draft.amount, cases: draft.cases || 0, desc: draft.desc, income: draft.income, local: draft.local, net: draft.net };
     if (existing) {
       for (var i = 0; i < pays.length; i++) {
         if (pays[i].pid === docsSel && pays[i].ym === draft.ym) pays[i] = row;
@@ -2839,6 +2887,7 @@
     $('docPhone').addEventListener('input', function () {
       this.value = formatPhone(this.value);
     });
+    $('docCaseCount').addEventListener('input', applyCasePay);
     $('docAmount').addEventListener('input', function () {
       var n = parseAmount(this.value);
       this.value = n ? n.toLocaleString('en-US') : '';
@@ -2851,7 +2900,12 @@
         if (pay) fillPay(pay);
         else {
           $('docPayDate').value = lastDayOfMonth(this.value);
-          $('docAmount').value = DEFAULT_PAY_AMOUNT.toLocaleString('en-US');
+          if (usesCasePay()) {
+            $('docCaseCount').value = '';
+            $('docAmount').value = '';
+          } else {
+            $('docAmount').value = DEFAULT_PAY_AMOUNT.toLocaleString('en-US');
+          }
           $('docPayDesc').value = $('docRole').value === 'promo' ? '홍보 용역' : '수업 용역';
         }
       } else {
@@ -2864,22 +2918,13 @@
       if (!c) return;
       selectPerson(c.getAttribute('data-pid'));
     });
-    $('docName').addEventListener('click', function () {
-      if (this.value.trim()) copyText(this.value.trim());
+    $('docIncomeVal').addEventListener('click', function () {
+      if (!this.dataset.copy) return;
+      copyText(this.dataset.copy);
     });
-    $('docRrn').addEventListener('click', function () {
-      var v = formatRrn(this.value);
-      if (rrnDigits(v).length === 13) copyText(v);
-    });
-    $('btnCopyAmount').addEventListener('click', function () {
-      var n = parseAmount($('docAmount').value);
-      if (n) copyText(String(n));
-    });
-    $('btnCopyIncome').addEventListener('click', function () {
-      if ($('docIncomeVal').dataset.copy) copyText($('docIncomeVal').dataset.copy);
-    });
-    $('btnCopyLocal').addEventListener('click', function () {
-      if ($('docLocalVal').dataset.copy) copyText($('docLocalVal').dataset.copy);
+    $('docLocalVal').addEventListener('click', function () {
+      if (!this.dataset.copy) return;
+      copyText(this.dataset.copy);
     });
     $('docWithholdSum').addEventListener('click', function (e) {
       var b = e.target.closest('[data-copy]');
