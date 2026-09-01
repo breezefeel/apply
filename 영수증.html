@@ -63,9 +63,6 @@
     display: grid; grid-template-columns: 1.15fr .85fr 1fr; gap: 8px;
     margin-bottom: 14px;
   }
-  .app-tabs.docs-locked {
-    grid-template-columns: 1.15fr .85fr 52px;
-  }
   .app-tab {
     border: 1.5px solid #d7d0c4;
     background: #fff;
@@ -396,6 +393,8 @@
     display: grid; grid-template-columns: 1fr 1fr; gap: 10px 10px;
   }
   [hidden] { display: none !important; }
+  #docsPinOverlay:not([hidden]) { display: flex !important; }
+  body:not(.mode-docs) #panelDocs { display: none !important; }
   .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
   .field.span2 { grid-column: span 2; }
   .field label {
@@ -611,11 +610,10 @@
       </div>
     </header>
 
-    <nav class="app-tabs no-print docs-locked" id="appTabs" aria-label="화면">
+    <nav class="app-tabs no-print" id="appTabs" aria-label="화면">
       <button type="button" class="app-tab active" data-app="consult" id="appTabConsult">상담 메뉴얼</button>
       <button type="button" class="app-tab" data-app="receipt" id="appTabReceipt">영수증</button>
-      <button type="button" class="app-tab lock" id="appTabDocsLock" aria-label="세금 서류 잠금">잠금</button>
-      <button type="button" class="app-tab" data-app="docs" id="appTabDocs" hidden>세금 서류</button>
+      <button type="button" class="app-tab" data-app="docs" id="appTabDocs">세금 서류</button>
     </nav>
 
     <div id="panelConsult" class="panel active">
@@ -839,10 +837,7 @@
 
         <section class="card">
           <div class="card-title">1. 지급자 (사업장)</div>
-          <div class="doc-folder">
-            <p class="hint" id="docFolderStatus">약수 스케줄 시트의 <b>강사급여</b> 탭에 저장됩니다. 저장 후 다른 컴퓨터·핸드폰에서도 이 화면으로 볼 수 있습니다.</p>
-            <button type="button" class="btn-sm" id="btnDocFolder">네이버 박스 백업(선택)</button>
-          </div>
+          <p class="hint" id="docFolderStatus">약수 스케줄 시트의 <b>강사급여</b> 탭에 저장됩니다. 저장 후 다른 컴퓨터·핸드폰에서도 이 화면으로 볼 수 있습니다.</p>
           <nav class="tabs" id="docPayerTabs" aria-label="지급자"></nav>
           <div id="docPayerFixed" class="doc-payer-info"></div>
           <div id="docPayerEdit" class="grid" hidden>
@@ -1956,12 +1951,10 @@
   }
   var DOCS_STORE = 'receipt-docs-v3';
   var DOCS_STORE_OLD = 'receipt-docs-v2';
-  var DOCS_FILE = '프리랜서.json';
-  var DOCS_FILE_URL = '관련서류/프리랜서.json';
+  var DOCS_PIN = '3645';
   var PAYROLL_API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
   var docsSel = '';
   var docsBound = false;
-  var docsDirHandle = null;
   var payrollSaveTimer = null;
   var ROLE_JOB = { instructor: '학원강사', promo: '광고선전', other: '기타 인적용역' };
   var ROLE_LABEL = { instructor: '강사', promo: '매니저·홍보', other: '기타 인적용역' };
@@ -2141,7 +2134,6 @@
   }
   function saveDocs(d) {
     localStorage.setItem(DOCS_STORE, JSON.stringify(d));
-    writeDocsFile(d);
     schedulePayrollSheetSave(d);
   }
   function setSheetStatus(kind, extra) {
@@ -2206,47 +2198,6 @@
     clearTimeout(payrollSaveTimer);
     payrollSaveTimer = setTimeout(function () { pushPayrollToSheet(d); }, 600);
   }
-  function docsIdb() {
-    return new Promise(function (resolve, reject) {
-      var req = indexedDB.open('rm-docs-folder', 1);
-      req.onupgradeneeded = function () { req.result.createObjectStore('kv'); };
-      req.onsuccess = function () { resolve(req.result); };
-      req.onerror = function () { reject(req.error); };
-    });
-  }
-  function docsIdbGet(key) {
-    return docsIdb().then(function (db) {
-      return new Promise(function (resolve, reject) {
-        var r = db.transaction('kv', 'readonly').objectStore('kv').get(key);
-        r.onsuccess = function () { resolve(r.result); };
-        r.onerror = function () { reject(r.error); };
-      });
-    });
-  }
-  function docsIdbSet(key, val) {
-    return docsIdb().then(function (db) {
-      return new Promise(function (resolve, reject) {
-        var r = db.transaction('kv', 'readwrite').objectStore('kv').put(val, key);
-        r.onsuccess = function () { resolve(); };
-        r.onerror = function () { reject(r.error); };
-      });
-    });
-  }
-  function setFolderStatus(kind, extra) {
-    var el = $('docFolderStatus');
-    var btn = $('btnDocFolder');
-    if (!el) return;
-    if (kind === 'ok') {
-      el.innerHTML = '시트 <b>강사급여</b>에 저장 중이며, 네이버 박스 백업도 연결돼 있습니다.';
-      if (btn) btn.textContent = '폴더 다시 연결';
-    } else if (kind === 'fail') {
-      el.innerHTML = extra || '네이버 박스 백업이 끊겼습니다. 시트 저장은 그대로 됩니다.';
-      if (btn) btn.textContent = '네이버 박스 백업(선택)';
-    } else {
-      el.innerHTML = '약수 스케줄 시트의 <b>강사급여</b> 탭에 저장됩니다. 저장 후 다른 컴퓨터·핸드폰에서도 이 화면으로 볼 수 있습니다.';
-      if (btn) btn.textContent = '네이버 박스 백업(선택)';
-    }
-  }
   function parseDocsPayload(raw) {
     if (!raw || typeof raw !== 'object' || !raw.buckets) return null;
     ['tree', 'incheon', 'other'].forEach(function (k) {
@@ -2258,101 +2209,8 @@
     ensureStaffDocs(raw);
     return raw;
   }
-  function writeDocsFile(d) {
-    var text = JSON.stringify(d, null, 2);
-    if (!docsDirHandle) return;
-    docsDirHandle.getFileHandle(DOCS_FILE, { create: true }).then(function (fh) {
-      return fh.createWritable().then(function (w) {
-        return w.write(text).then(function () { return w.close(); });
-      });
-    }).then(function () {
-      setFolderStatus('ok');
-    }).catch(function () {
-      docsDirHandle = null;
-      setFolderStatus('fail');
-    });
-  }
-  function readDocsFromHandle() {
-    if (!docsDirHandle) return Promise.resolve(null);
-    return docsDirHandle.getFileHandle(DOCS_FILE, { create: true }).then(function (fh) {
-      return fh.getFile().then(function (file) { return file.text(); });
-    }).then(function (text) {
-      if (!text || !text.trim()) return null;
-      try { return parseDocsPayload(JSON.parse(text)); } catch (e) { return null; }
-    }).catch(function () { return null; });
-  }
-  function fetchDocsFile() {
-    return fetch(DOCS_FILE_URL, { cache: 'no-store' }).then(function (res) {
-      if (!res.ok) return null;
-      return res.json().then(parseDocsPayload);
-    }).catch(function () { return null; });
-  }
   function applyDocsData(d) {
     localStorage.setItem(DOCS_STORE, JSON.stringify(d));
-  }
-  function restoreDocsFolder() {
-    if (!window.showDirectoryPicker) {
-      setFolderStatus('fail', '이 브라우저는 폴더 연결을 지원하지 않습니다. Chrome에서 열어 주세요.');
-      return fetchDocsFile().then(function (d) {
-        if (d) applyDocsData(d);
-      });
-    }
-    return docsIdbGet('dir').then(function (handle) {
-      if (!handle) return fetchDocsFile().then(function (d) {
-        if (d) applyDocsData(d);
-      });
-      var opt = { mode: 'readwrite' };
-      return handle.queryPermission(opt).then(function (perm) {
-        if (perm !== 'granted') {
-          setFolderStatus('fail', '권한이 만료됐습니다. 관련서류 폴더를 다시 연결해 주세요.');
-          return fetchDocsFile().then(function (d) {
-            if (d) applyDocsData(d);
-          });
-        }
-        docsDirHandle = handle;
-        setFolderStatus('ok');
-        return readDocsFromHandle().then(function (d) {
-          if (d) applyDocsData(d);
-          else writeDocsFile(loadDocs());
-        });
-      });
-    }).catch(function () {
-      return fetchDocsFile().then(function (d) {
-        if (d) applyDocsData(d);
-      });
-    });
-  }
-  function connectDocsFolder() {
-    if (!window.showDirectoryPicker) {
-      flashToast('Chrome에서 열어 주세요');
-      return;
-    }
-    window.showDirectoryPicker({ id: 'rm-docs', mode: 'readwrite' }).then(function (dir) {
-      docsDirHandle = dir;
-      return docsIdbSet('dir', dir).then(function () {
-        return readDocsFromHandle();
-      }).then(function (fromFile) {
-        var cur = loadDocs();
-        var hasPeople = ['tree', 'incheon', 'other'].some(function (k) {
-          return cur.buckets[k] && cur.buckets[k].people && cur.buckets[k].people.length;
-        });
-        if (fromFile && fromFile.buckets) {
-          applyDocsData(fromFile);
-        } else if (hasPeople) {
-          writeDocsFile(cur);
-        } else {
-          writeDocsFile(cur);
-        }
-        setFolderStatus('ok');
-        applyStaffSelection(loadDocs());
-        renderDocsMeta();
-        flashToast('관련서류 폴더에 저장합니다');
-      });
-    }).catch(function (err) {
-      if (err && err.name === 'AbortError') return;
-      setFolderStatus('fail');
-      flashToast('폴더를 열 수 없습니다');
-    });
   }
   function docsBucket(d) { return d.buckets[d.payerId] || d.buckets.tree; }
   function payerSlug(d) {
@@ -2982,13 +2840,8 @@
   function initDocs() {
     $('docYearMonth').value = prevMonthValue();
     $('docPayDate').value = lastDayOfMonth(prevMonthValue());
-    restoreDocsFolder().then(function () {
-      applyStaffSelection(loadDocs());
-      renderDocsMeta();
-    });
     if (docsBound) return;
     docsBound = true;
-    $('btnDocFolder').addEventListener('click', connectDocsFolder);
     ['docPayerName', 'docPayerBiz', 'docPayerOwner'].forEach(function (id) {
       $(id).addEventListener('input', persistOtherPayer);
     });
@@ -3089,25 +2942,27 @@
       flashToast('원천세·홈택스 안내를 열었습니다');
     });
   }
-  var DOCS_PIN = '3645';
-  var DOCS_UNLOCK_KEY = 'rmDocsUnlock';
+  var docsUnlockedNow = false;
   var docsPinBuf = '';
   function docsUnlocked() {
-    try { return sessionStorage.getItem(DOCS_UNLOCK_KEY) === '1'; } catch (e) { return false; }
+    return docsUnlockedNow === true;
   }
   function setDocsUnlocked(on) {
+    docsUnlockedNow = !!on;
     try {
-      if (on) sessionStorage.setItem(DOCS_UNLOCK_KEY, '1');
-      else sessionStorage.removeItem(DOCS_UNLOCK_KEY);
+      if (!on) sessionStorage.removeItem('rmDocsUnlock');
     } catch (e) {}
-    syncDocsLockUi();
+  }
+  function fillDocsScreen() {
+    applyStaffSelection(loadDocs());
+    renderDocsMeta();
   }
   function syncDocsLockUi() {
-    var on = docsUnlocked();
-    var tabs = $('appTabs');
-    if (tabs) tabs.classList.toggle('docs-locked', !on);
-    $('appTabDocsLock').hidden = on;
-    $('appTabDocs').hidden = !on;
+    if (!docsUnlocked()) {
+      document.body.classList.remove('mode-docs');
+      $('panelDocs').classList.remove('active');
+      $('appTabDocs').classList.remove('active');
+    }
   }
   function renderPinDots() {
     var n = docsPinBuf.length;
@@ -3120,22 +2975,18 @@
     $('docsPinErr').hidden = true;
     renderPinDots();
     $('docsPinOverlay').hidden = false;
+    document.body.style.overflow = 'hidden';
   }
   function closeDocsPin() {
     docsPinBuf = '';
     $('docsPinOverlay').hidden = true;
+    document.body.style.overflow = '';
   }
   function submitDocsPin() {
     if (docsPinBuf === DOCS_PIN) {
       setDocsUnlocked(true);
       closeDocsPin();
       setAppTab('docs');
-      pullPayrollFromSheet().then(function (ok) {
-        if (ok) {
-          applyStaffSelection(loadDocs());
-          renderDocsMeta();
-        }
-      });
       return;
     }
     docsPinBuf = '';
@@ -3146,6 +2997,10 @@
     if (which === 'docs' && !docsUnlocked()) {
       openDocsPin();
       return;
+    }
+    if (which !== 'docs') {
+      setDocsUnlocked(false);
+      closeDocsPin();
     }
     if (which !== 'consult' && which !== 'receipt' && which !== 'docs') which = 'consult';
     document.body.classList.toggle('mode-consult', which === 'consult');
@@ -3167,9 +3022,9 @@
       requestAnimationFrame(fitPreview);
     }
     if (which === 'docs') {
+      fillDocsScreen();
       pullPayrollFromSheet().then(function (ok) {
-        if (ok) applyStaffSelection(loadDocs());
-        renderDocsMeta();
+        if (ok) fillDocsScreen();
       });
     }
   }
@@ -3250,7 +3105,6 @@
   document.getElementById('appTabConsult').addEventListener('click', function () { setAppTab('consult'); });
   document.getElementById('appTabReceipt').addEventListener('click', function () { setAppTab('receipt'); });
   document.getElementById('appTabDocs').addEventListener('click', function () { setAppTab('docs'); });
-  $('appTabDocsLock').addEventListener('click', openDocsPin);
   $('docsPinCancel').addEventListener('click', closeDocsPin);
   $('docsPinOverlay').addEventListener('click', function (e) {
     if (e.target.id === 'docsPinOverlay') closeDocsPin();
