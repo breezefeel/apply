@@ -1361,7 +1361,7 @@
     .psp-part-card.p1-kind-card .method-row.done-prior { border-left-width: 3px; }
     .psp-part-card.p1-kind-card .method-row.done-recent { border-left-width: 3px; }
     .psp-part-card.p1-kind-card .method-row.done { border-left-width: 3px; }
-    /* 이상민 등 단순 목록 — 폭에 따라 2열~다열 칩 */
+    /* 이상민·박준규 등 단순 목록 — 폭에 따라 2열~다열 칩 */
     .psp-part-card.ex-chip-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(min(100%, 188px), 1fr));
@@ -1380,6 +1380,9 @@
       border-radius: 8px;
       background: #fafbfc;
       min-width: 0;
+    }
+    .psp-part-card.ex-chip-grid .method-row:not(.has-thumb) {
+      grid-template-columns: 16px minmax(0, 1fr) auto;
     }
     .psp-part-card.ex-chip-grid .method-row input { margin-top: 0; width: 16px; height: 16px; }
     .psp-part-card.ex-chip-grid .method-thumb {
@@ -10658,7 +10661,8 @@
         }
         var cardCls = 'psp-part-card';
         if (secKey === 'self_tool' && isSelfToolCompactProgram_(progName)) cardCls += ' self-tool-compact';
-        else if (isP1ParProgram(progName)) cardCls += ' p1-kind-card';
+        else if (isP1ParProgram(progName)) cardCls += ' p1-kind-card ex-chip-grid';
+        else cardCls += ' ex-chip-grid';
         html += '<div class="' + cardCls + '">';
         if (isP1ParProgram(progName)) {
           progItems = progItems.slice().sort(function(a, b) {
