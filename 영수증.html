@@ -337,6 +337,10 @@
     cursor: pointer;
   }
   .hometax-val:active { background: #f4f1ea; }
+  .hometax-val .acc-bank {
+    display: block; font-size: 11px; font-weight: 700; color: var(--mute); margin-bottom: 2px;
+  }
+  .doc-flow-actions { margin-top: 10px; }
   .hometax-sum {
     display: flex; flex-direction: column; gap: 8px;
   }
@@ -885,16 +889,25 @@
               <p class="hint" id="docCaseHint"></p>
             </div>
             <div class="field">
-              <label id="lblDocAmount">4. 지급액</label>
-              <input id="docAmount" type="text" inputmode="numeric" value="1,000,000" placeholder="1,000,000">
+              <label id="lblDocNet">5. 실입금액</label>
+              <button type="button" class="hometax-val" id="docNetVal">—</button>
+            </div>
+            <div class="field" id="docAccountWrap" hidden>
+              <label>입금 계좌</label>
+              <button type="button" class="hometax-val" id="docAccountVal">—</button>
+              <p class="hint">계좌번호를 누르면 복사됩니다.</p>
             </div>
             <div class="field">
-              <label id="lblDocIncome">5. 소득세</label>
+              <label id="lblDocIncome">6. 소득세</label>
               <button type="button" class="hometax-val" id="docIncomeVal">—</button>
             </div>
             <div class="field">
-              <label id="lblDocLocal">6. 지방소득세</label>
+              <label id="lblDocLocal">7. 지방소득세</label>
               <button type="button" class="hometax-val" id="docLocalVal">—</button>
+            </div>
+            <div class="field">
+              <label id="lblDocAmount">8. 총 지급액</label>
+              <input id="docAmount" type="text" inputmode="numeric" value="1,000,000" placeholder="1,000,000">
             </div>
           </div>
           <div class="field" style="margin-top:12px;">
@@ -917,8 +930,13 @@
             <button type="button" class="btn btn-ghost" id="btnDocNewPerson">새로 만들기</button>
             <button type="button" class="btn btn-ghost" id="btnDocDelPerson">삭제</button>
           </div>
+          <div class="chat-actions doc-flow-actions">
+            <button type="button" class="btn btn-ghost" id="btnDocNextStaff">다음 강사 지급하기</button>
+            <button type="button" class="btn btn-print" id="btnDocPayDone">모두 지급 완료</button>
+          </div>
         </section>
 
+        <div id="docWithholdBlock" hidden>
         <section class="card" id="docPayCard">
           <div class="card-title">3. 원천세 합계</div>
           <p class="hint">원천징수이행상황신고서에는 사람 이름이 아니라 그달 합계만 넣고 세금을 납부합니다. 칸을 누르면 복사됩니다.</p>
@@ -967,6 +985,7 @@
           <div class="card-title">참고</div>
           <div class="doc-note" id="docNotes"></div>
         </section>
+        </div>
       </div>
 
       <article class="docs-sheet" id="docsPrintSheet"></article>
@@ -1984,9 +2003,9 @@
     }
   };
   var STAFF = {
-    choi: { id: 'p-choi', tab: '최진옥', name: '최진옥', role: 'instructor', rrn: '8106091566810', phone: '010-8869-6056' },
+    choi: { id: 'p-choi', tab: '최진옥', name: '최진옥', role: 'instructor', rrn: '8106091566810', phone: '010-8869-6056', bank: '기업은행', account: '05210502202011' },
     sangmin: { id: 'p-sangmin', tab: '이상민', name: '이상민', role: 'instructor', rrn: '', phone: '010-9178-5716' },
-    yuju: { id: 'p-yuju', tab: '이유주', name: '이유주', role: 'promo', rrn: '9202082063122', phone: '010-9518-7785' }
+    yuju: { id: 'p-yuju', tab: '이유주', name: '이유주', role: 'promo', rrn: '9202082063122', phone: '010-9518-7785', bank: '하나은행', account: '46091064623907' }
   };
   var OTHER_SEED = { id: 'p-youngim', name: '이영임', rrn: '5810122243113', phone: '', role: 'other', job: '기타 인적용역', memo: '' };
   var TREE_PAY_SEED = [
@@ -2445,12 +2464,40 @@
   function syncCasePayUi() {
     var on = usesCasePay();
     $('docCaseWrap').hidden = !on;
-    $('lblDocAmount').textContent = on ? '5. 지급액' : '4. 지급액';
+    $('lblDocNet').textContent = on ? '5. 실입금액' : '4. 실입금액';
     $('lblDocIncome').textContent = on ? '6. 소득세' : '5. 소득세';
     $('lblDocLocal').textContent = on ? '7. 지방소득세' : '6. 지방소득세';
+    $('lblDocAmount').textContent = on ? '8. 총 지급액' : '7. 총 지급액';
     var n = parseCaseCount($('docCaseCount').value);
     $('docAmount').readOnly = on && n > 0;
     updateCaseHint();
+    syncAccountUi();
+  }
+  function currentStaffBank() {
+    var tab = staffTabOf();
+    var s = STAFF[tab];
+    if (!s || !s.account) return null;
+    return { bank: s.bank || '', account: String(s.account).replace(/\D/g, '') };
+  }
+  function syncAccountUi() {
+    var wrap = $('docAccountWrap');
+    var btn = $('docAccountVal');
+    if (!wrap || !btn) return;
+    var acc = currentStaffBank();
+    if (!acc) {
+      wrap.hidden = true;
+      btn.textContent = '—';
+      btn.dataset.copy = '';
+      return;
+    }
+    wrap.hidden = false;
+    btn.innerHTML = '<span class="acc-bank">' + acc.bank + '</span>' + acc.account;
+    btn.dataset.copy = acc.account;
+  }
+  function syncWithholdBlock() {
+    var d = loadDocs();
+    var on = !!d.withholdOpen;
+    if ($('docWithholdBlock')) $('docWithholdBlock').hidden = !on;
   }
   function applyCasePay() {
     if (!usesCasePay()) {
@@ -2625,6 +2672,9 @@
     $('docIncomeVal').dataset.copy = tax.income ? String(tax.income) : '';
     $('docLocalVal').textContent = tax.local ? fmtWon(tax.local) : '—';
     $('docLocalVal').dataset.copy = tax.local ? String(tax.local) : '';
+    $('docNetVal').textContent = tax.net ? fmtWon(tax.net) : '—';
+    $('docNetVal').dataset.copy = tax.net ? String(tax.net) : '';
+    syncAccountUi();
     var ym = $('docYearMonth').value || prevMonthValue();
     $('docDueWithhold').textContent = shiftMonthLabel(ym, 10);
     $('docDueSimple').textContent = shiftMonthLabel(ym, 'end');
@@ -2768,6 +2818,7 @@
     renderDocSteps();
     renderDocNotes();
     renderPrintSheet();
+    syncWithholdBlock();
   }
   function fillPerson(p) {
     $('docRole').value = (p && p.role) || 'instructor';
@@ -2994,6 +3045,14 @@
       if (!this.dataset.copy) return;
       copyText(this.dataset.copy);
     });
+    $('docNetVal').addEventListener('click', function () {
+      if (!this.dataset.copy) return;
+      copyText(this.dataset.copy);
+    });
+    $('docAccountVal').addEventListener('click', function () {
+      if (!this.dataset.copy) return;
+      copyText(this.dataset.copy);
+    });
     $('docWithholdSum').addEventListener('click', function (e) {
       var b = e.target.closest('[data-copy]');
       if (!b || !b.getAttribute('data-copy')) return;
@@ -3016,6 +3075,19 @@
       flashToast('삭제됨');
     });
     $('btnDocCopyLine').addEventListener('click', copyHometaxLine);
+    $('btnDocNextStaff').addEventListener('click', function () {
+      var tabs = $('docStaffTabs');
+      if (tabs) tabs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    $('btnDocPayDone').addEventListener('click', function () {
+      var d = loadDocs();
+      d.withholdOpen = true;
+      saveDocs(d);
+      syncWithholdBlock();
+      var block = $('docWithholdBlock');
+      if (block) block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      flashToast('원천세·홈택스 안내를 열었습니다');
+    });
   }
   var DOCS_PIN = '3645';
   var DOCS_UNLOCK_KEY = 'rmDocsUnlock';
