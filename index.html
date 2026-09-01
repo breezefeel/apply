@@ -5591,7 +5591,9 @@
 
     function shouldAutoIncludeSessionLink_(itemId) {
       var p = state.program.find(function(x) { return x.id === itemId; });
-      return !!(p && p.youtubeUrl);
+      if (!p || !p.youtubeUrl) return false;
+      if (isP1ParItem(p)) return false;
+      return true;
     }
 
     function getSessionIncludedIds() {
