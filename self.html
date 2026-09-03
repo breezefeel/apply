@@ -91,7 +91,8 @@
   .cat-tools > summary { background: #1e3a6e; color: #fff; }
   .cat-lie > summary { background: #d8efe4; color: #1a5c40; }
   .cat-sit > summary { background: #f3e6c4; color: #6b4e16; }
-  .cat-stand > summary { background: #dce6f5; color: #1e3a6e; }
+    .cat-stand > summary { background: #dce6f5; color: #1e3a6e; }
+    .cat-face > summary { background: #f3ddd6; color: #6b2a22; }
   .cat-body { padding: 12px 12px 6px; }
   .cat-body .sec-lead { margin: 0 0 12px; }
   .cat-body .grid { margin-bottom: 14px; }
@@ -282,6 +283,23 @@
         <div class="grid" id="standGrid"></div>
         <div class="sec-sub">기능 운동</div>
         <div class="grid" id="standExGrid"></div>
+      </div>
+    </details>
+
+    <details class="cat cat-face" id="catFace">
+      <summary>
+        <span class="cat-k">05</span>
+        <span><span class="cat-name">리얼 페이스</span><span class="cat-sub">스마일 호흡 10단계 · 추가 축 · 기타</span></span>
+        <span class="cat-chev">▾</span>
+      </summary>
+      <div class="cat-body">
+        <p class="sec-lead">오늘 센터에서 한 단계만 엽니다. 사진 순서로 따라 하고, 장면이 안 보이면 영상을 켜세요.</p>
+        <div class="sec-sub">1 · 스마일 호흡 10단계</div>
+        <div class="grid" id="face10Grid"></div>
+        <div class="sec-sub">2 · 추가 축</div>
+        <div class="grid" id="faceExtraGrid"></div>
+        <div class="sec-sub">3 · 기타 (10단계에 안 섞인 항목)</div>
+        <div class="grid" id="faceOtherGrid"></div>
       </div>
     </details>
   </div>
@@ -1042,6 +1060,376 @@ var GUIDE = [
       ['포인트', '무릎이 아닌 근육 위에 올리고, 호흡을 유지하세요.'],
       ['주의', '무릎 관절을 직접 누르지 않습니다.']
     ]
+  },
+  {
+    id: 'face_ex_sb_1', tool: 'face', pos: 'face10', kind: 'face',
+    toolKo: '리얼 페이스 · 10단계', name: '① 스마일 호흡',
+    video: 'https://youtu.be/Y1EwTrt1HnY', thumb: true, n: 8,
+    sequences: [
+      { title: '영상 장면', start: 1, captions: [
+        '거울 정면. 바르게 앉아 좌골을 느끼고, 턱·어깨는 힘 뺍니다.',
+        '코로 들이쉬며 갈비뼈가 옆으로 부풀게 합니다. 어깨는 올리지 않습니다.',
+        '날숨에 끝까지 뱉으며 입꼬리를 귀에 걸린다는 느낌으로 올립니다.',
+        '한 호흡에 표정과 숨이 같이 가는지 확인합니다.'
+      ]},
+      { title: '따라 하는 장면', start: 5, captions: [
+        '의자에서 좌골이 가장 튀어나온 자리에 앉습니다. 앞·뒤·한쪽으로 치우치지 않게.',
+        '양손으로 갈비를 감싸고, 들숨에 두 손을 밀어낸다고 생각합니다.',
+        '입꼬리를 귀에 걸듯 올리고, 광대가 볼록해지게 합니다.',
+        '날숨에 배 왕자를 만들며 조이면서 끝까지 뱉습니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '거울 정면. 바르게 앉아 좌골을 느낍니다. 턱·어깨는 힘 뺍니다.'],
+      ['동작', '코로 들이쉬며 갈비가 옆으로 부풀게 하고, 배를 만들며 끝까지 내쉽니다. 날숨에 입꼬리를 귀에 걸린다는 느낌으로 올립니다.'],
+      ['포인트', '윗배·어깨만 먼저 올라오면 갈비·아랫배를 먼저 씁니다. 이 단계가 평가이기도 합니다.'],
+      ['주의', '관경근(목 앞)이 당겨져 입이 가로로 찢어지면 범위를 줄입니다. 장면이 안 보이면 영상을 켭니다.']
+    ]
+  },
+  {
+    id: 'face_ex_sb_2', tool: 'face', pos: 'face10', kind: 'face',
+    toolKo: '리얼 페이스 · 10단계', name: '② 호흡',
+    video: 'https://youtu.be/PV7qD4CUaCs', thumb: true, n: 7,
+    sequences: [
+      { title: '영상 장면', start: 1, captions: [
+        '앉았을 때 튀어나온 뼈(좌골 결절)를 느낍니다.',
+        '모르겠으면 앞뒤·좌우로 골반을 움직여, 한쪽으로 치우치지 않는 지점에 앉습니다.',
+        '양손으로 갈비뼈를 감싸고, 들숨에 두 손을 밀어냅니다.',
+        '날숨에 배 왕자를 만들며 조이면서 끝까지 뱉습니다.'
+      ]},
+      { title: '따라 하는 장면', start: 5, captions: [
+        '좌골에 앉아 허리를 세우지 말고, 앉은 뼈가 느껴지는 자리를 찾습니다.',
+        '손으로 갈비를 감싼 채 들숨에 갈비가 손을 밀어내는지 확인합니다.',
+        '들이쉬기가 안 되면 다 마셨다 생각할 때 한 번 더 마신 뒤, 끝까지 뱉으며 배 왕자를 만듭니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '이 날은 호흡 단독입니다. 스마일은 아직 얹지 않아도 됩니다.'],
+      ['동작', '좌골 앉기 → 손으로 갈비 밀기 → 날숨 배 왕자.'],
+      ['포인트', '갈비가 손으로 밀리고, 끝까지 뱉어지는지가 통과입니다.'],
+      ['주의', '어깨·윗배만 먼저 올라오면 손 아래 갈비가 벌어지는지 다시 봅니다.']
+    ]
+  },
+  {
+    id: 'face_ex_sb_3', tool: 'face', pos: 'face10', kind: 'face',
+    toolKo: '리얼 페이스 · 10단계', name: '③ 스마일 트레이닝',
+    video: 'https://youtu.be/baEC8uts9ak', thumb: true, n: 7,
+    sequences: [
+      { title: '영상 장면', start: 1, captions: [
+        '입꼬리를 귀에 걸린다는 느낌으로 올립니다.',
+        '손바닥을 앞광대에 대고 끌어 올린 느낌을 익힙니다.',
+        '손을 뗀 뒤에도 같은 방향으로 광대를 올립니다.',
+        '이마를 쓰지 않고 눈을 동그랗게 뜹니다.'
+      ]},
+      { title: '따라 하는 장면', start: 5, captions: [
+        '입꼬리만 올리고, 입이 가로로 찢어지지 않게 합니다.',
+        '양손을 앞광대에 대고 귀 쪽으로 살짝 끌어 올립니다.',
+        '안 되면 손바닥으로 이마를 막고 눈부터 뜹니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '① 호흡이 된 다음입니다. 거울 정면.'],
+      ['동작', '입꼬리→귀, 앞광대 손→손 없이, 이마 없이 눈.'],
+      ['포인트', '광대가 볼록하게 올라가게. ① 호흡과 같이.'],
+      ['주의', '관경근을 과하게 쓰면 입이 가로로 벌어집니다. 그 모양은 쓰지 않습니다.']
+    ]
+  },
+  {
+    id: 'face_ex_sb_4', tool: 'face', pos: 'face10', kind: 'face',
+    toolKo: '리얼 페이스 · 10단계', name: '④ 뮤잉',
+    video: 'https://youtu.be/5W2eF5Kf4HI', thumb: true, n: 7,
+    sequences: [
+      { title: '영상 장면', start: 1, captions: [
+        '이를 깨물지 않습니다. 위·아래 이 사이에 1mm 빈 공간.',
+        '코로 쉽니다. 입은 다물되 이를 붙이지 않습니다.',
+        '혀가 이에 닿지 않은 채 혓바닥 전체를 입천장에 붙입니다.',
+        '구개골을 혀 중앙으로 밀어 올립니다.'
+      ]},
+      { title: '따라 하는 장면', start: 5, captions: [
+        '입술은 가볍게 닫고, 턱 힘은 뺍니다.',
+        '혀 전체가 천장에 붙었는지, 혀끝이 앞니를 밀지 않는지 확인합니다.',
+        '턱 아래 근육이 쑥 올라가면 잘된 것입니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '이 날이 뮤잉 단독 훈련입니다. ⑤에서 호흡·스마일과 합칩니다.'],
+      ['동작', '이 1mm 이격 · 혀 전체 구개 · 구개골을 혀 중앙으로.'],
+      ['포인트', '턱 아래가 올라가는지가 통과입니다.'],
+      ['주의', '이를 깨물면 사각턱·저작근이 커질 수 있습니다. 느낌이 안 잡히면 무리하지 않습니다.']
+    ]
+  },
+  {
+    id: 'face_ex_sb_5', tool: 'face', pos: 'face10', kind: 'face',
+    toolKo: '리얼 페이스 · 10단계', name: '⑤ 호흡 · 스마일 · 뮤잉 종합',
+    video: 'https://youtu.be/_JTlqF54U8M', thumb: true, n: 7,
+    sequences: [
+      { title: '영상 장면', start: 1, captions: [
+        '② 호흡 · ③ 스마일 · ④ 뮤잉을 각각 확인한 뒤 합칩니다.',
+        '갈비가 붓고 끝까지 내쉬기를 유지합니다.',
+        '입꼬리 귀에 걸듯, 광대·눈에 힘을 유지합니다.',
+        '혀를 구개에 두고 턱 아래가 올라가는지 같이 봅니다.'
+      ]},
+      { title: '따라 하는 장면', start: 5, captions: [
+        '한 호흡에 세 가지가 동시에 깨지지 않게 합니다.',
+        '혀는 천장, 이는 1mm, 입은 스마일.',
+        '하나씩 깨지면 그 축만 ②·③·④로 돌아갑니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '바르게 앉아 좌골을 느낍니다.'],
+      ['동작', '호흡 + 스마일 + 혀 구개를 한 호흡에.'],
+      ['포인트', '세 가지가 동시에 깨지지 않음이 통과입니다.'],
+      ['주의', '혀를 앞으로 밀거나 이를 악물지 않습니다.']
+    ]
+  },
+  {
+    id: 'face_ex_sb_6', tool: 'face', pos: 'face10', kind: 'face',
+    toolKo: '리얼 페이스 · 10단계', name: '⑥ 호흡2 · 흉곽 좌우 · 일롱게이션',
+    video: 'https://youtu.be/q1r0hWGn76k', thumb: true, n: 6,
+    sequences: [
+      { title: '영상 장면', start: 1, captions: [
+        '앉아서 거울로 팔-몸통 사이 공간을 봅니다.',
+        '팔이 더 붙어 있는 쪽(갈비가 덜 열린 쪽)을 날숨에 조입니다.',
+        '어깨는 바깥으로 열고, 올라간 어깨는 바닥으로 내립니다.',
+        '정수리가 위로 끌리듯 척추를 길게(일롱게이션). 턱은 살짝 내립니다.'
+      ]},
+      { title: '따라 하는 장면', start: 5, captions: [
+        '양쪽 빈 공간이 같아질 때까지 덜 열린 쪽만 조금 더 엽니다.',
+        '들숨에 라인 유지, 날숨에 힘 풉니다. 턱이 들리면 목이 짧아집니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '앉아서 거울로 팔-몸통 사이 공간을 봅니다.'],
+      ['동작', '좌우 갈비 · 어깨 내림 · 일롱게이션.'],
+      ['포인트', '좌우 옆구리 라인이 같아지게.'],
+      ['주의', '턱이 들리면 키만 커지고 목은 짧아집니다.']
+    ]
+  },
+  {
+    id: 'face_ex_sb_7', tool: 'face', pos: 'face10', kind: 'face',
+    toolKo: '리얼 페이스 · 10단계', name: '⑦ 스마일2 · 좌우 · 눈',
+    video: 'https://youtu.be/m24nPYeCQb8', thumb: true, n: 6,
+    sequences: [
+      { title: '영상 장면', start: 1, captions: [
+        '거울에서 입꼬리가 양쪽으로 같은지 봅니다.',
+        '약한 쪽에 더 힘을 줍니다.',
+        '안 되면 주먹 너클을 입꼬리에 대고 귀에 걸린다는 방향으로 끌어 올립니다.',
+        '눈을 동그랗게 뜨고 시선을 천장으로 올린 다음 좌우로 천천히.'
+      ]},
+      { title: '따라 하는 장면', start: 5, captions: [
+        '방향을 기억한 뒤 손 없이 약한 쪽만 올립니다.',
+        '이마로 눈을 뜨지 않습니다. 강한 쪽을 더 올리지 않습니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '거울에서 입꼬리 높이를 좌우로 비교합니다.'],
+      ['동작', '약한 쪽 입꼬리 · 너클 유도 · 이마 없이 눈.'],
+      ['포인트', '강한 쪽을 더 올리지 않습니다.'],
+      ['주의', '관경근으로 입을 가로로 벌리지 않습니다.']
+    ]
+  },
+  {
+    id: 'face_ex_sb_8', tool: 'face', pos: 'face10', kind: 'face',
+    toolKo: '리얼 페이스 · 10단계', name: '⑧ 뮤잉2 · 혀 흡착 진행',
+    video: 'https://youtu.be/5GBe_GU-7o8', thumb: true, n: 7,
+    sequences: [
+      { title: '영상 장면', start: 1, captions: [
+        '혀 전체를 입천장에 붙인 상태를 유지합니다.',
+        '혀 중앙으로 천장을 밀어 올리고, 왼쪽 뿌리·오른쪽 뿌리도 밀어 올립니다.',
+        '들숨에는 가볍게, 날숨을 끝까지 뱉고 침을 삼킨 뒤 밀어 올립니다.',
+        '힘이 없으면 혀로 입속 안쪽을 골고루 돌리며 밀어내는 힘을 줍니다.'
+      ]},
+      { title: '따라 하는 장면', start: 5, captions: [
+        '앞·뒤·뿌리가 다 붙게. 혀 일부가 떨어지면 진행하지 않습니다.',
+        '좌우 10회씩. 구역이 있으면 앞만 합니다.',
+        '턱 아래가 올라간 상태를 유지하는지 봅니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '④ 뮤잉이 된 다음입니다.'],
+      ['동작', '혀 뿌리 좌우 · 삼킨 뒤 밀기 · 입속 쓸기.'],
+      ['포인트', '이동 중·가만히 있을 때도 반복하면 옆볼 힘이 붙습니다.'],
+      ['주의', '혀 일부가 떨어지면 진행하지 않습니다.']
+    ]
+  },
+  {
+    id: 'face_ex_sb_9', tool: 'face', pos: 'face10', kind: 'face',
+    toolKo: '리얼 페이스 · 10단계', name: '⑨ 스탠딩 · 선 자세',
+    video: 'https://youtu.be/5dK8duBjEnU', thumb: true, n: 5,
+    sequences: [
+      { title: '영상 장면', start: 1, captions: [
+        '두 번째 발가락이 정면. 발 사이는 주먹 하나.',
+        '체중을 앞뒤·좌우로 흔들어 본 뒤, 뒤꿈치 1cm 앞에 싣습니다.',
+        '골반을 좌우로 밀어 바른 위치를 찾고, 엉덩이에 힘, 아랫배를 끌어 올립니다.',
+        '흉곽은 과하게 열지 않고 닫습니다. 키가 커지는 느낌(일롱게이션).'
+      ]},
+      { title: '따라 하는 장면', start: 5, captions: [
+        '오리 엉덩이·골반 전방경사 없이. 골반과 가슴이 같은 선인지 옆에서 봅니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '앉기에서 서기로 옮기는 날입니다.'],
+      ['동작', '발 · 체중 · 골반 · 흉곽 닫기 · 어깨 내림.'],
+      ['포인트', '골반 전방경사 없이.'],
+      ['주의', '흉곽만 열고 허리가 꺾이면 중단하고 골반부터.']
+    ]
+  },
+  {
+    id: 'face_ex_sb_10', tool: 'face', pos: 'face10', kind: 'face',
+    toolKo: '리얼 페이스 · 10단계', name: '⑩ 선 자세 스마일 호흡',
+    video: 'https://youtu.be/Dno8sLoQA0o', thumb: true, n: 6,
+    sequences: [
+      { title: '영상 장면', start: 1, captions: [
+        '⑨에서 배운 선 자세. 스마일 호흡은 유지합니다.',
+        '양발 11자. 뒤꿈치를 서로 밀어내듯 붙여 허벅지 안쪽이 떨어지지 않게.',
+        '뒤꿈치·허벅지 안쪽·엉덩이를 함께 조입니다.',
+        '조인 상태에서 키 커지는 느낌.'
+      ]},
+      { title: '따라 하는 장면', start: 5, captions: [
+        '옆모습·뒷모습에서 엉덩이가 뒤로 빠지거나 골반이 앞으로 나가지 않게.',
+        '조임과 스마일 호흡이 같이 가게. 안쪽만 세게 조이다가 골반이 앞으로 나오면 힘을 줄입니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '⑨ 선 자세가 된 다음입니다.'],
+      ['동작', '뒤꿈치·내전·힙 조임 + 스마일 호흡 유지.'],
+      ['포인트', '조여도 골반이 앞으로 안 나감.'],
+      ['주의', '안쪽만 세게 조이다가 골반이 앞으로 나오면 힘을 줄입니다.']
+    ]
+  },
+  {
+    id: 'face_ex_jaw', tool: 'face', pos: 'faceExtra', kind: 'face',
+    toolKo: '리얼 페이스 · 추가 축', name: '턱 관절 운동',
+    extra: 'https://www.healthline.com/health/myofunctional-therapy', extraLabel: 'Healthline 참고',
+    thumb: true, n: 1,
+    sequences: [
+      { title: '따라 하는 장면', start: 1, captions: [
+        '거울 정면. 혀는 구개 또는 편한 위치. 입을 통증 없는 범위에서 천천히 열고 닫습니다. 손가락을 귀 앞(턱관절)에 가볍게 대어 한쪽으로 새는지 확인합니다. 좌우로 작게 미끄러뜨려도 됩니다. 소리·통증이 세지면 중단합니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '10단계에 없는 턱 가동입니다. 스마일 때 턱이 앞·옆으로 새면 합니다.'],
+      ['동작', '통증 없는 범위에서 열고 닫기. 좌우로 작게 미끄러뜨려도 됩니다.'],
+      ['포인트', '턱이 한쪽으로 새면 범위를 줄입니다.'],
+      ['주의', '소리·통증이 세지면 중단합니다. 이 운동은 턱 치료를 대신하지 않습니다.']
+    ]
+  },
+  {
+    id: 'face_ex_chew', tool: 'face', pos: 'faceExtra', kind: 'face',
+    toolKo: '리얼 페이스 · 추가 축', name: '좌우 저작 균형',
+    extra: 'https://www.myofocus.com.au/myo-video-library/', extraLabel: 'Myofocus 축 참고',
+    thumb: true, n: 1,
+    sequences: [
+      { title: '따라 하는 장면', start: 1, captions: [
+        '어느 쪽으로 더 씹는지 먼저 확인합니다. 입을 다문 채 약한 쪽으로 천천히 씹는 느낌을 10회. 고개가 약한 쪽으로 기울지 않게. 실제 음식은 세션에서 안내한 경우만 사용합니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '스마일 스크린의 턱 항목이 깨질 때. Myofocus Swallowing 축에 가깝습니다.'],
+      ['동작', '약한 쪽으로 천천히 씹는 느낌을 연습합니다.'],
+      ['포인트', '고개가 약한 쪽으로 기울지 않게 합니다.'],
+      ['주의', '턱 통증이 있으면 빈 동작만 합니다.']
+    ]
+  },
+  {
+    id: 'face_ex_scalp', tool: 'face', pos: 'faceExtra', kind: 'face',
+    toolKo: '리얼 페이스 · 추가 축', name: '두피 이완 운동',
+    thumb: true, n: 1,
+    sequences: [
+      { title: '따라 하는 장면', start: 1, captions: [
+        '손가락을 정수리·옆머리에 가볍게 둡니다. 목을 꺾지 않은 채 작은 원으로 20초. 얼굴 표정이 따라가지 않게. 두통이 세지면 중단합니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '표정 때 두피가 따라올 때. Myofocus Posture 축의 머리 쪽입니다.'],
+      ['동작', '정수리·옆머리를 작은 원으로 움직입니다. 목을 꺾지 않습니다.'],
+      ['포인트', '얼굴 표정이 따라가지 않게 합니다.'],
+      ['주의', '두통이 세지면 중단합니다.']
+    ]
+  },
+  {
+    id: 'face_ex_neck', tool: 'face', pos: 'faceExtra', kind: 'face',
+    toolKo: '리얼 페이스 · 추가 축', name: '경추 정렬 + 표정',
+    thumb: true, n: 1,
+    sequences: [
+      { title: '따라 하는 장면', start: 1, captions: [
+        '턱을 살짝 당기고 정수리가 위로 가게 합니다. 이 목 정렬을 유지한 채 작은 스마일을 올립니다. 목 앞·옆이 과하게 뜨면 표정을 줄입니다.'
+      ]}
+    ],
+    note: [
+      ['준비', '⑥·⑨의 일롱게이션과 이어집니다. IAOM dissociation(얼굴만 움직이고 목은 안정)에 해당합니다.'],
+      ['동작', '스마일 호흡을 유지한 채 목이 따라붙는지 확인합니다.'],
+      ['포인트', '얼굴만 움직이고 목은 안정시킵니다.'],
+      ['주의', '어지러움·팔 저림이 있으면 중단합니다.']
+    ]
+  },
+  {
+    id: 'face_ex_lip_seal', tool: 'face', pos: 'faceOther', kind: 'face',
+    toolKo: '리얼 페이스 · 기타', name: '휴식 입술 봉인',
+    extra: 'https://valleyomt.com/what-is-ideal-healthy-oral-rest-posture/', extraLabel: '휴식 자세 참고',
+    thumb: true, n: 1,
+    sequences: [
+      { title: '따라 하는 장면', start: 1, captions: [
+        '운동이 아닙니다. 아무 표정 없이 입을 다뭅니다. 입술은 가볍게 닿고, 이를 깨물지 않습니다(1~2mm). 코로만 쉽니다. 혀는 가능하면 천장. 이 상태를 1분 유지합니다. 입이 벌어지면 다시 닫고 시간을 처음부터.'
+      ]}
+    ],
+    note: [
+      ['준비', 'IAOM 휴식 자세 4점 중 입술·비호흡입니다. 10단계에 휴식 장면이 없어 기타로 둡니다.'],
+      ['동작', '입술 가볍게 닫기 + 이 이격 + 코 호흡. 스마일은 하지 않습니다.'],
+      ['포인트', '힘줘서 입을 꾹 다물지 않습니다. 닿기만.'],
+      ['주의', '코가 막히면 운동 전에 원인을 봅니다. 입술 테이핑은 여기서 하지 않습니다.']
+    ]
+  },
+  {
+    id: 'face_ex_swallow', tool: 'face', pos: 'faceOther', kind: 'face',
+    toolKo: '리얼 페이스 · 기타', name: '삼킴 · 혀가 앞으로 안 나가게',
+    extra: 'https://www.healthline.com/health/tongue-thrust', extraLabel: 'Healthline 연하 참고',
+    thumb: true, n: 1,
+    sequences: [
+      { title: '따라 하는 장면', start: 1, captions: [
+        '혀를 천장에 붙인 채 침을 한 번 모읍니다. 이를 깨물지 않고, 혀가 이 사이로 나가지 않게 삼킵니다. 삼킨 뒤에도 혀는 천장에 남아 있습니다. 10회. 거울에서 입술이 벌어지거나 혀가 보이면 다시.'
+      ]}
+    ],
+    note: [
+      ['준비', 'Myofocus Swallowing 축. ⑧의 ‘삼킨 뒤 밀기’와 가깝지만, 여기는 연하 자체입니다.'],
+      ['동작', '혀 구개 유지 → 침 삼킴 → 혀가 앞으로 안 나옴.'],
+      ['포인트', '혀 내밀기(tongue thrust)가 있으면 이 항목. 스마일 10단계만으로는 안 잡힙니다.'],
+      ['주의', '사레·구역이 있으면 중단합니다. 연하장애 치료는 이 제품이 아닙니다.']
+    ]
+  },
+  {
+    id: 'face_ex_tongue_slide', tool: 'face', pos: 'faceOther', kind: 'face',
+    toolKo: '리얼 페이스 · 기타', name: '혀 미끄러기',
+    extra: 'https://www.healthline.com/health/myofunctional-therapy', extraLabel: 'Healthline 예제',
+    thumb: true, n: 1,
+    sequences: [
+      { title: '따라 하는 장면', start: 1, captions: [
+        '혀끝을 앞니 바로 뒤 천장(유두 근처, 이에 닿지 않게)에 댑니다. 혀끝을 천장에 붙인 채 뒤로 천천히 미끄러뜨립니다. 앞니를 밀지 않습니다. 20회.'
+      ]}
+    ],
+    note: [
+      ['준비', 'Healthline Tongue touches. 뮤잉(전체 흡착)과 달라서 10단계에 안 넣었습니다.'],
+      ['동작', '혀끝으로 천장을 따라 뒤로 미끄러기 20회.'],
+      ['포인트', '혀끝이 이에 닿지 않게.'],
+      ['주의', '구역이 있으면 범위를 줄입니다.']
+    ]
+  },
+  {
+    id: 'face_ex_uvula', tool: 'face', pos: 'faceOther', kind: 'face',
+    toolKo: '리얼 페이스 · 기타', name: '연구개 올리기 (아)',
+    extra: 'https://www.healthline.com/health/myofunctional-therapy', extraLabel: 'Healthline 예제',
+    thumb: true, n: 1,
+    sequences: [
+      { title: '따라 하는 장면', start: 1, captions: [
+        '입을 편하게 벌리고 ‘아’ 소리를 짧게 냅니다. 목젖(연구개)이 위로 올라가는 느낌을 봅니다. 거울이 있으면 목젖이 살짝 올라가는지. 힘줘서 목만 조이지 않습니다. 10~20회.'
+      ]}
+    ],
+    note: [
+      ['준비', 'Healthline Uvula raises. 스마일·뮤잉에 없는 연구개 항목이라 기타로 둡니다.'],
+      ['동작', '입을 열고 ‘아’ 하면서 연구개를 올립니다.'],
+      ['포인트', '목 앞을 세게 조이지 않고, 천장 뒤가 올라가는 느낌.'],
+      ['주의', '목 통증·쉰 목소리가 있으면 중단합니다. 수면무호흡 치료로 안내하지 않습니다.']
+    ]
   }
 ];
 
@@ -1061,7 +1449,7 @@ function findGuide(id){
 }
 function cardHtml(g){
   var hasImg = !!(g.n || g.thumb);
-  var ph = g.kind==='habit' ? '생활습관' : (g.kind==='move' ? '기능 운동' : ((g.kind==='ex' || g.kind==='stretch') ? '자세 교정' : (g.video ? '설명 + 영상' : '설명 가이드')));
+  var ph = g.kind==='habit' ? '생활습관' : (g.kind==='move' ? '기능 운동' : (g.kind==='face' ? '리얼 페이스' : ((g.kind==='ex' || g.kind==='stretch') ? '자세 교정' : (g.video ? '설명 + 영상' : '설명 가이드'))));
   var img = hasImg
     ? '<img src="'+BASE+g.id+'/01.jpg" alt="'+g.toolKo+' '+g.name+'">'
     : '<div class="ph">'+ph+'</div>';
@@ -1081,6 +1469,9 @@ function renderHub(){
   $('standExGrid').innerHTML = GUIDE.filter(function(g){ return g.pos==='stand' && g.kind==='move'; }).map(cardHtml).join('');
   $('foamGrid').innerHTML = GUIDE.filter(function(g){ return g.tool==='foam'; }).map(cardHtml).join('');
   $('ballGrid').innerHTML = GUIDE.filter(function(g){ return g.tool==='ball'; }).map(cardHtml).join('');
+  $('face10Grid').innerHTML = GUIDE.filter(function(g){ return g.pos==='face10'; }).map(cardHtml).join('');
+  $('faceExtraGrid').innerHTML = GUIDE.filter(function(g){ return g.pos==='faceExtra'; }).map(cardHtml).join('');
+  $('faceOtherGrid').innerHTML = GUIDE.filter(function(g){ return g.pos==='faceOther'; }).map(cardHtml).join('');
 }
 function noteHtml(g){
   return '<div class="note">'+g.note.map(function(row){
@@ -1136,11 +1527,13 @@ function renderDetail(id){
         '<figcaption><span class="num">'+n+'</span>'+cap+'</figcaption></figure>';
     });
   });
-  html += '<p class="lead" style="margin-top:8px">'+(g.tool==='stretch'
+  html += '<p class="lead" style="margin-top:8px">'+(g.tool==='face'
+    ? '사진 순서로 따라 하세요. 장면이 안 보이면 위 영상을 켭니다. 통증·구역이 있으면 멈추세요.'
+    : (g.tool==='stretch'
     ? '사진으로 오늘 한 동작을 확인하고, 자세한 건 영상을 보세요. 통증 없는 범위만. 찌릿하면 멈추세요.'
     : (g.tool==='posture'
     ? '센터에서 배운 느낌이 기준입니다. 어지럽거나 통증이 세지면 바로 멈추세요.'
-    : '통증 0~3만. 뼈 위는 피하고, 불편하면 멈추세요.'))+'</p>';
+    : '통증 0~3만. 뼈 위는 피하고, 불편하면 멈추세요.')))+'</p>';
   html += '<a class="back" href="#">← 목록으로</a>';
   $('detail').innerHTML = html;
 }
@@ -1163,6 +1556,7 @@ function catId(g){
   if (g.pos==='passive' || g.pos==='lie') return 'catLie';
   if (g.pos==='sitA' || g.pos==='sit') return 'catSit';
   if (g.pos==='standA' || g.pos==='stand') return 'catStand';
+  if (g.tool==='face') return 'catFace';
   return '';
 }
 function subCatId(g){
@@ -1172,7 +1566,7 @@ function subCatId(g){
   return '';
 }
 function openCat(cid, sid){
-  ['catTools','catLie','catSit','catStand'].forEach(function(id){
+  ['catTools','catLie','catSit','catStand','catFace'].forEach(function(id){
     var el = $(id);
     if (el) el.open = (id===cid);
   });
