@@ -3104,7 +3104,7 @@
     var PROGRAM_TABS = [
       { id: 'movement', label: '박준규 원장', sub: 'Lying · Sitting/Quadruped · Standing' },
       { id: 'func', label: '최진옥 원장', sub: 'Core · Trunk · Hip · Shoulder · Reformer' },
-      { id: 'sangmin', label: '이상민 원장', sub: 'Lying · Sitting/Quadruped · Standing' },
+      { id: 'sangmin', label: '이상민 원장', sub: 'Lying · Sitting/Quadruped · Standing · 어깨 밴드' },
       { id: 'hongtaek', label: '최홍택 원장', sub: '근막 경선 · Strength & Coordination' },
       { id: 'injun', label: '김인준 원장', sub: '고관절·코어 · 흉추 가동성' },
       { id: 'face', label: '리얼 페이스', sub: 'Manual · 스마일 호흡 10단계' },
@@ -4557,6 +4557,27 @@
       };
     }
 
+    function youtubeThumbFromUrl_(url) {
+      var m = String(url || '').match(/(?:youtu\.be\/|[?&]v=|shorts\/|embed\/)([A-Za-z0-9_-]{6,})/);
+      return m ? ('https://i.ytimg.com/vi/' + m[1] + '/hqdefault.jpg') : '';
+    }
+
+    function sangminLinkItem_(id, group, sectionTitle, program, label, alimtalkLabel, url, coachingNote, cue) {
+      return {
+        id: id,
+        uiSection: 'sangmin_' + group,
+        sectionTitle: sectionTitle,
+        program: program,
+        label: label,
+        alimtalkLabel: alimtalkLabel || label,
+        coachingNote: coachingNote || '',
+        cue: cue || '',
+        group: sectionTitle,
+        thumbUrl: youtubeThumbFromUrl_(url),
+        linkUrl: String(url || '').trim(),
+      };
+    }
+
     var SANGMIN_CATALOG_RAW = [
       /* ── Lying · Supine (01_누워서.mp4 + 8회차 프로그램) ── */
       sangminItem_('sm_lie_breath', 'lie', 'Lying', 'Supine', '바로 누워 호흡·정렬', '누워서 호흡·자세 정렬', 0,
@@ -4670,6 +4691,44 @@
       sangminItem_('sm_std_plyo', 'stand', 'Standing', 'Standing', '플라이오메트릭', '플라이오메트릭', 144,
         '준비: 7·8회차. 스쿼트·런지·힌지가 안정되고, 착지가 조용한 뒤에만.\n동작: 작은 스쿼트 점프, 스플릿 점프, 또는 제자리 홉. 높이보다 부드러운 착지.\n포인트: 착지 시 무릎이 안쪽으로 무너지지 않게, 소리가 크지 않게.\n주의: 통증·불안정하면 점프 없이 빠르게 일어서기만.',
         '높이보다 착지가 조용하고 무릎 정렬', '', 'gen_hop.png'),
+
+      /* ── 어깨 밴드 9가지 (영상 1편 = 동작 1개) ── */
+      sangminLinkItem_('sm_sh_ir', 'shoulder', '어깨 밴드', '어깨 밴드', '① 내회전', '어깨 밴드 · 내회전',
+        'https://youtu.be/owidN8ifYPk',
+        '준비: 상자를 앉아 팔꿈치를 옆구리에 90도로 붙입니다. 반대 손으로 운동하는 쪽 어깨를 가볍게 잡아 어깨가 귀로 올라가지 않게 합니다.\n동작: 전완만 몸 안쪽으로 천천히 당겼다가, 같은 속도로 돌아옵니다.\n포인트: 팔꿈치가 몸에서 떨어지지 않게. 어깨가 으쓱하지 않게.\n주의: 어깨 앞이 찌릿하면 범위를 줄입니다.',
+        '팔꿈치가 몸에서 떨어지지 않게'),
+      sangminLinkItem_('sm_sh_er', 'shoulder', '어깨 밴드', '어깨 밴드', '② 외회전', '어깨 밴드 · 외회전',
+        'https://youtu.be/vdIsjHTNU_c',
+        '준비: 상자를 앉아 팔꿈치를 옆구리에 90도로 붙입니다. 반대 손으로 운동하는 쪽 위팔을 안정시킵니다.\n동작: 전완만 바깥으로 천천히 열었다가, 같은 속도로 돌아옵니다.\n포인트: 팔꿈치 위치를 고정. 손목이 꺾이지 않게.\n주의: 어깨가 뒤로 젖히거나 으쓱하면 저항을 낮춥니다.',
+        '팔꿈치 위치를 고정'),
+      sangminLinkItem_('sm_sh_er90', 'shoulder', '어깨 밴드', '어깨 밴드', '③ 90도 외회전', '어깨 밴드 · 90도 외회전',
+        'https://youtu.be/7vcwaMNMJ10',
+        '준비: 상자를 앉아 팔꿈치를 어깨 높이, 전완은 세로로 세웁니다. 밴드는 아래·옆에서 잡아당기게 둡니다.\n동작: 손(전완)을 천천히 뒤로 열었다가 돌아옵니다. 팔꿈치 높이는 그대로.\n포인트: 어깨를 귀로 올리지 않기. 몸통이 같이 돌아가지 않게.\n주의: 어깨 위·앞이 불편하면 팔 높이를 낮춥니다.',
+        '어깨를 귀로 올리지 않기'),
+      sangminLinkItem_('sm_sh_flex', 'shoulder', '어깨 밴드', '어깨 밴드', '④ 전방 거상', '어깨 밴드 · 전방 거상',
+        'https://youtu.be/1zkm_CylG1E',
+        '준비: 상자를 앉아 허리를 세웁니다. 밴드를 한 손에 잡고 팔은 앞으로 둡니다.\n동작: 팔을 앞으로 길게 들어 머리 위까지 올렸다가, 천천히 내립니다.\n포인트: 어깨가 귀로 딸려 올라가지 않게. 허리를 젖혀 올리지 않기.\n주의: 팔이 잘 안 올라가면 끝까지 가지 말고 편한 높이에서 멈춥니다.',
+        '어깨가 귀로 딸려 올라가지 않게'),
+      sangminLinkItem_('sm_sh_punch', 'shoulder', '어깨 밴드', '어깨 밴드', '⑤ 전거근 펀치', '어깨 밴드 · 전거근 펀치',
+        'https://youtu.be/_GC6uHnxc7Y',
+        '준비: 상자를 앉아 밴드를 등 뒤에 고정합니다. 팔꿈치를 편 채 손을 어깨 높이에 둡니다.\n동작: 손만 앞으로 찌르듯 밀어 견갑이 앞으로 나가게 했다가, 천천히 돌아옵니다.\n포인트: 어깨를 으쓱하지 않고 견갑만 앞으로. 몸통이 같이 나가지 않게.\n주의: 목 긴장이 있으면 미는 거리를 줄입니다.',
+        '견갑만 앞으로, 어깨는 으쓱하지 않게'),
+      sangminLinkItem_('sm_sh_ext', 'shoulder', '어깨 밴드', '어깨 밴드', '⑥ 신전', '어깨 밴드 · 신전',
+        'https://youtu.be/oXuU46jtxlE',
+        '준비: 상자를 앉아 허리를 세웁니다. 밴드는 앞·아래에서 잡고, 팔은 몸 옆에 둡니다.\n동작: 팔꿈치를 편 채 팔을 몸 뒤로 천천히 밀어 내렸다가 돌아옵니다.\n포인트: 어깨가 앞으로 말리지 않게. 허리를 꺾어 뒤를 보지 않기.\n주의: 어깨 앞이 당기면 뒤로 가는 범위를 줄입니다.',
+        '어깨가 앞으로 말리지 않게'),
+      sangminLinkItem_('sm_sh_quadrow', 'shoulder', '어깨 밴드', '어깨 밴드', '⑦ 네발 로우', '어깨 밴드 · 네발 로우',
+        'https://youtu.be/WGz3ZAghPgM',
+        '준비: 매트에 무릎을 대고, 한쪽 손은 상자 위에 둡니다. 반대 손으로 밴드를 잡습니다.\n동작: 몸통이 돌아가지 않게 버틴 채, 팔꿈치를 옆구리 쪽으로 당겨 견갑을 모읍니다. 천천히 폅니다.\n포인트: 당기는 어깨가 귀로 올라가지 않게. 지지하는 팔·골반이 무너지지 않게.\n주의: 허리가 돌아가면 당기는 거리를 줄입니다.',
+        '견갑을 모으고 몸통이 돌아가지 않게'),
+      sangminLinkItem_('sm_sh_row', 'shoulder', '어깨 밴드', '어깨 밴드', '⑧ 시티드 로우', '어깨 밴드 · 시티드 로우',
+        'https://youtu.be/r5cuW8SIl5o',
+        '준비: 상자를 앉아 허리를 세웁니다. 밴드를 가슴 높이에서 양손으로 잡습니다.\n동작: 팔꿈치를 옆구리에 붙이며 당겼다가, 팔을 천천히 폅니다. 어깨부터 말고 견갑부터.\n포인트: 가슴을 열고 견갑을 모으기. 상체가 뒤로 눕지 않게.\n주의: 목을 내밀거나 어깨를 으쓱하면 저항을 낮춥니다.',
+        '견갑부터 모으고 상체는 세우기'),
+      sangminLinkItem_('sm_sh_pulldown', 'shoulder', '어깨 밴드', '어깨 밴드', '⑨ 오버헤드 풀다운', '어깨 밴드 · 오버헤드 풀다운',
+        'https://youtu.be/9qipHHT2ys4',
+        '준비: 상자를 앉아 양손을 머리 위로 뻗어 밴드를 잡습니다. 허리는 세웁니다.\n동작: 팔꿈치를 옆·아래로 접으며 밴드를 당겼다가, 천천히 머리 위로 돌아갑니다.\n포인트: 어깨를 귀에서 멀리. 허리를 젖혀 당기지 않기.\n주의: 어깨 위가 불편하면 손을 더 넓게, 내리는 깊이는 줄입니다.',
+        '어깨를 귀에서 멀리, 허리는 젖히지 않기'),
     ];
 
     function buildSangminCatalog() {
@@ -4780,7 +4839,9 @@
       sm_quad_tiger: 90, sm_quad_animal: 100, sm_quad_pushrot: 110,
       sm_std_sitstand: 10, sm_std_balance: 20, sm_std_hinge: 30, sm_std_squat: 40,
       sm_std_lunge: 50, sm_std_rev_lunge: 60, sm_std_side_lunge: 70, sm_std_lat_lunge: 80,
-      sm_std_plyo: 90
+      sm_std_plyo: 90,
+      sm_sh_ir: 10, sm_sh_er: 20, sm_sh_er90: 30, sm_sh_flex: 40, sm_sh_punch: 50,
+      sm_sh_ext: 60, sm_sh_quadrow: 70, sm_sh_row: 80, sm_sh_pulldown: 90
     };
 
     function sangminDifficulty_(id) {
@@ -5012,6 +5073,7 @@
         typeof buildFuncJinokCatalog === 'function' ? buildFuncJinokCatalog() : null,
         typeof buildHongtaekCatalog === 'function' ? buildHongtaekCatalog() : null,
         typeof buildInjunCatalog === 'function' ? buildInjunCatalog() : null,
+        typeof buildSangminCatalog === 'function' ? buildSangminCatalog() : null,
       ];
       var i;
       var j;
