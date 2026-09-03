@@ -3107,7 +3107,7 @@
       { id: 'sangmin', label: '이상민 원장', sub: 'Lying · Sitting/Quadruped · Standing' },
       { id: 'hongtaek', label: '최홍택 원장', sub: '근막 경선 · Strength & Coordination' },
       { id: 'injun', label: '김인준 원장', sub: '고관절·코어 · 흉추 가동성' },
-      { id: 'face', label: '리얼 페이스', sub: 'Manual · 스마일 6단계 · 호흡' },
+      { id: 'face', label: '리얼 페이스', sub: 'Manual · 스마일 호흡 10단계' },
     ];
 
     var SCHEDULE_PROGRAM_COLORS_FALLBACK = {
@@ -3115,15 +3115,28 @@
       '약수': { '기능 운동': '#2563eb', 'P-스트레칭': '#059669', '작은얼굴': '#d97706' },
     };
 
-    /** 예전 단건 스마일 진도 → 스마일 ① */
+    /** 예전 스마일 6단계·단건 진도 → IFC 스마일 호흡 10단계 */
+    var FACE_PROGRESS_ID_ALIAS_ = {
+      face_ex_smile: 'face_ex_sb_1',
+      face_ex_smile_1: 'face_ex_sb_1',
+      face_ex_smile_2: 'face_ex_sb_3',
+      face_ex_smile_3: 'face_ex_sb_7',
+      face_ex_smile_4: 'face_ex_sb_5',
+      face_ex_smile_5: 'face_ex_sb_1',
+      face_ex_smile_6: 'face_ex_sb_10',
+      face_ex_breath: 'face_ex_sb_6',
+      face_ex_tongue_rest: 'face_ex_sb_5',
+      face_ex_tongue_press: 'face_ex_sb_8',
+    };
     function canonicalFaceProgressId_(id) {
-      return id === 'face_ex_smile' ? 'face_ex_smile_1' : id;
+      return FACE_PROGRESS_ID_ALIAS_[id] || id;
     }
 
     function buildFaceCatalog() {
       function faceItem(id, uiSection, sectionTitle, label, extra) {
         extra = extra || {};
         var program = extra.program || sectionTitle;
+        var url = String(extra.youtubeUrl || extra.linkUrl || '').trim();
         return {
           id: id,
           uiSection: uiSection,
@@ -3131,9 +3144,11 @@
           program: program,
           label: label,
           group: program,
-          hasVideo: false,
+          hasVideo: !!url,
+          youtubeUrl: url,
           alimtalkLabel: extra.alimtalkLabel || label,
           coachingNote: extra.coachingNote || '',
+          videoTitle: extra.videoTitle || label,
         };
       }
       return [
@@ -3150,70 +3165,132 @@
         faceItem('face_self_heart', 'face_self', '셀프 관리', '하트 라인'),
         faceItem('face_self_cheek', 'face_self', '셀프 관리', '광대 리프팅'),
         faceItem('face_self_jawline', 'face_self', '셀프 관리', '턱 라인 정리'),
-        faceItem('face_ex_smile_1', 'face_exercise', 'Exercise', '① 관찰 스마일 (평가)', {
-          program: '1 · 스마일 6단계',
-          alimtalkLabel: '스마일 ① 관찰 · 좌우만 보기',
-          coachingNote: '준비: 거울 정면. 턱·어깨 힘 빼고 앉거나 섭니다. 이 동작이 평가입니다.\n동작: 힘을 빼고 천천히 스마일합니다. 좌우 입꼬리 높이·볼 볼륨만 봅니다.\n포인트: 과한 표정·목 꺾임을 확인합니다.\n주의: 아픈 범위까지 올리지 않습니다.',
+        faceItem('face_ex_sb_1', 'face_exercise', 'Exercise', '① 스마일 호흡', {
+          program: '1 · 스마일 호흡 10단계',
+          alimtalkLabel: '① 스마일 호흡',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_sb_1',
+          thumbUrl: 'exercise-thumbs/face_ex_sb_1.jpg',
+          videoTitle: '[1일차] 스마일 호흡(Smile Breathing)',
+          coachingNote: '준비: 거울 정면. 바르게 앉아 좌골을 느낍니다. 턱·어깨는 힘 뺍니다.\n동작: 코로 들이쉬며 갈비뼈가 옆으로 부풀게 하고, 배를 만들며 끝까지 내쉽니다. 날숨에 입꼬리를 귀에 걸린다는 느낌으로 올립니다.\n포인트: 윗배·어깨만 먼저 올라오면 갈비·아랫배를 먼저 씁니다. 이 단계가 평가이기도 합니다.\n주의: 관경근(목 앞)이 당겨져 입이 가로로 찢어지면 범위를 줄입니다. 사진 순서는 링크에서, 장면이 안 보이면 같은 페이지의 영상을 켭니다.',
         }),
-        faceItem('face_ex_smile_2', 'face_exercise', 'Exercise', '② 입술 봉인 스마일', {
-          program: '1 · 스마일 6단계',
-          alimtalkLabel: '스마일 ② 입술 봉인',
-          coachingNote: '준비: ①에서 과긴장을 확인한 뒤입니다.\n동작: 입술이 만나게 스마일합니다. 이가 보이지 않아도 됩니다. 턱 끝은 힘 뺍니다.\n포인트: 휴식 때도 입이 쉽게 다물어지는지 봅니다.\n주의: 턱밑을 당겨 입술을 붙이지 않습니다.',
+        faceItem('face_ex_sb_2', 'face_exercise', 'Exercise', '② 호흡', {
+          program: '1 · 스마일 호흡 10단계',
+          alimtalkLabel: '② 호흡',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_sb_2',
+          thumbUrl: 'exercise-thumbs/face_ex_sb_2.jpg',
+          coachingNote: '준비: 앉았을 때 튀어나온 뼈(좌골 결절)를 느낍니다. 모르겠으면 앞뒤·좌우로 골반을 움직여, 한쪽·앞뒤로 치우치지 않는 지점에 앉습니다.\n동작: 양손으로 갈비뼈를 감쌉니다. 들숨에 두 손을 밀어낸다고 생각합니다. 날숨에 배 왕자를 만들며 조이면서 끝까지 뱉습니다. 들이쉬기가 안 되면 다 마셨다 생각할 때 한 번 더 강하게 마신 뒤, 끝까지 뱉으며 배 왕자를 만듭니다.\n포인트: 이 날이 호흡 단독 훈련입니다. 스마일은 아직 얹지 않아도 됩니다.\n주의: 어깨·윗배만 먼저 올라오면 손 아래 갈비가 벌어지는지 확인합니다. 사진 순서는 링크에서 확인합니다.',
         }),
-        faceItem('face_ex_smile_3', 'face_exercise', 'Exercise', '③ 좌우 분리 스마일', {
-          program: '1 · 스마일 6단계',
-          alimtalkLabel: '스마일 ③ 좌우 분리',
-          coachingNote: '준비: 약한 쪽을 말로 정합니다.\n동작: 한쪽에만 스마일 → 반대. 약한 쪽이 같은 높이까지 올라가게 합니다.\n포인트: 목이 따라가지 않게 합니다.\n주의: 강한 쪽을 더 올리지 않습니다.',
+        faceItem('face_ex_sb_3', 'face_exercise', 'Exercise', '③ 스마일 트레이닝', {
+          program: '1 · 스마일 호흡 10단계',
+          alimtalkLabel: '③ 스마일 트레이닝',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_sb_3',
+          thumbUrl: 'exercise-thumbs/face_ex_sb_3.jpg',
+          coachingNote: '준비: 거울 정면. ① 호흡이 된 다음입니다.\n동작: 입꼬리를 귀에 걸린다는 느낌으로 올립니다. 손바닥을 앞광대에 대고 끌어 올린 느낌을 익힌 뒤, 손 없이 반복합니다. 이마를 쓰지 않고 눈을 동그랗게 뜹니다. 안 되면 손바닥으로 이마를 막고 눈부터.\n포인트: 광대가 볼록하게 올라가게. ① 호흡과 같이.\n주의: 관경근을 과하게 쓰면 입이 가로로 벌어집니다. 그 모양은 쓰지 않습니다. 사진 순서는 링크에서 확인합니다.',
         }),
-        faceItem('face_ex_smile_4', 'face_exercise', 'Exercise', '④ 혀 구개 + 스마일', {
-          program: '1 · 스마일 6단계',
-          alimtalkLabel: '스마일 ④ 혀 구개',
-          coachingNote: '준비: 혀 끝을 앞 구개(앞니 뒤)에 둡니다.\n동작: 혀를 구개에 둔 채 스마일합니다. 혀가 이 사이로 나오지 않게 합니다.\n포인트: 혀가 앞으로 밀리면 스마일을 줄입니다.\n주의: 구역·통증이 있으면 중단합니다.',
+        faceItem('face_ex_sb_4', 'face_exercise', 'Exercise', '④ 뮤잉', {
+          program: '1 · 스마일 호흡 10단계',
+          alimtalkLabel: '④ 뮤잉',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_sb_4',
+          thumbUrl: 'exercise-thumbs/face_ex_sb_4.jpg',
+          coachingNote: '준비: 이를 깨물지 않습니다. 위·아래 이 사이에 1mm 빈 공간. 코로 쉽니다.\n동작: 혀가 이에 닿지 않은 채 혓바닥 전체를 입천장에 붙입니다. 목젖에서 가장 가까운 뼈(구개골)를 혀 중앙으로 밀어 올립니다. 턱 아래 근육이 쑥 올라가면 잘된 것입니다.\n포인트: 이 날이 뮤잉 단독 훈련입니다. ⑤에서 호흡·스마일과 합칩니다.\n주의: 이를 깨물면 사각턱·저작근이 커질 수 있습니다. 사진 순서는 링크에서, 장면이 안 보이면 영상을 켭니다.',
         }),
-        faceItem('face_ex_smile_5', 'face_exercise', 'Exercise', '⑤ 코어 호흡 + 스마일', {
-          program: '1 · 스마일 6단계',
-          alimtalkLabel: '스마일 ⑤ 코어 호흡과 함께',
-          coachingNote: '준비: 코로 들이쉽니다. 아랫배가 먼저 움직이게 합니다.\n동작: 날숨에 스마일, 들숨에 이완. 표정과 숨이 같이 흔들리지 않게 합니다.\n포인트: 어깨가 올라가면 숨을 더 작게 합니다.\n주의: 어지러움이 있으면 멈춥니다.',
+        faceItem('face_ex_sb_5', 'face_exercise', 'Exercise', '⑤ 호흡 · 스마일 · 뮤잉 종합', {
+          program: '1 · 스마일 호흡 10단계',
+          alimtalkLabel: '⑤ 호흡·스마일·뮤잉',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_sb_5',
+          thumbUrl: 'exercise-thumbs/face_ex_sb_5.jpg',
+          coachingNote: '준비: ② 호흡 · ③ 스마일 · ④ 뮤잉을 각각 확인한 뒤 합칩니다. 바르게 앉아 좌골을 느낍니다.\n동작: ① 갈비가 붓고 끝까지 내쉬기. ② 입꼬리 귀에 걸듯, 광대·눈 힘. ③ 혀를 구개에 두고 턱 아래가 올라가는지. 되는 분은 세 가지를 한 호흡에.\n포인트: 하나씩 깨지면 그 축만 다시. 뮤잉은 ④, 호흡은 ②로 돌아갑니다.\n주의: 혀를 앞으로 밀거나 이를 악물지 않습니다. 사진 순서는 링크에서 확인합니다.',
         }),
-        faceItem('face_ex_smile_6', 'face_exercise', 'Exercise', '⑥ 일상 유지 스마일', {
-          program: '1 · 스마일 6단계',
-          alimtalkLabel: '스마일 ⑥ 일상 유지',
-          coachingNote: '준비: 세션이 끝난 뒤, 인사·대화 장면을 떠올립니다.\n동작: 말한 뒤·씹은 뒤 ① 자세로 돌아옵니다. 입이 벌어져 있지 않게 합니다.\n포인트: 하루 몇 번만 짧게 확인합니다.\n주의: 하루 종일 얼굴에 힘을 주지 않습니다.',
+        faceItem('face_ex_sb_6', 'face_exercise', 'Exercise', '⑥ 호흡2 · 흉곽 좌우 · 일롱게이션', {
+          program: '1 · 스마일 호흡 10단계',
+          alimtalkLabel: '⑥ 호흡2 · 흉곽·일롱게이션',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_sb_6',
+          thumbUrl: 'exercise-thumbs/face_ex_sb_6.jpg',
+          coachingNote: '준비: 앉아서 거울로 팔-몸통 사이 공간을 봅니다.\n동작: 팔이 더 붙어 있는 쪽(갈비가 덜 열린 쪽)을 날숨에 조입니다. 양쪽 빈 공간이 같아질 때까지. 어깨는 바깥으로 열고, 올라간 어깨는 바닥으로 내립니다. 정수리가 위로 끌리듯 척추를 길게(일롱게이션). 턱은 살짝 내립니다. 들숨에 라인 유지, 날숨에 힘 풉니다.\n포인트: 좌우 옆구리 라인이 같아지게.\n주의: 턱이 들리면 키만 커지고 목은 짧아집니다. 사진 순서는 링크에서 확인합니다.',
         }),
-        faceItem('face_ex_breath', 'face_exercise', 'Exercise', '코어 호흡 (얼굴 세션)', {
-          program: '2 · 호흡-코어',
-          alimtalkLabel: '얼굴 · 코어 호흡',
-          coachingNote: '준비: 얼굴 세션에서 합니다. 턱·어깨를 내리고 코로 쉽니다.\n동작: 들숨에 아랫배·옆이 부풀고, 날숨에 완전히 힘 뺍니다. 스마일 ⑤의 바탕입니다.\n포인트: 윗배·어깨만 먼저 올라오면 아랫배를 먼저 씁니다.\n주의: 어지러우면 중단합니다.',
+        faceItem('face_ex_sb_7', 'face_exercise', 'Exercise', '⑦ 스마일2 · 좌우 · 눈', {
+          program: '1 · 스마일 호흡 10단계',
+          alimtalkLabel: '⑦ 스마일2 · 좌우·눈',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_sb_7',
+          thumbUrl: 'exercise-thumbs/face_ex_sb_7.jpg',
+          coachingNote: '준비: 거울에서 입꼬리가 양쪽으로 같은지 봅니다.\n동작: 약한 쪽에 더 힘을 줍니다. 안 되면 주먹 너클을 입꼬리에 대고 대협골근 방향(귀에 걸린다는 방향)으로 끌어 올린 뒤, 손과 같이 그 근육에 힘을 넣습니다. 이어서 눈을 동그랗게 뜨고 시선을 천장으로 올린 다음 좌우로 천천히.\n포인트: 방향을 기억한 뒤 손 없이.\n주의: 강한 쪽을 더 올리지 않습니다. 이마로 눈을 뜨지 않습니다. 사진 순서는 링크에서 확인합니다.',
         }),
-        faceItem('face_ex_tongue_rest', 'face_exercise', 'Exercise', '혀 구개 안착', {
-          program: '3 · 혀-구개',
-          alimtalkLabel: '혀 · 구개 안착',
-          coachingNote: '준비: 입술을 가볍게 다뭅니다.\n동작: 혀 전체를 구개에 가볍게 올려 둡니다. 이를 악물지 않습니다.\n포인트: 앞만 붙이고 뒤가 떨어지지 않게 합니다.\n주의: 구역이 있으면 앞만 올립니다.',
+        faceItem('face_ex_sb_8', 'face_exercise', 'Exercise', '⑧ 뮤잉2 · 혀 흡착 진행', {
+          program: '1 · 스마일 호흡 10단계',
+          alimtalkLabel: '⑧ 뮤잉2 · 혀 흡착',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_sb_8',
+          thumbUrl: 'exercise-thumbs/face_ex_sb_8.jpg',
+          coachingNote: '준비: 혀 전체를 입천장에 붙인 상태를 유지합니다.\n동작: 혀 중앙으로 천장을 밀어 올리고, 왼쪽 뿌리·오른쪽 뿌리도 밀어 올립니다. 앞·뒤·뿌리가 다 붙게. 들숨에는 가볍게, 날숨을 끝까지 뱉고 침을 삼킨 뒤 밀어 올립니다. 힘이 없으면 혀로 입속 안쪽을 골고루 돌리며 밀어내는 힘을 줍니다. 좌우 10회씩.\n포인트: 이동 중·가만히 있을 때도 반복하면 옆볼 힘이 붙습니다.\n주의: 혀 일부가 떨어지면 진행하지 않습니다. 구역이 있으면 앞만. 사진 순서는 링크에서 확인합니다.',
         }),
-        faceItem('face_ex_tongue_press', 'face_exercise', 'Exercise', '혀 흡착', {
-          program: '3 · 혀-구개',
-          alimtalkLabel: '혀 · 흡착',
-          coachingNote: '준비: 혀 구개 안착이 된 다음입니다.\n동작: 혀 전체를 구개에 살짝 흡착했다 뗍니다. 10~20회.\n포인트: 턱을 움직이지 않고 혀만 씁니다.\n주의: 통증·클릭이 있으면 중단합니다.',
+        faceItem('face_ex_sb_9', 'face_exercise', 'Exercise', '⑨ 스탠딩 · 선 자세', {
+          program: '1 · 스마일 호흡 10단계',
+          alimtalkLabel: '⑨ 스탠딩 · 선 자세',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_sb_9',
+          thumbUrl: 'exercise-thumbs/face_ex_sb_9.jpg',
+          coachingNote: '준비: 두 번째 발가락이 정면. 발 사이는 주먹 하나.\n동작: 체중을 앞뒤·좌우로 흔들어 본 뒤, 뒤꿈치 1cm 앞에 싣습니다. 골반을 좌우로 밀어 바른 위치를 찾습니다. 엉덩이에 힘, 아랫배를 끌어 올려 앞면을 판판하게. 흉곽은 과하게 열지 않고 닫습니다. 골반과 가슴이 같은 선인지. 양쪽 빈 공간이 같게. 쇄골을 양옆으로 열고, 올라간 어깨는 손을 바닥으로 찌르듯 내립니다. 머리가 한쪽으로 기울지 않게. 키가 커지는 느낌(일롱게이션).\n포인트: 오리 엉덩이·골반 전방경사 없이.\n주의: 흉곽만 열고 허리가 꺾이면 중단하고 골반부터. 사진 순서는 링크에서 확인합니다.',
+        }),
+        faceItem('face_ex_sb_10', 'face_exercise', 'Exercise', '⑩ 선 자세 스마일 호흡', {
+          program: '1 · 스마일 호흡 10단계',
+          alimtalkLabel: '⑩ 선 자세 스마일 호흡',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_sb_10',
+          thumbUrl: 'exercise-thumbs/face_ex_sb_10.jpg',
+          coachingNote: '준비: ⑨에서 배운 선 자세. 스마일 호흡은 유지합니다.\n동작: 양발 11자. 뒤꿈치를 서로 밀어내듯 붙여 허벅지 안쪽이 떨어지지 않게. 뒤꿈치·허벅지 안쪽·엉덩이를 함께 조입니다. 옆모습·뒷모습에서 엉덩이가 뒤로 빠지거나 골반이 앞으로 나가지 않게. 조인 상태에서 키 커지는 느낌.\n포인트: 조임과 스마일 호흡이 같이 가게.\n주의: 안쪽만 세게 조이다가 골반이 앞으로 나오면 힘을 줄입니다. 사진 순서는 링크에서 확인합니다.',
         }),
         faceItem('face_ex_jaw', 'face_exercise', 'Exercise', '턱 관절 운동', {
-          program: '4 · 턱-저작',
+          program: '2 · 추가 축',
           alimtalkLabel: '턱 관절 운동',
-          coachingNote: '준비: 거울 정면. 혀는 구개 또는 편한 위치입니다.\n동작: 입을 통증 없는 범위에서 열고 닫습니다. 좌우로 작게 미끄러뜨려도 됩니다.\n포인트: 턱이 한쪽으로 새면 범위를 줄입니다.\n주의: 소리·통증이 세지면 중단합니다.',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_jaw',
+          thumbUrl: 'exercise-thumbs/face_ex_jaw.jpg',
+          coachingNote: '준비: 거울 정면. 혀는 구개 또는 편한 위치입니다. 10단계에 없는 턱 가동입니다.\n동작: 입을 통증 없는 범위에서 열고 닫습니다. 손가락을 귀 앞(턱관절)에 가볍게 대어 한쪽으로 새는지 확인합니다. 좌우로 작게 미끄러뜨려도 됩니다.\n포인트: 턱이 한쪽으로 새면 범위를 줄입니다.\n주의: 소리·통증이 세지면 중단합니다. 사진 순서는 링크에서 확인합니다.',
         }),
         faceItem('face_ex_chew', 'face_exercise', 'Exercise', '좌우 저작 균형', {
-          program: '4 · 턱-저작',
+          program: '2 · 추가 축',
           alimtalkLabel: '좌우 저작 균형',
-          coachingNote: '준비: 어느 쪽으로 더 씹는지 확인합니다.\n동작: 약한 쪽으로 천천히 씹는 느낌을 연습합니다. 실제 음식은 세션에서 안내한 경우만.\n포인트: 고개가 약한 쪽으로 기울지 않게 합니다.\n주의: 턱 통증이 있으면 빈 동작만 합니다.',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_chew',
+          thumbUrl: 'exercise-thumbs/face_ex_chew.jpg',
+          coachingNote: '준비: 어느 쪽으로 더 씹는지 확인합니다. 스마일 스크린의 턱 항목이 깨질 때.\n동작: 입을 다문 채 약한 쪽으로 천천히 씹는 느낌을 10회. 고개가 약한 쪽으로 기울지 않게. 실제 음식은 세션에서 안내한 경우만.\n포인트: 고개가 약한 쪽으로 기울지 않게 합니다.\n주의: 턱 통증이 있으면 빈 동작만 합니다. 사진 순서는 링크에서 확인합니다.',
         }),
         faceItem('face_ex_scalp', 'face_exercise', 'Exercise', '두피 이완 운동', {
-          program: '5 · 두피-경추',
+          program: '2 · 추가 축',
           alimtalkLabel: '두피 이완 운동',
-          coachingNote: '준비: 손가락으로 두피를 가볍게 둡니다.\n동작: 정수리·옆머리를 작은 원으로 움직입니다. 목을 꺾지 않습니다.\n포인트: 얼굴 표정이 따라가지 않게 합니다.\n주의: 두통이 세지면 중단합니다.',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_scalp',
+          thumbUrl: 'exercise-thumbs/face_ex_scalp.jpg',
+          coachingNote: '준비: 손가락으로 두피를 가볍게 둡니다. 표정 때 두피가 따라올 때.\n동작: 정수리·옆머리를 작은 원으로 20초. 목을 꺾지 않습니다.\n포인트: 얼굴 표정이 따라가지 않게 합니다.\n주의: 두통이 세지면 중단합니다. 사진 순서는 링크에서 확인합니다.',
         }),
         faceItem('face_ex_neck', 'face_exercise', 'Exercise', '경추 정렬 + 표정', {
-          program: '5 · 두피-경추',
+          program: '2 · 추가 축',
           alimtalkLabel: '경추 정렬 · 표정',
-          coachingNote: '준비: 턱을 살짝 당기고 정수리가 위로 가게 합니다.\n동작: 스마일 ①을 유지한 채 목이 따라붙는지 확인합니다. 목 앞·옆이 과하게 뜨면 표정을 줄입니다.\n포인트: 얼굴만 움직이고 목은 안정시킵니다.\n주의: 어지러움·팔 저림이 있으면 중단합니다.',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_neck',
+          thumbUrl: 'exercise-thumbs/face_ex_neck.jpg',
+          coachingNote: '준비: 턱을 살짝 당기고 정수리가 위로 가게 합니다. ⑥·⑨의 일롱게이션과 이어집니다.\n동작: 목 정렬을 유지한 채 작은 스마일을 올립니다. 목 앞·옆이 과하게 뜨면 표정을 줄입니다.\n포인트: 얼굴만 움직이고 목은 안정시킵니다.\n주의: 어지러움·팔 저림이 있으면 중단합니다. 사진 순서는 링크에서 확인합니다.',
+        }),
+        faceItem('face_ex_lip_seal', 'face_exercise', 'Exercise', '휴식 입술 봉인', {
+          program: '3 · 기타',
+          alimtalkLabel: '휴식 입술 봉인',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_lip_seal',
+          thumbUrl: 'exercise-thumbs/face_ex_lip_seal.jpg',
+          coachingNote: '준비: IAOM 휴식 자세. 스마일 10단계에 휴식 장면이 없어 기타로 둡니다.\n동작: 아무 표정 없이 입술을 가볍게 닫습니다. 이는 1~2mm 띄우고, 코로만 쉽니다. 혀는 가능하면 천장. 1분 유지.\n포인트: 힘줘서 입을 꾹 다물지 않습니다. 닿기만.\n주의: 코가 막히면 운동 전에 원인을 봅니다. 입술 테이핑은 하지 않습니다.',
+        }),
+        faceItem('face_ex_swallow', 'face_exercise', 'Exercise', '삼킴 · 혀가 앞으로 안 나가게', {
+          program: '3 · 기타',
+          alimtalkLabel: '삼킴 · 혀 내밀지 않기',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_swallow',
+          thumbUrl: 'exercise-thumbs/face_ex_swallow.jpg',
+          coachingNote: '준비: Myofocus Swallowing 축. ⑧과 가깝지만 여기는 연하 자체입니다.\n동작: 혀를 천장에 붙인 채 침을 삼킵니다. 혀가 이 사이로 나가지 않게. 삼킨 뒤에도 혀는 천장. 10회.\n포인트: 혀 내밀기(tongue thrust)가 있으면 이 항목.\n주의: 사레·구역이 있으면 중단합니다. 연하장애 주치료는 아닙니다.',
+        }),
+        faceItem('face_ex_tongue_slide', 'face_exercise', 'Exercise', '혀 미끄러기', {
+          program: '3 · 기타',
+          alimtalkLabel: '혀 미끄러기',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_tongue_slide',
+          thumbUrl: 'exercise-thumbs/face_ex_tongue_slide.jpg',
+          coachingNote: '준비: Healthline Tongue touches. 뮤잉(전체 흡착)과 달라 10단계에 안 넣었습니다.\n동작: 혀끝을 앞니 바로 뒤 천장에 대고, 천장에 붙인 채 뒤로 미끄러뜨립니다. 20회.\n포인트: 혀끝이 이에 닿지 않게.\n주의: 구역이 있으면 범위를 줄입니다.',
+        }),
+        faceItem('face_ex_uvula', 'face_exercise', 'Exercise', '연구개 올리기 (아)', {
+          program: '3 · 기타',
+          alimtalkLabel: '연구개 올리기',
+          linkUrl: SELF_GUIDE_PAGE + '#face_ex_uvula',
+          thumbUrl: 'exercise-thumbs/face_ex_uvula.jpg',
+          coachingNote: '준비: Healthline Uvula raises. 스마일·뮤잉에 없는 연구개 항목입니다.\n동작: 입을 편하게 벌리고 ‘아’를 짧게. 목젖이 위로 올라가는 느낌. 10~20회.\n포인트: 목 앞을 세게 조이지 않습니다.\n주의: 목 통증·쉰 목소리가 있으면 중단합니다. 수면무호흡 치료로 안내하지 않습니다.',
         }),
       ];
     }
@@ -6031,16 +6108,16 @@
         '편안한 표정 유지.'
       ),
       face_exercise: coachMemoPresetList(
-        '턱·어깨 힘 빼고, 천천히 반복!',
-        '좌·우 균형, 같은 범위로.',
-        '호흡 멈추지 않고, 얼굴·목 이완.',
-        '스마일은 날숨, 들숨에 이완.',
+        '좌골 느끼고, 갈비 부풀고, 끝까지 내쉬기!',
+        '입꼬리는 귀에 걸린다는 방향.',
+        '관경근으로 입을 가로로 찢지 않기.',
+        '광대 볼록, 이마 없이 눈 동그랗게.',
+        '혀는 구개 전체, 이 악물지 않기.',
         '약한 쪽만 올리고 강한 쪽은 유지.',
-        '혀는 구개, 이가 벌어지지 않게.',
-        '거울로 과한 표정·긴장 확인.',
-        '목을 꺾지 않고 정면 유지.',
-        '통증·어지러움 있으면 중단.',
-        '마지막은 가볍게 마무리.'
+        '날숨에 스마일, 들숨에 이완.',
+        '정수리 위로, 턱은 살짝 내리기.',
+        '선 자세는 뒤꿈치 1cm 앞 체중.',
+        '통증·어지러움 있으면 중단.'
       ),
       default: coachMemoPresetList(
         '편하게 호흡하며, 불필요한 긴장하지 말기!',
@@ -13675,7 +13752,7 @@
             evalHistItem('face_focus', '개선 우선', '', [
               '안면 비대칭', '얼굴 축소·붓기', '턱·목 라인', '전체 균형',
             ], true),
-            evalHistItem('face_smile_screen', '스마일 스크린', '스마일 한 장면에서 깨지는 항목 · 오늘 운동 축', [
+            evalHistItem('face_smile_screen', '스마일 스크린', '한 장면에서 깨지는 항목 · 10단계 처방 축', [
               '입술이 벌어진 채 휴식',
               '좌우 스마일 높이·볼륨 다름',
               '스마일 때 턱이 앞·옆으로',
