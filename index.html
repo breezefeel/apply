@@ -2809,7 +2809,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-08-31-load-director-tabs';
+    const INSTRUCTOR_HTML_BUILD = '2026-09-04-fix-sangmin-syntax';
     const PROGRAM_PLAN_SLOT_COUNT = 5;
     var _programPlanSaveSlot = 1;
     var _programPlanLoadDirectorTab = 'sangmin';
@@ -4717,7 +4717,7 @@
       sangminLinkItem_('sm_sh_punch', 'shoulder', '어깨 밴드', '어깨 밴드', '⑤ 90도 내회전', '어깨 밴드 · 90도 내회전',
         'https://youtu.be/_GC6uHnxc7Y',
         '준비: 상자를 앉아 팔꿈치를 어깨 높이(90도)에 둡니다. 전완은 바깥·위로 연 상태에서 시작합니다.\n동작: 팔꿈치 높이는 그대로 두고, 손(전완)만 안쪽·아래로 내회전했다가 돌아옵니다.\n포인트: 어깨를 귀로 올리지 않기. 몸통이 같이 돌아가지 않게.\n주의: 어깨 앞이 찌릿하면 범위를 줄입니다.',
-        '팔꿈치 높이 유지, 전완만 안쪽으로')
+        '팔꿈치 높이 유지, 전완만 안쪽으로'),
       sangminLinkItem_('sm_sh_ext', 'shoulder', '어깨 밴드', '어깨 밴드', '⑥ 신전', '어깨 밴드 · 신전',
         'https://youtu.be/oXuU46jtxlE',
         '준비: 상자를 앉아 허리를 세웁니다. 밴드는 앞·아래에서 잡고, 팔은 몸 옆에 둡니다.\n동작: 팔꿈치를 편 채 팔을 몸 뒤로 천천히 밀어 내렸다가 돌아옵니다.\n포인트: 어깨가 앞으로 말리지 않게. 허리를 꺾어 뒤를 보지 않기.\n주의: 어깨 앞이 당기면 뒤로 가는 범위를 줄입니다.',
@@ -4725,7 +4725,7 @@
       sangminLinkItem_('sm_sh_quadrow', 'shoulder', '어깨 밴드', '어깨 밴드', '⑦ 수평 외전', '어깨 밴드 · 수평 외전',
         'https://youtu.be/WGz3ZAghPgM',
         '준비: 매트에 무릎을 대고, 한쪽 손은 상자 위에 둡니다. 반대 손으로 밴드를 잡습니다.\n동작: 팔을 몸 옆·바깥으로 벌려 수평 외전(Horizontal abduction) 합니다. 몸통이 돌아가지 않게.\n포인트: 어깨가 귀로 올라가지 않게. 팔꿈치보다 어깨·견갑 뒤가 일하게.\n주의: 허리가 돌아가면 벌리는 범위를 줄입니다.',
-        '팔을 옆으로 벌리고 몸통은 고정')
+        '팔을 옆으로 벌리고 몸통은 고정'),
       sangminLinkItem_('sm_sh_row', 'shoulder', '어깨 밴드', '어깨 밴드', '⑧ 시티드 로우', '어깨 밴드 · 시티드 로우',
         'https://youtu.be/r5cuW8SIl5o',
         '준비: 상자를 앉아 허리를 세웁니다. 밴드를 가슴 높이에서 양손으로 잡습니다.\n동작: 팔꿈치를 옆구리에 붙이며 당겼다가, 팔을 천천히 폅니다. 어깨부터 말고 견갑부터.\n포인트: 가슴을 열고 견갑을 모으기. 상체가 뒤로 눕지 않게.\n주의: 목을 내밀거나 어깨를 으쓱하면 저항을 낮춥니다.',
@@ -15478,6 +15478,7 @@
     }
 
     /* 초회 평가: 바깥 클릭으로 닫지 않음 — 미저장 시 ×에서 저장 여부 확인 */
+    try {
     document.getElementById('coachNoteModal').addEventListener('click', function(e){ if(e.target===this) closeCoachingNoteModal(); });
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeHongtaekLightbox_();
@@ -15509,10 +15510,22 @@
     refreshSectionCollapseDefaults();
     paintInstructorBuildBadge_();
     syncBoardDateUi_(seoulTodayYmd_());
-    loadBoard();
     renderProgramTabs();
     initSessionCheckPanel();
     renderProgramList();
+    loadBoard();
+    } catch (bootErr) {
+      try {
+        var msg = (bootErr && bootErr.message) ? String(bootErr.message) : '앱 시작 오류';
+        var dl = document.getElementById('dateLine');
+        if (dl) dl.textContent = '앱 시작 오류 · 새로고침 또는 배포 확인';
+        setMemberChipsMessage(formatBoardLoadErrorMessage_(msg));
+        var root = document.getElementById('pspProgramList');
+        if (root) root.innerHTML = '<div class="empty-hint">' + escapeHtml(msg) + '</div>';
+        if (typeof toast === 'function') toast(formatBoardLoadErrorMessage_(msg));
+      } catch (ignoreBootUi) {}
+      try { console.error('[instructor boot]', bootErr); } catch (ignoreLog) {}
+    }
   </script>
 </body>
 </html>
