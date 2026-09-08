@@ -84,16 +84,33 @@
   .tabs::-webkit-scrollbar { display: none; }
   .org-tab {
     flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     border: 1.5px solid #d7d0c4;
     background: #fff;
     color: var(--ink);
     font-size: 13px; font-weight: 700;
-    padding: 9px 12px; border-radius: 999px;
+    padding: 9px 8px 9px 12px; border-radius: 999px;
     cursor: pointer; white-space: nowrap;
   }
   .org-tab.active {
     background: var(--ink); color: #fff; border-color: var(--ink);
   }
+  .org-tab-x {
+    flex: 0 0 auto;
+    width: 18px; height: 18px;
+    border: 0; border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    font-size: 14px; font-weight: 700; line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    opacity: .55;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .org-tab-x:hover { opacity: 1; background: rgba(0,0,0,.08); }
+  .org-tab.active .org-tab-x:hover { background: rgba(255,255,255,.22); }
 
   .chat-drop {
     border: 1.5px dashed #cfc6b6;
@@ -291,6 +308,35 @@
     display: block; font-style: normal; font-size: 12px; font-weight: 600;
     color: var(--mute); margin-top: 4px; line-height: 1.5;
   }
+  .htx-fill {
+    display: flex; flex-direction: column; gap: 8px;
+    margin: 10px 0 4px;
+  }
+  .htx-fill-title {
+    font-size: 12px; font-weight: 800; color: var(--ink);
+    margin: 2px 0 0;
+  }
+  .htx-fill-empty {
+    background: #f4f1ea; border-radius: 12px; padding: 12px 14px;
+    font-size: 13px; font-weight: 600; color: var(--mute); line-height: 1.5;
+  }
+  .htx-fill .hometax-sum { margin: 0; }
+  .htx-person {
+    background: #f4f1ea; border-radius: 12px; padding: 12px 14px;
+  }
+  .htx-person-hd {
+    font-size: 14px; font-weight: 800; margin: 0 0 8px; color: var(--ink);
+  }
+  .htx-person-rows { display: flex; flex-direction: column; gap: 6px; }
+  .htx-person-rows button {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; width: 100%;
+    border: 0; background: #fff; color: var(--ink);
+    border-radius: 10px; padding: 10px 12px;
+    cursor: pointer; text-align: left;
+  }
+  .htx-person-rows b { font-size: 11px; color: var(--mute); font-weight: 800; flex: 0 0 auto; }
+  .htx-person-rows span { font-size: 13.5px; font-weight: 800; text-align: right; line-height: 1.35; word-break: break-all; }
   .pin-overlay {
     position: fixed; inset: 0; z-index: 90;
     background: rgba(11, 32, 72, .45);
@@ -991,12 +1037,9 @@
             <a class="btn btn-ghost" href="https://www.hometax.go.kr/" target="_blank" rel="noopener noreferrer">홈택스 로그인</a>
             <a class="btn btn-print" id="linkWithhold" href="https://www.hometax.go.kr/websquare/websquare.html?w2xPath=/ui/pp/index_pp.xml&amp;tmIdx=41" target="_blank" rel="noopener noreferrer">원천징수이행상황신고서</a>
             <p class="doc-path">세금신고 → 원천세 → <b>정기신고</b> · 지급월 다음달 <b>10일</b>까지.<br>10일이 지났으면 같은 메뉴의 <b>기한후신고</b>로 들어갑니다. 지금 화면의 신고구분이 기한후여도 숫자는 같습니다.<br>사람별 서류가 아니라, 그달 지급 합계·원천세(3.3%)를 넣고 <b>세금만 납부</b>합니다.</p>
+            <p class="htx-fill-title">작성 시 적을 값 · 칸을 누르면 복사</p>
+            <div class="htx-fill" id="docWithholdFill"></div>
             <div class="htx-picks">
-              <div class="htx-pick">
-                <b>날짜</b>
-                <span>제출연월 = 지금 넣는 달 · 귀속연월·지급연월 = 3번의 지급월</span>
-                <em>7월 지급분은 제출 2026-08, 귀속·지급 2026-07. 사업자번호 옆 확인을 누릅니다.</em>
-              </div>
               <div class="htx-pick">
                 <b>원천신고구분</b>
                 <span>매월</span>
@@ -1021,7 +1064,9 @@
           <p class="hint">누구에게 얼마 줬는지를 사람별로 입력합니다. 여기서는 세금을 또 내지 않습니다.</p>
           <div class="doc-links">
             <a class="btn btn-print" id="linkSimple" href="https://www.hometax.go.kr/websquare/websquare.html?w2xPath=/ui/pp/index_pp.xml&amp;tmIdx=44&amp;tm2lIdx=4401000000&amp;tm3lIdx=4401100000" target="_blank" rel="noopener noreferrer">간이지급명세서 (거주자의 사업소득)</a>
-            <p class="doc-path">신청/제출 → 지급명세서 → 간이지급명세서(거주자의 사업소득) → 직접작성제출 · 지급월 다음달 <b>말일</b>까지.<br>급여 지급하기에서 넣은 성명·주민번호·지급액·소득세·지방소득세를 그대로 옮겨 적습니다.</p>
+            <p class="doc-path">신청/제출 → 지급명세서 → 간이지급명세서(거주자의 사업소득) → 직접작성제출 · 지급월 다음달 <b>말일</b>까지.<br>아래 값을 사람마다 그대로 옮겨 적습니다. 칸을 누르면 복사됩니다.</p>
+            <p class="htx-fill-title">작성 시 적을 값 · 사람별</p>
+            <div class="htx-fill" id="docSimpleFill"></div>
           </div>
         </section>
 
@@ -2180,6 +2225,8 @@
     });
     if (!DOC_PAYERS[d.payerId]) d.payerId = 'tree';
     if (!DOC_PAYERS[d.taxPayerId]) d.taxPayerId = d.payerId;
+    if (!Array.isArray(d.hiddenPayers)) d.hiddenPayers = [];
+    d.hiddenPayers = d.hiddenPayers.filter(function (id) { return !!DOC_PAYERS[id]; });
     if (ensureStaffDocs(d)) {
       try { localStorage.setItem(DOCS_STORE, JSON.stringify(d)); } catch (e3) {}
     }
@@ -2584,10 +2631,59 @@
     d.buckets.other.owner = $('docPayerOwner').value.trim();
     saveDocs(d);
   }
+  function payerIdsAll_() {
+    return ['tree', 'incheon', 'other'];
+  }
+  function hiddenPayersOf_(d) {
+    var list = Array.isArray(d.hiddenPayers) ? d.hiddenPayers : [];
+    return list.filter(function (id) { return !!DOC_PAYERS[id]; });
+  }
+  function visiblePayerIds_(d) {
+    var hidden = hiddenPayersOf_(d);
+    var ids = payerIdsAll_().filter(function (id) { return hidden.indexOf(id) < 0; });
+    return ids.length ? ids : payerIdsAll_();
+  }
+  function payerTabHtml_(id, selectedId, dataAttr) {
+    var active = selectedId === id ? ' active' : '';
+    return '<button type="button" class="org-tab' + active + '" ' + dataAttr + '="' + id + '">' +
+      '<span class="org-tab-label">' + DOC_PAYERS[id].tab + '</span>' +
+      '<span class="org-tab-x" data-del-payer="' + id + '" title="삭제" aria-label="삭제">×</span>' +
+      '</button>';
+  }
+  function removePayerChip_(id, opts) {
+    opts = opts || {};
+    if (!DOC_PAYERS[id]) return;
+    var d = loadDocs();
+    var visible = visiblePayerIds_(d);
+    if (visible.length <= 1) {
+      alert('사업장은 최소 1개는 남겨 두세요.');
+      return;
+    }
+    var label = DOC_PAYERS[id].tab || id;
+    if (!confirm('「' + label + '」을(를) 삭제할까요?\n목록에서만 숨깁니다. 저장된 지급 기록은 그대로 둡니다.')) return;
+    var hidden = hiddenPayersOf_(d);
+    if (hidden.indexOf(id) < 0) hidden.push(id);
+    d.hiddenPayers = hidden;
+    var nextIds = visiblePayerIds_(d);
+    if (d.payerId === id) d.payerId = nextIds[0];
+    if (d.taxPayerId === id) d.taxPayerId = nextIds[0];
+    saveDocs(d);
+    if (opts.after) opts.after(d);
+    else {
+      renderDocsMeta();
+      if (typeof renderTaxPayerTabs === 'function') renderTaxPayerTabs();
+      if (typeof renderWithholdSum === 'function') renderWithholdSum();
+    }
+  }
   function renderPayerTabs() {
     var d = loadDocs();
-    $('docPayerTabs').innerHTML = ['tree', 'incheon', 'other'].map(function (id) {
-      return '<button type="button" class="org-tab' + (d.payerId === id ? ' active' : '') + '" data-payer="' + id + '">' + DOC_PAYERS[id].tab + '</button>';
+    var ids = visiblePayerIds_(d);
+    if (ids.indexOf(d.payerId) < 0) {
+      d.payerId = ids[0];
+      saveDocs(d);
+    }
+    $('docPayerTabs').innerHTML = ids.map(function (id) {
+      return payerTabHtml_(id, d.payerId, 'data-payer');
     }).join('');
     var other = d.payerId === 'other';
     $('docPayerEdit').hidden = !other;
@@ -2611,9 +2707,15 @@
     var el = $('docTaxPayerTabs');
     if (!el) return;
     var d = loadDocs();
+    var ids = visiblePayerIds_(d);
     var sel = taxPayerIdOf(d);
-    el.innerHTML = ['tree', 'incheon', 'other'].map(function (id) {
-      return '<button type="button" class="org-tab' + (sel === id ? ' active' : '') + '" data-tax-payer="' + id + '">' + DOC_PAYERS[id].tab + '</button>';
+    if (ids.indexOf(sel) < 0) {
+      sel = ids[0];
+      d.taxPayerId = sel;
+      saveDocs(d);
+    }
+    el.innerHTML = ids.map(function (id) {
+      return payerTabHtml_(id, sel, 'data-tax-payer');
     }).join('');
   }
   function switchTaxPayer(id) {
@@ -2738,48 +2840,132 @@
     $('docDueSimple').textContent = shiftMonthLabel(ym, 'end');
     renderWithholdSum();
   }
-  function renderWithholdSum() {
-    var box = $('docWithholdSum');
-    if (!box) return;
-    var d = loadDocs();
-    var ym = withholdMonth();
-    var amount = 0;
-    var income = 0;
-    var local = 0;
-    var count = 0;
+  function submitYmOf_(ym) {
+    var p = String(ym || '').split('-');
+    var y = parseInt(p[0], 10);
+    var m = parseInt(p[1], 10);
+    if (!y || !m) return '';
+    m += 1;
+    if (m > 12) { m = 1; y += 1; }
+    return y + '-' + String(m).padStart(2, '0');
+  }
+  function ymLabel_(ym) {
+    var p = String(ym || '').split('-');
+    var y = parseInt(p[0], 10);
+    var m = parseInt(p[1], 10);
+    if (!y || !m) return '—';
+    return y + '년 ' + m + '월';
+  }
+  function copyRowHtml_(label, value, copyVal) {
+    var shown = (value == null || value === '') ? '—' : String(value);
+    var raw = (copyVal == null || copyVal === '') ? shown : String(copyVal);
+    if (shown === '—') raw = '';
+    return '<button type="button" data-copy="' + String(raw).replace(/"/g, '&quot;') + '"><b>' + label + '</b><span>' + shown + '</span></button>';
+  }
+  function collectTaxMonthPays_(d, ym) {
+    var rows = [];
     var seen = {};
-    var names = [];
     taxBucket(d).pays.forEach(function (pay) {
       if (pay.ym !== ym) return;
       var tax = withholdOf(pay.amount || 0);
-      amount += pay.amount || 0;
-      income += tax.income;
-      local += tax.local;
-      if (!seen[pay.pid]) {
-        seen[pay.pid] = true;
-        count += 1;
-        var nm = personNameOf(d, pay.pid);
-        if (nm) names.push(nm);
-      }
+      var person = findPerson(d, pay.pid) || {};
+      rows.push({
+        pid: pay.pid,
+        name: person.name || personNameOf(d, pay.pid) || '(이름 없음)',
+        rrn: formatRrn(person.rrn),
+        rrnRaw: rrnDigits(person.rrn),
+        amount: pay.amount || 0,
+        income: tax.income,
+        local: tax.local,
+        net: tax.net,
+        job: person.job || '',
+        phone: person.phone || ''
+      });
+      seen[pay.pid] = true;
     });
     if (taxPayerIdOf(d) === d.payerId && docsSel && parseAmount($('docAmount').value) > 0) {
       var draft = currentPayDraft();
-      if (draft.ym === ym && !findPay(d, docsSel, ym)) {
-        amount += draft.amount;
-        income += draft.income;
-        local += draft.local;
-        if (!seen[docsSel]) {
-          count += 1;
-          var draftName = personNameOf(d, docsSel) || $('docName').value.trim();
-          if (draftName) names.push(draftName);
-        }
+      if (draft.ym === ym && !findPay(d, docsSel, ym) && !seen[docsSel]) {
+        var dp = findPerson(d, docsSel) || {};
+        rows.push({
+          pid: docsSel,
+          name: dp.name || personNameOf(d, docsSel) || ($('docName') && $('docName').value.trim()) || '(이름 없음)',
+          rrn: formatRrn(dp.rrn || ($('docRrn') && $('docRrn').value)),
+          rrnRaw: rrnDigits(dp.rrn || ($('docRrn') && $('docRrn').value)),
+          amount: draft.amount,
+          income: draft.income,
+          local: draft.local,
+          net: draft.net,
+          job: dp.job || '',
+          phone: dp.phone || ''
+        });
       }
     }
-    box.innerHTML =
-      '<button type="button" data-copy="' + count + '"><b>인원</b><span>' + count + '명' + (names.length ? ' · ' + names.join(', ') : '') + '</span></button>' +
-      '<button type="button" data-copy="' + amount + '"><b>총지급액</b><span>' + fmtWon(amount) + '</span></button>' +
-      '<button type="button" data-copy="' + income + '"><b>소득세</b><span>' + fmtWon(income) + '</span></button>' +
-      '<button type="button" data-copy="' + local + '"><b>지방소득세</b><span>' + fmtWon(local) + '</span></button>';
+    rows.sort(function (a, b) { return String(a.name).localeCompare(String(b.name), 'ko'); });
+    return rows;
+  }
+  function renderWithholdSum() {
+    var box = $('docWithholdSum');
+    var fill = $('docWithholdFill');
+    var simple = $('docSimpleFill');
+    var d = loadDocs();
+    var ym = withholdMonth();
+    var rows = collectTaxMonthPays_(d, ym);
+    var amount = 0;
+    var income = 0;
+    var local = 0;
+    var names = [];
+    rows.forEach(function (r) {
+      amount += r.amount || 0;
+      income += r.income || 0;
+      local += r.local || 0;
+      if (r.name) names.push(r.name);
+    });
+    var count = rows.length;
+    var sumHtml =
+      copyRowHtml_('인원', count + '명' + (names.length ? ' · ' + names.join(', ') : ''), count) +
+      copyRowHtml_('총지급액', fmtWon(amount), amount) +
+      copyRowHtml_('소득세', fmtWon(income), income) +
+      copyRowHtml_('지방소득세', fmtWon(local), local);
+    if (box) box.innerHTML = sumHtml;
+
+    var submitYm = submitYmOf_(ym);
+    if (fill) {
+      if (!ym) {
+        fill.innerHTML = '<div class="htx-fill-empty">지급연월을 먼저 고르세요.</div>';
+      } else {
+        fill.innerHTML =
+          '<div class="hometax-sum">' +
+          copyRowHtml_('제출연월', submitYm, submitYm) +
+          copyRowHtml_('귀속연월', ym, ym) +
+          copyRowHtml_('지급연월', ym, ym) +
+          copyRowHtml_('인원', count + '명', count) +
+          copyRowHtml_('총지급액', fmtWon(amount), amount) +
+          copyRowHtml_('소득세', fmtWon(income), income) +
+          copyRowHtml_('지방소득세', fmtWon(local), local) +
+          '</div>' +
+          '<div class="htx-pick"><b>날짜 안내</b><span>제출 ' + ymLabel_(submitYm) + ' · 귀속·지급 ' + ymLabel_(ym) + '</span><em>사업자번호 옆 확인을 누른 뒤, 위 숫자를 그대로 넣습니다.</em></div>';
+      }
+    }
+
+    if (simple) {
+      if (!rows.length) {
+        simple.innerHTML = '<div class="htx-fill-empty">이 상호·지급연월에 옮길 사람이 없습니다. 급여 지급하기에서 먼저 저장하세요.</div>';
+      } else {
+        simple.innerHTML = rows.map(function (r, idx) {
+          return '<div class="htx-person">' +
+            '<div class="htx-person-hd">' + (idx + 1) + '. ' + r.name + '</div>' +
+            '<div class="htx-person-rows">' +
+            copyRowHtml_('성명', r.name, r.name) +
+            copyRowHtml_('주민등록번호', r.rrn || '—', r.rrnRaw || r.rrn) +
+            copyRowHtml_('지급연월', ym, ym) +
+            copyRowHtml_('지급액', fmtWon(r.amount), r.amount) +
+            copyRowHtml_('소득세', fmtWon(r.income), r.income) +
+            copyRowHtml_('지방소득세', fmtWon(r.local), r.local) +
+            '</div></div>';
+        }).join('');
+      }
+    }
   }
   function renderDocNotes() {
     $('docNotes').innerHTML =
@@ -3071,10 +3257,30 @@
       setPayerDetailOpen(!payerDetailOpen);
     });
     $('docPayerTabs').addEventListener('click', function (e) {
+      var del = e.target.closest('[data-del-payer]');
+      if (del) {
+        e.preventDefault();
+        e.stopPropagation();
+        removePayerChip_(del.getAttribute('data-del-payer'));
+        return;
+      }
       var t = e.target.closest('[data-payer]');
       if (t) switchDocPayer(t.getAttribute('data-payer'));
     });
     $('docTaxPayerTabs').addEventListener('click', function (e) {
+      var del = e.target.closest('[data-del-payer]');
+      if (del) {
+        e.preventDefault();
+        e.stopPropagation();
+        removePayerChip_(del.getAttribute('data-del-payer'), {
+          after: function () {
+            renderTaxPayerTabs();
+            renderWithholdSum();
+            renderDocsMeta();
+          }
+        });
+        return;
+      }
       var t = e.target.closest('[data-tax-payer]');
       if (t) switchTaxPayer(t.getAttribute('data-tax-payer'));
     });
@@ -3151,11 +3357,18 @@
       var m = payMsgChoices()[parseInt(item.getAttribute('data-msg'), 10)];
       if (m && m.text) copyText(m.text);
     });
-    $('docWithholdSum').addEventListener('click', function (e) {
-      var b = e.target.closest('[data-copy]');
-      if (!b || !b.getAttribute('data-copy')) return;
-      copyText(b.getAttribute('data-copy'));
-    });
+    function bindCopyBox_(el) {
+      if (!el || el._copyBound) return;
+      el._copyBound = true;
+      el.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-copy]');
+        if (!b || !b.getAttribute('data-copy')) return;
+        copyText(b.getAttribute('data-copy'));
+      });
+    }
+    bindCopyBox_($('docWithholdSum'));
+    bindCopyBox_($('docWithholdFill'));
+    bindCopyBox_($('docSimpleFill'));
     $('btnDocSavePerson').addEventListener('click', savePerson);
     $('btnDocNewPerson').addEventListener('click', function () { selectPerson(''); });
     $('btnDocDelPerson').addEventListener('click', function () {
