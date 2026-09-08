@@ -265,11 +265,26 @@
   }
   .docs-work-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
   .doc-pay-history {
-    background: #f4f1ea; border-radius: 12px; padding: 11px 12px;
+    background: #f4f1ea; border-radius: 12px; padding: 10px 12px;
     font-size: 13.5px; font-weight: 700; line-height: 1.55; color: var(--ink);
     margin: 0 0 10px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    align-items: center;
   }
-  .doc-pay-history.empty { color: var(--mute); font-weight: 600; }
+  .doc-pay-history.empty {
+    color: var(--mute); font-weight: 600;
+    display: block;
+  }
+  .pay-hist-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1.5px solid #d7d0c4;
+    background: #fff;
+    color: var(--ink);
+    font-size: 13px; font-weight: 700;
+    padding: 7px 8px 7px 12px; border-radius: 999px;
+    white-space: nowrap;
+  }
+  .pay-hist-chip .org-tab-x { color: var(--ink); }
   .doc-payer-toggle {
     width: 100%;
     border: 1px solid #e2ddd3; background: #fff; color: var(--ink);
@@ -2570,20 +2585,44 @@
     var pays = (docsBucket(d).pays || []).slice().sort(function (a, b) {
       return String(a.ym || '').localeCompare(String(b.ym || ''));
     });
-    var bits = [];
+    var chips = [];
     pays.forEach(function (pay) {
       var name = personNameOf(d, pay.pid);
       var m = parseInt(String(pay.ym || '').split('-')[1], 10);
-      if (!m || !name) return;
-      bits.push(m + '월 ' + name);
+      if (!m || !name || !pay.ym || !pay.pid) return;
+      chips.push(
+        '<span class="pay-hist-chip">' +
+          '<span class="pay-hist-label">' + m + '월 ' + name + '</span>' +
+          '<button type="button" class="org-tab-x" data-del-pay-pid="' + pay.pid + '" data-del-pay-ym="' + pay.ym + '" title="삭제" aria-label="삭제">×</button>' +
+        '</span>'
+      );
     });
-    if (!bits.length) {
+    if (!chips.length) {
       el.textContent = '아직 저장된 지급 내역이 없습니다.';
       el.classList.add('empty');
       return;
     }
-    el.textContent = bits.join(', ');
     el.classList.remove('empty');
+    el.innerHTML = chips.join('');
+  }
+  function removePayHistoryChip_(pid, ym) {
+    if (!pid || !ym) return;
+    var d = loadDocs();
+    var name = personNameOf(d, pid) || '이 사람';
+    var m = parseInt(String(ym).split('-')[1], 10);
+    var label = (m ? m + '월 ' : '') + name;
+    if (!confirm('「' + label + '」지급 내역을 삭제할까요?')) return;
+    var bucket = docsBucket(d);
+    bucket.pays = (bucket.pays || []).filter(function (p) {
+      return !(p.pid === pid && p.ym === ym);
+    });
+    saveDocs(d);
+    if (docsSel === pid && ($('docYearMonth') && $('docYearMonth').value) === ym) {
+      fillPay(null);
+    }
+    renderPayHistory();
+    renderTaxBox();
+    if (typeof renderWithholdSum === 'function') renderWithholdSum();
   }
   function setPayerDetailOpen(on) {
     payerDetailOpen = !!on;
@@ -2631,59 +2670,10 @@
     d.buckets.other.owner = $('docPayerOwner').value.trim();
     saveDocs(d);
   }
-  function payerIdsAll_() {
-    return ['tree', 'incheon', 'other'];
-  }
-  function hiddenPayersOf_(d) {
-    var list = Array.isArray(d.hiddenPayers) ? d.hiddenPayers : [];
-    return list.filter(function (id) { return !!DOC_PAYERS[id]; });
-  }
-  function visiblePayerIds_(d) {
-    var hidden = hiddenPayersOf_(d);
-    var ids = payerIdsAll_().filter(function (id) { return hidden.indexOf(id) < 0; });
-    return ids.length ? ids : payerIdsAll_();
-  }
-  function payerTabHtml_(id, selectedId, dataAttr) {
-    var active = selectedId === id ? ' active' : '';
-    return '<button type="button" class="org-tab' + active + '" ' + dataAttr + '="' + id + '">' +
-      '<span class="org-tab-label">' + DOC_PAYERS[id].tab + '</span>' +
-      '<span class="org-tab-x" data-del-payer="' + id + '" title="삭제" aria-label="삭제">×</span>' +
-      '</button>';
-  }
-  function removePayerChip_(id, opts) {
-    opts = opts || {};
-    if (!DOC_PAYERS[id]) return;
-    var d = loadDocs();
-    var visible = visiblePayerIds_(d);
-    if (visible.length <= 1) {
-      alert('사업장은 최소 1개는 남겨 두세요.');
-      return;
-    }
-    var label = DOC_PAYERS[id].tab || id;
-    if (!confirm('「' + label + '」을(를) 삭제할까요?\n목록에서만 숨깁니다. 저장된 지급 기록은 그대로 둡니다.')) return;
-    var hidden = hiddenPayersOf_(d);
-    if (hidden.indexOf(id) < 0) hidden.push(id);
-    d.hiddenPayers = hidden;
-    var nextIds = visiblePayerIds_(d);
-    if (d.payerId === id) d.payerId = nextIds[0];
-    if (d.taxPayerId === id) d.taxPayerId = nextIds[0];
-    saveDocs(d);
-    if (opts.after) opts.after(d);
-    else {
-      renderDocsMeta();
-      if (typeof renderTaxPayerTabs === 'function') renderTaxPayerTabs();
-      if (typeof renderWithholdSum === 'function') renderWithholdSum();
-    }
-  }
   function renderPayerTabs() {
     var d = loadDocs();
-    var ids = visiblePayerIds_(d);
-    if (ids.indexOf(d.payerId) < 0) {
-      d.payerId = ids[0];
-      saveDocs(d);
-    }
-    $('docPayerTabs').innerHTML = ids.map(function (id) {
-      return payerTabHtml_(id, d.payerId, 'data-payer');
+    $('docPayerTabs').innerHTML = ['tree', 'incheon', 'other'].map(function (id) {
+      return '<button type="button" class="org-tab' + (d.payerId === id ? ' active' : '') + '" data-payer="' + id + '">' + DOC_PAYERS[id].tab + '</button>';
     }).join('');
     var other = d.payerId === 'other';
     $('docPayerEdit').hidden = !other;
@@ -2707,15 +2697,9 @@
     var el = $('docTaxPayerTabs');
     if (!el) return;
     var d = loadDocs();
-    var ids = visiblePayerIds_(d);
     var sel = taxPayerIdOf(d);
-    if (ids.indexOf(sel) < 0) {
-      sel = ids[0];
-      d.taxPayerId = sel;
-      saveDocs(d);
-    }
-    el.innerHTML = ids.map(function (id) {
-      return payerTabHtml_(id, sel, 'data-tax-payer');
+    el.innerHTML = ['tree', 'incheon', 'other'].map(function (id) {
+      return '<button type="button" class="org-tab' + (sel === id ? ' active' : '') + '" data-tax-payer="' + id + '">' + DOC_PAYERS[id].tab + '</button>';
     }).join('');
   }
   function switchTaxPayer(id) {
@@ -3257,32 +3241,18 @@
       setPayerDetailOpen(!payerDetailOpen);
     });
     $('docPayerTabs').addEventListener('click', function (e) {
-      var del = e.target.closest('[data-del-payer]');
-      if (del) {
-        e.preventDefault();
-        e.stopPropagation();
-        removePayerChip_(del.getAttribute('data-del-payer'));
-        return;
-      }
       var t = e.target.closest('[data-payer]');
       if (t) switchDocPayer(t.getAttribute('data-payer'));
     });
     $('docTaxPayerTabs').addEventListener('click', function (e) {
-      var del = e.target.closest('[data-del-payer]');
-      if (del) {
-        e.preventDefault();
-        e.stopPropagation();
-        removePayerChip_(del.getAttribute('data-del-payer'), {
-          after: function () {
-            renderTaxPayerTabs();
-            renderWithholdSum();
-            renderDocsMeta();
-          }
-        });
-        return;
-      }
       var t = e.target.closest('[data-tax-payer]');
       if (t) switchTaxPayer(t.getAttribute('data-tax-payer'));
+    });
+    $('docPayHistory').addEventListener('click', function (e) {
+      var del = e.target.closest('[data-del-pay-pid]');
+      if (!del) return;
+      e.preventDefault();
+      removePayHistoryChip_(del.getAttribute('data-del-pay-pid'), del.getAttribute('data-del-pay-ym'));
     });
     $('docStaffTabs').addEventListener('click', function (e) {
       var t = e.target.closest('[data-staff]');
