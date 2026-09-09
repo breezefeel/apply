@@ -37,7 +37,7 @@
     padding: calc(12px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom));
   }
   body.mode-receipt .app {
-    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
 
   .head {
@@ -285,6 +285,26 @@
     white-space: nowrap;
   }
   .pay-hist-chip .org-tab-x { color: var(--ink); }
+  .receipt-hist-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1.5px solid #d7d0c4;
+    background: #fff;
+    color: var(--ink);
+    font-size: 12.5px; font-weight: 700;
+    padding: 7px 8px 7px 12px; border-radius: 999px;
+    white-space: nowrap;
+    cursor: pointer;
+    max-width: 100%;
+  }
+  .receipt-hist-chip .pay-hist-label {
+    overflow: hidden; text-overflow: ellipsis; max-width: 220px;
+  }
+  .receipt-hist-chip.active {
+    background: var(--ink); color: #fff; border-color: var(--ink);
+  }
+  .receipt-hist-chip.active .org-tab-x { color: #fff; }
+  .receipt-hist-chip .org-tab-x { color: var(--ink); }
+  #receiptHistStatus { margin-bottom: 10px; }
   .doc-payer-toggle {
     width: 100%;
     border: 1px solid #e2ddd3; background: #fff; color: var(--ink);
@@ -762,6 +782,12 @@
     <div id="panelReceipt" class="panel">
     <nav class="tabs no-print" id="orgTabs" aria-label="발급 기관"></nav>
 
+    <section class="card no-print" id="receiptHistCard">
+      <div class="card-title">발행 내역</div>
+      <p class="hint" id="receiptHistStatus">약수 스케줄 시트에 함께 저장됩니다. 저장 후 다른 컴퓨터·핸드폰에서도 볼 수 있습니다.</p>
+      <div class="doc-pay-history empty" id="receiptHistory">아직 저장된 발행 내역이 없습니다.</div>
+    </section>
+
     <section class="card no-print">
       <div class="card-title">입력</div>
       <div class="grid">
@@ -1125,7 +1151,8 @@
   <div class="dock no-print receipt-dock">
     <div class="dock-inner">
       <button type="button" class="btn btn-ghost" id="btnClear">입력 지우기</button>
-      <button type="button" class="btn btn-print" onclick="window.print()">인쇄 / PDF 저장</button>
+      <button type="button" class="btn btn-ghost" id="btnSaveReceipt">발행 저장</button>
+      <button type="button" class="btn btn-print" id="btnPrintReceipt">인쇄 / PDF 저장</button>
     </div>
   </div>
 
@@ -2242,6 +2269,7 @@
     if (!DOC_PAYERS[d.taxPayerId]) d.taxPayerId = d.payerId;
     if (!Array.isArray(d.hiddenPayers)) d.hiddenPayers = [];
     d.hiddenPayers = d.hiddenPayers.filter(function (id) { return !!DOC_PAYERS[id]; });
+    if (!Array.isArray(d.receiptHistory)) d.receiptHistory = [];
     if (ensureStaffDocs(d)) {
       try { localStorage.setItem(DOCS_STORE, JSON.stringify(d)); } catch (e3) {}
     }
@@ -2262,6 +2290,21 @@
       el.innerHTML = extra || '시트 저장에 실패했습니다. Apps Script를 다시 배포한 뒤 저장해 주세요.';
     } else {
       el.innerHTML = '약수 스케줄 시트의 <b>강사급여</b> 탭에 저장됩니다. 저장 후 다른 컴퓨터·핸드폰에서도 이 화면으로 볼 수 있습니다.';
+    }
+  }
+  function setReceiptHistStatus(kind, extra) {
+    var el = $('receiptHistStatus');
+    if (!el) return;
+    if (kind === 'ok') {
+      el.innerHTML = extra || '시트에 발행 내역이 저장됐습니다. 다른 기기에서도 이 화면으로 볼 수 있습니다.';
+    } else if (kind === 'load') {
+      el.innerHTML = extra || '시트에서 발행 내역을 불러왔습니다.';
+    } else if (kind === 'fail') {
+      el.innerHTML = extra || '시트 저장에 실패했습니다. 이 기기에는 저장돼 있습니다.';
+    } else if (kind === 'saving') {
+      el.innerHTML = extra || '시트에 저장 중…';
+    } else {
+      el.innerHTML = '약수 스케줄 시트에 함께 저장됩니다. 저장 후 다른 컴퓨터·핸드폰에서도 볼 수 있습니다.';
     }
   }
   function payrollRequest(payload, forcePost) {
@@ -2325,9 +2368,203 @@
     return raw;
   }
   function applyDocsData(d) {
+    var prev = {};
+    try { prev = JSON.parse(localStorage.getItem(DOCS_STORE) || '{}'); } catch (e0) { prev = {}; }
+    if (!Array.isArray(d.receiptHistory)) {
+      // 예전 시트 데이터에 필드가 없으면 이 기기 발행 내역을 지기지 않음
+      d.receiptHistory = Array.isArray(prev.receiptHistory) ? prev.receiptHistory : [];
+    }
     localStorage.setItem(DOCS_STORE, JSON.stringify(d));
   }
   function docsBucket(d) { return d.buckets[d.payerId] || d.buckets.tree; }
+
+  var receiptHistActiveId = '';
+  var receiptHistPulling = false;
+  var RECEIPT_HIST_MAX = 200;
+  function escHtml_(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+  function receiptNoOf_(org, issueDate) {
+    var o = ORGS[org] || ORGS.hbw;
+    var ymd = String(issueDate || todayISO()).replace(/-/g, '');
+    return (o.prefix || 'RCP') + '-' + ymd;
+  }
+  function receiptFingerprint_(row) {
+    return [
+      row.orgId || '',
+      String(row.clientName || '').trim().toLowerCase(),
+      row.issueDate || '',
+      String(row.amount || '').replace(/[^\d]/g, ''),
+      String(row.svcName || '').trim().toLowerCase(),
+      String(row.sessions || '')
+    ].join('|');
+  }
+  function getReceiptHistory_() {
+    var d = loadDocs();
+    if (!Array.isArray(d.receiptHistory)) d.receiptHistory = [];
+    return d.receiptHistory.slice().sort(function (a, b) {
+      return String(b.savedAt || '').localeCompare(String(a.savedAt || ''));
+    });
+  }
+  function fmtReceiptAmtLabel_(amountStr) {
+    var n = parseAmount(amountStr);
+    return n ? n.toLocaleString('en-US') : '0';
+  }
+  function renderReceiptHistory() {
+    var el = $('receiptHistory');
+    if (!el) return;
+    var list = getReceiptHistory_();
+    if (!list.length) {
+      el.textContent = '아직 저장된 발행 내역이 없습니다.';
+      el.classList.add('empty');
+      return;
+    }
+    el.classList.remove('empty');
+    el.innerHTML = list.map(function (row) {
+      var orgTab = (ORGS[row.orgId] && ORGS[row.orgId].tab) || row.orgTab || row.orgId || '';
+      var when = row.issueDate || (row.savedAt || '').slice(0, 10) || '';
+      var label = (when ? when.slice(5).replace('-', '/') + ' ' : '') +
+        (row.clientName || '이름 없음') + ' · ' + fmtReceiptAmtLabel_(row.amount);
+      var title = escHtml_([orgTab, row.receiptNo || '', row.svcName || ''].filter(Boolean).join(' · '));
+      return '<span class="receipt-hist-chip' + (row.id === receiptHistActiveId ? ' active' : '') +
+        '" data-receipt-id="' + escHtml_(row.id) + '" title="' + title + '">' +
+        '<span class="pay-hist-label">' + escHtml_(label) + '</span>' +
+        '<button type="button" class="org-tab-x" data-del-receipt="' + escHtml_(row.id) +
+        '" title="삭제" aria-label="삭제">×</button></span>';
+    }).join('');
+  }
+  function buildReceiptEntry_() {
+    var form = readForm();
+    var name = String(form.clientName || '').trim();
+    var amt = parseAmount(form.amount);
+    if (!name) return { error: '회원 이름을 넣어 주세요' };
+    if (!amt) return { error: '금액을 넣어 주세요' };
+    var o = ORGS[orgId] || ORGS.hbw;
+    return {
+      entry: {
+        id: 'r-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7),
+        savedAt: new Date().toISOString(),
+        orgId: orgId,
+        orgTab: o.tab || '',
+        orgName: o.name || '',
+        receiptNo: receiptNoOf_(orgId, form.issueDate),
+        clientName: name,
+        nationality: form.nationality || '',
+        payMethod: form.payMethod || '',
+        issueDate: form.issueDate || todayISO(),
+        payDate: form.payDate || todayISO(),
+        svcName: form.svcName || '',
+        svcDesc: form.svcDesc || '',
+        sessions: form.sessions || '',
+        amount: form.amount || '',
+        validFrom: form.validFrom || '',
+        validUntil: form.validUntil || '',
+        issuer: form.issuer || '',
+        issuerRole: form.issuerRole || '',
+        addr: form.addr || '',
+        phone: form.phone || '',
+        bizNo: form.bizNo || '',
+        notes: form.notes || '',
+        packId: form.packId || 'custom'
+      }
+    };
+  }
+  function saveReceiptHistory(opts) {
+    opts = opts || {};
+    var built = buildReceiptEntry_();
+    if (built.error) {
+      if (!opts.silent) flashToast(built.error);
+      return Promise.resolve(false);
+    }
+    var entry = built.entry;
+    var d = loadDocs();
+    if (!Array.isArray(d.receiptHistory)) d.receiptHistory = [];
+    var fp = receiptFingerprint_(entry);
+    var updated = false;
+    d.receiptHistory = d.receiptHistory.map(function (row) {
+      if (receiptFingerprint_(row) === fp) {
+        updated = true;
+        entry.id = row.id;
+        return entry;
+      }
+      return row;
+    });
+    if (!updated) d.receiptHistory.unshift(entry);
+    d.receiptHistory = d.receiptHistory.sort(function (a, b) {
+      return String(b.savedAt || '').localeCompare(String(a.savedAt || ''));
+    }).slice(0, RECEIPT_HIST_MAX);
+    receiptHistActiveId = entry.id;
+    clearTimeout(payrollSaveTimer);
+    localStorage.setItem(DOCS_STORE, JSON.stringify(d));
+    renderReceiptHistory();
+    setReceiptHistStatus('saving');
+    if (!opts.silent) flashToast(updated ? '발행 내역 갱신됨' : '발행 내역 저장됨');
+    return pushPayrollToSheet(d).then(function (ok) {
+      setReceiptHistStatus(ok ? 'ok' : 'fail');
+      if (ok && !opts.silent) flashToast('시트에 저장됨');
+      return ok;
+    });
+  }
+  function loadReceiptHistoryEntry_(id) {
+    if (!id) return;
+    var row = getReceiptHistory_().filter(function (r) { return r.id === id; })[0];
+    if (!row) return;
+    if (row.orgId && ORGS[row.orgId] && row.orgId !== orgId) {
+      persist();
+      orgId = row.orgId;
+      var all = loadAll();
+      all.orgId = orgId;
+      if (!all[orgId]) all[orgId] = defaults(orgId);
+      saveAll(all);
+      document.querySelectorAll('#orgTabs .org-tab').forEach(function (t) {
+        t.classList.toggle('active', t.dataset.id === orgId);
+      });
+    }
+    var data = defaults(orgId);
+    FIELDS.forEach(function (k) {
+      if (k === 'packId') data.packId = row.packId || 'custom';
+      else if (row[k] != null) data[k] = row[k];
+    });
+    writeForm(data);
+    persist();
+    render();
+    receiptHistActiveId = id;
+    renderReceiptHistory();
+    flashToast('발행 내역을 불러왔습니다');
+  }
+  function removeReceiptHistory_(id) {
+    if (!id) return;
+    var row = getReceiptHistory_().filter(function (r) { return r.id === id; })[0];
+    var label = row ? ((row.clientName || '이 영수증') + (row.issueDate ? ' · ' + row.issueDate : '')) : '이 발행 내역';
+    if (!confirm('「' + label + '」을(를) 삭제할까요?')) return;
+    var d = loadDocs();
+    d.receiptHistory = (d.receiptHistory || []).filter(function (r) { return r.id !== id; });
+    if (receiptHistActiveId === id) receiptHistActiveId = '';
+    clearTimeout(payrollSaveTimer);
+    localStorage.setItem(DOCS_STORE, JSON.stringify(d));
+    renderReceiptHistory();
+    setReceiptHistStatus('saving');
+    flashToast('삭제됨');
+    pushPayrollToSheet(d).then(function (ok) {
+      setReceiptHistStatus(ok ? 'ok' : 'fail');
+    });
+  }
+  function pullReceiptHistoryFromSheet_() {
+    if (receiptHistPulling) return Promise.resolve(false);
+    receiptHistPulling = true;
+    return pullPayrollFromSheet().then(function (ok) {
+      renderReceiptHistory();
+      if (ok) setReceiptHistStatus('load');
+      receiptHistPulling = false;
+      return ok;
+    }, function () {
+      receiptHistPulling = false;
+      return false;
+    });
+  }
+
   function payerSlug(d) {
     var p = currentPayerInfo(d);
     return (p.name || '기타').replace(/\s+/g, '');
@@ -3441,6 +3678,8 @@
         applyReceiptPrefill(receiptPrefillFromQuery);
         receiptPrefillApplied = true;
       }
+      renderReceiptHistory();
+      pullReceiptHistoryFromSheet_();
       requestAnimationFrame(fitPreview);
     }
     if (which === 'docs') {
@@ -3484,6 +3723,7 @@
   writeForm(saved[orgId]);
   render();
   initDocs();
+  renderReceiptHistory();
   syncDocsLockUi();
   applyQuery();
 
@@ -3495,6 +3735,17 @@
     var c = e.target.closest('.chip');
     if (c) applyPack(c.dataset.id);
   });
+  $('receiptHistory').addEventListener('click', function (e) {
+    var del = e.target.closest('[data-del-receipt]');
+    if (del) {
+      e.preventDefault();
+      e.stopPropagation();
+      removeReceiptHistory_(del.getAttribute('data-del-receipt'));
+      return;
+    }
+    var chip = e.target.closest('[data-receipt-id]');
+    if (chip) loadReceiptHistoryEntry_(chip.getAttribute('data-receipt-id'));
+  });
   $('btnClear').addEventListener('click', function () {
     var d = defaults(orgId);
     d.clientName = '';
@@ -3503,8 +3754,23 @@
     d.svcName = '';
     d.packId = 'custom';
     writeForm(d);
+    receiptHistActiveId = '';
     persist();
     render();
+    renderReceiptHistory();
+  });
+  $('btnSaveReceipt').addEventListener('click', function () {
+    saveReceiptHistory();
+  });
+  $('btnPrintReceipt').addEventListener('click', function () {
+    var name = ($('clientName').value || '').trim();
+    var amt = parseAmount($('amount').value);
+    var goPrint = function () { window.print(); };
+    if (name && amt) {
+      saveReceiptHistory({ silent: true }).then(function () { goPrint(); }, goPrint);
+    } else {
+      goPrint();
+    }
   });
 
   FIELDS.forEach(function (k) {
