@@ -79,6 +79,7 @@
       white-space:nowrap;
     }
     .page-hd-link:hover { color:#fff; }
+    a.page-hd-btn { text-decoration:none; }
     @media (max-width:520px) {
       .page-hd { padding:10px 10px 10px; }
       .page-hd-inner { gap:6px; flex-wrap:nowrap; align-items:flex-start; }
@@ -2339,17 +2340,16 @@
         <p id="dateLine">—</p>
       </div>
       <div class="page-hd-side">
-        <div class="page-hd-links">
-          <a class="page-hd-link" href="#" onclick="openApplicationForm_(event)">회원등록</a>
-          <a class="page-hd-link" href="영수증.html" onclick="openMemberCare_(event)">회원대응</a>
-          <span class="page-hd-links-gap" aria-hidden="true"></span>
-          <a class="page-hd-link" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠</a>
-          <a class="page-hd-link" href="#" onclick="openMemberScheduleSheet_(event)" title="보드 날짜의 월 스케줄표로 이동">예약 스케줄</a>
+        <div class="page-hd-actions">
+          <a class="page-hd-btn" href="영수증.html" onclick="openMemberCare_(event)">관리지원</a>
+          <a class="page-hd-btn" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠</a>
+          <a class="page-hd-btn" href="#" onclick="openMemberScheduleSheet_(event)" title="보드 날짜의 월 스케줄표로 이동">예약 스케줄</a>
         </div>
         <div class="page-hd-actions">
-          <button type="button" class="page-hd-btn page-hd-btn--refresh" onclick="loadBoard()" title="새로고침" aria-label="새로고침">새로고침</button>
-          <button type="button" class="page-hd-btn" onclick="sendWellnessIntakeSms_()">사전평가</button>
+          <button type="button" class="page-hd-btn" onclick="openApplicationForm_(event)">회원등록</button>
           <button type="button" class="page-hd-btn page-hd-btn--eval" onclick="openEvalModal()">초회평가</button>
+          <button type="button" class="page-hd-btn" onclick="sendWellnessIntakeSms_()">사전평가</button>
+          <button type="button" class="page-hd-btn page-hd-btn--refresh" onclick="loadBoard()" title="새로고침" aria-label="새로고침">새로고침</button>
         </div>
       </div>
     </div>
