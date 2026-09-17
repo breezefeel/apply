@@ -253,6 +253,11 @@
     white-space: pre-wrap;
     word-break: keep-all;
   }
+  .reply-box.is-copy {
+    cursor: pointer;
+    caret-color: transparent;
+  }
+  .reply-box.is-copy:active { background: #ece7dc; }
   #faqText { min-height: 226px; }
   a.btn-sm {
     display: inline-flex; align-items: center; justify-content: center;
@@ -262,7 +267,16 @@
     background: var(--ink); color: #fff; border-color: var(--ink);
     padding: 5px 8px; font-size: 12px;
   }
-  .faq-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+  .faq-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: -4px 0 12px;
+    padding: 2px 4px 6px;
+  }
+  #faqCard { margin-bottom: 10px; }
   .faq-tabs {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -785,19 +799,18 @@
       <section class="card no-print" id="faqCard">
         <div class="reply-label">
           <span>FAQ</span>
-          <span class="faq-actions">
-            <a class="btn-sm faq-dl" id="btnSavePrice" download>가격표</a>
-            <a class="btn-sm faq-dl" id="btnSaveBrochureFront">브로셔 앞</a>
-            <a class="btn-sm faq-dl" id="btnSaveBrochureBack">브로셔 뒤</a>
-            <a class="btn-sm faq-dl" id="btnSaveDiffFront">차별성 앞</a>
-            <a class="btn-sm faq-dl" id="btnSaveDiffBack">차별성 뒤</a>
-            <button type="button" class="btn-sm" id="btnCopyFaq">복사</button>
-          </span>
         </div>
         <div class="faq-tabs" id="faqTabs"></div>
-        <textarea class="reply-box" id="faqText" placeholder="버튼을 누르면 멘트가 여기에 나타납니다."></textarea>
+        <textarea class="reply-box is-copy" id="faqText" readonly title="누르면 복사됩니다" placeholder="버튼을 누르면 멘트가 여기에 나타납니다. 멘트를 누르면 복사됩니다."></textarea>
         <img id="priceSheetImg" alt="" hidden>
       </section>
+      <div class="faq-actions" aria-label="자료 저장">
+        <a class="btn-sm faq-dl" id="btnSavePrice" download>가격표</a>
+        <a class="btn-sm faq-dl" id="btnSaveBrochureFront">브로셔 앞</a>
+        <a class="btn-sm faq-dl" id="btnSaveBrochureBack">브로셔 뒤</a>
+        <a class="btn-sm faq-dl" id="btnSaveDiffFront">차별성 앞</a>
+        <a class="btn-sm faq-dl" id="btnSaveDiffBack">차별성 뒤</a>
+      </div>
       <section class="card no-print">
         <div class="field">
           <label>회원 질문</label>
@@ -814,12 +827,9 @@
         <p class="ocr-status" id="ocrStatus"></p>
         <div class="reply-label follow-reply">
           <span>첫 인사</span>
-          <span>
-            <button type="button" class="btn-sm" id="btnNewConsult">새 상담</button>
-            <button type="button" class="btn-sm" id="btnCopyReply">복사</button>
-          </span>
+          <button type="button" class="btn-sm" id="btnNewConsult">새 상담</button>
         </div>
-        <textarea class="reply-box" id="chatReply" placeholder="캡처나 질문을 넣으면 첫 인사가 생깁니다."></textarea>
+        <textarea class="reply-box is-copy" id="chatReply" readonly title="누르면 복사됩니다" placeholder="캡처나 질문을 넣으면 첫 인사가 생깁니다. 멘트를 누르면 복사됩니다."></textarea>
       </section>
       <section class="card no-print">
         <div class="field">
@@ -836,9 +846,8 @@
         </div>
         <div class="reply-label follow-reply">
           <span>상담 멘트</span>
-          <button type="button" class="btn-sm" id="btnCopyFollow">복사</button>
         </div>
-        <textarea class="reply-box" id="chatFollow" placeholder="이어서 넣으면 다음 멘트가 생깁니다."></textarea>
+        <textarea class="reply-box is-copy" id="chatFollow" readonly title="누르면 복사됩니다" placeholder="이어서 넣으면 다음 멘트가 생깁니다. 멘트를 누르면 복사됩니다."></textarea>
       </section>
     </div>
 
@@ -1990,11 +1999,12 @@
     img.onerror = function () {
       img.onerror = function () { setStatus('가격표를 불러오지 못했습니다.'); };
       img.src = priceImgSrc(b, true);
-      a.href = img.src;
+      bindBlobToAnchor_(a, b.priceImg, b.priceDownload);
     };
     img.src = priceImgSrc(b, false);
-    a.href = img.src;
     a.setAttribute('download', b.priceDownload);
+    a.href = img.src;
+    bindBlobToAnchor_(a, b.priceImg, b.priceDownload);
     syncBrochureLink();
     syncDiffLink();
   }
@@ -2002,6 +2012,49 @@
     { src: '리얼무브먼트 차별점-01.png', download: '차별성-4단계.png' },
     { src: '리얼무브먼트 차별점-02.png', download: '차별성-WHY-US.png' }
   ];
+  var assetFileCache_ = {};
+  var assetBlobUrls_ = {};
+  function asDownloadFile_(buf, filename) {
+    try {
+      return new File([buf], filename, { type: 'application/octet-stream' });
+    } catch (err) {
+      return new Blob([buf], { type: 'application/octet-stream' });
+    }
+  }
+  function fetchAssetBuffer_(src) {
+    function one(url) {
+      return fetch(url, { mode: 'cors', credentials: 'omit' }).then(function (r) {
+        if (!r.ok) throw new Error('bad');
+        return r.arrayBuffer();
+      });
+    }
+    return one(applyAssetUrl(src, false)).catch(function () {
+      return one(applyAssetUrl(src, true));
+    });
+  }
+  function prefetchDownloadFile_(src, filename) {
+    var key = String(src) + '\0' + String(filename);
+    if (!assetFileCache_[key]) {
+      assetFileCache_[key] = fetchAssetBuffer_(src).then(function (buf) {
+        return asDownloadFile_(buf, filename);
+      });
+    }
+    return assetFileCache_[key];
+  }
+  function bindBlobToAnchor_(a, src, filename) {
+    if (!a || !src) return;
+    prefetchDownloadFile_(src, filename).then(function (file) {
+      if (assetBlobUrls_[a.id]) URL.revokeObjectURL(assetBlobUrls_[a.id]);
+      var u = URL.createObjectURL(file);
+      assetBlobUrls_[a.id] = u;
+      a.href = u;
+      a.setAttribute('download', filename);
+      a.setAttribute('type', 'application/octet-stream');
+    }).catch(function () {
+      a.href = applyAssetUrl(src, true);
+      a.setAttribute('download', filename);
+    });
+  }
   function syncDlBtn_(id, file) {
     var a = $(id);
     if (!a) return;
@@ -2012,8 +2065,9 @@
       return;
     }
     a.hidden = false;
-    a.href = applyAssetUrl(file.src);
     a.setAttribute('download', file.download);
+    a.href = applyAssetUrl(file.src);
+    bindBlobToAnchor_(a, file.src, file.download);
   }
   function syncBrochureLink() {
     var files = BRANCH[consultBranch].brochure || [];
@@ -2028,32 +2082,21 @@
     var a = document.createElement('a');
     a.href = href;
     a.setAttribute('download', filename);
+    a.setAttribute('type', 'application/octet-stream');
     a.rel = 'noopener';
+    a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
     a.remove();
   }
   function downloadAssetFile(src, filename) {
-    var local = applyAssetUrl(src, false);
-    var remote = applyAssetUrl(src, true);
-    function viaBlob(url, thenFail) {
-      fetch(url, { mode: 'cors' }).then(function (r) {
-        if (!r.ok) throw new Error('bad');
-        return r.blob();
-      }).then(function (blob) {
-        var u = URL.createObjectURL(blob);
-        triggerDownloadHref_(u, filename);
-        setTimeout(function () { URL.revokeObjectURL(u); }, 2000);
-      }).catch(thenFail);
-    }
-    viaBlob(local, function () {
-      viaBlob(remote, function () { triggerDownloadHref_(remote, filename); });
+    prefetchDownloadFile_(src, filename).then(function (file) {
+      var u = URL.createObjectURL(file);
+      triggerDownloadHref_(u, filename);
+      setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+    }).catch(function () {
+      triggerDownloadHref_(applyAssetUrl(src, true), filename);
     });
-  }
-  function downloadOneAsset_(file, e) {
-    if (!file) return;
-    if (e) e.preventDefault();
-    downloadAssetFile(file.src, file.download);
   }
   function brochureFile_(idx) {
     return (BRANCH[consultBranch].brochure || [])[idx];
@@ -2061,7 +2104,20 @@
   function bindFaqDownload_(id, getFile) {
     var a = $(id);
     if (!a) return;
-    a.addEventListener('click', function (e) { downloadOneAsset_(getFile(), e); });
+    a.addEventListener('pointerdown', function () {
+      var file = getFile();
+      if (file) bindBlobToAnchor_(a, file.src, file.download);
+    });
+    a.addEventListener('click', function (e) {
+      var file = getFile();
+      if (!file) {
+        e.preventDefault();
+        return;
+      }
+      if (String(a.getAttribute('href') || '').indexOf('blob:') === 0) return;
+      e.preventDefault();
+      downloadAssetFile(file.src, file.download);
+    });
   }
   function startGreeting(reason) {
     var q = $('chatQ').value.trim();
@@ -3907,14 +3963,26 @@
     renderThumbs(2);
     setStatus('');
   });
-  $('btnCopyReply').addEventListener('click', function () { copyText($('chatReply').value); });
-  $('btnCopyFollow').addEventListener('click', function () { copyText($('chatFollow').value); });
-  $('btnCopyFaq').addEventListener('click', function () { copyText($('faqText').value); });
+  function bindCopyBox_(id) {
+    var el = $(id);
+    if (!el) return;
+    el.addEventListener('click', function () {
+      if (!el.value) return;
+      copyText(el.value);
+    });
+  }
+  bindCopyBox_('faqText');
+  bindCopyBox_('chatReply');
+  bindCopyBox_('chatFollow');
   $('panelLinks').addEventListener('click', function (e) {
     var btn = e.target.closest('.link-copy');
     if (!btn) return;
     e.preventDefault();
     copyText(btn.getAttribute('data-copy'));
+  });
+  bindFaqDownload_('btnSavePrice', function () {
+    var b = BRANCH[consultBranch];
+    return { src: b.priceImg, download: b.priceDownload };
   });
   bindFaqDownload_('btnSaveBrochureFront', function () { return brochureFile_(0); });
   bindFaqDownload_('btnSaveBrochureBack', function () { return brochureFile_(1); });
