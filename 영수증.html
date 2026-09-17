@@ -60,6 +60,7 @@
   body.mode-links #consultBranchChips { display: none; }
   body.mode-consult #pageSub,
   body.mode-links #pageSub { display: none; }
+  body.mode-links .app { max-width: 1040px; }
 
   .app-tabs {
     display: grid; grid-template-columns: 1.15fr .9fr .75fr .9fr; gap: 6px;
@@ -83,37 +84,71 @@
   .panel.active { display: block; }
 
   .links-lead {
-    font-size: 13px; color: var(--mute); font-weight: 600;
-    margin: 0 0 14px; line-height: 1.5;
+    font-size: 12.5px; color: var(--mute); font-weight: 600;
+    margin: 0 0 10px; line-height: 1.45;
   }
-  .links-group { margin-bottom: 18px; }
+  .links-group { margin-bottom: 14px; }
   .links-group-title {
-    font-size: 12px; font-weight: 800; color: var(--mute);
-    letter-spacing: -.02em; margin: 0 0 8px;
+    font-size: 11.5px; font-weight: 800; color: var(--mute);
+    letter-spacing: -.02em; margin: 0 0 6px;
   }
   .links-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+  @media (min-width: 480px) {
+    .links-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (min-width: 720px) {
+    .links-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  @media (min-width: 960px) {
+    .links-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   }
   .link-card {
-    display: flex; align-items: center; gap: 10px;
-    min-height: 62px; padding: 10px 12px;
+    display: flex; align-items: center; gap: 6px;
+    min-height: 0; padding: 6px 8px;
     background: #fff; color: inherit; text-decoration: none;
-    border: 1.5px solid #e8e2d6; border-radius: 16px;
+    border: 1px solid #e8e2d6; border-radius: 10px;
   }
   .link-card:hover { border-color: var(--gold); background: #fffdf8; }
-  .link-card-ico {
-    flex: 0 0 36px; width: 36px; height: 36px; border-radius: 12px;
-    display: inline-flex; align-items: center; justify-content: center;
-    background: #f4f1ea; font-size: 18px;
+  a.link-card-go {
+    display: flex; align-items: center; gap: 7px;
+    min-width: 0; flex: 1;
+    color: inherit; text-decoration: none;
   }
-  .link-card-txt { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-  .link-card-name { font-size: 13.5px; font-weight: 800; letter-spacing: -.03em; }
-  .link-card-sub {
-    font-size: 11px; font-weight: 600; color: var(--mute);
+  .link-copy {
+    flex: 0 0 auto;
+    border: 1px solid #ddd6c8;
+    background: #f4f1ea;
+    color: var(--ink);
+    font-size: 11px; font-weight: 800; letter-spacing: -.03em;
+    padding: 5px 8px; border-radius: 8px;
+    cursor: pointer; line-height: 1;
+  }
+  .link-copy:hover { border-color: var(--gold); background: #fffdf8; }
+  .link-card-ico {
+    flex: 0 0 24px; width: 24px; height: 24px; border-radius: 7px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #f4f1ea; font-size: 13px;
+  }
+  .link-card-txt { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 1px; }
+  .link-card-name {
+    font-size: 12.5px; font-weight: 800; letter-spacing: -.03em;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  @media (max-width: 420px) {
-    .links-grid { grid-template-columns: 1fr; }
+  .link-card-sub {
+    font-size: 10px; font-weight: 600; color: var(--mute);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .link-card:has(.link-copy) .link-card-name,
+  .link-card:has(.link-copy) .link-card-sub {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: keep-all;
+    line-height: 1.25;
   }
 
   .tabs {
@@ -225,6 +260,7 @@
   }
   a.btn-sm.faq-dl {
     background: var(--ink); color: #fff; border-color: var(--ink);
+    padding: 5px 8px; font-size: 12px;
   }
   .faq-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
   .faq-tabs {
@@ -750,9 +786,11 @@
         <div class="reply-label">
           <span>FAQ</span>
           <span class="faq-actions">
-            <a class="btn-sm faq-dl" id="btnSavePrice" download>가격표 다운</a>
-            <a class="btn-sm faq-dl" id="btnSaveBrochure">브로셔 다운</a>
-            <a class="btn-sm faq-dl" id="btnSaveDiff">차별성 다운</a>
+            <a class="btn-sm faq-dl" id="btnSavePrice" download>가격표</a>
+            <a class="btn-sm faq-dl" id="btnSaveBrochureFront">브로셔 앞</a>
+            <a class="btn-sm faq-dl" id="btnSaveBrochureBack">브로셔 뒤</a>
+            <a class="btn-sm faq-dl" id="btnSaveDiffFront">차별성 앞</a>
+            <a class="btn-sm faq-dl" id="btnSaveDiffBack">차별성 뒤</a>
             <button type="button" class="btn-sm" id="btnCopyFaq">복사</button>
           </span>
         </div>
@@ -807,17 +845,60 @@
     <div id="panelLinks" class="panel">
       <p class="links-lead">자주 쓰는 사이트를 새 탭으로 엽니다.</p>
       <div class="links-group">
-        <div class="links-group-title">AI · 제작 · 개발</div>
+        <div class="links-group-title">약수점</div>
         <div class="links-grid">
-          <a class="link-card" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">💬</span><span class="link-card-txt"><span class="link-card-name">ChatGPT</span><span class="link-card-sub">chatgpt.com</span></span></a>
-          <a class="link-card" href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">✦</span><span class="link-card-txt"><span class="link-card-name">Gemini</span><span class="link-card-sub">gemini.google.com</span></span></a>
-          <a class="link-card" href="https://claude.ai/" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">◐</span><span class="link-card-txt"><span class="link-card-name">Claude</span><span class="link-card-sub">claude.ai</span></span></a>
-          <a class="link-card" href="https://www.mangoboard.net/aichat/designer" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🎨</span><span class="link-card-txt"><span class="link-card-name">망고보드</span><span class="link-card-sub">디자인 제작</span></span></a>
-          <a class="link-card" href="https://github.com/breezefeel" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🖥</span><span class="link-card-txt"><span class="link-card-name">GitHub</span><span class="link-card-sub">github.com/breezefeel</span></span></a>
+          <div class="link-card">
+            <a class="link-card-go" href="https://talk.naver.com/profile/c/real_movement_y" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">💬</span><span class="link-card-txt"><span class="link-card-name">네이버 톡톡</span><span class="link-card-sub">상담 · 예약</span></span></a>
+            <button type="button" class="link-copy" data-copy="https://talk.naver.com/profile/c/real_movement_y">복사</button>
+          </div>
+          <div class="link-card">
+            <a class="link-card-go" href="https://pf.kakao.com/_nVSxdn/chat" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">💛</span><span class="link-card-txt"><span class="link-card-name">카카오채널</span><span class="link-card-sub">채팅 상담</span></span></a>
+            <button type="button" class="link-copy" data-copy="https://pf.kakao.com/_nVSxdn/chat">복사</button>
+          </div>
+          <div class="link-card">
+            <a class="link-card-go" href="https://blog.naver.com/allenjoy/224307689748" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">📍</span><span class="link-card-txt"><span class="link-card-name">오시는 길</span><span class="link-card-sub">블로그 안내글</span></span></a>
+            <button type="button" class="link-copy" data-copy="https://blog.naver.com/allenjoy/224307689748">복사</button>
+          </div>
+          <a class="link-card" href="https://naver.me/x2YstInq" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🗺</span><span class="link-card-txt"><span class="link-card-name">스마트플레이스</span><span class="link-card-sub">정보 · 지도 · 예약</span></span></a>
+          <div class="link-card">
+            <a class="link-card-go" href="tel:0507-1359-4596"><span class="link-card-ico">📞</span><span class="link-card-txt"><span class="link-card-name">0507-1359-4596</span><span class="link-card-sub">전화</span></span></a>
+            <button type="button" class="link-copy" data-copy="0507-1359-4596">복사</button>
+          </div>
         </div>
       </div>
       <div class="links-group">
-        <div class="links-group-title">콘텐츠 · 마케팅 채널</div>
+        <div class="links-group-title">인천점</div>
+        <div class="links-grid">
+          <div class="link-card">
+            <a class="link-card-go" href="https://talk.naver.com/profile/c/real_movement_i" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">💬</span><span class="link-card-txt"><span class="link-card-name">네이버 톡톡</span><span class="link-card-sub">상담 · 예약</span></span></a>
+            <button type="button" class="link-copy" data-copy="https://talk.naver.com/profile/c/real_movement_i">복사</button>
+          </div>
+          <div class="link-card">
+            <a class="link-card-go" href="https://pf.kakao.com/_unqbX/chat" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">💛</span><span class="link-card-txt"><span class="link-card-name">카카오채널</span><span class="link-card-sub">채팅 상담</span></span></a>
+            <button type="button" class="link-copy" data-copy="https://pf.kakao.com/_unqbX/chat">복사</button>
+          </div>
+          <div class="link-card">
+            <a class="link-card-go" href="https://blog.naver.com/allenjoy/224122998739" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">📍</span><span class="link-card-txt"><span class="link-card-name">오시는 길</span><span class="link-card-sub">블로그 안내글</span></span></a>
+            <button type="button" class="link-copy" data-copy="https://blog.naver.com/allenjoy/224122998739">복사</button>
+          </div>
+          <a class="link-card" href="https://naver.me/xYNbHrY9" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🗺</span><span class="link-card-txt"><span class="link-card-name">스마트플레이스</span><span class="link-card-sub">정보 · 지도 · 예약</span></span></a>
+          <div class="link-card">
+            <a class="link-card-go" href="tel:0507-1312-4596"><span class="link-card-ico">📞</span><span class="link-card-txt"><span class="link-card-name">0507-1312-4596</span><span class="link-card-sub">전화</span></span></a>
+            <button type="button" class="link-copy" data-copy="0507-1312-4596">복사</button>
+          </div>
+        </div>
+      </div>
+      <div class="links-group">
+        <div class="links-group-title">운영 관리</div>
+        <div class="links-grid">
+          <a class="link-card" href="apply-index.html" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">👥</span><span class="link-card-txt"><span class="link-card-name">회원 관리</span><span class="link-card-sub">출석 · 평가 · 진도</span></span></a>
+          <a class="link-card" href="https://new.smartplace.naver.com/" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🛠</span><span class="link-card-txt"><span class="link-card-name">스마트플레이스 관리</span><span class="link-card-sub">네이버 매장 정보</span></span></a>
+          <a class="link-card" href="https://business.kakao.com/" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">💬</span><span class="link-card-txt"><span class="link-card-name">카카오 매장관리</span><span class="link-card-sub">카카오맵 · 비즈니스</span></span></a>
+          <a class="link-card" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">✍️</span><span class="link-card-txt"><span class="link-card-name">블로그 글쓰기</span><span class="link-card-sub">네이버 새 글 작성</span></span></a>
+        </div>
+      </div>
+      <div class="links-group">
+        <div class="links-group-title">콘텐츠</div>
         <div class="links-grid">
           <a class="link-card" href="https://blog.naver.com/allenjoy" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">📝</span><span class="link-card-txt"><span class="link-card-name">네이버 블로그</span><span class="link-card-sub">blog.naver.com/allenjoy</span></span></a>
           <a class="link-card" href="https://www.instagram.com/dr.park_dc.pt/" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">📷</span><span class="link-card-txt"><span class="link-card-name">인스타그램</span><span class="link-card-sub">@dr.park_dc.pt</span></span></a>
@@ -832,30 +913,13 @@
         </div>
       </div>
       <div class="links-group">
-        <div class="links-group-title">약수점</div>
+        <div class="links-group-title">AI</div>
         <div class="links-grid">
-          <a class="link-card" href="https://talk.naver.com/profile/c/real_movement_y" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">💬</span><span class="link-card-txt"><span class="link-card-name">네이버 톡톡</span><span class="link-card-sub">상담 · 예약</span></span></a>
-          <a class="link-card" href="https://blog.naver.com/allenjoy/224307689748" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">📍</span><span class="link-card-txt"><span class="link-card-name">오시는 길</span><span class="link-card-sub">블로그 안내글</span></span></a>
-          <a class="link-card" href="https://naver.me/x2YstInq" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🗺</span><span class="link-card-txt"><span class="link-card-name">스마트플레이스</span><span class="link-card-sub">정보 · 지도 · 예약</span></span></a>
-          <a class="link-card" href="tel:0507-1359-4596"><span class="link-card-ico">📞</span><span class="link-card-txt"><span class="link-card-name">전화</span><span class="link-card-sub">0507-1359-4596</span></span></a>
-        </div>
-      </div>
-      <div class="links-group">
-        <div class="links-group-title">인천점</div>
-        <div class="links-grid">
-          <a class="link-card" href="https://talk.naver.com/profile/c/real_movement_i" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">💬</span><span class="link-card-txt"><span class="link-card-name">네이버 톡톡</span><span class="link-card-sub">상담 · 예약</span></span></a>
-          <a class="link-card" href="https://blog.naver.com/allenjoy/224122998739" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">📍</span><span class="link-card-txt"><span class="link-card-name">오시는 길</span><span class="link-card-sub">블로그 안내글</span></span></a>
-          <a class="link-card" href="https://naver.me/xYNbHrY9" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🗺</span><span class="link-card-txt"><span class="link-card-name">스마트플레이스</span><span class="link-card-sub">정보 · 지도 · 예약</span></span></a>
-          <a class="link-card" href="tel:0507-1312-4596"><span class="link-card-ico">📞</span><span class="link-card-txt"><span class="link-card-name">전화</span><span class="link-card-sub">0507-1312-4596</span></span></a>
-        </div>
-      </div>
-      <div class="links-group">
-        <div class="links-group-title">운영 · 관리</div>
-        <div class="links-grid">
-          <a class="link-card" href="apply-index.html" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">👥</span><span class="link-card-txt"><span class="link-card-name">회원 관리</span><span class="link-card-sub">출석 · 평가 · 진도</span></span></a>
-          <a class="link-card" href="https://new.smartplace.naver.com/" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🛠</span><span class="link-card-txt"><span class="link-card-name">스마트플레이스 관리</span><span class="link-card-sub">네이버 매장 정보</span></span></a>
-          <a class="link-card" href="https://business.kakao.com/" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">💬</span><span class="link-card-txt"><span class="link-card-name">카카오 매장관리</span><span class="link-card-sub">카카오맵 · 비즈니스</span></span></a>
-          <a class="link-card" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">✍️</span><span class="link-card-txt"><span class="link-card-name">블로그 글쓰기</span><span class="link-card-sub">네이버 새 글 작성</span></span></a>
+          <a class="link-card" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">💬</span><span class="link-card-txt"><span class="link-card-name">ChatGPT</span><span class="link-card-sub">chatgpt.com</span></span></a>
+          <a class="link-card" href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">✦</span><span class="link-card-txt"><span class="link-card-name">Gemini</span><span class="link-card-sub">gemini.google.com</span></span></a>
+          <a class="link-card" href="https://claude.ai/" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">◐</span><span class="link-card-txt"><span class="link-card-name">Claude</span><span class="link-card-sub">claude.ai</span></span></a>
+          <a class="link-card" href="https://www.mangoboard.net/aichat/designer" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🎨</span><span class="link-card-txt"><span class="link-card-name">망고보드</span><span class="link-card-sub">디자인 제작</span></span></a>
+          <a class="link-card" href="https://github.com/breezefeel" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🖥</span><span class="link-card-txt"><span class="link-card-name">GitHub</span><span class="link-card-sub">github.com/breezefeel</span></span></a>
         </div>
       </div>
     </div>
@@ -1938,26 +2002,27 @@
     { src: '리얼무브먼트 차별점-01.png', download: '차별성-4단계.png' },
     { src: '리얼무브먼트 차별점-02.png', download: '차별성-WHY-US.png' }
   ];
-  function syncBrochureLink() {
-    var a = $('btnSaveBrochure');
-    var files = (BRANCH[consultBranch].brochure || []);
-    if (!files.length) {
+  function syncDlBtn_(id, file) {
+    var a = $(id);
+    if (!a) return;
+    if (!file) {
+      a.hidden = true;
       a.removeAttribute('href');
       a.removeAttribute('download');
       return;
     }
-    a.href = applyAssetUrl(files[0].src);
-    a.setAttribute('download', files[0].download);
+    a.hidden = false;
+    a.href = applyAssetUrl(file.src);
+    a.setAttribute('download', file.download);
+  }
+  function syncBrochureLink() {
+    var files = BRANCH[consultBranch].brochure || [];
+    syncDlBtn_('btnSaveBrochureFront', files[0]);
+    syncDlBtn_('btnSaveBrochureBack', files[1]);
   }
   function syncDiffLink() {
-    var a = $('btnSaveDiff');
-    if (!DIFF_FILES.length) {
-      a.removeAttribute('href');
-      a.removeAttribute('download');
-      return;
-    }
-    a.href = applyAssetUrl(DIFF_FILES[0].src);
-    a.setAttribute('download', DIFF_FILES[0].download);
+    syncDlBtn_('btnSaveDiffFront', DIFF_FILES[0]);
+    syncDlBtn_('btnSaveDiffBack', DIFF_FILES[1]);
   }
   function triggerDownloadHref_(href, filename) {
     var a = document.createElement('a');
@@ -1985,20 +2050,18 @@
       viaBlob(remote, function () { triggerDownloadHref_(remote, filename); });
     });
   }
-  function downloadNamedFiles(files, e) {
-    if (!files.length) return;
-    e.preventDefault();
-    files.forEach(function (f, i) {
-      setTimeout(function () {
-        downloadAssetFile(f.src, f.download);
-      }, i * 350);
-    });
+  function downloadOneAsset_(file, e) {
+    if (!file) return;
+    if (e) e.preventDefault();
+    downloadAssetFile(file.src, file.download);
   }
-  function downloadBrochure(e) {
-    downloadNamedFiles(BRANCH[consultBranch].brochure || [], e);
+  function brochureFile_(idx) {
+    return (BRANCH[consultBranch].brochure || [])[idx];
   }
-  function downloadDiff(e) {
-    downloadNamedFiles(DIFF_FILES, e);
+  function bindFaqDownload_(id, getFile) {
+    var a = $(id);
+    if (!a) return;
+    a.addEventListener('click', function (e) { downloadOneAsset_(getFile(), e); });
   }
   function startGreeting(reason) {
     var q = $('chatQ').value.trim();
@@ -3847,8 +3910,16 @@
   $('btnCopyReply').addEventListener('click', function () { copyText($('chatReply').value); });
   $('btnCopyFollow').addEventListener('click', function () { copyText($('chatFollow').value); });
   $('btnCopyFaq').addEventListener('click', function () { copyText($('faqText').value); });
-  $('btnSaveBrochure').addEventListener('click', downloadBrochure);
-  $('btnSaveDiff').addEventListener('click', downloadDiff);
+  $('panelLinks').addEventListener('click', function (e) {
+    var btn = e.target.closest('.link-copy');
+    if (!btn) return;
+    e.preventDefault();
+    copyText(btn.getAttribute('data-copy'));
+  });
+  bindFaqDownload_('btnSaveBrochureFront', function () { return brochureFile_(0); });
+  bindFaqDownload_('btnSaveBrochureBack', function () { return brochureFile_(1); });
+  bindFaqDownload_('btnSaveDiffFront', function () { return DIFF_FILES[0]; });
+  bindFaqDownload_('btnSaveDiffBack', function () { return DIFF_FILES[1]; });
   $('faqTabs').addEventListener('click', function (e) {
     var c = e.target.closest('[data-faq]');
     if (!c) return;
