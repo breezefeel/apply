@@ -907,11 +907,18 @@
     .session-check-label {
       display:block; font-size:11px; font-weight:700; color:var(--dim); margin-bottom:6px;
     }
-    .session-check-chips, .session-check-vas {
-      display:flex; flex-wrap:wrap; gap:6px;
-    }
     .session-check-chips {
-      flex-direction:column; align-items:stretch; gap:0;
+      display:flex; flex-wrap:wrap; flex-direction:column; align-items:stretch; gap:0;
+    }
+    .session-check-vas {
+      display:grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap:6px;
+    }
+    @media (min-width: 560px) {
+      .session-check-vas {
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+      }
     }
     .session-discomfort-group {
       display:flex; flex-wrap:wrap; align-items:center; gap:4px 5px;
@@ -927,8 +934,20 @@
     .session-discomfort-group-chips {
       display:flex; flex-wrap:wrap; gap:4px 5px; width:100%;
     }
+    .session-discomfort-group--quick .session-discomfort-group-chips {
+      flex-direction:column; gap:6px;
+    }
+    .session-quick-row {
+      display:flex; flex-wrap:wrap; gap:4px 5px; width:100%;
+    }
+    .session-quick-row--sides {
+      display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:4px 5px;
+    }
     .session-discomfort-group--quick .session-check-chip {
       font-size:10px; padding:5px 9px;
+    }
+    .session-quick-row--sides .session-check-chip {
+      width:100%; min-width:0; text-align:center; padding:5px 2px;
     }
     .session-discomfort-dropdowns {
       display:flex; flex-wrap:wrap; gap:8px; width:100%;
@@ -964,7 +983,11 @@
       font-size:9px; font-weight:800; color:#94a3b8; letter-spacing:0.03em;
     }
     .eval-body-area-sides {
-      display:flex; flex-wrap:wrap; gap:5px; width:100%; margin-top:8px;
+      display:grid; grid-template-columns:repeat(5, minmax(0, 1fr));
+      gap:5px; width:100%; margin-top:8px;
+    }
+    .eval-body-area-sides .eval-hist-chip {
+      width:100%; min-width:0; text-align:center; padding-left:4px; padding-right:4px;
     }
     @media (max-width:480px) {
       .session-discomfort-dropdowns,
@@ -998,9 +1021,12 @@
     .session-discomfort-group .session-check-chip.on {
       background:var(--blue-bg); border-color:var(--blue); color:var(--blue); font-weight:700;
     }
+    .session-discomfort-group--quick .session-quick-row--sides .session-check-chip {
+      width:100%; min-width:0; text-align:center; padding:5px 2px;
+    }
     .session-check-vas .session-check-chip {
-      flex:1 1 0; min-width:28px; max-width:44px; padding:6px 0;
-      font-size:11px; text-align:center; white-space:nowrap;
+      width:100%; min-width:0; max-width:none; flex:none;
+      padding:6px 0; font-size:11px; text-align:center; white-space:nowrap;
     }
     .session-check-note-row textarea {
       width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:8px;
@@ -2809,7 +2835,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-09-04-fix-sangmin-syntax';
+    const INSTRUCTOR_HTML_BUILD = '2026-09-18-vas-quick-layout';
     const PROGRAM_PLAN_SLOT_COUNT = 5;
     var _programPlanSaveSlot = 1;
     var _programPlanLoadDirectorTab = 'sangmin';
@@ -5581,12 +5607,13 @@
     var SESSION_BODY_AREA_GROUPS = ['head_spine', 'upper', 'lower'];
 
     var SESSION_DISCOMFORT_AREAS = [
-      { id: 'comfortable', label: '편안함', group: 'quick' },
-      { id: 'same', label: '동일', group: 'quick' },
-      { id: 'both', label: '전체적', group: 'quick' },
-      { id: 'lt', label: 'Lt', group: 'quick' },
-      { id: 'center', label: '중앙', group: 'quick' },
-      { id: 'rt', label: 'Rt', group: 'quick' },
+      { id: 'comfortable', label: '편안함', group: 'quick', row: 'special' },
+      { id: 'same', label: '동일', group: 'quick', row: 'special' },
+      { id: 'both', label: '전체적', group: 'quick', row: 'side' },
+      { id: 'bilateral', label: '양측', group: 'quick', row: 'side' },
+      { id: 'lt', label: '왼쪽', group: 'quick', row: 'side' },
+      { id: 'center', label: '중앙', group: 'quick', row: 'side' },
+      { id: 'rt', label: '오른쪽', group: 'quick', row: 'side' },
       { id: 'headache', label: '두통', group: 'head_spine' },
       { id: 'jaw', label: '턱', group: 'head_spine' },
       { id: 'neck', label: '목', group: 'head_spine' },
@@ -9535,7 +9562,7 @@
       return m.discomfortHistory[m.discomfortHistory.length - 1];
     }
 
-    var SESSION_SIDE_MODIFIER_IDS = ['both', 'lt', 'center', 'rt'];
+    var SESSION_SIDE_MODIFIER_IDS = ['both', 'bilateral', 'lt', 'center', 'rt'];
     var SESSION_SPECIAL_AREA_IDS = ['comfortable', 'same'];
 
     function isSessionSideModifierId_(id) {
@@ -9563,9 +9590,10 @@
     function sessionCheckSideLabel_(areas) {
       areas = areas || [];
       if (areas.indexOf('both') >= 0) return '전체적';
-      if (areas.indexOf('lt') >= 0) return 'Lt';
+      if (areas.indexOf('bilateral') >= 0) return '양측';
+      if (areas.indexOf('lt') >= 0) return '왼쪽';
       if (areas.indexOf('center') >= 0) return '중앙';
-      if (areas.indexOf('rt') >= 0) return 'Rt';
+      if (areas.indexOf('rt') >= 0) return '오른쪽';
       return '';
     }
 
@@ -9573,9 +9601,12 @@
       var s = String(label || '').trim();
       if (/^전체적\s+/.test(s)) return { side: '전체적', rest: s.replace(/^전체적\s+/, '').trim() };
       if (/^Both\s+/i.test(s)) return { side: '전체적', rest: s.replace(/^Both\s+/i, '').trim() };
-      if (/^Lt\s+/i.test(s)) return { side: 'Lt', rest: s.replace(/^Lt\s+/i, '').trim() };
+      if (/^양측\s+/.test(s)) return { side: '양측', rest: s.replace(/^양측\s+/, '').trim() };
+      if (/^왼쪽\s+/.test(s)) return { side: '왼쪽', rest: s.replace(/^왼쪽\s+/, '').trim() };
+      if (/^오른쪽\s+/.test(s)) return { side: '오른쪽', rest: s.replace(/^오른쪽\s+/, '').trim() };
+      if (/^Lt\s+/i.test(s)) return { side: '왼쪽', rest: s.replace(/^Lt\s+/i, '').trim() };
       if (/^중앙\s+/.test(s)) return { side: '중앙', rest: s.replace(/^중앙\s+/, '').trim() };
-      if (/^Rt\s+/i.test(s)) return { side: 'Rt', rest: s.replace(/^Rt\s+/i, '').trim() };
+      if (/^Rt\s+/i.test(s)) return { side: '오른쪽', rest: s.replace(/^Rt\s+/i, '').trim() };
       return { side: '', rest: s };
     }
 
@@ -10047,9 +10078,27 @@
           html += '<div class="session-discomfort-group-label">' + escapeHtml(glabel) + '</div>';
         }
         html += '<div class="session-discomfort-group-chips">';
-        items.forEach(function (opt) {
-          html += renderSessionDiscomfortChipHtml_(opt);
-        });
+        if (gk === 'quick') {
+          var quickRows = { special: [], side: [] };
+          items.forEach(function (opt) {
+            var rk = opt.row || (opt.id === 'comfortable' || opt.id === 'same' ? 'special' : 'side');
+            if (!quickRows[rk]) quickRows[rk] = [];
+            quickRows[rk].push(opt);
+          });
+          ['special', 'side'].forEach(function (rk) {
+            var rowItems = quickRows[rk];
+            if (!rowItems || !rowItems.length) return;
+            html += '<div class="session-quick-row session-quick-row--' + rk + '">';
+            rowItems.forEach(function (opt) {
+              html += renderSessionDiscomfortChipHtml_(opt);
+            });
+            html += '</div>';
+          });
+        } else {
+          items.forEach(function (opt) {
+            html += renderSessionDiscomfortChipHtml_(opt);
+          });
+        }
         html += '</div></div>';
       });
       html += renderBodyAreaDropdownsHtml_({
