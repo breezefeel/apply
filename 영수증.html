@@ -59,7 +59,20 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 6px;
+    gap: 5px;
+  }
+  .head-branch .chip-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .head-branch .chip-group-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--mute);
+    letter-spacing: -.02em;
+    white-space: nowrap;
   }
   .head-branch .chips { justify-content: flex-end; }
   .head-branch .chip { font-size: 12px; padding: 7px 11px; }
@@ -266,8 +279,12 @@
     caret-color: transparent;
   }
   .reply-box.is-copy:active { background: #ece7dc; }
-  #faqText { min-height: 226px; }
-  body.academy-mode #faqText { min-height: 280px; }
+  #faqText {
+    min-height: 0;
+    height: auto;
+    overflow: hidden;
+    resize: none;
+  }
   a.btn-sm {
     display: inline-flex; align-items: center; justify-content: center;
     text-decoration: none; color: inherit;
@@ -799,14 +816,20 @@
         </div>
       </div>
       <div class="head-branch" id="consultBranchChips">
-        <div class="chips">
-          <button type="button" class="chip active" data-branch="yaksu">약수</button>
-          <button type="button" class="chip" data-branch="incheon">인천</button>
+        <div class="chip-row">
+          <span class="chip-group-label">센터</span>
+          <div class="chips">
+            <button type="button" class="chip active" data-branch="yaksu">약수</button>
+            <button type="button" class="chip" data-branch="incheon">인천</button>
+          </div>
         </div>
-        <div class="chips">
-          <button type="button" class="chip" data-branch="cmt">CMT</button>
-          <button type="button" class="chip" data-branch="ifc">IFC</button>
-          <button type="button" class="chip" data-branch="real">Re:Al</button>
+        <div class="chip-row">
+          <span class="chip-group-label">과정</span>
+          <div class="chips">
+            <button type="button" class="chip" data-branch="cmt">CMT</button>
+            <button type="button" class="chip" data-branch="ifc">IFC</button>
+            <button type="button" class="chip" data-branch="real">Re:Al</button>
+          </div>
         </div>
       </div>
     </header>
@@ -1639,43 +1662,318 @@
   }
   var ACADEMY_ASK = '일정·수강료·현장 준비 관련해서 궁금한 점 있으신가요?';
   var ACADEMY_BANK = '우리 583-373-1970-2001';
-  var ACADEMY_DEPOSIT =
-    '신청서 작성만으로는 자리가 확정되지 않아요.\n' +
-    '안내에 따라 입금까지 완료되어야 접수가 끝납니다.\n' +
-    '(입금 계좌: ' + ACADEMY_BANK + ')\n\n' +
-    ACADEMY_ASK;
+  var ACADEMY_DEPOSIT = [
+    '신청서 작성만으로는 자리가 확정되지 않습니다.',
+    '안내에 따라 입금까지 완료되어야 접수가 끝납니다.',
+    '',
+    '정원은 입금 완료 순으로 마감됩니다.',
+    '',
+    '입금 계좌: ' + ACADEMY_BANK,
+    '입금자명이 신청 성함과 다르시면 톡으로 알려 주세요.',
+    '',
+    '입금 확인 후 일정·준비물·오시는 길을 보내드립니다.',
+    '',
+    ACADEMY_ASK
+  ].join('\n');
+  var ACADEMY_BUNDLE = [
+    'CMT로 손으로 푼 다음, Re:Al 정규에서 움직임으로 지키는 통합 과정입니다.',
+    '',
+    '평가 → 손(CMT) → 움직임(Re:Al)',
+    '',
+    '수강료',
+    '• 각각 신청 시 278만 원',
+    '• 통합 신청 시 222만 원 (20% 할인)',
+    '',
+    'CMT는 연부조직·관절을 손으로 다루고,',
+    'Re:Al 정규는 Passive → Resistive까지 같은 순서로 유지 설계를 익힙니다.',
+    '',
+    '통합으로 진행할까요, 해당 과정만 진행할까요?'
+  ].join('\n');
   var ACADEMY = {
     cmt: {
       faqs: [
-        { id: 'hello', label: '첫 인사', text: '안녕하세요, CMT 과정 박준규입니다.\nCMT 도수치료 과정 신청 확인했습니다.' },
-        { id: 'spring', label: '상반기', text: '선택하신 일정은 [상반기: 3월 시작] 이고,\n장소는 삼육보건대학교(서울 동대문구), 8시간씩 6일입니다.\n\n수강료는 150만원, 얼리버드 135만원입니다.\n신졸·동반은 120만원입니다.' },
-        { id: 'fall', label: '하반기', text: '선택하신 일정은 [하반기: 9월 시작] 이고,\n장소는 삼육보건대학교(서울 동대문구), 8시간씩 6일입니다.\n\n수강료는 150만원, 얼리버드 135만원입니다.\n신졸·동반은 120만원입니다.' },
+        { id: 'hello', label: '첫 인사', text: [
+          '안녕하세요. 반갑습니다.',
+          '평가로 원인을 찾고, 손으로 풉니다.',
+          'CMT 임상도수치료입니다.',
+          '',
+          'CMT 도수치료 과정 신청 확인했습니다.',
+          '의료인·의료기사가 평가와 도수 테크닉을 부위별로 익히는 과정입니다.',
+          '골반부터 경추까지, 연부조직 다음 관절로 들어가는 같은 순서를 내일 베드에서 바로 꺼내 쓰게 됩니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') },
+        { id: 'spring', label: '상반기', text: [
+          '선택하신 일정은 [상반기 · 3월 시작]입니다.',
+          '',
+          '장소: 삼육보건대학교 (서울 동대문구)',
+          '구성: 8시간씩 6일',
+          '',
+          '수강료',
+          '• 정가 150만 원',
+          '• 얼리버드 135만 원 (수업 시작 1개월 전까지 신청 완료)',
+          '• 신졸·동반 120만 원',
+          '',
+          '진행 순서',
+          '평가 → 연부조직(Fascia → Muscle) → 관절(Joint) → 재평가',
+          '',
+          '• DAY 1–2  골반 · 고관절',
+          '• DAY 3–4  요추 · 흉추',
+          '• DAY 5–6  경추 · 종합',
+          '',
+          '정원은 입금 완료 순입니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') },
+        { id: 'fall', label: '하반기', text: [
+          '선택하신 일정은 [하반기 · 9월 시작]입니다.',
+          '',
+          '장소: 삼육보건대학교 (서울 동대문구)',
+          '구성: 8시간씩 6일',
+          '',
+          '수강료',
+          '• 정가 150만 원',
+          '• 얼리버드 135만 원 (수업 시작 1개월 전까지 신청 완료)',
+          '• 신졸·동반 120만 원',
+          '',
+          '진행 순서',
+          '평가 → 연부조직(Fascia → Muscle) → 관절(Joint) → 재평가',
+          '',
+          '• DAY 1–2  골반 · 고관절',
+          '• DAY 3–4  요추 · 흉추',
+          '• DAY 5–6  경추 · 종합',
+          '',
+          '정원은 입금 완료 순입니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') },
         { id: 'deposit', label: '입금', text: ACADEMY_DEPOSIT },
-        { id: 'who', label: '대상', text: '의료인·의료기사가 평가와 도수 테크닉을 부위별로 익히는 과정입니다.\n의사·한의사, 물리치료사께 맞춰져 있어요.' },
-        { id: 'bundle', label: '통합과정', text: 'CMT + Re:Al 정규 통합은 278만 → 222만원입니다.\n평가 → 손(CMT) → 움직임(Re:Al)으로 이어집니다.\n\n통합으로 진행할까요, CMT만 진행할까요?' },
-        { id: 'prep', label: '준비물', text: '실습 가능한 복장, 필기도구, 개인 수건을 준비해 주세요.\n세부는 입금 확인 후 보내드립니다.\n재수강은 세션당 대관비 2만원입니다.' }
+        { id: 'who', label: '대상', text: [
+          'CMT는 의료인·의료기사만 신청할 수 있는 도수치료 과정입니다.',
+          '',
+          '의사·한의사, 물리치료사처럼',
+          '평가와 함께 도수 테크닉을 부위별로 체계화하고 싶은 분께 맞춰져 있습니다.',
+          '',
+          '듣고 나면',
+          '골반·허리·흉추·경추에서',
+          '연부조직(Fascia → Muscle) 다음 관절(Joint)로 들어가는 순서를 말할 수 있습니다.',
+          '',
+          '테크닉을 하나 더 모으는 자리가 아니라,',
+          '케이스 앞에서 “오늘 이 손인지”를 평가로 고르는 과정입니다.'
+        ].join('\n') },
+        { id: 'bundle', label: '통합과정', text: ACADEMY_BUNDLE },
+        { id: 'curric', label: '커리큘럼', text: [
+          '동일한 순서로 진행합니다.',
+          '평가 → 연부조직(Fascia → Muscle) → 관절(Joint) → 재평가',
+          '',
+          '• DAY 1–2  골반 · 고관절',
+          '  하지·골반 정렬을 본 뒤 요추 연부조직과 관절을 연결합니다.',
+          '',
+          '• DAY 3–4  요추 · 흉추',
+          '  체간에서 복부를 중심으로 평가·치료·재평가를 반복합니다.',
+          '',
+          '• DAY 5–6  경추 · 종합',
+          '  목과 어깨, 배운 부위를 한 흐름으로 이어 임상 케이스를 살펴봅니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') },
+        { id: 'prep', label: '준비물', text: [
+          '현장 실습 기준으로 아래를 준비해 주세요.',
+          '',
+          '• 실습 가능한 복장',
+          '• 필기도구',
+          '• 개인 수건',
+          '',
+          '세부는 입금 확인 후 일정·오시는 길과 함께 보내드립니다.',
+          '재수강은 세션당 대관비 2만 원입니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') }
       ]
     },
     ifc: {
       faqs: [
-        { id: 'hello', label: '첫 인사', text: '안녕하세요, IFC 학회장 박준규입니다.\nIFC 얼굴교정 과정 신청 확인했습니다.' },
-        { id: 'fall', label: '하반기', text: '선택하신 일정은 [하반기: 11월 8·15·22일] 이고,\n장소는 약수역 도보 약 3분, 하루 6시간씩 3일입니다.\n\n수강료가 변동되었습니다.\n정가 240만원, 현재 얼리버드 적용되어 180만원입니다.' },
-        { id: 'spring', label: '상반기', text: '선택하신 일정은 [상반기: 4월 시작] 이고,\n장소는 약수역 도보 약 3분, 하루 6시간씩 3일입니다.\n\n수강료가 변동되었습니다.\n정가 240만원, 현재 얼리버드 적용되어 180만원입니다.' },
+        { id: 'hello', label: '첫 인사', text: [
+          '안녕하세요. 반갑습니다.',
+          '해부학으로 찾고, 손으로 얼굴을 바꿉니다.',
+          'IFC 국제얼굴교정학회입니다.',
+          '',
+          'IFC 얼굴교정 과정 신청 확인했습니다.',
+          '얼굴 해부학·촉진으로 핵심 포인트를 찾고, 수기·괄사·고주파를 같은 순서로 연결하는 과정입니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') },
+        { id: 'fall', label: '하반기', text: [
+          '선택하신 일정은 [하반기 · 11월 8·15·22일]입니다.',
+          '',
+          '장소: 약수역 도보 약 3분',
+          '구성: 하루 6시간씩 3일',
+          '',
+          '수강료',
+          '• 정가 240만 원',
+          '• 현재 얼리버드 180만 원',
+          '',
+          '오프라인 전에 온라인 이론을 먼저 보시고,',
+          '현장 3일은 손 감각과 테크닉에 집중합니다.',
+          '',
+          '정원은 입금 완료 순입니다.',
+          '신청 정보만으로는 자리가 확정되지 않습니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') },
+        { id: 'spring', label: '상반기', text: [
+          '선택하신 일정은 [상반기 · 4월 시작]입니다.',
+          '',
+          '장소: 약수역 도보 약 3분',
+          '구성: 하루 6시간씩 3일',
+          '',
+          '수강료',
+          '• 정가 240만 원',
+          '• 현재 얼리버드 180만 원',
+          '',
+          '오프라인 전에 온라인 이론을 먼저 보시고,',
+          '현장 3일은 손 감각과 테크닉에 집중합니다.',
+          '',
+          '정원은 입금 완료 순입니다.',
+          '신청 정보만으로는 자리가 확정되지 않습니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') },
         { id: 'deposit', label: '입금', text: ACADEMY_DEPOSIT },
-        { id: 'who', label: '대상', text: '얼굴 케어·바디 현장에서 평가 기반 수기·기기 시퀀스를 배우고 싶은 분께 맞춰져 있습니다.\n의사·한의사, 물리치료사, 트레이너/필라테스/요가, 에스테티션 모두 신청하실 수 있어요.' },
-        { id: 'curric', label: '커리큘럼', text: 'DAY 1 얼굴 해부학\nDAY 2 촉진법\nDAY 3 수기 · 괄사 · 고주파\n\n오프라인 전에 온라인 이론을 먼저 보시고, 현장 3일은 손 감각에 집중합니다.' },
-        { id: 'prep', label: '준비물', text: '실습 가능한 복장, 필기도구, 개인 수건을 준비해 주세요.\n얼굴 실습이 있어 화장은 지우고 오시는 편이 편합니다.\n세부는 입금 확인 후 보내드립니다.' }
+        { id: 'who', label: '대상', text: [
+          'IFC는 비수술 얼굴 윤곽·비대칭을',
+          '해부 → 촉진 → 수기·괄사·고주파 순으로 익히는 과정입니다.',
+          '',
+          '얼굴 케어·바디 현장에서',
+          '평가 기반 수기·기기 시퀀스를 배우고 싶은 분께 맞춰져 있습니다.',
+          '',
+          '의사·한의사, 물리치료사, 트레이너·필라테스·요가, 에스테티션 모두 신청하실 수 있습니다.',
+          '',
+          '듣고 나면',
+          '핵심 포인트를 손으로 찾고,',
+          '수기·괄사·고주파를 같은 순서로 연결할 수 있습니다.',
+          '',
+          '얼굴을 만지는 자리가 아니라, 구조를 읽고 시퀀스를 고르는 과정입니다.'
+        ].join('\n') },
+        { id: 'curric', label: '커리큘럼', text: [
+          '오프라인 전에 온라인 이론을 먼저 봅니다.',
+          '실습 3일은 손 감각에 집중합니다.',
+          '',
+          '• DAY 1  얼굴 해부학',
+          '  표정·입 모양 변화까지 읽어 문제 원인을 가늠합니다.',
+          '',
+          '• DAY 2  촉진법',
+          '  핵심 포인트를 스스로 인식하게 만드는 평가입니다.',
+          '  상담과 티켓팅의 신뢰 기반이 됩니다.',
+          '',
+          '• DAY 3  수기 · 괄사 · 고주파',
+          '  Fascia · Muscle · 간질액 테크닉을 표층에서 심층으로 연결합니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') },
+        { id: 'prep', label: '준비물', text: [
+          '얼굴 실습이 있어 화장은 지우고 오시는 편이 편합니다.',
+          '',
+          '• 실습 가능한 복장',
+          '• 필기도구',
+          '• 개인 수건',
+          '',
+          '세부는 입금 확인 후 일정·오시는 길과 함께 보내드립니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') }
       ]
     },
     real: {
       faqs: [
-        { id: 'hello', label: '첫 인사', text: '안녕하세요, Re:Al 과정 박준규입니다.\nRe:Al 움직임 과정 신청 확인했습니다.' },
-        { id: 'oneday', label: '원데이', text: '선택하신 일정은 [원데이: 10월 11일 10시–17시] 이고,\n장소는 리얼무브먼트 약수점입니다.\n\n수강료 30만원, 얼리버드 27만원(9월 27일까지 신청 완료),\n동반 25만원입니다.' },
-        { id: 'regular', label: '정규', text: '선택하신 일정은 [정규: 6월 / 12월 시작] 이고,\n장소는 리얼무브먼트 약수점, 6시간씩 3일입니다.\n\n수강료는 128만 → 108만원입니다.' },
+        { id: 'hello', label: '첫 인사', text: [
+          '안녕하세요. 반갑습니다.',
+          '푼 몸을 움직임으로 지킵니다.',
+          'Re:Alignment입니다.',
+          '',
+          'Re:Al 움직임 과정 신청 확인했습니다.',
+          '풀어 준 다음을 패시브에서 저항까지 같은 순서로 이어, 유지되는 움직임으로 만드는 과정입니다.',
+          '원데이는 패시브 스트레칭, 정규반은 PAR 전체입니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') },
+        { id: 'oneday', label: '원데이', text: [
+          '선택하신 일정은 [원데이 · 10월 11일 10:00–17:00]입니다.',
+          '',
+          '장소: 리얼무브먼트 약수점',
+          '구성: 하루 과정 · 패시브 스트레칭',
+          '',
+          '수강료',
+          '• 정가 30만 원',
+          '• 얼리버드 27만 원 (9월 27일까지 신청 완료)',
+          '• 동반 25만 원 (1인 기준 · 동반 수강 시)',
+          '',
+          '이 원데이의 핵심',
+          '• 강사 부담이 적은 자세',
+          '• 말단에서 근위로 잇는 시퀀스',
+          '• 매트와 베드 모두 가능',
+          '',
+          '커리큘럼',
+          '• SUPINE 하지  발 → 발목 → 무릎 → 고관절',
+          '• SUPINE 상지  손가락 → 손목 → 팔꿈치 → 어깨',
+          '• PRONE 하지   엎드린 자세의 하체 후방',
+          '• PRONE 상지   베드 위에서도 안정적인 상지·체간 연결',
+          '',
+          'PAR 전체로 이어가려면 정규반(6·12월 시작, 3일)이 있습니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') },
+        { id: 'regular', label: '정규', text: [
+          '선택하신 일정은 [정규 · 6월 / 12월 시작]입니다.',
+          '',
+          '장소: 리얼무브먼트 약수점',
+          '구성: 6시간씩 3일 · PAR 전체',
+          '',
+          '수강료',
+          '• 정가 128만 원',
+          '• 현재 108만 원',
+          '',
+          '누워서 → 네발·앉기 → 서서, 포지션을 올리며',
+          '각 자세에서 P · AA · A · R을 익힙니다.',
+          '',
+          '• P   Passive            강사가 움직임을 유도합니다.',
+          '• AA  Assisted Active    통증은 없고 ROM이 남을 때 함께 회복합니다.',
+          '• A   Active             호흡·생활 자세로 불필요한 긴장을 줄입니다.',
+          '• R   Resistive          저항을 더해 일상에서 쓰는 힘으로 확장합니다.',
+          '',
+          '• DAY 1  Supine / Prone',
+          '• DAY 2  Quadruped / Sitting',
+          '• DAY 3  Standing',
+          '',
+          'CMT와 함께라면 통합 222만 원(각각 278만)으로 진행할 수 있습니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') },
         { id: 'deposit', label: '입금', text: ACADEMY_DEPOSIT },
-        { id: 'who', label: '대상', text: '트레이너·필라테스·요가·에스테티션처럼, 풀어 준 다음을 움직임으로 이어가고 싶은 분께 맞습니다.\n원데이는 베드 위에서도 가능한 패시브라 피부·바디 케어 현장에도 쓸 수 있어요.' },
-        { id: 'bundle', label: 'CMT통합', text: 'CMT + Re:Al 정규 통합은 278만 → 222만원입니다.\n통합으로 진행할까요?' },
-        { id: 'prep', label: '준비물', text: '움직이기 편한 복장으로 오시면 됩니다.\n세부는 입금 확인 후 보내드립니다.' }
+        { id: 'who', label: '대상', text: [
+          'Re:Al은 풀어 준 몸을 움직임으로 지키는 과정입니다.',
+          '',
+          '트레이너·필라테스·요가·에스테티션처럼',
+          '손으로 푼 다음을 현장 움직임으로 이어가고 싶은 분께 맞춰져 있습니다.',
+          '',
+          '원데이는 강사가 움직임을 유도하는 패시브 스트레칭입니다.',
+          '매트뿐 아니라 베드 위에서도 가능해서, 피부·바디 케어 현장에도 바로 쓸 수 있습니다.',
+          '',
+          '정규반은 PAR 전체입니다.',
+          'Passive → Assisted Active → Active → Resistive를',
+          '누운 자세에서 서서까지 같은 순서로 익힙니다.',
+          '',
+          '테크닉을 하나 더 모으는 자리라기보다,',
+          '케이스 앞에서 “오늘 어디부터인지”를 말할 수 있게 되는 과정입니다.'
+        ].join('\n') },
+        { id: 'bundle', label: 'CMT통합', text: ACADEMY_BUNDLE },
+        { id: 'prep', label: '준비물', text: [
+          '움직이기 편한 복장으로 오시면 됩니다.',
+          '',
+          '세부는 입금 확인 후 일정·오시는 길과 함께 보내드립니다.',
+          '',
+          ACADEMY_ASK
+        ].join('\n') }
       ]
     }
   };
@@ -1703,7 +2001,7 @@
     if (/통합|같이 들|CMT\s*\+|Re:?Al.*CMT/.test(q)) return academyFaqText('bundle') || academyFaqText('hello');
     if (/원데이|10월\s*11|패시브/.test(q)) return academyFaqText('oneday') || academyFaqText('hello');
     if (/정규|PAR|6월|12월/.test(q)) return academyFaqText('regular') || academyFaqText('hello');
-    if (/커리|수업 내용|뭘 배우|커리큘럼|해부|촉진/.test(q)) return academyFaqText('curric') || academyFaqText('hello');
+    if (/커리|수업 내용|뭘 배우|커리큘럼|해부|촉진/.test(q)) return academyFaqText('curric') || academyFaqText('regular') || academyFaqText('oneday') || academyFaqText('spring');
     if (/하반기|11월|8.?15.?22/.test(q)) return academyFaqText('fall') || academyFaqText('hello');
     if (/상반기|4월|3월/.test(q)) return academyFaqText('spring') || academyFaqText('hello');
     if (/일정|며칠|몇 시|시작/.test(q)) return academyFaqText('fall') || academyFaqText('oneday') || academyFaqText('spring') || academyFaqText('hello');
@@ -1711,7 +2009,7 @@
   }
   var chatImages = [];
   var chatImages2 = [];
-  var faqId = 'start';
+  var faqId = 'hello';
   var consultFollow = 0;
   var ocrWorker = null;
   var tesseractLoading = null;
@@ -2538,6 +2836,11 @@
     if (isAcademyBranch()) return academyFaqs();
     var b = BRANCH[consultBranch];
     return [
+      { id: 'hello', label: '첫 인사', text: [
+        '안녕하세요. 반갑습니다.',
+        '움직임을 편하게, Better Movement, Better Life.',
+        '리얼무브먼트입니다.'
+      ].join('\n') },
       { id: 'start', label: '운동 시작', text: START_LINE + '\n\n기능 운동은 보통 6개월 단위로 봅니다.\n지금 가장 신경 쓰이는 부분을 알려 주시면, 그에 맞춰 안내해 드릴게요.' },
       { id: 'period', label: '기간', text: '불편하신 부분은 주 2회 기준으로, 보통 2~3주 안에 변화가 느껴지는지를 봅니다.\n그 안에 변화가 없으면 병원 진료를 함께 상의드려요.\n주 1회도 가능하지만, 변화를 보는 기준은 주 2회입니다.\n\n자세 교정은 3개월 단위로 보고,\n이후 기능을 키우는 운동은 6개월 단위로 진행합니다.\n\n시작 단계는 회원님 상태에 따라 달라지니, 방문하시면 평가 후 맞춰 안내해 드릴게요.\n주 1회로 시작하시려면 가능하신 요일을 알려 주세요.' },
       { id: 'price', label: '가격', text: priceRecommendText() },
@@ -2555,6 +2858,14 @@
       { id: 'face', label: '리얼 페이스', text: FACE_LINE + '\n\n원하시는 요일이나 시간대가 있으시면 알려 주세요.' }
     ];
   }
+  function fitFaqBox() {
+    var ta = $('faqText');
+    if (!ta) return;
+    ta.style.height = '0px';
+    var line = parseFloat(window.getComputedStyle(ta).lineHeight) || 25;
+    var next = Math.ceil(ta.scrollHeight + line);
+    ta.style.height = next + 'px';
+  }
   function renderFaq() {
     var items = faqItems();
     if (!items.some(function (it) { return it.id === faqId; })) faqId = items[0].id;
@@ -2563,6 +2874,7 @@
     }).join('');
     var cur = items.filter(function (it) { return it.id === faqId; })[0];
     $('faqText').value = cur ? cur.text : '';
+    requestAnimationFrame(fitFaqBox);
   }
   function applyReceiptPrefill(p) {
     var id = 'hbw';
@@ -4216,6 +4528,7 @@
   });
 
   window.addEventListener('resize', function () {
+    fitFaqBox();
     if (document.body.classList.contains('mode-receipt')) fitPreview();
   });
   window.addEventListener('beforeprint', function () {
