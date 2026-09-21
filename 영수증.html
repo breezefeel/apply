@@ -267,6 +267,13 @@
     background: var(--ink); color: #fff; border-color: var(--ink);
     padding: 5px 8px; font-size: 12px;
   }
+  .faq-dl-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-right: 2px;
+  }
   .faq-actions {
     display: flex;
     align-items: center;
@@ -290,14 +297,14 @@
     width: 100%;
     text-align: center;
     border-radius: 10px;
-    padding: 8px 6px;
-    font-size: 12.5px;
+    padding: 7px 4px;
+    font-size: 12px;
     line-height: 1.25;
     white-space: normal;
   }
   @media (max-width: 420px) {
     .faq-tabs { gap: 5px; }
-    .faq-tabs .chip { font-size: 11px; padding: 8px 3px; }
+    .faq-tabs .chip { font-size: 10.5px; padding: 7px 2px; }
   }
   .follow-reply { margin-top: 12px; }
   .reply-box:focus { outline: 2px solid var(--gold); background: #fff; }
@@ -805,6 +812,7 @@
         <img id="priceSheetImg" alt="" hidden>
       </section>
       <div class="faq-actions" aria-label="자료 저장">
+        <span class="faq-dl-label">다운로드:</span>
         <a class="btn-sm faq-dl" id="btnSavePrice" download>가격표</a>
         <a class="btn-sm faq-dl" id="btnSaveBrochureFront">브로셔 앞</a>
         <a class="btn-sm faq-dl" id="btnSaveBrochureBack">브로셔 뒤</a>
@@ -1583,7 +1591,8 @@
     yaksu: {
       price: '1:1 예약제이고, 평가 후 프로그램이 정해집니다.\n\n50분 1회 8만 5천원\n주 2회 8회 66만원\n시그니처 1회 12만 5천원',
       loc: '약수역 5·6·7번 출구에서 도보 3분, 더약수빌딩 4층입니다.\n\n네이버 지도\nhttps://naver.me/x2YstInq\n\n전화 0507-1359-4596',
-      hours: '예약제로 운영합니다.\n평일 09–21시, 토요일 09–18시\n일요일·공휴일은 휴무입니다.\n\n예약은 톡톡 아래 메뉴의 예약에서 남겨 주시면 됩니다.\n가능하신 요일과 시간대를 알려 주셔도 맞춰 볼게요.',
+      hours: '예약제로 운영합니다.\n평일 09–21시, 토요일 09–18시\n평일 마지막 수업은 21시까지, 토요일은 18시까지입니다.\n일요일·공휴일은 휴무입니다.\n\n빈 자리가 있으면 당일 예약도 확인해 드립니다.\n예약은 톡톡 아래 메뉴의 예약에서 남겨 주시면 됩니다.\n원하시는 요일과 시간대를 알려 주세요.',
+      parking: '주차는 리사르커피 옆 지상, 벤츠 옆 우측 2칸입니다.\n내비는 「리사르커피 약수」로 검색해 주세요.',
       map: 'https://naver.me/x2YstInq',
       phone: '0507-1359-4596',
       priceImg: '가격표  리얼무브먼트 약수.jpg',
@@ -1596,7 +1605,8 @@
     incheon: {
       price: '1:1 예약제이고, 평가 후 프로그램이 정해집니다.\n\n50분 1회 4만 5천원\n주 2회 8회 32만원\n80분 주 2회 8회 62만원',
       loc: '힐스테이트자이계양 1층, 도서관 옆입니다.\n\n네이버 지도\nhttps://naver.me/xYNbHrY9\n\n전화 0507-1312-4596',
-      hours: '예약제로 운영합니다.\n평일 09–21시, 토요일 09–18시\n일요일·공휴일은 휴무입니다.\n\n예약은 톡톡 아래 메뉴의 예약에서 남겨 주시면 됩니다.\n가능하신 요일과 시간대를 알려 주셔도 맞춰 볼게요.',
+      hours: '예약제로 운영합니다.\n평일 09–21시, 토요일 09–18시\n평일 마지막 수업은 21시까지, 토요일은 18시까지입니다.\n일요일·공휴일은 휴무입니다.\n\n빈 자리가 있으면 당일 예약도 확인해 드립니다.\n예약은 톡톡 아래 메뉴의 예약에서 남겨 주시면 됩니다.\n원하시는 요일과 시간대를 알려 주세요.',
+      parking: '주차는 힐스테이트자이계양 단지 주차장이며, 입차 전 차량번호를 알려 주셔야 합니다.\n내비는 「힐스테이트자이 계양」 동문으로 검색해 주세요.',
       map: 'https://naver.me/xYNbHrY9',
       phone: '0507-1312-4596',
       priceImg: '가격표  리얼무브먼트 인천.jpg',
@@ -1650,7 +1660,7 @@
   var VS_LINE = '도수는 지금 불편한 부분을 풀어 주는 데 초점을 둡니다.\n리얼무브먼트는 같은 문제가 다시 생기지 않도록, 움직임과 자세를 다시 잡아 드리는 데 초점을 둡니다.\n풀어 주는 것에서 그치지 않고, 이후 기능을 강화하는 단계까지 이어집니다.';
   var POSTURE_LINE = '자세 교정은 바로 세운 자세에서 시작하지 않습니다.\n가장 안전한 누운 자세에서 호흡부터 잡고, 앉기 → 서기 → 걸음걸이까지 같은 순서로 이어갑니다.';
   var START_LINE = '운동을 처음 시작하시거나, 안전하게 몸을 만들고 싶으신 분께 맞는 프로그램입니다.\n누운 자세·호흡부터 시작해, 앉고 서서 실제로 쓰는 움직임까지 단계를 쌓아 갑니다.';
-  var FACE_LINE = '리얼 페이스는 약수점·인천점 모두 박준규 원장이 직접 진행합니다.\n원장님이 계신 요일에 맞춰 예약해 드리고 있어요.';
+  var FACE_LINE = '리얼 페이스는 얼굴 움직임과 균형을 보는 1:1 프로그램입니다.\n50분 동안 수기·인디바로 얼굴을 본 뒤, 얼굴 운동으로 이어갑니다.\n약수점·인천점 모두 박준규 원장이 직접 진행하며, 원장님이 계신 요일에 맞춰 예약해 드리고 있어요.';
   function helloLine() {
     return '안녕하세요.';
   }
@@ -2290,6 +2300,12 @@
     if ($('chatQ').value.trim()) startGreeting('silent');
     if ($('chatQ2').value.trim()) startFollow('silent');
   }
+  function priceAskLine() {
+    return '현재 몸에서 불편하게 느끼는 부분이나 개선하고 싶은 점이 있으실까요? (ex.거북목, 라운드숄더, 측만, 어깨 통증 등)';
+  }
+  function scheduleAskLine() {
+    return '원하시는 요일이나 시간대가 있으시면 알려 주세요.';
+  }
   function priceRecommendText() {
     if (consultBranch === 'incheon') {
       return [
@@ -2305,7 +2321,9 @@
         '',
         '수업 전 몸 상태와 움직임을 확인한 뒤 패시브 스트레칭, 자세 교정, 1:1 맞춤 기능재활운동을 현재 상태와 목표에 맞게 구성해 진행합니다.',
         '',
-        '현재 불편하게 느끼시는 부분이나 개선하고 싶은 점이 있으실까요?'
+        priceAskLine(),
+        '',
+        scheduleAskLine()
       ].join('\n');
     }
     return [
@@ -2318,24 +2336,102 @@
       '• 주 2회 8회 패키지 66만 원입니다.',
       '',
       '필요한 부위를 짧게 집중적으로 관리하는 25분 1:1 컨디셔닝 수업도 별도로 운영하고 있으며 1회 4만 원입니다.',
+      '시그니처 1회는 12만 5천 원입니다.',
       '',
       '수업 전 몸 상태와 움직임을 확인한 뒤 패시브 스트레칭, 자세 교정, 1:1 맞춤 기능재활운동을 현재 상태와 목표에 맞게 구성해 진행합니다.',
       '',
-      '현재 불편하게 느끼시는 부분이나 개선하고 싶은 점이 있으실까요?'
+      priceAskLine(),
+      '',
+      scheduleAskLine()
+    ].join('\n');
+  }
+  function priceShortText() {
+    if (consultBranch === 'incheon') {
+      return [
+        '50분 1:1 수업은',
+        '• 1회 4만 5천 원',
+        '• 주 2회 8회 패키지 32만 원입니다.',
+        '',
+        '80분 1:1 수업 주 2회 8회 패키지는 62만 원입니다.',
+        '',
+        scheduleAskLine()
+      ].join('\n');
+    }
+    return [
+      '50분 1:1 수업은',
+      '• 1회 8만 5천 원',
+      '• 주 2회 8회 패키지 66만 원입니다.',
+      '',
+      '25분 1:1 컨디셔닝은 1회 4만 원,',
+      '시그니처는 1회 12만 5천 원입니다.',
+      '',
+      scheduleAskLine()
+    ].join('\n');
+  }
+  function bookingFaqText() {
+    return [
+      '예약은 톡톡 아래 메뉴의 예약에서 남겨 주시면 됩니다.',
+      '가능하신 요일과 시간대를 알려 주셔도 빈 자리에 맞춰 드릴게요.',
+      '',
+      '일정 변경이 필요하시면 가능한 한 미리 톡으로 알려 주세요.',
+      '당일 변경은 다음 시간이 이미 차 있을 수 있습니다.',
+      '',
+      '패키지 일정은 예약 시 함께 잡아 드립니다.',
+      scheduleAskLine()
+    ].join('\n');
+  }
+  function parkingFaqText() {
+    var b = BRANCH[consultBranch];
+    var ask = consultBranch === 'incheon'
+      ? '오시는 차량번호를 알려 주시면 입차 안내해 드릴게요.'
+      : '차량으로 오실까요, 대중교통으로 오실까요?';
+    return [
+      '운동복처럼 움직이기 편한 복장으로 오시면 됩니다.',
+      '',
+      b.parking,
+      '',
+      ask
+    ].join('\n');
+  }
+  function receiptFaqText() {
+    return [
+      '병원이나 보험 적용 기관은 아닙니다.',
+      '실손·의료보험 청구용으로는 해당되지 않습니다.',
+      '',
+      '카드 결제와 현금영수증은 발급해 드립니다.',
+      '영문 영수증이 필요하시면 말씀해 주세요.',
+      '',
+      '필요하신 서류가 있으실까요?'
+    ].join('\n');
+  }
+  function onceFaqText() {
+    return [
+      '체형이나 불편함은 한 번에 바뀌지 않습니다.',
+      '누운 자세에서 호흡부터 잡아, 앉기·서기까지 단계를 쌓아 갑니다.',
+      '',
+      '첫 방문은 문진 → 평가 → 당일 안전한 범위만 진행합니다.',
+      '이후 일정은 몸 상태를 본 뒤에 맞춰 드립니다.',
+      '',
+      '지금 가장 개선하고 싶은 부분을 알려 주시면 안내해 드릴게요.'
     ].join('\n');
   }
   function faqItems() {
     var b = BRANCH[consultBranch];
     return [
       { id: 'start', label: '운동 시작', text: START_LINE + '\n\n기능 운동은 보통 6개월 단위로 봅니다.\n지금 가장 신경 쓰이는 부분을 알려 주시면, 그에 맞춰 안내해 드릴게요.' },
-      { id: 'period', label: '기간', text: '불편하신 부분은 주 2회 기준으로, 보통 2~3주 안에 변화가 느껴지는지를 봅니다.\n그 안에 변화가 없으면 병원 진료를 함께 상의드려요.\n\n자세 교정은 3개월 단위로 보고,\n이후 기능을 키우는 운동은 6개월 단위로 진행합니다.\n\n시작 단계는 회원님 상태에 따라 달라지니, 방문하시면 평가 후 맞춰 안내해 드릴게요.' },
+      { id: 'period', label: '기간', text: '불편하신 부분은 주 2회 기준으로, 보통 2~3주 안에 변화가 느껴지는지를 봅니다.\n그 안에 변화가 없으면 병원 진료를 함께 상의드려요.\n주 1회도 가능하지만, 변화를 보는 기준은 주 2회입니다.\n\n자세 교정은 3개월 단위로 보고,\n이후 기능을 키우는 운동은 6개월 단위로 진행합니다.\n\n시작 단계는 회원님 상태에 따라 달라지니, 방문하시면 평가 후 맞춰 안내해 드릴게요.\n주 1회로 시작하시려면 가능하신 요일을 알려 주세요.' },
       { id: 'price', label: '가격', text: priceRecommendText() },
-      { id: 'map', label: '오시는 길', text: '첫 방문은 문진 → 평가 → 당일 안전한 범위만 진행합니다.\n운동복처럼 움직이기 편한 복장으로 오시면 됩니다.\n\n' + mapBlurb() },
+      { id: 'priceShort', label: '가격만', text: priceShortText() },
+      { id: 'map', label: '오시는 길', text: '첫 방문은 문진 → 평가 → 당일 안전한 범위만 진행합니다.\n\n' + mapBlurb() },
       { id: 'hours', label: '운영시간', text: b.hours },
+      { id: 'booking', label: '예약·취소', text: bookingFaqText() },
+      { id: 'parking', label: '주차·복장', text: parkingFaqText() },
       { id: 'pain', label: '통증', text: '문자로는 진단을 드리지 않습니다.\n가장 불편한 부위, 언제부터인지, 앉기·서기·걷기 중 언제 더 불편하신지를 알려 주시면 맞춰 안내해 드릴게요.\n\n저림·마비·날카로운 통증이 있거나 힘이 빠지신다면 병원 검사가 먼저일 수 있습니다.\n방문해 주시면 평가에서 병원 단계인지, 움직임으로 진행할 단계인지를 가려 드립니다.' },
-      { id: 'posture', label: '자세교정', text: POSTURE_LINE + '\n\n한 번에 바뀌기보다 3개월 단위로 보면서, 일상에서 유지되는 자세를 만드는 과정입니다.' },
-      { id: 'vs', label: '도수와 차이', text: VS_LINE + '\n\n그래서 방문하시면 오늘의 몸 상태를 먼저 보고, 필요한 단계부터 진행해요.' },
-      { id: 'hospital', label: '병원·보험', text: '병원이나 보험 적용 기관은 아닙니다.\n검사가 필요해 보이는 경우에는 운동보다 진료를 먼저 권해 드려요.\n\n이미 병원에서 진료 중이시라면, 병행 가능 여부는 평가 후 안내해 드립니다.' },
+      { id: 'posture', label: '자세교정', text: POSTURE_LINE + '\n\n한 번에 바뀌기보다 3개월 단위로 보면서, 일상에서 유지되는 자세를 만드는 과정입니다.\n지금 가장 신경 쓰이는 자세가 있으시면 알려 주세요.' },
+      { id: 'vs', label: '도수와 차이', text: VS_LINE + '\n\n그래서 방문하시면 오늘의 몸 상태를 먼저 보고, 필요한 단계부터 진행해요.\n지금 가장 불편하신 부분을 알려 주시면 맞춰 안내해 드릴게요.' },
+      { id: 'hospital', label: '병원·보험', text: '병원이나 보험 적용 기관은 아닙니다.\n검사가 필요해 보이는 경우에는 운동보다 진료를 먼저 권해 드려요.\n\n이미 병원에서 진료 중이시라면, 병행 가능 여부는 평가 후 안내해 드립니다.\n카드 결제·현금영수증은 가능합니다.\n\n개선되고 싶은 부분이 있으시면 알려 주세요.' },
+      { id: 'receipt', label: '영수증', text: receiptFaqText() },
+      { id: 'once', label: '1회만', text: onceFaqText() },
       { id: 'face', label: '리얼 페이스', text: FACE_LINE + '\n\n원하시는 요일이나 시간대가 있으시면 알려 주세요.' }
     ];
   }
