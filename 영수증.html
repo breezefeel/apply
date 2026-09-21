@@ -285,6 +285,7 @@
     overflow: hidden;
     resize: none;
   }
+  #priceSheetImg { display: none !important; }
   a.btn-sm {
     display: inline-flex; align-items: center; justify-content: center;
     text-decoration: none; color: inherit;
@@ -2405,7 +2406,7 @@
       return;
     }
     if (actions) actions.hidden = false;
-    img.hidden = false;
+    img.hidden = true;
     var b = BRANCH[consultBranch];
     img.alt = consultBranch === 'incheon' ? '인천 가격표' : '약수 가격표';
     img.onerror = function () {
