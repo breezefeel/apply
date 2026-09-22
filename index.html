@@ -74,9 +74,10 @@
       width:14px; flex:0 0 14px; height:1px;
     }
     .page-hd-link {
-      font-size:10px; font-weight:700; color:rgba(255,255,255,.88);
-      text-decoration:underline; text-underline-offset:2px;
-      white-space:nowrap;
+      font-size:11px; font-weight:700; color:rgba(255,255,255,.9);
+      text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px;
+      white-space:nowrap; background:none; border:none; padding:2px 0;
+      cursor:pointer; font-family:inherit; line-height:1.2;
     }
     .page-hd-link:hover { color:#fff; }
     a.page-hd-btn { text-decoration:none; }
@@ -88,7 +89,7 @@
       .page-hd-side { gap:4px; }
       .page-hd-actions { gap:3px; flex-wrap:nowrap; max-width:100%; }
       .page-hd-btn { font-size:10px; padding:5px 6px; }
-      .page-hd-link { font-size:9px; }
+      .page-hd-link { font-size:10px; }
     }
     @media (max-width:380px) {
       .page-hd-btn { font-size:9px; padding:5px 5px; }
@@ -984,7 +985,7 @@
     }
     .eval-body-area-sides {
       display:grid; grid-template-columns:repeat(5, minmax(0, 1fr));
-      gap:5px; width:100%; margin-top:8px;
+      gap:5px; width:100%; margin:8px 0 6px;
     }
     .eval-body-area-sides .eval-hist-chip {
       width:100%; min-width:0; text-align:center; padding-left:4px; padding-right:4px;
@@ -1897,7 +1898,7 @@
     .eval-hist-section--goals { border-color:#bfdbfe; background:#f8fbff; }
     .eval-hist-section--detail { border-color:#e2e8f0; background:#fafbfc; }
     .eval-hist-section--pain { border-color:#6ee7b7; background:#f0fdf4; }
-    .eval-hist-section-hd { display:flex; flex-wrap:wrap; gap:6px 8px; align-items:center; margin-bottom:6px; }
+    .eval-hist-section-hd { display:flex; flex-wrap:wrap; gap:6px 8px; align-items:center; margin-bottom:6px; width:100%; }
     .eval-hist-step {
       font-size:12px; font-weight:800; color:#fff; background:var(--blue);
       width:22px; height:22px; border-radius:6px; flex-shrink:0;
@@ -1922,6 +1923,19 @@
     .eval-hist-chip.on { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
     .eval-hist-chip--pain { border-color:#fca5a5; }
     .eval-hist-chip--pain.on { background:#fef2f2; border-color:#ef4444; color:#b91c1c; }
+    .eval-add-pain-wrap { margin:10px 0 4px; }
+    .eval-add-pain-btn {
+      width:100%; padding:9px 12px; border-radius:10px; cursor:pointer; font-family:inherit;
+      border:1.5px dashed #6ee7b7; background:#f0fdf4; color:#047857;
+      font-size:13px; font-weight:800;
+    }
+    .eval-add-pain-btn:hover { background:#dcfce7; border-color:#34d399; }
+    .eval-pain-remove-btn {
+      margin-left:auto; padding:3px 8px; border-radius:8px; cursor:pointer; font-family:inherit;
+      border:1px solid #fca5a5; background:#fff; color:#b91c1c;
+      font-size:11px; font-weight:700;
+    }
+    .eval-pain-remove-btn:hover { background:#fef2f2; }
     .eval-prefill-panel {
       margin: 0 0 12px; padding: 12px 14px; border-radius: 12px;
       background: linear-gradient(165deg, #f8fbff 0%, #f2f7fd 100%);
@@ -1943,9 +1957,17 @@
     .eval-hist-subtitle { font-size:11px; font-weight:800; color:var(--text); margin-bottom:5px; }
     .eval-hist-optgroup { margin-bottom:8px; }
     .eval-hist-optgroup:last-child { margin-bottom:0; }
+    .eval-hist-optgroup-hd {
+      display:flex; align-items:center; gap:6px; margin-bottom:4px; min-height:22px;
+    }
     .eval-hist-optgroup-label {
       font-size:10px; font-weight:800; color:#64748b;
-      margin-bottom:4px; letter-spacing:0.04em;
+      margin-bottom:0; letter-spacing:0.04em;
+    }
+    .eval-hist-optgroup-sides { display:flex; gap:4px; margin-left:2px; }
+    .eval-hist-optgroup-sides .eval-hist-chip {
+      padding:3px 8px; font-size:10px; font-weight:800;
+      min-width:32px; text-align:center;
     }
     .eval-hist-optgroup .eval-hist-chips { margin-bottom:0; }
     .eval-mov-pattern-wrap .eval-hist-hint { margin-bottom:0; }
@@ -1973,7 +1995,8 @@
     }
     .eval-hist-chip-note { margin-top:6px; min-height:44px; background:#fff; }
     .eval-hist-chip-note[hidden] { display:none !important; }
-    .eval-hist-section.eval-hist-hidden { display: none; }
+    .eval-hist-section.eval-hist-hidden,
+    .eval-add-pain-wrap.eval-hist-hidden { display: none; }
     .eval-exam-block { margin-top: 0; }
     /* 초회 평가 — 권장 프로그램·3단계 */
     .eval-rec-panel {
@@ -2108,6 +2131,13 @@
     .toast.show { opacity:1; }
     .empty-hint { text-align:center; color:var(--dim); font-size:13px; padding:16px 8px; }
     .load-countdown { display:block; font-size:11px; color:#94a3b8; margin-top:4px; font-weight:600; }
+    .board-retry-btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      margin:10px auto 0; padding:7px 14px; border-radius:9px;
+      border:1px solid #bfdbfe; background:#fff; color:var(--blue);
+      font:700 12px/1.2 inherit; cursor:pointer;
+    }
+    .board-retry-btn:hover { background:var(--blue-bg); }
 
     .send-link-list { display:flex; flex-direction:column; gap:6px; margin:12px 0 16px; max-height:42vh; overflow:auto; }
     .send-link-item {
@@ -2366,16 +2396,16 @@
         <p id="dateLine">—</p>
       </div>
       <div class="page-hd-side">
-        <div class="page-hd-actions">
-          <a class="page-hd-btn" href="영수증.html" onclick="openMemberCare_(event)">관리지원</a>
-          <a class="page-hd-btn" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠</a>
-          <a class="page-hd-btn" href="#" onclick="openMemberScheduleSheet_(event)" title="보드 날짜의 월 스케줄표로 이동">예약 스케줄</a>
+        <div class="page-hd-links">
+          <a class="page-hd-link" href="영수증.html" onclick="openMemberCare_(event)">관리지원</a>
+          <a class="page-hd-link" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠</a>
+          <a class="page-hd-link" href="#" onclick="openMemberScheduleSheet_(event)" title="보드 날짜의 월 스케줄표로 이동">예약 스케줄</a>
         </div>
         <div class="page-hd-actions">
           <button type="button" class="page-hd-btn" onclick="openApplicationForm_(event)">회원등록</button>
           <button type="button" class="page-hd-btn page-hd-btn--eval" onclick="openEvalModal()">초회평가</button>
           <button type="button" class="page-hd-btn" onclick="sendWellnessIntakeSms_()">사전평가</button>
-          <button type="button" class="page-hd-btn page-hd-btn--refresh" onclick="loadBoard()" title="새로고침" aria-label="새로고침">새로고침</button>
+          <button type="button" class="page-hd-btn page-hd-btn--refresh" onclick="loadBoard({forceRefresh:true})" title="새로고침" aria-label="새로고침">새로고침</button>
         </div>
       </div>
     </div>
@@ -2835,14 +2865,19 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-09-18-vas-quick-layout';
+    const INSTRUCTOR_HTML_BUILD = '2026-09-22-insp-sides';
     const PROGRAM_PLAN_SLOT_COUNT = 5;
     var _programPlanSaveSlot = 1;
     var _programPlanLoadDirectorTab = 'sangmin';
-    const BOARD_LOAD_TIMEOUT_MS = 90000;
+    /** 시도별 대기 — GAS가 멈추면 90초를 한 번에 쓰기보다 끊고 재시도하는 편이 성공률이 높다 */
+    const BOARD_LOAD_ATTEMPT_TIMEOUTS_MS = [40000, 45000, 50000];
+    const BOARD_LOAD_TIMEOUT_MS = BOARD_LOAD_ATTEMPT_TIMEOUTS_MS[0];
     const BOARD_LOAD_TIMEOUT_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
-    /** 회원 목록 UI 카운트다운용 예상 시간(초) — 실제 API 타임아웃과 별도 */
-    const BOARD_LOAD_ESTIMATE_SEC = 35;
+    const BOARD_LOAD_RETRY_GAP_MS = 800;
+    /** 회원 목록 UI 카운트다운용 예상 시간(초) — 첫 시도 기준 */
+    const BOARD_LOAD_ESTIMATE_SEC = Math.round(BOARD_LOAD_TIMEOUT_MS / 1000);
+    const BOARD_CACHE_LS_KEY = 'real_instructor_board_cache_v1';
+    const BOARD_CACHE_MAX_DATES = 4;
     const PIN_KEY = 'real_instructor_pin_v1';
     const INSTRUCTORS_FALLBACK = [
       { index:0, name:'박준규', color:'#BDD7EE', lightColor:'#DEEEF7' },
@@ -5552,6 +5587,7 @@
       hongtaekScreenByMember: (typeof loadHongtaekScreenStore_ === 'function' ? loadHongtaekScreenStore_() : {}),
       scheduleProgramColors: null,
       boardOnline: false,
+      boardFromCache: false,
       selected: null,
       selectedKey: '',
       savedProgress: {},
@@ -5609,11 +5645,11 @@
     var SESSION_DISCOMFORT_AREAS = [
       { id: 'comfortable', label: '편안함', group: 'quick', row: 'special' },
       { id: 'same', label: '동일', group: 'quick', row: 'special' },
-      { id: 'both', label: '전체적', group: 'quick', row: 'side' },
-      { id: 'bilateral', label: '양측', group: 'quick', row: 'side' },
-      { id: 'lt', label: '왼쪽', group: 'quick', row: 'side' },
-      { id: 'center', label: '중앙', group: 'quick', row: 'side' },
-      { id: 'rt', label: '오른쪽', group: 'quick', row: 'side' },
+      { id: 'both', label: '전체적', group: 'quick', row: 'sides' },
+      { id: 'bilateral', label: '양측', group: 'quick', row: 'sides' },
+      { id: 'lt', label: 'Lt', group: 'quick', row: 'sides' },
+      { id: 'center', label: '중앙', group: 'quick', row: 'sides' },
+      { id: 'rt', label: 'Rt', group: 'quick', row: 'sides' },
       { id: 'headache', label: '두통', group: 'head_spine' },
       { id: 'jaw', label: '턱', group: 'head_spine' },
       { id: 'neck', label: '목', group: 'head_spine' },
@@ -5914,10 +5950,26 @@
       var blocks = entries.map(function(ent, idx) {
         var p = state.program.find(function(x) { return x.id === ent.id; });
         var lbl = p ? methodAlimtalkLabel(p) : ent.label;
-        var url = linkSet[ent.id] && ent.youtubeUrl ? ent.youtubeUrl : '';
+        var url = linkSet[ent.id] && ent.youtubeUrl ? String(ent.youtubeUrl).trim() : '';
         return { line: (idx + 1) + ') ' + lbl, url: url };
       });
-      return joinTodayAlimtalkBlocks(blocks);
+      var urlCounts = {};
+      blocks.forEach(function(b) {
+        if (b.url) urlCounts[b.url] = (urlCounts[b.url] || 0) + 1;
+      });
+      var seenDup = {};
+      var trailingUrls = [];
+      var outBlocks = blocks.map(function(b) {
+        if (!b.url || urlCounts[b.url] < 2) return b;
+        if (!seenDup[b.url]) {
+          seenDup[b.url] = true;
+          trailingUrls.push(b.url);
+        }
+        return { line: b.line, url: '' };
+      });
+      var text = joinTodayAlimtalkBlocks(outBlocks);
+      if (trailingUrls.length) text += '\n\n' + trailingUrls.join('\n');
+      return text;
     }
 
     function todayProgressLabels(limit) {
@@ -8431,14 +8483,29 @@
     var _loadCountdownTimer = null;
     var _loadCountdownStartedAt = 0;
     var _loadCountdownActive = false;
+    var _loadCountdownKeepChips = false;
+    var _boardLoadAbort = null;
+    var _boardLoadGen = 0;
     var _boardSyncInFlight = false;
 
     function clearLoadCountdown() {
       _loadCountdownActive = false;
       _loadCountdownStartedAt = 0;
+      _loadCountdownKeepChips = false;
       if (_loadCountdownTimer) {
         clearInterval(_loadCountdownTimer);
         _loadCountdownTimer = null;
+      }
+    }
+
+    function paintBoardDateLineUpdating_(left) {
+      var dl = document.getElementById('dateLine');
+      if (!dl || !state.board) return;
+      var base = boardDateLineText_(state.board, boardDateYmd_(), state.boardFromCache ? '저장된 목록' : '');
+      if (left < 0) {
+        dl.textContent = base + ' · 서버 응답이 늦습니다';
+      } else {
+        dl.textContent = base + ' · 갱신 중 ' + left + '초';
       }
     }
 
@@ -8447,24 +8514,36 @@
       if (!_loadCountdownActive || !_loadCountdownStartedAt) return;
       var elapsed = Math.floor((Date.now() - _loadCountdownStartedAt) / 1000);
       var left = BOARD_LOAD_ESTIMATE_SEC - elapsed;
+      if (_loadCountdownKeepChips) {
+        paintBoardDateLineUpdating_(left);
+        return;
+      }
       if (left < 0) {
-        setMemberChipsMessage('불러오는 중… 시간이 길어지고 있습니다. 잠시만 기다려 주세요', null);
+        setMemberChipsMessage('불러오는 중… 시간이 길어지고 있습니다. 잠시만 기다려 주세요', null, { retry: true });
         return;
       }
       setMemberChipsMessage('불러오는 중…', left);
     }
 
-    function setMemberChipsMessage(msg, countdownSec) {
+    function setMemberChipsMessage(msg, countdownSec, extraOpts) {
+      extraOpts = extraOpts || {};
       var extra = '';
       if (typeof countdownSec === 'number' && countdownSec >= 0) {
         extra = '<span class="load-countdown">예상 ' + countdownSec + '초 · 서버에서 회원 목록을 가져오는 중</span>';
       }
-      document.getElementById('memberChips').innerHTML =
-        '<span class="empty-hint">' + escapeHtml(msg) + extra + '</span>';
+      if (extraOpts.retry) {
+        extra += '<button type="button" class="board-retry-btn" onclick="loadBoard({forceRefresh:true})">다시 시도</button>';
+      }
+      var el = document.getElementById('memberChips');
+      if (el) {
+        el.innerHTML = '<span class="empty-hint">' + escapeHtml(msg) + extra + '</span>';
+      }
     }
 
-    function startMemberLoadCountdown() {
+    function startMemberLoadCountdown(opts) {
+      opts = opts || {};
       clearLoadCountdown();
+      _loadCountdownKeepChips = !!opts.keepChips;
       _loadCountdownActive = true;
       _loadCountdownStartedAt = Date.now();
       paintMemberLoadCountdown();
@@ -8480,6 +8559,30 @@
 
     function isUnknownActionResponse_(data) {
       return !!(data && data.ok === false && /unknown action/i.test(String(data.message || '')));
+    }
+
+    function isTransientHttpStatus_(status) {
+      var n = Number(status);
+      return n === 0 || n === 404 || n === 408 || n === 429 ||
+        n === 500 || n === 502 || n === 503 || n === 504;
+    }
+
+    function httpErrorMessage_(status) {
+      var n = Number(status);
+      if (n === 404) {
+        return 'Google이 웹앱을 잠시 찾지 못했습니다(HTTP 404). 배포가 바뀐 경우보다 일시 장애인 경우가 많습니다.';
+      }
+      if (n === 429) return '서버가 잠시 요청을 제한했습니다(HTTP 429). 곧 다시 시도합니다.';
+      if (n === 502 || n === 503 || n === 504) {
+        return 'Google 서버가 잠시 응답하지 못했습니다(HTTP ' + n + ').';
+      }
+      if (n >= 500) return '서버 오류 (HTTP ' + n + ')';
+      if (n) return '서버 오류 (HTTP ' + n + ') — Apps Script 배포·URL 확인';
+      return '서버 연결 실패 — Apps Script 배포·URL 확인';
+    }
+
+    function isHttp404Response_(data) {
+      return !!(data && Number(data.status) === 404);
     }
 
     async function apiFetchJson_(method, body, signal) {
@@ -8506,17 +8609,19 @@
         }
         if (!res.ok) {
           data.ok = false;
-          if (res.status >= 500) data.recoverable = true;
-          if (!data.message) data.message = '서버 오류 (HTTP ' + res.status + ')';
+          data.status = res.status;
+          data.recoverable = isTransientHttpStatus_(res.status);
+          if (!data.message) data.message = httpErrorMessage_(res.status);
         }
         return data;
       } catch (parseErr) {
         return {
           ok: false,
-          recoverable: !res.ok && (res.status >= 500 || res.status === 0),
+          status: res.status,
+          recoverable: isTransientHttpStatus_(res.status),
           message: res.ok
             ? '서버 응답 형식 오류 — Apps Script 배포·URL 확인'
-            : '서버 오류 (HTTP ' + res.status + ') — Apps Script 배포·URL 확인',
+            : httpErrorMessage_(res.status),
         };
       }
     }
@@ -8526,6 +8631,12 @@
       var timeoutMs = opts.timeoutMs != null ? opts.timeoutMs : 55000;
       var controller = new AbortController();
       var timer = setTimeout(function() { controller.abort(); }, timeoutMs);
+      if (opts.signal) {
+        if (opts.signal.aborted) controller.abort();
+        else {
+          opts.signal.addEventListener('abort', function() { controller.abort(); }, { once: true });
+        }
+      }
       var body = JSON.stringify(Object.assign({ pin: state.pin }, payload));
       var canGet = apiCanUseGet_(body);
       // 회원 목록·조회 등 작은 payload는 GET 우선 (POST→리다이렉트→unknown action 방지)
@@ -8537,6 +8648,10 @@
         if (usePost && canGet && isUnknownActionResponse_(data)) {
           data = await apiFetchJson_('GET', body, controller.signal);
         }
+        // GAS 프론트가 HTML 404를 내는 경우가 있음 → 반대 메서드로 한 번 더
+        if (isHttp404Response_(data) && canGet) {
+          data = await apiFetchJson_(usePost ? 'GET' : 'POST', body, controller.signal);
+        }
         if (isUnknownActionResponse_(data)) {
           data.message =
             '서버가 요청을 인식하지 못했습니다(unknown action). ' +
@@ -8545,10 +8660,14 @@
         return data;
       } catch (err) {
         if (err && err.name === 'AbortError') {
+          if (opts.signal && opts.signal.aborted) {
+            return { ok: false, aborted: true, message: '요청이 취소되었습니다.' };
+          }
           var sec = Math.round(timeoutMs / 1000);
           return {
             ok: false,
             offline: true,
+            recoverable: true,
             message: opts.timeoutMessage ||
               ('서버 응답 시간 초과(약 ' + sec + '초). ' +
               '저장·출석이 반영되지 않았을 수 있으니 새로고침 후 확인해 주세요.'),
@@ -8557,7 +8676,7 @@
         var hint = (location.protocol === 'file:')
           ? 'HTML 파일을 직접 열면 안 됩니다 — GitHub Pages 등 HTTPS 주소로 열어 주세요'
           : '인터넷·Apps Script 배포 상태를 확인하고 새로고침해 주세요';
-        return { ok: false, offline: true, message: hint };
+        return { ok: false, offline: true, recoverable: true, message: hint };
       } finally {
         clearTimeout(timer);
       }
@@ -9365,93 +9484,263 @@
       } catch (ignoreScroll) {}
     }
 
-    async function loadBoard(opts) {
-      opts = opts || {};
-      if (_boardSyncInFlight) {
-        if (!opts.silent) toast('이미 불러오는 중입니다…');
+    function sleepMs_(ms, signal) {
+      return new Promise(function(resolve) {
+        if (signal && signal.aborted) { resolve(); return; }
+        var t = setTimeout(resolve, ms);
+        if (signal) {
+          signal.addEventListener('abort', function() {
+            clearTimeout(t);
+            resolve();
+          }, { once: true });
+        }
+      });
+    }
+
+    function boardDateLineText_(data, requestYmd, extra) {
+      var ymd = (data && data.date) || requestYmd || boardDateYmd_();
+      var dayKr = (data && data.dayKr) || dayKrFromYmd_(ymd) || '';
+      var n = (data && data.members && data.members.length) || 0;
+      var text = ymd + ' (' + dayKr + ') · 예약 ' + n + '명';
+      if (extra) text += ' · ' + extra;
+      return text;
+    }
+
+    function boardHasSnapshotForYmd_(ymd) {
+      return !!(state.board && normalizeBoardYmd_(state.board.date || '') === ymd);
+    }
+
+    function boardCachePayload_(data) {
+      return {
+        ok: true,
+        date: data.date,
+        dayKr: data.dayKr,
+        members: data.members || [],
+        instructors: data.instructors || [],
+        scheduleProgramColors: data.scheduleProgramColors || null,
+      };
+    }
+
+    function readBoardCacheStore_() {
+      try {
+        var raw = JSON.parse(localStorage.getItem(BOARD_CACHE_LS_KEY) || '{}');
+        return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function readCachedBoard_(ymd) {
+      var item = readBoardCacheStore_()[ymd];
+      if (!item || !item.board || item.board.ok === false) return null;
+      return item;
+    }
+
+    function writeCachedBoard_(ymd, data) {
+      if (!ymd || !data || data.ok === false) return;
+      try {
+        var store = readBoardCacheStore_();
+        store[ymd] = { savedAt: Date.now(), board: boardCachePayload_(data) };
+        var keys = Object.keys(store).sort();
+        while (keys.length > BOARD_CACHE_MAX_DATES) {
+          delete store[keys.shift()];
+          keys = Object.keys(store).sort();
+        }
+        localStorage.setItem(BOARD_CACHE_LS_KEY, JSON.stringify(store));
+      } catch (e) { /* quota / private mode */ }
+    }
+
+    function isBoardLoadRetryable_(data) {
+      if (!data) return true;
+      if (data.ok || data.needPin || data.aborted) return false;
+      if (data.offline || data.recoverable) return true;
+      var msg = String(data.message || '');
+      return /시간 초과|timeout|HTTP\s*[45]|HTTP 404|서버 연결|응답 형식|배포·URL|네트워크|Failed to fetch|offline|unknown action|잠시 찾지 못했/i.test(msg);
+    }
+
+    function applyBoardPayload_(data, requestYmd, applyOpts) {
+      applyOpts = applyOpts || {};
+      state.board = data;
+      state.boardOnline = !applyOpts.fromCache;
+      state.boardFromCache = !!applyOpts.fromCache;
+      if (!applyOpts.fromCache) state.lastBoardSyncAt = Date.now();
+      if (data.pspProgram || data.pspCatalog) {
+        state.movementCatalog = mergeMovementCatalogFromServer_(data.pspProgram || data.pspCatalog);
+      }
+      state.scheduleProgramColors = data.scheduleProgramColors || state.scheduleProgramColors || SCHEDULE_PROGRAM_COLORS_FALLBACK;
+      state.program = getProgramCatalog(state.activeProgramTab);
+      syncBoardDateUi_(data.date || requestYmd, data.dayKr);
+      var extra = '';
+      if (applyOpts.fromCache) extra = '저장된 목록';
+      if (applyOpts.updating) extra = extra ? extra + ' · 갱신 중' : '갱신 중';
+      document.getElementById('dateLine').textContent = boardDateLineText_(data, requestYmd, extra);
+      renderProgramTabs();
+      if (applyOpts.clearSelection) {
+        clearUiAfterManualBoardRefresh_();
+      }
+      renderMemberChips();
+      renderProgramList();
+      if (!applyOpts.clearSelection && state.selectedKey) {
+        var m = todayMembers().find(function(x) { return memberKey(x) === state.selectedKey; });
+        if (m) {
+          if (applyOpts.silent && state.selected && memberKey(state.selected) === state.selectedKey) {
+            refreshSelectedMemberFromBoard_(m);
+          } else if (applyOpts.fromCache) {
+            refreshSelectedMemberFromBoard_(m);
+          } else {
+            selectMember(m, false);
+          }
+        } else if (!applyOpts.fromCache && !applyOpts.updating) {
+          clearSelectedMember_();
+        }
+      }
+    }
+
+    function paintBoardLoadFailure_(message, opts, requestYmd) {
+      var hasSnapshot = boardHasSnapshotForYmd_(requestYmd);
+      state.boardOnline = false;
+      if (hasSnapshot) {
+        document.getElementById('dateLine').textContent =
+          boardDateLineText_(state.board, requestYmd, '저장된 목록 · 최신 불러오기 실패');
+        if (!opts.silent) toast(formatBoardLoadErrorMessage_(message));
         return;
       }
-      if (!opts.silent) startMemberLoadCountdown();
-      _boardSyncInFlight = true;
-      // 버튼 「새로고침」만 선택·결과 초기화. silent(백그라운드 동기화)는 선택 유지
-      var clearSelectionOnLoad = !opts.silent && !opts.keepSelection;
-      var requestYmd = normalizeBoardYmd_(opts.date || boardDateYmd_());
-      syncBoardDateUi_(requestYmd);
-      try {
-        const data = await api({
+      document.getElementById('dateLine').textContent = '오프라인 · 프로그램만 표시';
+      setMemberChipsMessage(formatBoardLoadErrorMessage_(message), null, { retry: true });
+      if (!state.program.length) state.program = getProgramCatalog(state.activeProgramTab);
+      renderProgramTabs();
+      renderProgramList();
+      if (!opts.silent) toast(formatBoardLoadErrorMessage_(message));
+    }
+
+    async function fetchInstructorDayBoard_(requestYmd, opts, signal) {
+      var timeouts = BOARD_LOAD_ATTEMPT_TIMEOUTS_MS;
+      var last = null;
+      var i;
+      for (i = 0; i < timeouts.length; i++) {
+        if (signal && signal.aborted) {
+          return { ok: false, aborted: true, message: '불러오기를 중단했습니다.' };
+        }
+        if (i > 0 && !opts.silent) {
+          if (_loadCountdownKeepChips) {
+            var dl = document.getElementById('dateLine');
+            if (dl && state.board) {
+              dl.textContent = boardDateLineText_(state.board, requestYmd,
+                (state.boardFromCache ? '저장된 목록 · ' : '') + '다시 시도 ' + (i + 1) + '/' + timeouts.length);
+            }
+          } else {
+            setMemberChipsMessage('서버가 바빠 다시 시도하는 중… (' + (i + 1) + '/' + timeouts.length + ')');
+          }
+        }
+        last = await api({
           action: 'instructorDayBoard',
           date: requestYmd,
-          forceRefresh: !opts.silent,
+          forceRefresh: !!(opts.forceRefresh && i === 0),
         }, {
-          timeoutMs: BOARD_LOAD_TIMEOUT_MS,
+          timeoutMs: timeouts[i],
+          signal: signal,
+          forcePost: i === 1,
           timeoutMessage:
-            '회원 목록 응답 시간 초과(약 ' + BOARD_LOAD_TIMEOUT_SEC + '초). ' +
-            'Google Apps Script가 지연 중입니다. 잠시 후 새로고침해 주세요.',
+            '회원 목록 응답 시간 초과(약 ' + Math.round(timeouts[i] / 1000) + '초). ' +
+            'Google Apps Script가 지연 중입니다.',
         });
+        if (last && (last.ok || last.needPin || last.aborted)) return last;
+        if (!isBoardLoadRetryable_(last)) return last;
+        if (i < timeouts.length - 1) {
+          await sleepMs_(BOARD_LOAD_RETRY_GAP_MS + Math.floor(Math.random() * 400), signal);
+        }
+      }
+      if (last && !last.ok && isHttp404Response_(last)) {
+        last.message =
+          'Google 웹앱이 반복해서 404를 냈습니다. 잠시 후 「다시 시도」해 주세요. ' +
+          '같은 메시지가 계속이면 Apps Script 배포 관리에서 웹앱 URL이 앱의 API 주소와 같은지 확인해 주세요.';
+      } else if (last && !last.ok && /시간 초과|timeout/i.test(String(last.message || ''))) {
+        last.message =
+          '회원 목록 응답 시간 초과. 서버가 혼잡합니다. 「다시 시도」를 눌러 주세요.';
+      }
+      return last;
+    }
+
+    async function loadBoard(opts) {
+      opts = opts || {};
+      if (opts.silent && _boardSyncInFlight) return;
+      if (_boardLoadAbort) {
+        try { _boardLoadAbort.abort(); } catch (ignoreAbort) {}
+      }
+      var ac = new AbortController();
+      _boardLoadAbort = ac;
+      var myGen = ++_boardLoadGen;
+      _boardSyncInFlight = true;
+      // 버튼 「새로고침」만 선택·결과 초기화. silent(백그라운드 동기화)는 선택 유지
+      var clearSelectionOnLoad = !opts.silent && !opts.keepSelection && !!opts.forceRefresh;
+      var requestYmd = normalizeBoardYmd_(opts.date || boardDateYmd_());
+      syncBoardDateUi_(requestYmd);
+      var usedCache = false;
+      try {
+        if (!opts.silent) {
+          if (boardHasSnapshotForYmd_(requestYmd)) {
+            startMemberLoadCountdown({ keepChips: true });
+          } else {
+            var cached = readCachedBoard_(requestYmd);
+            if (cached && cached.board) {
+              applyBoardPayload_(cached.board, requestYmd, { fromCache: true, updating: true, keepSelection: true });
+              usedCache = true;
+              startMemberLoadCountdown({ keepChips: true });
+            } else {
+              startMemberLoadCountdown();
+            }
+          }
+        }
+
+        const data = await fetchInstructorDayBoard_(requestYmd, opts, ac.signal);
+        if (myGen !== _boardLoadGen) return;
+
+        if (data && data.aborted) return;
+
+        if (!data) {
+          paintBoardLoadFailure_('회원 목록 불러오기 실패', opts, requestYmd);
+          return;
+        }
 
         if (data.needPin) {
           showPin(true);
           state.boardOnline = false;
           document.getElementById('dateLine').textContent = '강사 PIN 입력 필요';
-          setMemberChipsMessage('PIN 입력 후 회원 목록을 불러옵니다');
+          if (!usedCache && !boardHasSnapshotForYmd_(requestYmd)) {
+            setMemberChipsMessage('PIN 입력 후 회원 목록을 불러옵니다');
+          }
           renderProgramList();
           return;
         }
 
         if (!data.ok) {
-          state.boardOnline = false;
-          document.getElementById('dateLine').textContent = '오프라인 · 프로그램만 표시';
-          setMemberChipsMessage(formatBoardLoadErrorMessage_(data.message || (data.offline
+          paintBoardLoadFailure_(data.message || (data.offline
             ? '서버 연결 실패'
-            : '회원 목록 불러오기 실패')));
-          if (!state.program.length) state.program = getProgramCatalog(state.activeProgramTab);
-          renderProgramTabs();
-          renderProgramList();
-          if (!opts.silent) toast(formatBoardLoadErrorMessage_(data.message || '서버 연결 실패'));
+            : '회원 목록 불러오기 실패'), opts, requestYmd);
           return;
         }
 
-        state.board = data;
-        state.boardOnline = true;
-        state.lastBoardSyncAt = Date.now();
-        state.movementCatalog = mergeMovementCatalogFromServer_(data.pspProgram || data.pspCatalog);
-        state.scheduleProgramColors = data.scheduleProgramColors || SCHEDULE_PROGRAM_COLORS_FALLBACK;
-        state.program = getProgramCatalog(state.activeProgramTab);
-        syncBoardDateUi_(data.date || requestYmd, data.dayKr);
-        document.getElementById('dateLine').textContent =
-          (data.date || requestYmd) + ' (' + (data.dayKr || dayKrFromYmd_(data.date || requestYmd) || '') + ') · 예약 ' + (data.members || []).length + '명';
-        renderProgramTabs();
-        if (clearSelectionOnLoad) {
-          clearUiAfterManualBoardRefresh_();
-        }
-        renderMemberChips();
-        renderProgramList();
-        if (!clearSelectionOnLoad && state.selectedKey) {
-          const m = todayMembers().find(function(x) { return memberKey(x) === state.selectedKey; });
-          if (m) {
-            if (opts.silent && state.selected && memberKey(state.selected) === state.selectedKey) {
-              refreshSelectedMemberFromBoard_(m);
-            } else {
-              selectMember(m, false);
-            }
-          } else {
-            clearSelectedMember_();
+        writeCachedBoard_(data.date || requestYmd, data);
+        applyBoardPayload_(data, requestYmd, {
+          silent: !!opts.silent,
+          clearSelection: clearSelectionOnLoad,
+        });
+      } catch (loadErr) {
+        if (myGen !== _boardLoadGen) return;
+        var errMsg = (loadErr && loadErr.message) ? String(loadErr.message) : '회원 목록 처리 중 오류';
+        try { paintBoardLoadFailure_(errMsg, opts, requestYmd); } catch (ignoreFail) {}
+      } finally {
+        if (myGen === _boardLoadGen) {
+          clearLoadCountdown();
+          _boardSyncInFlight = false;
+          if (_boardLoadAbort === ac) _boardLoadAbort = null;
+          if (state.board && state.boardOnline) {
+            try {
+              document.getElementById('dateLine').textContent =
+                boardDateLineText_(state.board, requestYmd, '');
+            } catch (ignoreLine) {}
           }
         }
-      } catch (loadErr) {
-        state.boardOnline = false;
-        var errMsg = (loadErr && loadErr.message) ? String(loadErr.message) : '회원 목록 처리 중 오류';
-        try { document.getElementById('dateLine').textContent = '오프라인 · 프로그램만 표시'; } catch (ignoreDate) {}
-        setMemberChipsMessage(formatBoardLoadErrorMessage_(errMsg));
-        if (!state.program.length) {
-          try { state.program = getProgramCatalog(state.activeProgramTab); } catch (ignoreProg) {}
-        }
-        try { renderProgramTabs(); } catch (ignoreTabs) {}
-        try { renderProgramList(); } catch (ignoreList) {}
-        if (!opts.silent) toast(formatBoardLoadErrorMessage_(errMsg));
-      } finally {
-        clearLoadCountdown();
-        _boardSyncInFlight = false;
       }
     }
 
@@ -9591,9 +9880,9 @@
       areas = areas || [];
       if (areas.indexOf('both') >= 0) return '전체적';
       if (areas.indexOf('bilateral') >= 0) return '양측';
-      if (areas.indexOf('lt') >= 0) return '왼쪽';
+      if (areas.indexOf('lt') >= 0) return 'Lt';
       if (areas.indexOf('center') >= 0) return '중앙';
-      if (areas.indexOf('rt') >= 0) return '오른쪽';
+      if (areas.indexOf('rt') >= 0) return 'Rt';
       return '';
     }
 
@@ -9602,11 +9891,9 @@
       if (/^전체적\s+/.test(s)) return { side: '전체적', rest: s.replace(/^전체적\s+/, '').trim() };
       if (/^Both\s+/i.test(s)) return { side: '전체적', rest: s.replace(/^Both\s+/i, '').trim() };
       if (/^양측\s+/.test(s)) return { side: '양측', rest: s.replace(/^양측\s+/, '').trim() };
-      if (/^왼쪽\s+/.test(s)) return { side: '왼쪽', rest: s.replace(/^왼쪽\s+/, '').trim() };
-      if (/^오른쪽\s+/.test(s)) return { side: '오른쪽', rest: s.replace(/^오른쪽\s+/, '').trim() };
-      if (/^Lt\s+/i.test(s)) return { side: '왼쪽', rest: s.replace(/^Lt\s+/i, '').trim() };
+      if (/^왼쪽\s+/.test(s) || /^Lt\s+/i.test(s)) return { side: 'Lt', rest: s.replace(/^(왼쪽|Lt)\s+/i, '').trim() };
       if (/^중앙\s+/.test(s)) return { side: '중앙', rest: s.replace(/^중앙\s+/, '').trim() };
-      if (/^Rt\s+/i.test(s)) return { side: '오른쪽', rest: s.replace(/^Rt\s+/i, '').trim() };
+      if (/^오른쪽\s+/.test(s) || /^Rt\s+/i.test(s)) return { side: 'Rt', rest: s.replace(/^(오른쪽|Rt)\s+/i, '').trim() };
       return { side: '', rest: s };
     }
 
@@ -10079,13 +10366,14 @@
         }
         html += '<div class="session-discomfort-group-chips">';
         if (gk === 'quick') {
-          var quickRows = { special: [], side: [] };
+          var quickRows = { special: [], sides: [] };
           items.forEach(function (opt) {
-            var rk = opt.row || (opt.id === 'comfortable' || opt.id === 'same' ? 'special' : 'side');
+            var rk = opt.row || (opt.id === 'comfortable' || opt.id === 'same' ? 'special' : 'sides');
+            if (rk === 'side') rk = 'sides';
             if (!quickRows[rk]) quickRows[rk] = [];
             quickRows[rk].push(opt);
           });
-          ['special', 'side'].forEach(function (rk) {
+          ['special', 'sides'].forEach(function (rk) {
             var rowItems = quickRows[rk];
             if (!rowItems || !rowItems.length) return;
             html += '<div class="session-quick-row session-quick-row--' + rk + '">';
@@ -13700,6 +13988,7 @@
           groups.push({
             label: x.group,
             options: gOpts.map(function(o) { return o.label; }),
+            sideChips: !!x.sideChips,
           });
           gOpts.forEach(function(o) { flat.push(o); });
         } else {
@@ -13730,11 +14019,11 @@
       title: 'Inspection',
       items: [
         evalHistItem('insp_findings', '자세·관찰', '부위별 다중 선택', [
-          { group: '목', options: ['거북목', '일자목', 'Lt 기울어짐', 'Rt 기울어짐'] },
-          { group: '어깨', options: ['라운드 숄더', 'Lt 내려감', 'Rt 내려감'] },
-          { group: '등', options: ['굽은 등', 'Lt 좁아짐', 'Rt 좁아짐', '척추 측만 의심'] },
-          { group: '허리', options: ['허리 전만', '요추전만', 'Lt 좁아짐', 'Rt 좁아짐'] },
-          { group: '골반', options: ['골반 틀어짐', 'Lt 낮음', 'Rt 낮음'] },
+          { group: '목', sideChips: true, options: ['거북목', '일자목', '기울어짐', '앞틀어짐'] },
+          { group: '어깨', sideChips: true, options: ['라운드 숄더', '내려감', '앞틀어짐'] },
+          { group: '등', options: ['굽은 등', 'Lt 좁아짐', 'Rt 좁아짐', '척추 측만 의심', '앞틀어짐'] },
+          { group: '허리', options: ['허리 전만', '요추전만', 'Lt 좁아짐', 'Rt 좁아짐', '앞틀어짐'] },
+          { group: '골반', options: ['골반 틀어짐', 'Lt 낮음', 'Rt 낮음', '앞틀어짐'] },
           { group: '무릎·다리', options: ['오다리', 'X자 다리'] },
         ], true),
       ],
@@ -13771,7 +14060,7 @@
           { group: '목', options: ['후두하', '목 앞', '목 옆', '목 뒤'] },
           { group: '어깨', options: ['승모근', '견갑 주변', '회전근개', '삼각근'] },
           { group: '상지', options: ['상완', '팔꿈치', '전완', '손목·손'] },
-          { group: '등', options: ['상부 등', '견갑 사이', '중부 등', '하부 등'] },
+          { group: '등', options: ['상부', '견갑 안쪽', '중부', '하부'] },
           { group: '허리', options: ['허리 중앙', '허리 기립근', '옆구리'] },
           { group: '골반·고관절', options: ['장골능', '둔근', '이상근', '고관절 옆', '고관절 앞', '장요근'] },
           { group: '하지', options: ['허벅지 앞', '허벅지 뒤', '허벅지 옆'] },
@@ -13924,6 +14213,88 @@
       ];
     })();
 
+    var _evalExtraPainGroups = [];
+
+    function evalPainTemplateGroup_() {
+      return EVAL_HISTORY_GROUPS.find(function (g) { return g.showWhenPain && !g.extraPain; }) || null;
+    }
+
+    function evalClonePainGroup_(n) {
+      var src = evalPainTemplateGroup_() || { items: [] };
+      var suffix = '_p' + n;
+      return {
+        showWhenPain: true,
+        extraPain: true,
+        painIndex: n,
+        sectionKind: 'pain',
+        step: '◉',
+        stepClass: 'clinical',
+        title: '통증 문진 ' + n,
+        sub: 'OPQRST',
+        items: (src.items || []).map(function (it) {
+          return {
+            id: it.id + suffix,
+            title: it.title,
+            hint: it.hint,
+            multi: it.multi,
+            bodyDropdowns: it.bodyDropdowns,
+            areaSecId: it.areaSecId ? it.areaSecId + suffix : '',
+            groups: it.groups,
+            options: it.options,
+          };
+        }),
+      };
+    }
+
+    function evalAllHistoryGroups_() {
+      return EVAL_HISTORY_GROUPS.concat(_evalExtraPainGroups || []);
+    }
+
+    function evalMaxExtraPainIndexFromState_(histState) {
+      var max = 1;
+      Object.keys(histState || {}).forEach(function (k) {
+        var m = String(k).match(/_p(\d+)$/);
+        if (m) max = Math.max(max, parseInt(m[1], 10));
+      });
+      return max;
+    }
+
+    function ensureEvalExtraPainGroupsFromState_(histState) {
+      var maxP = evalMaxExtraPainIndexFromState_(histState);
+      _evalExtraPainGroups = [];
+      for (var n = 2; n <= maxP; n++) _evalExtraPainGroups.push(evalClonePainGroup_(n));
+    }
+
+    function renderEvalExtraPainBlocks_() {
+      var root = document.getElementById('evalExtraPainBlocks');
+      if (!root) return;
+      root.innerHTML = (_evalExtraPainGroups || []).map(function (grp) {
+        return renderEvalHistoryGroupSection(grp, 'extra-' + grp.painIndex);
+      }).join('');
+    }
+
+    function resetEvalExtraPainBlocks_() {
+      _evalExtraPainGroups = [];
+      var extra = document.getElementById('evalExtraPainBlocks');
+      if (extra) extra.innerHTML = '';
+    }
+
+    function addEvalPainBlock_() {
+      if (getSelectedEvalGoalIds().indexOf('pain') < 0) return;
+      var used = {};
+      (_evalExtraPainGroups || []).forEach(function (g) { used[g.painIndex] = true; });
+      var n = 2;
+      while (used[n]) n++;
+      if (n > 8) return;
+      _evalExtraPainGroups.push(evalClonePainGroup_(n));
+      renderEvalExtraPainBlocks_();
+    }
+
+    function removeEvalPainBlock_(n) {
+      _evalExtraPainGroups = (_evalExtraPainGroups || []).filter(function (g) { return g.painIndex !== n; });
+      renderEvalExtraPainBlocks_();
+    }
+
     function getSelectedEvalGoalIds() {
       var ids = [];
       document.querySelectorAll('.eval-hist-chip[data-sec="goal"].on').forEach(function(el) {
@@ -13944,12 +14315,16 @@
 
     function updateEvalFormVisibility() {
       var goalIds = getSelectedEvalGoalIds();
+      var painOn = goalIds.indexOf('pain') >= 0;
       document.querySelectorAll('#evalHistoryForm .eval-hist-section[data-eval-group]').forEach(function(el) {
         var idx = parseInt(el.dataset.evalGroup, 10);
         var grp = EVAL_HISTORY_GROUPS[idx];
         if (!grp) return;
         el.classList.toggle('eval-hist-hidden', !evalGroupShouldShow(grp, goalIds));
       });
+      var wrap = document.getElementById('evalAddPainWrap');
+      if (wrap) wrap.classList.toggle('eval-hist-hidden', !painOn);
+      if (!painOn) resetEvalExtraPainBlocks_();
     }
 
     function evalBodyAreaSideSecId_(areaSecId) {
@@ -13971,7 +14346,7 @@
 
     function getEvalHistoryChipSections() {
       var flat = [];
-      EVAL_HISTORY_GROUPS.forEach(function (grp) {
+      evalAllHistoryGroups_().forEach(function (grp) {
         if (grp.isMemo) return;
         (grp.items || []).forEach(function (sec) {
           flat.push({
@@ -13999,6 +14374,15 @@
       [EVAL_INSPECTION_SECTION, EVAL_MOVEMENT_SECTION, EVAL_PALPATION_SECTION].forEach(function(block) {
         (block.items || []).forEach(function(sec) {
           flat.push({ id: sec.id, title: sec.title, multi: sec.multi, examBlock: block.title });
+          (sec.groups || []).forEach(function (g) {
+            if (!g.sideChips) return;
+            flat.push({
+              id: evalInspGroupSideSecId_(sec.id, g.label),
+              title: '',
+              multi: true,
+              examBlock: block.title,
+            });
+          });
         });
       });
       return flat;
@@ -14006,7 +14390,7 @@
 
     function getEvalBodyAreaDropdownSecs() {
       var out = [];
-      EVAL_HISTORY_GROUPS.forEach(function (grp) {
+      evalAllHistoryGroups_().forEach(function (grp) {
         (grp.items || []).forEach(function (sec) {
           if (sec.bodyDropdowns && sec.areaSecId) {
             out.push({ id: sec.areaSecId, parentId: sec.id, parentTitle: sec.title });
@@ -14042,6 +14426,53 @@
       selectEl.classList.toggle('has-value', !!selectEl.value);
     }
 
+    function evalInspGroupSideSecId_(secId, groupLabel) {
+      return String(secId || '') + '_side_' + String(groupLabel || '');
+    }
+
+    function renderEvalGroupSideChipsHtml_(secId, groupLabel) {
+      var sideSec = evalInspGroupSideSecId_(secId, groupLabel);
+      var html = '<div class="eval-hist-optgroup-sides">';
+      ['Lt', 'Rt'].forEach(function (side) {
+        html += '<button type="button" class="eval-hist-chip eval-hist-chip--side" data-sec="' + escapeHtml(sideSec) + '"' +
+          ' data-val="' + side + '" onclick="toggleEvalHistChip(this)">' + side + '</button>';
+      });
+      html += '</div>';
+      return html;
+    }
+
+    function evalInspGroupSideLabel_(secId, groupLabel) {
+      var sides = evalChipSelectionsForSec(evalInspGroupSideSecId_(secId, groupLabel));
+      var hasLt = sides.indexOf('Lt') >= 0;
+      var hasRt = sides.indexOf('Rt') >= 0;
+      if (hasLt && hasRt) return 'Lt·Rt';
+      if (hasLt) return 'Lt';
+      if (hasRt) return 'Rt';
+      return '';
+    }
+
+    function evalChipSelectionsInGroup_(secId, groupLabel) {
+      var selected = [];
+      var sel = groupLabel
+        ? '.eval-hist-optgroup[data-opt-group="' + groupLabel + '"] .eval-hist-chip[data-sec="' + secId + '"].on'
+        : '.eval-hist-chip[data-sec="' + secId + '"].on';
+      document.querySelectorAll(sel).forEach(function (el) {
+        selected.push(el.dataset.val || el.textContent.trim());
+      });
+      return selected;
+    }
+
+    function evalGroupedChipSaveVals_(sec) {
+      if (!sec || !sec.groups || !sec.groups.length) return evalChipSelectionsForSec(sec && sec.id);
+      var out = [];
+      sec.groups.forEach(function (g) {
+        evalChipSelectionsInGroup_(sec.id, g.label).forEach(function (val) {
+          out.push(g.label + ' · ' + val);
+        });
+      });
+      return out;
+    }
+
     function renderEvalHistChipBtn_(sec, opt, extraAttrs) {
       var goalAttr = sec.id === 'goal' && opt.id ? ' data-goal-id="' + escapeHtml(opt.id) + '"' : '';
       var painCls = sec.id === 'goal' && opt.id === 'pain' ? ' eval-hist-chip--pain' : '';
@@ -14057,10 +14488,17 @@
         (sec.options || []).forEach(function (opt) { optByLabel[opt.label] = opt; });
         chipsHtml = sec.groups.map(function (g) {
           var chips = (g.options || []).map(function (label) {
-            return renderEvalHistChipBtn_(sec, optByLabel[label] || { id: label, label: label });
+            return renderEvalHistChipBtn_(
+              sec,
+              optByLabel[label] || { id: label, label: label },
+              ' data-opt-group="' + escapeHtml(g.label) + '"'
+            );
           }).join('');
-          return '<div class="eval-hist-optgroup">' +
-            '<div class="eval-hist-optgroup-label">' + escapeHtml(g.label) + '</div>' +
+          return '<div class="eval-hist-optgroup" data-opt-group="' + escapeHtml(g.label) + '">' +
+            '<div class="eval-hist-optgroup-hd">' +
+              '<div class="eval-hist-optgroup-label">' + escapeHtml(g.label) + '</div>' +
+              (g.sideChips ? renderEvalGroupSideChipsHtml_(sec.id, g.label) : '') +
+            '</div>' +
             '<div class="eval-hist-chips">' + chips + '</div>' +
           '</div>';
         }).join('');
@@ -14068,15 +14506,15 @@
         var chips = (sec.options || []).map(function (opt) {
           return renderEvalHistChipBtn_(sec, opt);
         }).join('');
-        chipsHtml = '<div class="eval-hist-chips' + (sec.id === 'severity' ? ' eval-hist-chips--vas' : '') + '">' + chips + '</div>';
+        chipsHtml = '<div class="eval-hist-chips' + (/^severity(_p\d+)?$/.test(sec.id) ? ' eval-hist-chips--vas' : '') + '">' + chips + '</div>';
       }
       var dropdownHtml = sec.bodyDropdowns
-        ? renderBodyAreaDropdownsHtml_({
+        ? renderEvalBodyAreaSideChipsHtml_(sec.areaSecId) + renderBodyAreaDropdownsHtml_({
             prefix: 'eval',
             secId: sec.areaSecId,
             onChange: 'onEvalBodyAreaDropdown_(this)',
             getSelected: function () { return ''; },
-          }) + renderEvalBodyAreaSideChipsHtml_(sec.areaSecId)
+          })
         : '';
       var notesHtml = (sec.options || []).filter(function (opt) { return opt.note; }).map(function (opt) {
         return '<textarea class="eval-hist-note eval-hist-chip-note" rows="2" hidden' +
@@ -14111,15 +14549,21 @@
         );
       }
       var stepCls = grp.stepClass ? ' ' + grp.stepClass : '';
-      var hiddenCls = grp.alwaysVisible ? '' : ' eval-hist-hidden';
+      var hiddenCls = (grp.alwaysVisible || grp.extraPain) ? '' : ' eval-hist-hidden';
       var kindCls = grp.sectionKind ? ' eval-hist-section--' + grp.sectionKind : '';
+      var groupAttr = grp.extraPain
+        ? ' data-eval-extra-pain="' + escapeHtml(String(grp.painIndex)) + '"'
+        : ' data-eval-group="' + groupIndex + '"';
       var hd =
         '<span class="eval-hist-step' + stepCls + '">' + escapeHtml(String(grp.step || '▸')) + '</span>' +
         (grp.groupTag ? '<span class="eval-hist-group-tag">' + escapeHtml(grp.groupTag) + '</span>' : '') +
         (grp.title ? '<span class="eval-hist-title">' + escapeHtml(grp.title) + '</span>' : '') +
-        (grp.sub ? '<span class="eval-hist-sub">(' + escapeHtml(grp.sub) + ')</span>' : '');
+        (grp.sub ? '<span class="eval-hist-sub">(' + escapeHtml(grp.sub) + ')</span>' : '') +
+        (grp.extraPain
+          ? '<button type="button" class="eval-pain-remove-btn" onclick="removeEvalPainBlock_(' + grp.painIndex + ')">삭제</button>'
+          : '');
       return (
-        '<div class="eval-hist-section' + kindCls + hiddenCls + '" data-eval-group="' + groupIndex + '">' +
+        '<div class="eval-hist-section' + kindCls + hiddenCls + '"' + groupAttr + '>' +
           '<div class="eval-hist-section-hd">' + hd + '</div>' +
           (grp.items || []).map(renderEvalHistoryChipRow).join('') +
         '</div>'
@@ -14210,6 +14654,15 @@
       }
       var selected = [];
       ((section && section.items) || []).forEach(function (sec) {
+        if (sec.groups && sec.groups.length) {
+          sec.groups.forEach(function (g) {
+            evalChipSelectionsInGroup_(sec.id, g.label).forEach(function (val) {
+              var key = g.label + ' · ' + val;
+              if (selected.indexOf(key) < 0) selected.push(key);
+            });
+          });
+          return;
+        }
         evalChipSelectionsForSec(sec.id).forEach(function (val) {
           if (selected.indexOf(val) < 0) selected.push(val);
         });
@@ -14242,8 +14695,18 @@
       }
       root.innerHTML = selected.map(function (val) {
         var note = notes[val] || '';
+        var m = String(val).match(/^(.+?) · (.+)$/);
+        var label = val;
+        if (m) {
+          var ownerSec = ((section.items || []).find(function (it) {
+            return (it.groups || []).some(function (g) { return g.label === m[1]; });
+          }) || {}).id || '';
+          var side = ownerSec ? evalInspGroupSideLabel_(ownerSec, m[1]) : '';
+          label = m[1] + ' · ' + (side ? side + ' ' : '') + m[2];
+          if (!note) note = notes[m[2]] || '';
+        }
         return '<div class="eval-exam-detail-row">' +
-          '<div class="eval-exam-detail-label">' + escapeHtml(val) + '</div>' +
+          '<div class="eval-exam-detail-label">' + escapeHtml(label) + '</div>' +
           '<input type="text" class="eval-exam-detail-input" data-opt="' + escapeHtml(val) + '"' +
             ' placeholder="세부 사항" value="' + escapeHtml(note) + '">' +
         '</div>';
@@ -14252,12 +14715,16 @@
 
     function refreshEvalExamDetailsForSec_(secId) {
       evalExamBlocks_().forEach(function (block) {
-        var hit = (block.items || []).some(function (it) { return it.id === secId; });
+        var hit = (block.items || []).some(function (it) {
+          if (it.id === secId) return true;
+          return String(secId || '').indexOf(it.id + '_side_') === 0;
+        });
         if (hit) renderEvalExamDetails_(block);
       });
     }
 
     function clearEvalFormSelections_() {
+      resetEvalExtraPainBlocks_();
       document.querySelectorAll('.eval-hist-chip.on').forEach(function (el) { el.classList.remove('on'); });
       document.querySelectorAll('.eval-body-area-select').forEach(function (sel) {
         sel.value = '';
@@ -14282,14 +14749,65 @@
       updateEvalFormVisibility();
     }
 
+    function evalChipValMatches_(btnVal, itemVal) {
+      if (btnVal === itemVal) return true;
+      var aliases = {
+        'Lt': ['왼쪽', 'Lt'],
+        'Rt': ['오른쪽', 'Rt'],
+        '왼쪽': ['왼쪽', 'Lt'],
+        '오른쪽': ['오른쪽', 'Rt'],
+      };
+      var a = aliases[itemVal];
+      return !!(a && a.indexOf(btnVal) >= 0);
+    }
+
+    function normalizeEvalExamPrefill_(chipPrefill) {
+      var palpMap = {
+        '상부 등': '상부',
+        '견갑 사이': '견갑 안쪽',
+        '중부 등': '중부',
+        '하부 등': '하부',
+      };
+      var sideMap = {
+        'Lt 기울어짐': { val: '기울어짐', side: 'Lt', group: '목' },
+        'Rt 기울어짐': { val: '기울어짐', side: 'Rt', group: '목' },
+        'Lt 내려감': { val: '내려감', side: 'Lt', group: '어깨' },
+        'Rt 내려감': { val: '내려감', side: 'Rt', group: '어깨' },
+      };
+      var out = [];
+      (chipPrefill || []).forEach(function (item) {
+        if (!item || !item.sec || !item.val) return;
+        var val = item.val;
+        if (item.sec === 'palp_region' && palpMap[val]) val = palpMap[val];
+        var sm = (item.sec === 'insp_findings') ? sideMap[val] : null;
+        if (sm) {
+          out.push({ sec: item.sec, val: sm.group + ' · ' + sm.val });
+          out.push({ sec: evalInspGroupSideSecId_('insp_findings', sm.group), val: sm.side });
+          return;
+        }
+        out.push({ sec: item.sec, val: val, goalId: item.goalId });
+      });
+      return out;
+    }
+
     function applyEvalChipPrefill_(chipPrefill) {
       if (!chipPrefill || !chipPrefill.length) return 0;
+      chipPrefill = normalizeEvalExamPrefill_(chipPrefill);
       var applied = 0;
       chipPrefill.forEach(function (item) {
         if (!item || !item.sec || !item.val) return;
+        var want = item.val;
+        var wantGrp = item.group || '';
+        var parsed = String(want).match(/^(.+?) · (.+)$/);
+        if (parsed && !wantGrp) {
+          wantGrp = parsed[1];
+          want = parsed[2];
+        }
         document.querySelectorAll('.eval-hist-chip[data-sec="' + item.sec + '"]').forEach(function (btn) {
           var val = btn.dataset.val || btn.textContent.trim();
-          if (val !== item.val) return;
+          var grp = btn.getAttribute('data-opt-group') || '';
+          if (wantGrp && grp && grp !== wantGrp) return;
+          if (!evalChipValMatches_(val, want)) return;
           if (item.goalId && btn.dataset.goalId && btn.dataset.goalId !== item.goalId) return;
           if (!btn.classList.contains('on')) {
             btn.classList.add('on');
@@ -14398,7 +14916,12 @@
     function renderEvalHistoryForm() {
       var root = document.getElementById('evalHistoryForm');
       if (!root) return;
-      root.innerHTML = EVAL_HISTORY_GROUPS.map(renderEvalHistoryGroupSection).join('');
+      root.innerHTML = EVAL_HISTORY_GROUPS.map(renderEvalHistoryGroupSection).join('') +
+        '<div id="evalExtraPainBlocks"></div>' +
+        '<div class="eval-add-pain-wrap eval-hist-hidden" id="evalAddPainWrap">' +
+          '<button type="button" class="eval-add-pain-btn" onclick="addEvalPainBlock_()">통증 추가</button>' +
+        '</div>';
+      renderEvalExtraPainBlocks_();
       renderEvalExamBlock(EVAL_INSPECTION_SECTION, 'evalInspectionForm');
       renderEvalExamBlock(EVAL_MOVEMENT_SECTION, 'evalMovementForm');
       renderEvalExamBlock(EVAL_PALPATION_SECTION, 'evalPalpationForm');
@@ -14410,7 +14933,7 @@
       var secId = btn.dataset.sec;
       var sec = getEvalHistoryChipSections().find(function (s) { return s.id === secId; });
       var grpItem = null;
-      EVAL_HISTORY_GROUPS.forEach(function (g) {
+      evalAllHistoryGroups_().forEach(function (g) {
         (g.items || []).forEach(function (it) { if (it.id === secId) grpItem = it; });
       });
       if (!grpItem) {
@@ -14484,7 +15007,7 @@
     function compileEvalHistoryText() {
       var goalIds = getSelectedEvalGoalIds();
       var lines = [];
-      EVAL_HISTORY_GROUPS.forEach(function (grp) {
+      evalAllHistoryGroups_().forEach(function (grp) {
         if (grp.isMemo) return;
         if (!evalGroupShouldShow(grp, goalIds)) return;
         var rows = [];
@@ -14555,11 +15078,12 @@
         var selectedAll = evalChipSelectionsForSec(sec.id);
         if (sec.groups && sec.groups.length) {
           sec.groups.forEach(function (g) {
-            var selected = selectedAll.filter(function (val) {
-              return (g.options || []).indexOf(val) >= 0;
-            }).map(function (val) {
-              var note = String(notes[val] || '').trim();
-              return note ? val + ' (' + note + ')' : val;
+            var side = evalInspGroupSideLabel_(sec.id, g.label);
+            var selected = evalChipSelectionsInGroup_(sec.id, g.label).map(function (val) {
+              var noteKey = g.label + ' · ' + val;
+              var note = String(notes[noteKey] || notes[val] || '').trim();
+              var text = note ? val + ' (' + note + ')' : val;
+              return side ? side + ' ' + text : text;
             });
             if (!selected.length) return;
             lines.push(g.label + ': ' + selected.join(' / '));
@@ -14878,7 +15402,12 @@
       var examChips = {};
       evalExamBlocks_().forEach(function (block) {
         (block.items || []).forEach(function (sec) {
-          examChips[sec.id] = evalChipSelectionsForSec(sec.id);
+          examChips[sec.id] = evalGroupedChipSaveVals_(sec);
+          (sec.groups || []).forEach(function (g) {
+            if (!g.sideChips) return;
+            var sid = evalInspGroupSideSecId_(sec.id, g.label);
+            examChips[sid] = evalChipSelectionsForSec(sid);
+          });
         });
       });
       return {
@@ -14906,6 +15435,8 @@
 
     function applyEvalFormSnapshot_(snap) {
       if (!snap) return;
+      ensureEvalExtraPainGroupsFromState_(snap.historyState);
+      renderEvalExtraPainBlocks_();
       var prefill = [];
       function addSec(map) {
         if (!map) return;
