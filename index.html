@@ -62,7 +62,19 @@
     .page-hd-btn:active { transform:scale(.98); }
     .page-hd-btn--refresh {
       flex:0 0 auto;
+      gap:4px;
     }
+    .page-hd-refresh-ico {
+      width:14px; height:14px; flex:0 0 auto; display:block;
+    }
+    .page-hd-refresh-label { font-variant-numeric:tabular-nums; }
+    .page-hd-btn--refresh.is-loading .page-hd-refresh-ico {
+      animation:page-hd-refresh-spin .8s linear infinite;
+    }
+    .page-hd-btn--refresh.is-loading .page-hd-refresh-label {
+      min-width:6.4em; text-align:center;
+    }
+    @keyframes page-hd-refresh-spin { to { transform:rotate(360deg); } }
     .page-hd-btn--eval {
       background:rgba(255,255,255,.22);
       border-color:rgba(255,255,255,.4);
@@ -89,6 +101,8 @@
       .page-hd-side { gap:4px; }
       .page-hd-actions { gap:3px; flex-wrap:nowrap; max-width:100%; }
       .page-hd-btn { font-size:10px; padding:5px 6px; }
+      .page-hd-refresh-ico { width:13px; height:13px; }
+      .page-hd-btn--refresh.is-loading { font-size:9px; padding:5px 6px; }
       .page-hd-link { font-size:10px; }
     }
     @media (max-width:380px) {
@@ -2405,7 +2419,15 @@
           <button type="button" class="page-hd-btn" onclick="openApplicationForm_(event)">회원등록</button>
           <button type="button" class="page-hd-btn page-hd-btn--eval" onclick="openEvalModal()">초회평가</button>
           <button type="button" class="page-hd-btn" onclick="sendWellnessIntakeSms_()">사전평가</button>
-          <button type="button" class="page-hd-btn page-hd-btn--refresh" onclick="loadBoard({forceRefresh:true})" title="새로고침" aria-label="새로고침">새로고침</button>
+          <button type="button" class="page-hd-btn page-hd-btn--refresh" id="boardRefreshBtn" onclick="loadBoard({forceRefresh:true})" title="새로고침" aria-label="새로고침">
+            <svg class="page-hd-refresh-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 2v6h-6"></path>
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+              <path d="M3 22v-6h6"></path>
+              <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+            </svg>
+            <span class="page-hd-refresh-label" id="boardRefreshLabel">새로고침</span>
+          </button>
         </div>
       </div>
     </div>
@@ -7676,6 +7698,8 @@
     }
 
     var _attendResultScrollTimer = null;
+    var _attendCountdownScrollBound = false;
+    var _attendCountdownScrollRaf = 0;
 
     function scrollToMemberSection() {
       if (_attendResultScrollTimer) {
@@ -7687,7 +7711,7 @@
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    /** 출석 결과·처리 중 패널이 화면 상단에 오도록 스크롤 (최초 진입 시에만 호출) */
+    /** 출석 결과 패널이 화면 상단에 오도록 스크롤 (결과 화면 최초 진입 시에만 호출) */
     function scrollToAttendResultTop() {
       if (_attendResultScrollTimer) clearTimeout(_attendResultScrollTimer);
       _attendResultScrollTimer = window.setTimeout(function() {
@@ -7698,6 +7722,54 @@
         if (!target) return;
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
+    }
+
+    /** 출석 카운트다운 막대를 현재 화면 높이에 맞춰 화면 하단에 붙인다 */
+    function scrollAttendCountdownToViewportBottom_(smooth) {
+      var bar = document.getElementById('sessionAttendCountdownBar');
+      if (!bar || bar.hidden) return;
+      var spacer = document.getElementById('attendScrollSpacer');
+      if (spacer) spacer.style.height = '0px';
+      var gap = 16;
+      var viewH = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+      var rect = bar.getBoundingClientRect();
+      var delta = (rect.height + gap * 2 >= viewH)
+        ? (rect.top - gap)
+        : (rect.bottom - (viewH - gap));
+      if (delta > 1) {
+        var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        var room = maxScroll - window.scrollY;
+        if (delta > room + 1) {
+          if (!spacer) {
+            spacer = document.createElement('div');
+            spacer.id = 'attendScrollSpacer';
+            spacer.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(spacer);
+          }
+          spacer.style.height = Math.ceil(delta - room + 2) + 'px';
+        }
+      }
+      if (Math.abs(delta) < 2) return;
+      window.scrollBy({ top: delta, behavior: smooth === false ? 'auto' : 'smooth' });
+    }
+
+    function onAttendCountdownViewportChange_() {
+      if (!state.attendProcessing) return;
+      if (_attendCountdownScrollRaf) return;
+      _attendCountdownScrollRaf = requestAnimationFrame(function() {
+        _attendCountdownScrollRaf = 0;
+        if (!state.attendProcessing) return;
+        scrollAttendCountdownToViewportBottom_(false);
+      });
+    }
+
+    function bindAttendCountdownViewportWatch_() {
+      if (_attendCountdownScrollBound) return;
+      _attendCountdownScrollBound = true;
+      window.addEventListener('resize', onAttendCountdownViewportChange_);
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', onAttendCountdownViewportChange_);
+      }
     }
 
     function buildBasicAttendAlimtalkPreviewText_(m, data) {
@@ -8496,17 +8568,34 @@
         clearInterval(_loadCountdownTimer);
         _loadCountdownTimer = null;
       }
+      resetRefreshButtonCountdown_();
     }
 
-    function paintBoardDateLineUpdating_(left) {
-      var dl = document.getElementById('dateLine');
-      if (!dl || !state.board) return;
-      var base = boardDateLineText_(state.board, boardDateYmd_(), state.boardFromCache ? '저장된 목록' : '');
+    /** 새로고침 버튼 — 아이콘은 유지하고 예상 대기만 카운트다운 */
+    function paintRefreshButtonCountdown_(left) {
+      var btn = document.getElementById('boardRefreshBtn');
+      var label = document.getElementById('boardRefreshLabel');
+      if (!btn || !label) return;
+      btn.classList.add('is-loading');
       if (left < 0) {
-        dl.textContent = base + ' · 서버 응답이 늦습니다';
-      } else {
-        dl.textContent = base + ' · 갱신 중 ' + left + '초';
+        label.textContent = '지연 중';
+        btn.title = '새로고침 지연 중';
+        btn.setAttribute('aria-label', '새로고침 지연 중');
+        return;
       }
+      label.textContent = '예상 ' + left + '초';
+      btn.title = '새로고침 중 · 예상 ' + left + '초';
+      btn.setAttribute('aria-label', '새로고침 중, 예상 ' + left + '초');
+    }
+
+    function resetRefreshButtonCountdown_() {
+      var btn = document.getElementById('boardRefreshBtn');
+      var label = document.getElementById('boardRefreshLabel');
+      if (!btn || !label) return;
+      btn.classList.remove('is-loading');
+      label.textContent = '새로고침';
+      btn.title = '새로고침';
+      btn.setAttribute('aria-label', '새로고침');
     }
 
     /** 백그라운드 탭에서도 경과 시간 기준으로 카운트다운 표시 */
@@ -8514,10 +8603,8 @@
       if (!_loadCountdownActive || !_loadCountdownStartedAt) return;
       var elapsed = Math.floor((Date.now() - _loadCountdownStartedAt) / 1000);
       var left = BOARD_LOAD_ESTIMATE_SEC - elapsed;
-      if (_loadCountdownKeepChips) {
-        paintBoardDateLineUpdating_(left);
-        return;
-      }
+      paintRefreshButtonCountdown_(left);
+      if (_loadCountdownKeepChips) return;
       if (left < 0) {
         setMemberChipsMessage('불러오는 중… 시간이 길어지고 있습니다. 잠시만 기다려 주세요', null, { retry: true });
         return;
@@ -13313,9 +13400,12 @@
 
     function hideAttendCountdownBar_() {
       var bar = document.getElementById('sessionAttendCountdownBar');
-      if (!bar) return;
-      bar.hidden = true;
-      bar.innerHTML = '';
+      if (bar) {
+        bar.hidden = true;
+        bar.innerHTML = '';
+      }
+      var spacer = document.getElementById('attendScrollSpacer');
+      if (spacer) spacer.style.height = '0px';
     }
 
     function stopAttendProcessingCountdown() {
@@ -13383,10 +13473,8 @@
         state.inlineAttendResult = null;
         renderSessionAlimtalkSection();
         startAttendProcessingCountdown_();
-        var panel =
-          document.getElementById('sessionAlimtalkSection') ||
-          document.getElementById('sessionAttendCountdownBar');
-        if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        bindAttendCountdownViewportWatch_();
+        scrollAttendCountdownToViewportBottom_(true);
       } else {
         renderSessionAlimtalkSection();
         tickAttendProcessingCountdown_();
