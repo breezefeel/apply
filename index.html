@@ -2347,6 +2347,14 @@
     .alimtalk-preview.is-result-mode {
       background:transparent; color:inherit; padding:0;
     }
+    /* 출석 결과·다음 예약이 나중에 높이가 바뀌어도 브라우저가 스크롤을 다시 맞추지 않음 */
+    #sessionAlimtalkSection,
+    #sessionAlimtalkSection *,
+    #nextBookingPanel,
+    #nextBookingPanel *,
+    #sessionAttendCountdownBar {
+      overflow-anchor: none;
+    }
     .session-attend-result-title {
       font-size:15px; font-weight:800; color:var(--blue);
       margin:0 0 10px; line-height:1.35;
@@ -7736,28 +7744,100 @@
     var _attendResultScrollTimer = null;
     var _attendCountdownScrollBound = false;
     var _attendCountdownScrollRaf = 0;
+    /** 출석 완료 버튼으로 처리가 시작된 뒤에만 켜고, 스크롤을 예약한 순간 끈다. */
+    var _attendNextBookingScrollArmed = false;
 
     function scrollToMemberSection() {
-      if (_attendResultScrollTimer) {
-        clearTimeout(_attendResultScrollTimer);
-        _attendResultScrollTimer = null;
-      }
+      cancelAttendNextBookingScroll_();
       var chips = document.getElementById('memberChips');
       var target = chips ? chips.closest('.card') : document.querySelector('main .card');
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    /** 출석 결과 패널이 화면 상단에 오도록 스크롤 (결과 화면 최초 진입 시에만 호출) */
-    function scrollToAttendResultTop() {
-      if (_attendResultScrollTimer) clearTimeout(_attendResultScrollTimer);
+    function armAttendNextBookingScrollOnce_() {
+      _attendNextBookingScrollArmed = true;
+    }
+
+    var _attendNextBookingScrollUnlisten = null;
+
+    function cancelAttendNextBookingScroll_() {
+      _attendNextBookingScrollArmed = false;
+      if (_attendResultScrollTimer) {
+        clearTimeout(_attendResultScrollTimer);
+        _attendResultScrollTimer = null;
+      }
+      if (_attendNextBookingScrollUnlisten) {
+        _attendNextBookingScrollUnlisten();
+        _attendNextBookingScrollUnlisten = null;
+      }
+    }
+
+    /** 「다음 예약」 날짜 블록의 바닥이 보이는 화면 하단에 오도록 한 번 이동 */
+    function scrollNextBookingBlockToViewportBottom_() {
+      var panel = document.getElementById('nextBookingPanel');
+      var target = document.getElementById('nextBookingExisting');
+      if (!panel || panel.hidden || !target || target.hidden) return;
+      var gap = 12;
+      var vv = window.visualViewport;
+      var viewH = (vv && vv.height) || window.innerHeight;
+      var rect = target.getBoundingClientRect();
+      var delta = (rect.height + gap * 2 >= viewH)
+        ? (rect.top - gap)
+        : (rect.bottom - (viewH - gap));
+      if (delta > 1) {
+        var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        var room = maxScroll - window.scrollY;
+        if (delta > room + 1) {
+          var spacer = document.getElementById('attendScrollSpacer');
+          if (!spacer) {
+            spacer = document.createElement('div');
+            spacer.id = 'attendScrollSpacer';
+            spacer.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(spacer);
+          }
+          var extra = Math.ceil(delta - room + 2);
+          var cur = parseFloat(spacer.style.height) || 0;
+          spacer.style.height = Math.ceil(cur + extra) + 'px';
+          rect = target.getBoundingClientRect();
+          delta = (rect.height + gap * 2 >= viewH)
+            ? (rect.top - gap)
+            : (rect.bottom - (viewH - gap));
+        }
+      }
+      if (Math.abs(delta) < 2) return;
+      window.scrollBy({ top: delta, behavior: 'smooth' });
+    }
+
+    /**
+     * 출석 완료 직후 한 번만 예약. 이미 예약됐거나 버튼으로 시작하지 않았으면 아무것도 하지 않는다.
+     * 타이머를 다시 걸지 않아, 이후 결과 갱신이 스크롤을 되돌리거나 반복하지 않는다.
+     */
+    function scheduleAttendNextBookingScrollOnce_() {
+      if (!_attendNextBookingScrollArmed) return;
+      if (_attendResultScrollTimer) return;
+      _attendNextBookingScrollArmed = false;
+      var onUserScroll = function() {
+        cancelAttendNextBookingScroll_();
+      };
+      window.addEventListener('wheel', onUserScroll, { capture: true, passive: true });
+      window.addEventListener('touchmove', onUserScroll, { capture: true, passive: true });
+      _attendNextBookingScrollUnlisten = function() {
+        window.removeEventListener('wheel', onUserScroll, true);
+        window.removeEventListener('touchmove', onUserScroll, true);
+      };
       _attendResultScrollTimer = window.setTimeout(function() {
         _attendResultScrollTimer = null;
-        var target =
-          document.getElementById('sessionAttendResultInline') ||
-          document.getElementById('sessionAlimtalkSection');
-        if (!target) return;
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
+        if (_attendNextBookingScrollUnlisten) {
+          _attendNextBookingScrollUnlisten();
+          _attendNextBookingScrollUnlisten = null;
+        }
+        if (state.attendProcessing) return;
+        var result = state.inlineAttendResult;
+        if (!result || result.memberKey !== state.selectedKey) return;
+        var title = String(result.title || '');
+        if (title.indexOf('완료') < 0) return;
+        scrollNextBookingBlockToViewportBottom_();
+      }, 180);
     }
 
     /** 출석 카운트다운 막대를 현재 화면 높이에 맞춰 화면 중앙에 둔다 */
@@ -7878,9 +7958,7 @@
       var isProcessing = !!state.attendProcessing;
       var result = state.inlineAttendResult;
       var showResult = result && result.memberKey === state.selectedKey;
-      // 이미 결과 화면인데 폴링·스케줄 동기화로 다시 그리면 스크롤하지 않음
-      var enteringResultMode = showResult && !section.classList.contains('is-result-mode');
-
+      // 결과 문구가 나중에 바뀌어도 여기서는 스크롤하지 않는다.
       section.classList.toggle('is-result-mode', showResult);
 
       var outcomeEl = document.getElementById('sessionAttendOutcomePreview');
@@ -7926,7 +8004,6 @@
             : '';
           document.getElementById('sessionAttendResultBody').innerHTML = resultTitleHtml + (result.html || '');
         }
-        if (enteringResultMode) scrollToAttendResultTop();
         return;
       }
 
@@ -13403,6 +13480,7 @@
     }
 
     function cancelAttendProcessing_() {
+      cancelAttendNextBookingScroll_();
       _attendRequestGen += 1;
       _attendFlowStartedAt = 0;
       releaseCompleteSessionInFlight_();
@@ -13561,6 +13639,7 @@
         if (mk === state.selectedKey) state.inlineAttendResult = failResult;
         saveMemberAttendResult_(mk, failResult);
         renderSessionAlimtalkSection();
+        cancelAttendNextBookingScroll_();
         return;
       }
 
@@ -13583,6 +13662,8 @@
       if (mk === state.selectedKey) state.inlineAttendResult = okResult;
       saveMemberAttendResult_(mk, okResult);
       renderSessionAlimtalkSection();
+      if (data.completed) scheduleAttendNextBookingScrollOnce_();
+      else cancelAttendNextBookingScroll_();
       if (showAlimtalkUi) {
         startAttendAlimtalkPoll_(m, data, opts);
       }
@@ -13620,6 +13701,7 @@
           return;
         }
         _completeSessionInFlight = true;
+        armAttendNextBookingScrollOnce_();
       }
       var myGen = ++_attendRequestGen;
       state.attendRecoverAttempt = recoverAttempt;
