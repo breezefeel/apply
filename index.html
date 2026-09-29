@@ -2987,7 +2987,9 @@
 
     /** Lying Passive Stretching — ① 하체 → ② 상체 순 */
     function p1ItemOrder_(item) {
-      var m = String(item && item.label || '').match(/^[①②③④⑤]/);
+      var label = String(item && item.label || '');
+      if (label.charAt(0) === '*') return 5;
+      var m = label.match(/^[①②③④⑤]/);
       var order = { '①': 1, '②': 2, '③': 3, '④': 4, '⑤': 5 };
       return m ? (order[m[0]] || 99) : 99;
     }
@@ -3091,7 +3093,7 @@
       { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'① Supine · 하체', linkUrl:SELF_GUIDE_PAGE+'#p_supine_lower', coachingNote:'준비: 오늘 누워서 하체를 풀어 준 동작입니다. 사진으로 장면을 확인하고, 디테일은 영상으로.\n동작: 발 → 발목 → 무릎 → 고관절. 영상이 3편입니다.\n포인트: 억지로 늘리지 마세요. 센터에서 받은 각도만.\n주의: 찌릿함·날카로운 통증이 있으면 중단하고 다음 수업에 말씀하세요.' },
       { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'④ Prone · 상체', linkUrl:SELF_GUIDE_PAGE+'#p_prone_upper', coachingNote:'준비: 오늘 엎드려 상체를 풀어 준 동작입니다.\n동작: 손가락 → 손목 → 팔꿈치 → 어깨 → 척추.\n포인트: 척추는 한 번에 꺾지 말고, 센터에서 받은 범위만.\n주의: 찌릿하면 멈추세요.' },
       { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'③ Prone · 하체', linkUrl:SELF_GUIDE_PAGE+'#p_prone_lower', coachingNote:'준비: 오늘 엎드려 하체를 풀어 준 동작입니다.\n동작: 발가락 → 발목 → 무릎 → 고관절.\n포인트: 얼굴·목을 편하게. 허리에 힘을 주지 마세요.\n주의: 찌릿하면 멈추세요.' },
-      { id:'p1_special_care', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'⑤ Special Care', omitFromAlimtalk: true },
+      { id:'p1_special_care', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'* Special Care', omitFromAlimtalk: true },
       { id:'p1_fl_ue_flex', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'상지 Flexion', alimtalkLabel:'Force Line · 상지 Flexion' },
       { id:'p1_fl_ue_ext', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'상지 Extension', alimtalkLabel:'Force Line · 상지 Extension' },
       { id:'p1_fl_ue_rot', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'상지 Rotation', alimtalkLabel:'Force Line · 상지 Rotation' },
@@ -7758,8 +7760,8 @@
       }, 100);
     }
 
-    /** 출석 카운트다운 막대를 현재 화면 높이에 맞춰 화면 하단에 붙인다 */
-    function scrollAttendCountdownToViewportBottom_(smooth) {
+    /** 출석 카운트다운 막대를 현재 화면 높이에 맞춰 화면 중앙에 둔다 */
+    function scrollAttendCountdownToViewportCenter_(smooth) {
       var bar = document.getElementById('sessionAttendCountdownBar');
       if (!bar || bar.hidden) return;
       var spacer = document.getElementById('attendScrollSpacer');
@@ -7769,7 +7771,7 @@
       var rect = bar.getBoundingClientRect();
       var delta = (rect.height + gap * 2 >= viewH)
         ? (rect.top - gap)
-        : (rect.bottom - (viewH - gap));
+        : (rect.top + rect.height / 2 - viewH / 2);
       if (delta > 1) {
         var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
         var room = maxScroll - window.scrollY;
@@ -7793,7 +7795,7 @@
       _attendCountdownScrollRaf = requestAnimationFrame(function() {
         _attendCountdownScrollRaf = 0;
         if (!state.attendProcessing) return;
-        scrollAttendCountdownToViewportBottom_(false);
+        scrollAttendCountdownToViewportCenter_(false);
       });
     }
 
@@ -11198,11 +11200,33 @@
       renderProgramList();
     }
 
-    /** 그룹 전체선택 체크 상태 — 오늘 진도 기준 */
+    function isSelectAllExcludedItem_(item) {
+      return !!(item && (item.omitFromAlimtalk || item.id === 'p1_special_care'));
+    }
+
+    function selectableGroupItems_(items) {
+      return (items || []).filter(function(item) { return !isSelectAllExcludedItem_(item); });
+    }
+
+    /** 전체 선택 후에도 해당 묶음은 접지 않고 펼친 채로 둔다 */
+    function keepExpandedAfterSelectAll_(secKey, items) {
+      var subKey = items && items[0] ? movementSubCategory(items[0]) : '';
+      if (subKey && positionHasSubCategories(secKey)) {
+        var k = collapsibleSubKey(secKey, subKey);
+        state.sectionCollapsedTouched[k] = true;
+        state.sectionCollapsed[k] = false;
+        return;
+      }
+      state.sectionCollapsedTouched[secKey] = true;
+      state.sectionCollapsed[secKey] = false;
+    }
+
+    /** 그룹 전체선택 체크 상태 — 오늘 진도 기준. Special Care는 전체 선택에서 제외 */
     function groupTodayStats_(items) {
-      var total = (items || []).length;
+      items = selectableGroupItems_(items);
+      var total = items.length;
       var todayCount = 0;
-      (items || []).forEach(function(item) {
+      items.forEach(function(item) {
         if (state.todayProgress[item.id]) todayCount++;
       });
       return {
@@ -11275,8 +11299,10 @@
         cb.checked = false;
         return;
       }
-      toggleItemsToday_(subSectionItems(secKey, subKey), !!cb.checked);
+      var subItems = selectableGroupItems_(subSectionItems(secKey, subKey));
+      toggleItemsToday_(subItems, !!cb.checked);
       refreshSectionCollapseDefaults();
+      if (cb.checked) keepExpandedAfterSelectAll_(secKey, subItems);
       renderProgramList();
       renderSessionWrapPanel();
       updateSendBar();
@@ -11288,11 +11314,12 @@
         cb.checked = false;
         return;
       }
-      var items = sectionItems(secKey).filter(function(p) {
+      var items = selectableGroupItems_(sectionItems(secKey).filter(function(p) {
         return String(p.program || '') === String(progName || '');
-      });
+      }));
       toggleItemsToday_(items, !!cb.checked);
       refreshSectionCollapseDefaults();
+      if (cb.checked) keepExpandedAfterSelectAll_(secKey, items);
       renderProgramList();
       renderSessionWrapPanel();
       updateSendBar();
@@ -13508,7 +13535,7 @@
         renderSessionAlimtalkSection();
         startAttendProcessingCountdown_();
         bindAttendCountdownViewportWatch_();
-        scrollAttendCountdownToViewportBottom_(true);
+        scrollAttendCountdownToViewportCenter_(true);
       } else {
         renderSessionAlimtalkSection();
         tickAttendProcessingCountdown_();
