@@ -86,7 +86,8 @@
       border-color:rgba(255,255,255,.4);
     }
     .page-hd-links {
-      display:flex; gap:10px; margin-top:0; flex-wrap:nowrap; justify-content:flex-end; align-items:center;
+      display:flex; gap:10px; margin-top:0; flex-wrap:wrap; justify-content:flex-end; align-items:center;
+      row-gap:2px;
     }
     .page-hd-links-gap {
       width:14px; flex:0 0 14px; height:1px;
@@ -98,6 +99,34 @@
       cursor:pointer; font-family:inherit; line-height:1.2;
     }
     .page-hd-link:hover { color:#fff; }
+    .page-hd-link:disabled { opacity:.55; cursor:default; }
+    .unbooked-modal { max-width:560px; }
+    .unbooked-summary {
+      font-size:12px; line-height:1.45; color:var(--dim); margin:0 0 10px;
+    }
+    .unbooked-list { display:flex; flex-direction:column; gap:8px; }
+    .unbooked-card {
+      border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:#fff;
+    }
+    .unbooked-card.is-gap { background:#fffbeb; border-color:#fcd34d; }
+    .unbooked-card.is-over { background:#fef2f2; border-color:#fecaca; }
+    .unbooked-card-top {
+      display:flex; justify-content:space-between; gap:8px; align-items:baseline;
+    }
+    .unbooked-card-top strong { font-size:14px; font-weight:800; }
+    .unbooked-phone { font-size:12px; color:var(--dim); font-weight:600; white-space:nowrap; }
+    .unbooked-nums {
+      display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px; margin-top:8px;
+    }
+    .unbooked-nums div {
+      background:#f8fafc; border-radius:8px; padding:6px 8px; text-align:center;
+    }
+    .unbooked-card.is-gap .unbooked-nums div { background:rgba(255,255,255,.72); }
+    .unbooked-nums dt { font-size:10px; color:var(--dim); font-weight:700; }
+    .unbooked-nums dd { font-size:16px; font-weight:800; margin:0; color:var(--text); }
+    .unbooked-last { margin:8px 0 0; font-size:12px; font-weight:700; color:#92400e; }
+    .unbooked-empty { font-size:13px; color:var(--dim); padding:12px 2px; line-height:1.5; }
+    .unbooked-empty .ch-countdown { display:block; margin-top:4px; font-weight:800; color:var(--blue); }
     a.page-hd-btn { text-decoration:none; }
     @media (max-width:520px) {
       .page-hd { padding:10px 10px 10px; }
@@ -2428,6 +2457,7 @@
       </div>
       <div class="page-hd-side">
         <div class="page-hd-links">
+          <button type="button" class="page-hd-link" id="unbookedCheckBtn" onclick="openUnbookedCheck_()">미예약 확인</button>
           <a class="page-hd-link" href="영수증.html" onclick="openMemberCare_(event)">관리지원</a>
           <a class="page-hd-link" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer">컨텐츠</a>
           <a class="page-hd-link" href="#" onclick="openMemberScheduleSheet_(event)" title="보드 날짜의 월 스케줄표로 이동">예약 스케줄</a>
@@ -2630,6 +2660,18 @@
       <p id="instructorBuildBadge" class="session-build-badge" aria-hidden="true"></p>
     </section>
   </main>
+
+  <!-- 미예약 확인 -->
+  <div class="modal-overlay" id="unbookedCheckModal" onclick="if(event.target===this)closeUnbookedCheck_()">
+    <div class="modal unbooked-modal" role="dialog" aria-labelledby="unbookedCheckTitle">
+      <div class="modal-hd">
+        <h2 id="unbookedCheckTitle">미예약 확인</h2>
+        <button type="button" class="modal-close" onclick="closeUnbookedCheck_()" aria-label="닫기">×</button>
+      </div>
+      <p class="unbooked-summary" id="unbookedCheckSummary">남은 횟수가 있는 회원의 예약과 비교합니다.</p>
+      <div id="unbookedCheckBody"><p class="unbooked-empty">확인하는 중…</p></div>
+    </div>
+  </div>
 
   <!-- 초회 평가 모달 -->
   <div class="modal-overlay" id="evalModal">
@@ -13951,6 +13993,140 @@
       if (careDur) params.set('careDuration', careDur);
 
       return params;
+    }
+
+    var UNBOOKED_CHECK_EST_SEC = 40;
+    var _unbookedCheckTimer = null;
+    var _unbookedCheckLeft = 0;
+    var _unbookedCheckGen = 0;
+    var _unbookedCheckReq = 0;
+
+    function stopUnbookedCheckCountdown_() {
+      _unbookedCheckGen += 1;
+      if (_unbookedCheckTimer) {
+        clearInterval(_unbookedCheckTimer);
+        _unbookedCheckTimer = null;
+      }
+      _unbookedCheckLeft = 0;
+    }
+
+    function paintUnbookedCheckCountdown_() {
+      var summary = document.getElementById('unbookedCheckSummary');
+      var body = document.getElementById('unbookedCheckBody');
+      var btn = document.getElementById('unbookedCheckBtn');
+      var est = UNBOOKED_CHECK_EST_SEC;
+      var left = _unbookedCheckLeft;
+      var wait = left > 0
+        ? ('예상 ' + est + '초 · ' + left + '초 남음')
+        : ('예상 ' + est + '초 · 조금 더 걸리고 있어요');
+      if (summary) summary.textContent = '회원정보와 스케줄표를 비교하는 중입니다. (' + wait + ')';
+      if (body) {
+        body.innerHTML = '<p class="unbooked-empty" aria-live="polite">확인하는 중… <span class="ch-countdown">' +
+          wait + '</span></p>';
+      }
+      if (btn) btn.textContent = left > 0 ? ('확인 중 ' + left + '초') : '확인 중…';
+    }
+
+    function startUnbookedCheckCountdown_() {
+      stopUnbookedCheckCountdown_();
+      var gen = _unbookedCheckGen;
+      _unbookedCheckLeft = UNBOOKED_CHECK_EST_SEC;
+      paintUnbookedCheckCountdown_();
+      _unbookedCheckTimer = setInterval(function() {
+        if (gen !== _unbookedCheckGen) return;
+        if (_unbookedCheckLeft > 0) _unbookedCheckLeft -= 1;
+        paintUnbookedCheckCountdown_();
+      }, 1000);
+    }
+
+    function closeUnbookedCheck_() {
+      stopUnbookedCheckCountdown_();
+      var overlay = document.getElementById('unbookedCheckModal');
+      if (overlay) overlay.classList.remove('open');
+      var btn = document.getElementById('unbookedCheckBtn');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '미예약 확인';
+      }
+    }
+
+    function formatUnbookedCount_(n) {
+      var v = parseInt(n, 10);
+      if (isNaN(v)) return '—';
+      return String(v);
+    }
+
+    function renderUnbookedCheckList_(data) {
+      var summary = document.getElementById('unbookedCheckSummary');
+      var body = document.getElementById('unbookedCheckBody');
+      if (!body) return;
+      var rows = (data && data.rows) || [];
+      var gapN = 0;
+      rows.forEach(function(row) {
+        if ((parseInt(row.unbooked, 10) || 0) > 0) gapN += 1;
+      });
+      if (summary) {
+        summary.textContent = rows.length
+          ? '남은 횟수 있는 회원 ' + rows.length + '명 · 아직 예약이 부족한 회원 ' + gapN + '명. 예약횟수는 오늘부터 출석 체크 전인 예약입니다.'
+          : '남은 횟수가 있는 회원이 없습니다.';
+      }
+      if (!rows.length) {
+        body.innerHTML = '<p class="unbooked-empty">남은 횟수가 있는 회원이 없습니다.</p>';
+        return;
+      }
+      body.innerHTML = '<div class="unbooked-list">' + rows.map(function(row) {
+        var unbooked = parseInt(row.unbooked, 10) || 0;
+        var cls = unbooked > 0 ? ' is-gap' : (unbooked < 0 ? ' is-over' : '');
+        var last = '';
+        if (unbooked > 0) {
+          last = '<p class="unbooked-last">마지막 예약일 ' +
+            escapeHtml(row.lastDateLabel || '없음') + '</p>';
+        }
+        return '<article class="unbooked-card' + cls + '">' +
+          '<div class="unbooked-card-top"><strong>' + escapeHtml(row.name || '—') + '</strong>' +
+          '<span class="unbooked-phone">' + escapeHtml(row.phone || '—') + '</span></div>' +
+          '<dl class="unbooked-nums">' +
+          '<div><dt>남은횟수</dt><dd>' + formatUnbookedCount_(row.remain) + '</dd></div>' +
+          '<div><dt>예약횟수</dt><dd>' + formatUnbookedCount_(row.reserved) + '</dd></div>' +
+          '<div><dt>예약되지 않은 횟수</dt><dd>' + formatUnbookedCount_(row.unbooked) + '</dd></div>' +
+          '</dl>' + last + '</article>';
+      }).join('') + '</div>';
+    }
+
+    async function openUnbookedCheck_() {
+      var overlay = document.getElementById('unbookedCheckModal');
+      var body = document.getElementById('unbookedCheckBody');
+      var summary = document.getElementById('unbookedCheckSummary');
+      var btn = document.getElementById('unbookedCheckBtn');
+      if (!overlay || !body) return;
+      var req = ++_unbookedCheckReq;
+      overlay.classList.add('open');
+      if (btn) btn.disabled = true;
+      startUnbookedCheckCountdown_();
+      try {
+        var data = await api({ action: 'instructorUnbookedRemain' }, { timeoutMs: 90000 });
+        if (req !== _unbookedCheckReq) return;
+        stopUnbookedCheckCountdown_();
+        if (!data || !data.ok) {
+          var msg = (data && data.message) || '목록을 불러오지 못했습니다.';
+          if (summary) summary.textContent = msg;
+          body.innerHTML = '<p class="unbooked-empty">' + escapeHtml(msg) + '</p>';
+          return;
+        }
+        renderUnbookedCheckList_(data);
+      } catch (err) {
+        if (req !== _unbookedCheckReq) return;
+        stopUnbookedCheckCountdown_();
+        var fail = '목록을 불러오지 못했습니다.';
+        if (summary) summary.textContent = fail;
+        body.innerHTML = '<p class="unbooked-empty">' + escapeHtml(fail) + '</p>';
+      } finally {
+        if (req !== _unbookedCheckReq) return;
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '미예약 확인';
+        }
+      }
     }
 
     function openMemberCare_(ev) {
