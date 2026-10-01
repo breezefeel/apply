@@ -566,8 +566,8 @@
     text-align: center;
   }
   .doc-roster-name.active { background: var(--ink); color: #fff; border-color: var(--ink); }
-  .pay-month-chip.payer-tree { background: #0B2048; color: #fff; border-color: #0B2048; }
-  .pay-month-chip.payer-incheon { background: #F8E7C4; color: #6b4e16; border-color: #C4A056; }
+  .pay-month-chip.payer-tree { background: #1F8A4C; color: #fff; border-color: #176B3A; }
+  .pay-month-chip.payer-incheon { background: #D7F3FF; color: #0B4F73; border-color: #7EC8EA; }
   .pay-month-chip.payer-other { background: #eef2f6; color: #334155; border-color: #94a3b8; }
   .pay-month-chip.is-on { outline: 2px solid #C4A056; outline-offset: 2px; }
   .pay-month-add {
@@ -1195,7 +1195,7 @@
         <div id="docsWorkPay">
         <section class="card">
           <div class="doc-roster" id="docRoster"></div>
-          <p class="hint" id="docFolderStatus">약수 스케줄 시트의 <b>강사급여</b> 탭에 저장됩니다. 월 칩 색은 발급 사업장입니다. 남색 힐링트리, 베이지 인천점, 회색 기타.</p>
+          <p class="hint" id="docFolderStatus">약수 스케줄 시트의 <b>강사급여</b> 탭에 저장됩니다. 월 칩 색은 발급 사업장입니다. 초록 힐링트리, 하늘색 리얼무브먼트, 회색 기타.</p>
         </section>
 
         <section class="card">
@@ -3378,13 +3378,17 @@
   }
   function thanksLines() {
     var m = payMonthShort() || '이번 달';
-    return [
-      { who: '최진옥', text: '형, ' + m + ' 한달 수고 많으셨습니다~ ㅎ' },
-      { who: '이상민', text: m + '도 수고 많았어 ^^' },
-      { who: '이유주', text: m + '도 수고 많았습니다 :)' },
-      { who: '추천', text: m + '도 함께해 주셔서 감사합니다.' },
-      { who: '추천', text: m + ' 급여 입금했습니다. 확인 부탁드려요 :)' }
-    ];
+    var personal = {
+      choi: { who: '최진옥', text: '형, ' + m + ' 한달 수고 많으셨습니다~ ㅎ' },
+      sangmin: { who: '이상민', text: m + '도 수고 많았어 ^^' },
+      yuju: { who: '이유주', text: m + '도 수고 많았습니다 :)' }
+    };
+    var lines = [];
+    var mine = personal[staffTabOf()];
+    if (mine) lines.push(mine);
+    lines.push({ who: '추천', text: m + '도 함께해 주셔서 감사합니다.' });
+    lines.push({ who: '추천', text: m + ' 급여 입금했습니다. 확인 부탁드려요 :)' });
+    return lines;
   }
   function renderPayMsgList() {
     var box = $('docThanks');
@@ -3499,8 +3503,8 @@
     var cols = [
       { key: 'choi', label: STAFF.choi.name, pid: STAFF.choi.id },
       { key: 'sangmin', label: STAFF.sangmin.name, pid: STAFF.sangmin.id },
-      { key: 'youngim', label: STAFF.youngim.name, pid: STAFF.youngim.id },
       { key: 'yuju', label: STAFF.yuju.name, pid: STAFF.yuju.id },
+      { key: 'youngim', label: STAFF.youngim.name, pid: STAFF.youngim.id },
       { key: 'other', label: '기타', pid: '' }
     ];
     el.innerHTML = cols.map(function (col) {
@@ -3721,7 +3725,7 @@
   function renderStaffTabs() {
     var d = loadDocs();
     var tab = d.staffTab || 'choi';
-    var ids = ['choi', 'sangmin', 'youngim', 'yuju', 'other'];
+    var ids = ['choi', 'sangmin', 'yuju', 'youngim', 'other'];
     $('docStaffTabs').innerHTML = ids.map(function (id) {
       var label = id === 'other' ? '기타' : STAFF[id].tab;
       return '<button type="button" class="org-tab' + (tab === id ? ' active' : '') + '" data-staff="' + id + '">' + label + '</button>';
