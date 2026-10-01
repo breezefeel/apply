@@ -78,13 +78,15 @@
   .head-branch .chip { font-size: 12px; padding: 7px 11px; }
   body.mode-receipt #consultBranchChips,
   body.mode-docs #consultBranchChips,
-  body.mode-links #consultBranchChips { display: none; }
+  body.mode-links #consultBranchChips,
+  body.mode-unbooked #consultBranchChips { display: none; }
   body.mode-consult #pageSub,
-  body.mode-links #pageSub { display: none; }
+  body.mode-links #pageSub,
+  body.mode-unbooked #pageSub { display: none; }
   body.mode-links .app { max-width: 1040px; }
 
   .app-tabs {
-    display: grid; grid-template-columns: 1.15fr .9fr .75fr .9fr; gap: 6px;
+    display: grid; grid-template-columns: 1.05fr .8fr .95fr .7fr .85fr; gap: 6px;
     margin-bottom: 14px;
   }
   .app-tab {
@@ -374,7 +376,28 @@
   }
   body.mode-consult .receipt-dock,
   body.mode-links .receipt-dock,
+  body.mode-unbooked .receipt-dock,
   body.mode-docs .receipt-dock { display: none; }
+  .unbooked-summary {
+    font-size: 13px; font-weight: 700; line-height: 1.5; color: var(--ink); margin: 0 0 12px;
+  }
+  .unbooked-wait { font-size: 13.5px; font-weight: 700; color: var(--mute); line-height: 1.5; }
+  .unbooked-wait b { display: block; margin-top: 4px; color: var(--ink); font-size: 15px; }
+  .unbooked-list { display: flex; flex-direction: column; gap: 8px; }
+  .unbooked-card {
+    border: 1px solid #e2ddd3; background: #fff; border-radius: 14px; padding: 12px;
+  }
+  .unbooked-card.is-gap { background: #fffbeb; border-color: #fcd34d; }
+  .unbooked-card.is-over { background: #fef2f2; border-color: #fecaca; }
+  .unbooked-card-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .unbooked-card-top strong { font-size: 14px; }
+  .unbooked-phone { font-size: 12px; color: var(--mute); font-weight: 700; white-space: nowrap; }
+  .unbooked-nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+  .unbooked-nums div { background: #f4f1ea; border-radius: 10px; padding: 8px 6px; text-align: center; }
+  .unbooked-card.is-gap .unbooked-nums div { background: rgba(255,255,255,.72); }
+  .unbooked-nums dt { font-size: 10px; color: var(--mute); font-weight: 800; }
+  .unbooked-nums dd { font-size: 16px; font-weight: 800; margin: 2px 0 0; }
+  .unbooked-last { margin: 8px 0 0; font-size: 12px; font-weight: 700; color: #92400e; }
 
   .docs-work-tabs {
     display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
@@ -461,6 +484,14 @@
     font-size: 13px; font-weight: 600; color: var(--mute); line-height: 1.5;
   }
   .htx-fill .hometax-sum { margin: 0; }
+  .htx-note {
+    font-size: 12px; font-weight: 600; color: var(--mute);
+    line-height: 1.5; margin: 0;
+  }
+  .htx-next {
+    background: var(--ink); color: #fff; border-radius: 12px;
+    padding: 12px 14px; font-size: 14px; font-weight: 800; text-align: center;
+  }
   .htx-person {
     background: #f4f1ea; border-radius: 12px; padding: 12px 14px;
   }
@@ -882,6 +913,7 @@
     <nav class="app-tabs no-print" id="appTabs" aria-label="화면">
       <button type="button" class="app-tab active" data-app="consult" id="appTabConsult">상담 메뉴얼</button>
       <button type="button" class="app-tab" data-app="links" id="appTabLinks">링크 모음</button>
+      <button type="button" class="app-tab" data-app="unbooked" id="appTabUnbooked">미예약 확인</button>
       <button type="button" class="app-tab" data-app="receipt" id="appTabReceipt">영수증</button>
       <button type="button" class="app-tab" data-app="docs" id="appTabDocs">세금 서류</button>
     </nav>
@@ -1026,6 +1058,17 @@
           <a class="link-card" href="https://github.com/breezefeel" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🖥</span><span class="link-card-txt"><span class="link-card-name">GitHub</span><span class="link-card-sub">github.com/breezefeel</span></span></a>
         </div>
       </div>
+    </div>
+
+    <div id="panelUnbooked" class="panel">
+      <section class="card">
+        <div class="card-title">미예약 확인</div>
+        <p class="unbooked-summary" id="unbookedSummary">남은 횟수가 있는 회원의 예약과 비교합니다.</p>
+        <div id="unbookedBody"><p class="unbooked-wait">탭을 열면 확인을 시작합니다.</p></div>
+        <div class="chat-actions" style="margin-top:12px;">
+          <button type="button" class="btn btn-print" id="btnUnbookedRefresh">다시 확인</button>
+        </div>
+      </section>
     </div>
 
     <div id="panelReceipt" class="panel">
@@ -1261,6 +1304,7 @@
             <div class="field">
               <label id="lblDocAmount">8. 총 지급액</label>
               <input id="docAmount" type="text" inputmode="numeric" value="1,000,000" placeholder="1,000,000">
+              <p class="hint">저장 후 누르면 총 지급액 = 실지급액 + 소득세 + 지방소득세가 복사됩니다.</p>
             </div>
           </div>
           <div class="field" style="margin-top:12px;">
@@ -1328,26 +1372,9 @@
           <div class="doc-links" style="margin-top:12px;">
             <a class="btn btn-ghost" href="https://www.hometax.go.kr/" target="_blank" rel="noopener noreferrer">홈택스 로그인</a>
             <a class="btn btn-print" id="linkWithhold" href="https://www.hometax.go.kr/websquare/websquare.html?w2xPath=/ui/pp/index_pp.xml&amp;tmIdx=41" target="_blank" rel="noopener noreferrer">원천징수이행상황신고서</a>
-            <p class="doc-path">세금신고 → 원천세 → <b>정기신고</b> · 지급월 다음달 <b>10일</b>까지.<br>10일이 지났으면 같은 메뉴의 <b>기한후신고</b>로 들어갑니다. 지금 화면의 신고구분이 기한후여도 숫자는 같습니다.<br>사람별 서류가 아니라, 그달 지급 합계·원천세(3.3%)를 넣고 <b>세금만 납부</b>합니다.</p>
+            <p class="doc-path">세금신고 → 원천세 → 일반신고 → <b>정기신고</b> · 지급월 다음달 <b>10일</b>까지.<br>10일이 지났으면 같은 메뉴의 <b>기한후신고</b>로 들어갑니다. 숫자는 같습니다.</p>
             <p class="htx-fill-title">작성 시 적을 값 · 칸을 누르면 복사</p>
             <div class="htx-fill" id="docWithholdFill"></div>
-            <div class="htx-picks">
-              <div class="htx-pick">
-                <b>원천신고구분</b>
-                <span>매월</span>
-                <em>반기납부를 따로 신청한 사업장만 반기. 아니면 매월입니다.</em>
-              </div>
-              <div class="htx-pick">
-                <b>연말정산 · 소득처분 · 환급 · 일괄납부 · 사업자단위과세</b>
-                <span>전부 부</span>
-                <em>프리랜서 3.3%만 넣는 달입니다. 돌려받을 세금이 있을 때만 환급을 여로 바꿉니다.</em>
-              </div>
-              <div class="htx-pick">
-                <b>소득종류선택</b>
-                <span>사업소득만 체크</span>
-                <em>근로소득·기타소득은 켜지 마세요. 강사·매니저 3.3%는 사업소득입니다. 세무대리인은 비우고 저장 후 다음이동.</em>
-              </div>
-            </div>
           </div>
         </section>
 
@@ -1356,8 +1383,8 @@
           <p class="hint">누구에게 얼마 줬는지를 사람별로 입력합니다. 여기서는 세금을 또 내지 않습니다.</p>
           <div class="doc-links">
             <a class="btn btn-print" id="linkSimple" href="https://www.hometax.go.kr/websquare/websquare.html?w2xPath=/ui/pp/index_pp.xml&amp;tmIdx=44&amp;tm2lIdx=4401000000&amp;tm3lIdx=4401100000" target="_blank" rel="noopener noreferrer">간이지급명세서 (거주자의 사업소득)</a>
-            <p class="doc-path">신청/제출 → 지급명세서 → 간이지급명세서(거주자의 사업소득) → 직접작성제출 · 지급월 다음달 <b>말일</b>까지.<br>아래 값을 사람마다 그대로 옮겨 적습니다. 칸을 누르면 복사됩니다.</p>
-            <p class="htx-fill-title">작성 시 적을 값 · 사람별</p>
+            <p class="doc-path">지급명세서·자료·공익법인 → 일용·간이지급명세서 → <b>직접작성 제출</b> · 지급월 다음달 <b>말일</b>까지.<br>지급명세서를 고르고 제출 구분을 정한 뒤, 상세 내역을 작성합니다. 칸을 누르면 복사됩니다.</p>
+            <p class="htx-fill-title">작성 시 적을 값 · 칸을 누르면 복사</p>
             <div class="htx-fill" id="docSimpleFill"></div>
           </div>
         </section>
@@ -3425,6 +3452,16 @@
     d = d || loadDocs();
     return d.buckets[taxPayerIdOf(d)] || d.buckets.tree;
   }
+  function taxPayerInfo_(d) {
+    d = d || loadDocs();
+    var id = taxPayerIdOf(d);
+    var def = DOC_PAYERS[id] || DOC_PAYERS.tree;
+    if (id === 'other') {
+      var b = d.buckets.other || {};
+      return { name: b.name || '', bizNo: b.bizNo || '' };
+    }
+    return { name: def.name || '', bizNo: def.bizNo || '' };
+  }
   function personNameOf(d, pid) {
     var p = findPerson(d, pid);
     if (p && p.name) return p.name;
@@ -3892,17 +3929,39 @@
       if (!ym) {
         fill.innerHTML = '<div class="htx-fill-empty">지급연월을 먼저 고르세요.</div>';
       } else {
+        var payer = taxPayerInfo_(d);
         fill.innerHTML =
           '<div class="hometax-sum">' +
-          copyRowHtml_('제출연월', submitYm, submitYm) +
+          copyRowHtml_('1. 사업자등록번호', payer.bizNo || '—', payer.bizNo) +
           copyRowHtml_('귀속연월', ym, ym) +
           copyRowHtml_('지급연월', ym, ym) +
-          copyRowHtml_('인원', count + '명', count) +
-          copyRowHtml_('총지급액', fmtWon(amount), amount) +
-          copyRowHtml_('소득세', fmtWon(income), income) +
-          copyRowHtml_('지방소득세', fmtWon(local), local) +
+          copyRowHtml_('2. 원천신고구분', '매월', '매월') +
+          copyRowHtml_('3. 연말정산포함 여부', '부', '부') +
+          copyRowHtml_('4. 환급신청 여부', '부', '부') +
+          copyRowHtml_('5. 일괄납부 여부', '부', '부') +
+          copyRowHtml_('6. 사업자단위과세 여부', '부', '부') +
+          copyRowHtml_('7. 소득종류 선택', '사업소득', '사업소득') +
           '</div>' +
-          '<div class="htx-pick"><b>날짜 안내</b><span>제출 ' + ymLabel_(submitYm) + ' · 귀속·지급 ' + ymLabel_(ym) + '</span><em>사업자번호 옆 확인을 누른 뒤, 위 숫자를 그대로 넣습니다.</em></div>';
+          '<p class="htx-note">신고구분은 정기입니다. 소득처분신고 여부는 부로 잠겨 있으니 그대로 둡니다. 근로소득은 체크하지 않습니다. 제출은 ' + ymLabel_(submitYm) + '입니다.</p>' +
+          '<div class="htx-next">저장 후 다음이동</div>' +
+          '<p class="htx-fill-title">매월징수 (A25)에 적습니다</p>' +
+          '<p class="htx-note">금액은 매월징수 한 줄입니다. 연말정산 칸은 비웁니다. 농어촌특별세·가산세·환급은 0입니다. (6)과 (10)은 소득세 3%이고, 지방소득세는 여기 넣지 않습니다.</p>' +
+          '<div class="hometax-sum">' +
+          copyRowHtml_('(4) 소득지급 인원수', count + '명', count) +
+          copyRowHtml_('(5) 소득지급 총지급금액', fmtWon(amount), amount) +
+          copyRowHtml_('(6) 징수세액 소득세 등', fmtWon(income), income) +
+          copyRowHtml_('(7) 농어촌특별세', '0', '0') +
+          copyRowHtml_('(8) 가산세', '0', '0') +
+          copyRowHtml_('(9) 당월조정 환급세액', '0', '0') +
+          copyRowHtml_('(10) 납부세액 소득세 등', fmtWon(income), income) +
+          copyRowHtml_('(11) 납부세액 농어촌특별세', '0', '0') +
+          '</div>' +
+          '<p class="htx-note">환급세액 조정은 전부 0입니다. 바꾸지 않습니다.</p>' +
+          '<div class="htx-next">저장 후 다음이동</div>' +
+          '<div class="hometax-sum">' +
+          copyRowHtml_('지방소득세 · 위택스', fmtWon(local), local) +
+          '</div>' +
+          '<p class="htx-note">지방소득세는 홈택스 매월징수에 넣지 않습니다. 위택스 지방소득세 특별징수에서 같은 10일까지 냅니다.</p>';
       }
     }
 
@@ -3910,18 +3969,35 @@
       if (!rows.length) {
         simple.innerHTML = '<div class="htx-fill-empty">이 상호·지급연월에 옮길 사람이 없습니다. 급여 지급하기에서 먼저 저장하세요.</div>';
       } else {
-        simple.innerHTML = rows.map(function (r, idx) {
-          return '<div class="htx-person">' +
-            '<div class="htx-person-hd">' + (idx + 1) + '. ' + r.name + '</div>' +
-            '<div class="htx-person-rows">' +
-            copyRowHtml_('성명', r.name, r.name) +
-            copyRowHtml_('주민등록번호', r.rrn || '—', r.rrnRaw || r.rrn) +
-            copyRowHtml_('지급연월', ym, ym) +
-            copyRowHtml_('지급액', fmtWon(r.amount), r.amount) +
-            copyRowHtml_('소득세', fmtWon(r.income), r.income) +
-            copyRowHtml_('지방소득세', fmtWon(r.local), r.local) +
-            '</div></div>';
-        }).join('');
+        var ymParts = String(ym || '').split('-');
+        var belongYear = ymParts[0] || '';
+        var belongMonth = String(parseInt(ymParts[1], 10) || '');
+        simple.innerHTML =
+          '<div class="hometax-sum">' +
+          copyRowHtml_('지급명세서', '거주자의 사업소득', '거주자의 사업소득') +
+          copyRowHtml_('제출 구분', '매월', '매월') +
+          '</div>' +
+          '<div class="htx-next">상세 내역 작성하기</div>' +
+          rows.map(function (r, idx) {
+            var totalTax = (r.income || 0) + (r.local || 0);
+            return '<div class="htx-person">' +
+              '<div class="htx-person-hd">' + (idx + 1) + '. ' + r.name + '</div>' +
+              '<div class="htx-person-rows">' +
+              copyRowHtml_('내/외국인', '내국인', '내국인') +
+              copyRowHtml_('주민(사업자)등록번호', r.rrn || '—', r.rrnRaw || r.rrn) +
+              copyRowHtml_('성명(상호)', r.name, r.name) +
+              copyRowHtml_('업종구분', r.job || '—', r.job) +
+              copyRowHtml_('귀속연도', belongYear, belongYear) +
+              copyRowHtml_('귀속월', belongMonth ? belongMonth + '월' : '—', belongMonth) +
+              copyRowHtml_('지급액', fmtWon(r.amount), r.amount) +
+              copyRowHtml_('세율', '3%', '3') +
+              copyRowHtml_('소득세', fmtWon(r.income), r.income) +
+              copyRowHtml_('지방소득세', fmtWon(r.local), r.local) +
+              copyRowHtml_('계', fmtWon(totalTax), totalTax) +
+              '</div>' +
+              '<p class="htx-note">주민번호 옆 확인, 업종은 검색으로 고릅니다.</p>' +
+              '</div>';
+          }).join('');
       }
     }
   }
@@ -3929,7 +4005,7 @@
     $('docNotes').innerHTML =
       '원천세 신고와 간이지급명세서는 <strong>다른 신고</strong>입니다. 10일까지 원천세를 냈어도 말일 명세서는 따로 내야 합니다.<br><br>' +
       '힐링트리(법인)와 인천점(개인 간이과세)는 홈택스 계정이 다릅니다. 원천세 신고에서 상호를 고른 뒤 그 사업자로 로그인하세요.<br><br>' +
-      '간이지급명세서 입력 순서: 성명 → 주민등록번호 → 지급연월 → 총 회원 건수·상담 성공 건수(최진옥·이상민) → 지급액 → 소득세 → 지방소득세.<br><br>' +
+      '간이지급명세서: 지급명세서·자료·공익법인 → 일용·간이지급명세서 → 직접작성 제출 → 거주자의 사업소득 · 매월 → 상세 내역. 사람마다 내국인, 주민번호, 성명, 업종, 귀속연월, 지급액, 세율 3%, 소득세, 지방소득세 순입니다.<br><br>' +
       '그달에 지급이 없으면 간이지급명세서는 내지 않아도 됩니다. 한 달이라도 빠지면 이듬해 3월 일반 지급명세서를 따로 내야 할 수 있습니다.<br><br>' +
       '입력한 지급 내역은 약수 스케줄 시트의 <strong>강사급여</strong> 탭에 저장됩니다. 나중에 그 탭을 숨겨 두셔도, 이 화면에서는 그대로 불러옵니다.<br><br>' +
       '기한 내 미제출·사실과 다른 제출은 지급액의 <strong>0.25%</strong> 가산세입니다.';
@@ -4280,6 +4356,16 @@
       this.value = n ? n.toLocaleString('en-US') : '';
       renderTaxBox();
     });
+    $('docAmount').addEventListener('click', function () {
+      if (!this.readOnly) return;
+      var amount = parseAmount(this.value);
+      if (!amount) return;
+      var tax = withholdOf(amount);
+      copyText(
+        '총 지급액 ' + amount.toLocaleString('ko-KR') + '원 = 실지급액 ' +
+        tax.net.toLocaleString('ko-KR') + '원 + 소득세 + 지방소득세'
+      );
+    });
     $('docYearMonth').addEventListener('change', function () {
       if (!docFormEditing) return;
       if ($('docTaxYearMonth')) $('docTaxYearMonth').value = this.value;
@@ -4440,6 +4526,143 @@
     renderPinDots();
     $('docsPinErr').hidden = false;
   }
+  var UNBOOKED_EST_SEC = 20;
+  var UNBOOKED_TIMEOUT_MS = 60000;
+  var unbookedTimer = null;
+  var unbookedLeft = 0;
+  var unbookedGen = 0;
+  var unbookedAbort = null;
+
+  function escHtml_(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+  function stopUnbookedCountdown_() {
+    if (unbookedTimer) {
+      clearInterval(unbookedTimer);
+      unbookedTimer = null;
+    }
+  }
+  function resetUnbookedButton_() {
+    var btn = $('btnUnbookedRefresh');
+    if (!btn) return;
+    btn.disabled = false;
+    btn.textContent = '다시 확인';
+  }
+  function paintUnbookedWait_() {
+    var summary = $('unbookedSummary');
+    var body = $('unbookedBody');
+    var btn = $('btnUnbookedRefresh');
+    var wait = unbookedLeft > 0
+      ? ('예상 ' + UNBOOKED_EST_SEC + '초 · ' + unbookedLeft + '초 남음')
+      : ('예상 ' + UNBOOKED_EST_SEC + '초 · 조금 더 걸리고 있어요');
+    if (summary) summary.textContent = '회원정보와 스케줄표를 비교하는 중입니다. (' + wait + ')';
+    if (body) body.innerHTML = '<p class="unbooked-wait" aria-live="polite">확인하는 중…<b>' + wait + '</b></p>';
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = unbookedLeft > 0 ? ('확인 중 ' + unbookedLeft + '초') : '확인 중…';
+    }
+  }
+  function showUnbookedFail_(msg) {
+    var summary = $('unbookedSummary');
+    var body = $('unbookedBody');
+    if (summary) summary.textContent = msg;
+    if (body) body.innerHTML = '<p class="unbooked-wait">' + escHtml_(msg) + '</p>';
+    resetUnbookedButton_();
+  }
+  function renderUnbookedList_(data) {
+    var summary = $('unbookedSummary');
+    var body = $('unbookedBody');
+    if (!body) return;
+    var rows = (data && data.rows) || [];
+    var gapN = 0;
+    rows.forEach(function (row) {
+      if ((parseInt(row.unbooked, 10) || 0) > 0) gapN += 1;
+    });
+    if (summary) {
+      summary.textContent = rows.length
+        ? ('남은 횟수 있는 회원 ' + rows.length + '명 · 아직 예약이 부족한 회원 ' + gapN + '명. 예약횟수는 오늘부터 출석 체크 전인 예약입니다.')
+        : '남은 횟수가 있는 회원이 없습니다.';
+    }
+    if (!rows.length) {
+      body.innerHTML = '<p class="unbooked-wait">남은 횟수가 있는 회원이 없습니다.</p>';
+      resetUnbookedButton_();
+      return;
+    }
+    body.innerHTML = '<div class="unbooked-list">' + rows.map(function (row) {
+      var unbooked = parseInt(row.unbooked, 10) || 0;
+      var cls = unbooked > 0 ? ' is-gap' : (unbooked < 0 ? ' is-over' : '');
+      var last = '';
+      if (unbooked > 0) {
+        last = '<p class="unbooked-last">마지막 예약일 ' + escHtml_(row.lastDateLabel || '없음') + '</p>';
+      }
+      return '<article class="unbooked-card' + cls + '">' +
+        '<div class="unbooked-card-top"><strong>' + escHtml_(row.name || '—') + '</strong>' +
+        '<span class="unbooked-phone">' + escHtml_(row.phone || '—') + '</span></div>' +
+        '<dl class="unbooked-nums">' +
+        '<div><dt>남은횟수</dt><dd>' + escHtml_(row.remain) + '</dd></div>' +
+        '<div><dt>예약횟수</dt><dd>' + escHtml_(row.reserved) + '</dd></div>' +
+        '<div><dt>예약되지 않은 횟수</dt><dd>' + escHtml_(row.unbooked) + '</dd></div>' +
+        '</dl>' + last + '</article>';
+    }).join('') + '</div>';
+    resetUnbookedButton_();
+  }
+  function cancelUnbookedCheck_() {
+    unbookedGen += 1;
+    if (unbookedAbort) {
+      try { unbookedAbort.abort(); } catch (eAbort) {}
+      unbookedAbort = null;
+    }
+    stopUnbookedCountdown_();
+    resetUnbookedButton_();
+  }
+  function startUnbookedCheck_() {
+    unbookedGen += 1;
+    var gen = unbookedGen;
+    if (unbookedAbort) {
+      try { unbookedAbort.abort(); } catch (eAbort) {}
+    }
+    stopUnbookedCountdown_();
+    unbookedLeft = UNBOOKED_EST_SEC;
+    paintUnbookedWait_();
+    unbookedTimer = setInterval(function () {
+      if (gen !== unbookedGen) return;
+      if (unbookedLeft > 0) unbookedLeft -= 1;
+      paintUnbookedWait_();
+    }, 1000);
+    var controller = new AbortController();
+    unbookedAbort = controller;
+    var killer = setTimeout(function () { controller.abort(); }, UNBOOKED_TIMEOUT_MS);
+    var payload = JSON.stringify({ action: 'instructorUnbookedRemain' });
+    var url = PAYROLL_API_URL + (PAYROLL_API_URL.indexOf('?') >= 0 ? '&' : '?') + 'data=' + encodeURIComponent(payload) + '&_=' + Date.now();
+    fetch(url, { method: 'GET', cache: 'no-store', signal: controller.signal }).then(function (res) {
+      return res.text();
+    }).then(function (text) {
+      clearTimeout(killer);
+      if (gen !== unbookedGen) return;
+      var data;
+      try { data = JSON.parse(text); } catch (eParse) { data = { ok: false, message: '응답을 읽지 못했습니다.' }; }
+      stopUnbookedCountdown_();
+      unbookedAbort = null;
+      if (!data || data.ok === false) {
+        showUnbookedFail_((data && data.message) || '목록을 불러오지 못했습니다.');
+        return;
+      }
+      renderUnbookedList_(data);
+    }).catch(function (err) {
+      clearTimeout(killer);
+      if (gen !== unbookedGen) return;
+      stopUnbookedCountdown_();
+      unbookedAbort = null;
+      if (err && err.name === 'AbortError') {
+        showUnbookedFail_('서버 응답 시간 초과(약 ' + Math.round(UNBOOKED_TIMEOUT_MS / 1000) + '초). 다시 확인해 주세요.');
+        return;
+      }
+      showUnbookedFail_('목록을 불러오지 못했습니다.');
+    });
+  }
+
   function setAppTab(which) {
     if (which === 'docs' && !docsUnlocked()) {
       openDocsPin();
@@ -4449,20 +4672,23 @@
       setDocsUnlocked(false);
       closeDocsPin();
     }
-    if (which !== 'consult' && which !== 'links' && which !== 'receipt' && which !== 'docs') which = 'consult';
+    if (which !== 'consult' && which !== 'links' && which !== 'unbooked' && which !== 'receipt' && which !== 'docs') which = 'consult';
     document.body.classList.toggle('mode-consult', which === 'consult');
     document.body.classList.toggle('mode-links', which === 'links');
+    document.body.classList.toggle('mode-unbooked', which === 'unbooked');
     document.body.classList.toggle('mode-receipt', which === 'receipt');
     document.body.classList.toggle('mode-docs', which === 'docs');
     $('panelConsult').classList.toggle('active', which === 'consult');
     $('panelLinks').classList.toggle('active', which === 'links');
+    $('panelUnbooked').classList.toggle('active', which === 'unbooked');
     $('panelReceipt').classList.toggle('active', which === 'receipt');
     $('panelDocs').classList.toggle('active', which === 'docs');
     $('appTabConsult').classList.toggle('active', which === 'consult');
     $('appTabLinks').classList.toggle('active', which === 'links');
+    $('appTabUnbooked').classList.toggle('active', which === 'unbooked');
     $('appTabReceipt').classList.toggle('active', which === 'receipt');
     $('appTabDocs').classList.toggle('active', which === 'docs');
-    $('pageTitle').textContent = which === 'consult' ? '상담 메뉴얼' : which === 'links' ? '링크 모음' : which === 'receipt' ? '영문 영수증' : '세금 서류';
+    $('pageTitle').textContent = which === 'consult' ? '상담 메뉴얼' : which === 'links' ? '링크 모음' : which === 'unbooked' ? '미예약 확인' : which === 'receipt' ? '영문 영수증' : '세금 서류';
     $('pageSub').textContent = which === 'receipt' ? '발급 기관을 고른 뒤 항목을 입력하세요' : '프리랜서를 고른 뒤 지급액을 입력하세요';
     if (which === 'receipt') {
       if (receiptPrefillFromQuery && !receiptPrefillApplied) {
@@ -4477,6 +4703,8 @@
         if (ok) fillDocsScreen();
       });
     }
+    if (which === 'unbooked') startUnbookedCheck_();
+    else cancelUnbookedCheck_();
   }
   function applyQuery() {
     var q = new URLSearchParams(location.search);
@@ -4494,7 +4722,7 @@
       receiptPrefillFromQuery = { name: name, branch: branch, sessions: sessions, instructor: instructor };
     }
     renderConsultBranch();
-    setAppTab(tab === 'receipt' ? 'receipt' : tab === 'docs' ? 'docs' : tab === 'links' ? 'links' : 'consult');
+    setAppTab(tab === 'receipt' ? 'receipt' : tab === 'docs' ? 'docs' : tab === 'links' ? 'links' : tab === 'unbooked' ? 'unbooked' : 'consult');
   }
 
   buildTabs();
@@ -4557,7 +4785,9 @@
 
   document.getElementById('appTabConsult').addEventListener('click', function () { setAppTab('consult'); });
   document.getElementById('appTabLinks').addEventListener('click', function () { setAppTab('links'); });
+  document.getElementById('appTabUnbooked').addEventListener('click', function () { setAppTab('unbooked'); });
   document.getElementById('appTabReceipt').addEventListener('click', function () { setAppTab('receipt'); });
+  document.getElementById('btnUnbookedRefresh').addEventListener('click', startUnbookedCheck_);
   document.getElementById('appTabDocs').addEventListener('click', function () { setAppTab('docs'); });
   $('docsPinCancel').addEventListener('click', closeDocsPin);
   $('docsPinOverlay').addEventListener('click', function (e) {
