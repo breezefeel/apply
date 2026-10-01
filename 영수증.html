@@ -649,6 +649,9 @@
   }
   .hometax-sum b { font-size: 12px; color: var(--mute); font-weight: 800; }
   .hometax-sum span { font-size: 15px; font-weight: 800; text-align: right; line-height: 1.35; }
+  .hometax-sum.htx-pair { display: grid; grid-template-columns: 1fr 1fr; }
+  .hometax-sum.htx-pair button { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .hometax-sum.htx-pair span { text-align: left; }
   .docs-sheet { display: none; }
   .doc-payer-info {
     display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
@@ -1398,6 +1401,17 @@
             <p class="doc-path">지급명세서·자료·공익법인 → 일용·간이지급명세서 → <b>직접작성 제출</b> · 지급월 다음달 <b>말일</b>까지.<br>지급명세서를 고르고 제출 구분을 정한 뒤, 상세 내역을 작성합니다. 칸을 누르면 복사됩니다.</p>
             <p class="htx-fill-title">작성 시 적을 값 · 칸을 누르면 복사</p>
             <div class="htx-fill" id="docSimpleFill"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-title">3. 위택스 특별징수신고</div>
+          <p class="hint">소득세의 10%를 위택스에 냅니다. 칸을 누르면 복사됩니다.</p>
+          <div class="doc-links">
+            <a class="btn btn-print" id="linkWetax" href="https://www.wetax.go.kr/etr/lit/b0701/B070101M01.do" target="_blank" rel="noopener noreferrer">위택스 특별징수신고</a>
+            <p class="doc-path">신고하기 → 지방소득세 → 특별징수 → <b>특별징수신고</b> → <b>한건신고</b> · 지급월 다음달 <b>10일</b>까지.<br>10일이 토·일·공휴일이면 다음 영업일까지입니다. 최근신고내역불러오기는 누르지 않습니다.</p>
+            <p class="htx-fill-title">작성 시 적을 값 · 칸을 누르면 복사</p>
+            <div class="htx-fill" id="docWetaxFill"></div>
           </div>
         </section>
 
@@ -3931,6 +3945,7 @@
     var box = $('docWithholdSum');
     var fill = $('docWithholdFill');
     var simple = $('docSimpleFill');
+    var wetax = $('docWetaxFill');
     var d = loadDocs();
     var ym = withholdMonth();
     var rows = collectTaxMonthPays_(d, ym);
@@ -3956,6 +3971,7 @@
     if (fill) {
       if (!ym) {
         fill.innerHTML = '<div class="htx-fill-empty">지급연월을 먼저 고르세요.</div>';
+        if (wetax) wetax.innerHTML = '<div class="htx-fill-empty">지급연월을 먼저 고르세요.</div>';
       } else {
         var payer = taxPayerInfo_(d);
         fill.innerHTML =
@@ -3999,25 +4015,37 @@
           copyRowHtml_('농어촌특별세', '0', '0') +
           '</div>' +
           '<div class="htx-next">작성완료</div>' +
-          '<p class="htx-note">납부할 세액 화면에서 귀속연월·지급연월은 선택한 달, 제출연월은 다음달, 신고구분은 정기신고, 원천징수의무구분은 매월, 환급신청여부는 부입니다. 소득세 납부세액이 위 금액과 같고, 농어촌특별세·차월이월 환급세액·환급신청액이 0이면 맞습니다.</p>' +
-          '<p class="htx-fill-title">지방소득세 · 위택스</p>' +
-          '<a class="btn btn-print" href="https://www.wetax.go.kr/etr/lit/b0701/B070101M01.do" target="_blank" rel="noopener noreferrer">위택스 특별징수신고</a>' +
-          '<p class="doc-path">신고하기 → 지방소득세 → 특별징수 → <b>특별징수신고</b> → <b>한건신고</b> · 지급월 다음달 <b>10일</b>까지.<br>홈택스 신고내역의 지방소득세 <b>이동</b>을 눌러도 같은 신고로 들어갑니다. 10일이 지났으면 <b>기한후신고</b>입니다.</p>' +
-          '<p class="htx-note">홈택스 신고정보 가져오기가 있으면 먼저 누릅니다. 아래 금액과 같으면 그대로 두고, 없으면 칸을 눌러 복사해 넣습니다. 사업장이 하나라 한건신고입니다.</p>' +
-          '<div class="hometax-sum">' +
-          copyRowHtml_('1. 사업자등록번호', payer.bizNo || '—', payer.bizNo) +
-          copyRowHtml_('귀속연월', ym, ym) +
-          copyRowHtml_('지급연월', ym, ym) +
-          copyRowHtml_('2. 신고구분', '정기신고', '정기신고') +
-          copyRowHtml_('3. 징수구분', '매월', '매월') +
-          copyRowHtml_('4. 소득구분', '사업소득', '사업소득') +
-          copyRowHtml_('5. 인원', count + '명', count) +
-          copyRowHtml_('6. 총지급액', fmtWon(amount), amount) +
-          copyRowHtml_('7. 소득세액', fmtWon(income), income) +
-          copyRowHtml_('8. 납부할 지방소득세', fmtWon(local), local) +
-          '</div>' +
-          '<p class="htx-note">과세표준 칸이 소득세액을 물으면 7번을 넣습니다. 총지급액을 넣지 않습니다. 지방소득세는 소득세의 10%입니다. 가산세와 환급은 0입니다.</p>' +
-          '<div class="htx-next">신고 제출 후 납부</div>';
+          '<p class="htx-note">납부할 세액 화면에서 귀속연월·지급연월은 선택한 달, 제출연월은 다음달, 신고구분은 정기신고, 원천징수의무구분은 매월, 환급신청여부는 부입니다. 소득세 납부세액이 위 금액과 같고, 농어촌특별세·차월이월 환급세액·환급신청액이 0이면 맞습니다.</p>';
+        if (wetax) {
+          wetax.innerHTML =
+            '<p class="htx-fill-title">1. 신고인</p>' +
+            '<div class="hometax-sum">' +
+            copyRowHtml_('사업자등록번호', payer.bizNo || '—', payer.bizNo) +
+            '</div>' +
+            '<p class="htx-note">사업장번호조회를 누릅니다. 상호와 주소, 관할자치단체가 나오면 다음.</p>' +
+            '<div class="htx-next">다음</div>' +
+            '<p class="htx-fill-title">2. 신고대상</p>' +
+            '<p class="htx-note">납부시기는 월입니다.</p>' +
+            '<div class="hometax-sum htx-pair">' +
+            copyRowHtml_('지급연월', ym, ym) +
+            copyRowHtml_('귀속연월', ym, ym) +
+            '</div>' +
+            '<p class="htx-note">사업소득만 적습니다. 과세표준은 총지급액이 아니라 소득세입니다. 특별징수세액은 그 10%입니다.</p>' +
+            '<div class="hometax-sum">' +
+            copyRowHtml_('인원', count + '명', count) +
+            copyRowHtml_('과세표준', fmtWon(income), income) +
+            copyRowHtml_('특별징수세액', fmtWon(local), local) +
+            '</div>' +
+            '<div class="htx-next">다음</div>' +
+            '<p class="htx-fill-title">3. 가감조정</p>' +
+            '<p class="htx-note">가산세와 환급은 0입니다. 바꾸지 않습니다.</p>' +
+            '<div class="htx-next">다음</div>' +
+            '<p class="htx-fill-title">4. 특별징수명세서</p>' +
+            '<p class="htx-note">작성할 내역이 없으면 그대로 둡니다.</p>' +
+            '<div class="htx-next">다음</div>' +
+            '<div class="htx-next">5. 신고서 제출</div>' +
+            '<div class="htx-next">6. 납부 · ' + fmtWon(local) + '</div>';
+        }
       }
     }
 
