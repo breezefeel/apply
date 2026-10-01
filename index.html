@@ -78,7 +78,7 @@
       animation:page-hd-refresh-spin .8s linear infinite;
     }
     .page-hd-btn--refresh.is-loading .page-hd-refresh-label {
-      min-width:6.4em; text-align:center;
+      min-width:7.2em; text-align:center;
     }
     @keyframes page-hd-refresh-spin { to { transform:rotate(360deg); } }
     .page-hd-btn--eval {
@@ -996,6 +996,13 @@
     .session-discomfort-group--quick .session-check-chip {
       font-size:10px; padding:5px 9px;
     }
+    .session-quick-row--special .session-check-chip {
+      box-sizing:border-box;
+      display:inline-flex; justify-content:center; align-items:center;
+      flex:0 0 auto; text-align:center;
+    }
+    .session-quick-row--special .session-check-chip[data-area="comfortable"] { width:90px; }
+    .session-quick-row--special .session-check-chip[data-area="same"] { width:72px; }
     .session-quick-row--sides .session-check-chip {
       width:100%; min-width:0; text-align:center; padding:5px 2px;
     }
@@ -2946,7 +2953,7 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-09-22-insp-sides';
+    const INSTRUCTOR_HTML_BUILD = '2026-10-01-attend-scroll';
     const PROGRAM_PLAN_SLOT_COUNT = 5;
     var _programPlanSaveSlot = 1;
     var _programPlanLoadDirectorTab = 'sangmin';
@@ -5743,11 +5750,11 @@
     var SESSION_DISCOMFORT_AREAS = [
       { id: 'comfortable', label: '편안함', group: 'quick', row: 'special' },
       { id: 'same', label: '동일', group: 'quick', row: 'special' },
-      { id: 'both', label: '전체적', group: 'quick', row: 'sides' },
-      { id: 'bilateral', label: '양측', group: 'quick', row: 'sides' },
       { id: 'lt', label: 'Lt', group: 'quick', row: 'sides' },
       { id: 'center', label: '중앙', group: 'quick', row: 'sides' },
       { id: 'rt', label: 'Rt', group: 'quick', row: 'sides' },
+      { id: 'bilateral', label: '양측', group: 'quick', row: 'sides' },
+      { id: 'both', label: '전체적', group: 'quick', row: 'sides' },
       { id: 'headache', label: '두통', group: 'head_spine' },
       { id: 'jaw', label: '턱', group: 'head_spine' },
       { id: 'neck', label: '목', group: 'head_spine' },
@@ -7784,10 +7791,12 @@
     }
 
     var _attendResultScrollTimer = null;
-    var _attendCountdownScrollBound = false;
-    var _attendCountdownScrollRaf = 0;
     /** 출석 완료 버튼으로 처리가 시작된 뒤에만 켜고, 스크롤을 예약한 순간 끈다. */
     var _attendNextBookingScrollArmed = false;
+    /** 버튼을 누른 뒤 사용자가 직접 화면을 움직이면, 이후 자동 이동은 하지 않는다. */
+    var _attendUserMovedScroll = false;
+    var _attendUserScrollBound = false;
+    var _attendIgnoreUserScrollUntil = 0;
 
     function scrollToMemberSection() {
       cancelAttendNextBookingScroll_();
@@ -7796,8 +7805,39 @@
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    function noteAttendUserMovedScroll_() {
+      if (!state.attendProcessing && !_attendNextBookingScrollArmed) return;
+      _attendUserMovedScroll = true;
+      cancelAttendNextBookingScroll_();
+    }
+
+    function markProgrammaticAttendScroll_() {
+      _attendIgnoreUserScrollUntil = Date.now() + 900;
+    }
+
+    function onAttendPageScroll_() {
+      if (Date.now() < _attendIgnoreUserScrollUntil) return;
+      noteAttendUserMovedScroll_();
+    }
+
+    function bindAttendUserScrollCancel_() {
+      if (_attendUserScrollBound) return;
+      _attendUserScrollBound = true;
+      window.addEventListener('wheel', noteAttendUserMovedScroll_, { capture: true, passive: true });
+      window.addEventListener('touchmove', noteAttendUserMovedScroll_, { capture: true, passive: true });
+      window.addEventListener('scroll', onAttendPageScroll_, { passive: true });
+      window.addEventListener('keydown', function(e) {
+        var k = e.key;
+        if (k === 'ArrowDown' || k === 'ArrowUp' || k === 'PageDown' || k === 'PageUp' || k === 'Home' || k === 'End' || k === ' ') {
+          noteAttendUserMovedScroll_();
+        }
+      }, true);
+    }
+
     function armAttendNextBookingScrollOnce_() {
+      _attendUserMovedScroll = false;
       _attendNextBookingScrollArmed = true;
+      bindAttendUserScrollCancel_();
     }
 
     var _attendNextBookingScrollUnlisten = null;
@@ -7847,6 +7887,7 @@
         }
       }
       if (Math.abs(delta) < 2) return;
+      markProgrammaticAttendScroll_();
       window.scrollBy({ top: delta, behavior: 'smooth' });
     }
 
@@ -7855,24 +7896,16 @@
      * 타이머를 다시 걸지 않아, 이후 결과 갱신이 스크롤을 되돌리거나 반복하지 않는다.
      */
     function scheduleAttendNextBookingScrollOnce_() {
+      if (_attendUserMovedScroll) {
+        cancelAttendNextBookingScroll_();
+        return;
+      }
       if (!_attendNextBookingScrollArmed) return;
       if (_attendResultScrollTimer) return;
       _attendNextBookingScrollArmed = false;
-      var onUserScroll = function() {
-        cancelAttendNextBookingScroll_();
-      };
-      window.addEventListener('wheel', onUserScroll, { capture: true, passive: true });
-      window.addEventListener('touchmove', onUserScroll, { capture: true, passive: true });
-      _attendNextBookingScrollUnlisten = function() {
-        window.removeEventListener('wheel', onUserScroll, true);
-        window.removeEventListener('touchmove', onUserScroll, true);
-      };
       _attendResultScrollTimer = window.setTimeout(function() {
         _attendResultScrollTimer = null;
-        if (_attendNextBookingScrollUnlisten) {
-          _attendNextBookingScrollUnlisten();
-          _attendNextBookingScrollUnlisten = null;
-        }
+        if (_attendUserMovedScroll) return;
         if (state.attendProcessing) return;
         var result = state.inlineAttendResult;
         if (!result || result.memberKey !== state.selectedKey) return;
@@ -7908,26 +7941,8 @@
         }
       }
       if (Math.abs(delta) < 2) return;
+      markProgrammaticAttendScroll_();
       window.scrollBy({ top: delta, behavior: smooth === false ? 'auto' : 'smooth' });
-    }
-
-    function onAttendCountdownViewportChange_() {
-      if (!state.attendProcessing) return;
-      if (_attendCountdownScrollRaf) return;
-      _attendCountdownScrollRaf = requestAnimationFrame(function() {
-        _attendCountdownScrollRaf = 0;
-        if (!state.attendProcessing) return;
-        scrollAttendCountdownToViewportCenter_(false);
-      });
-    }
-
-    function bindAttendCountdownViewportWatch_() {
-      if (_attendCountdownScrollBound) return;
-      _attendCountdownScrollBound = true;
-      window.addEventListener('resize', onAttendCountdownViewportChange_);
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', onAttendCountdownViewportChange_);
-      }
     }
 
     function buildBasicAttendAlimtalkPreviewText_(m, data) {
@@ -8726,27 +8741,39 @@
       resetRefreshButtonCountdown_();
     }
 
-    /** 새로고침 버튼 — 아이콘은 유지하고 예상 대기만 카운트다운 */
-    function paintRefreshButtonCountdown_(left) {
+    /** 새로고침 버튼 — 아이콘은 유지하고 대기만 카운트다운. kind 'attend'면 '출석중' */
+    function paintRefreshButtonCountdown_(left, kind) {
       var btn = document.getElementById('boardRefreshBtn');
       var label = document.getElementById('boardRefreshLabel');
       if (!btn || !label) return;
+      var attending = kind === 'attend';
+      var prefix = attending ? '출석중' : '예상';
       btn.classList.add('is-loading');
       if (left < 0) {
-        label.textContent = '지연 중';
-        btn.title = '새로고침 지연 중';
-        btn.setAttribute('aria-label', '새로고침 지연 중');
+        label.textContent = attending ? '출석중' : '지연 중';
+        btn.title = attending ? '출석 처리 중' : '새로고침 지연 중';
+        btn.setAttribute('aria-label', attending ? '출석 처리 중' : '새로고침 지연 중');
         return;
       }
-      label.textContent = '예상 ' + left + '초';
-      btn.title = '새로고침 중 · 예상 ' + left + '초';
-      btn.setAttribute('aria-label', '새로고침 중, 예상 ' + left + '초');
+      label.textContent = prefix + ' ' + left + '초';
+      btn.title = (attending ? '출석 처리 중 · ' : '새로고침 중 · ') + prefix + ' ' + left + '초';
+      btn.setAttribute('aria-label', (attending ? '출석 처리 중, ' : '새로고침 중, ') + prefix + ' ' + left + '초');
     }
 
     function resetRefreshButtonCountdown_() {
       var btn = document.getElementById('boardRefreshBtn');
       var label = document.getElementById('boardRefreshLabel');
       if (!btn || !label) return;
+      if (state.attendProcessing && _attendProcessingStartedAt) {
+        var attendLeft = ATTEND_PROCESS_EST_SEC - Math.floor((Date.now() - _attendProcessingStartedAt) / 1000);
+        paintRefreshButtonCountdown_(attendLeft, 'attend');
+        return;
+      }
+      if (_loadCountdownActive && _loadCountdownStartedAt) {
+        var loadLeft = BOARD_LOAD_ESTIMATE_SEC - Math.floor((Date.now() - _loadCountdownStartedAt) / 1000);
+        paintRefreshButtonCountdown_(loadLeft);
+        return;
+      }
       btn.classList.remove('is-loading');
       label.textContent = '새로고침';
       btn.title = '새로고침';
@@ -8758,7 +8785,9 @@
       if (!_loadCountdownActive || !_loadCountdownStartedAt) return;
       var elapsed = Math.floor((Date.now() - _loadCountdownStartedAt) / 1000);
       var left = BOARD_LOAD_ESTIMATE_SEC - elapsed;
-      paintRefreshButtonCountdown_(left);
+      if (!(state.attendProcessing && _attendProcessingStartedAt)) {
+        paintRefreshButtonCountdown_(left);
+      }
       if (_loadCountdownKeepChips) return;
       if (left < 0) {
         setMemberChipsMessage('불러오는 중… 시간이 길어지고 있습니다. 잠시만 기다려 주세요', null, { retry: true });
@@ -13597,6 +13626,7 @@
         _attendProcessingTimer = null;
       }
       hideAttendCountdownBar_();
+      resetRefreshButtonCountdown_();
     }
 
     function paintAttendProcessingCountdown(sec, overdue, mode) {
@@ -13629,6 +13659,7 @@
       if (!_attendProcessingStartedAt || !state.attendProcessing) return;
       var elapsed = Math.floor((Date.now() - _attendProcessingStartedAt) / 1000);
       var left = ATTEND_PROCESS_EST_SEC - elapsed;
+      paintRefreshButtonCountdown_(left, 'attend');
       if (left <= 0) {
         paintAttendProcessingCountdown(0, true, state.attendProcessingMode);
         return;
@@ -13654,7 +13685,6 @@
         state.inlineAttendResult = null;
         renderSessionAlimtalkSection();
         startAttendProcessingCountdown_();
-        bindAttendCountdownViewportWatch_();
         scrollAttendCountdownToViewportCenter_(true);
       } else {
         renderSessionAlimtalkSection();
