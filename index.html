@@ -1855,7 +1855,42 @@
     .eval-tab { flex:1; border:1px solid var(--border); background:#fff; border-radius:8px; padding:8px; font-size:12px; font-weight:600; cursor:pointer; }
     .eval-tab.on { background:var(--blue-bg); border-color:var(--blue); color:var(--blue); }
     .eval-pane { display:none; } .eval-pane.on { display:block; }
-    .report-box { white-space:pre-wrap; font-size:13px; line-height:1.65; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid var(--border); max-height:45vh; overflow:auto; }
+    .report-box {
+      font-size:13px; line-height:1.65; background:#fff; padding:0;
+      border-radius:10px; border:1px solid #ddd6fe; max-height:48vh; overflow:auto;
+    }
+    .report-box.member-report-box { border-color:#c4b5fd; }
+    .member-report { display:flex; flex-direction:column; gap:8px; padding:10px; }
+    .member-report-hero {
+      background:linear-gradient(135deg,#f5f3ff,#eff6ff);
+      border:1px solid #ddd6fe; border-radius:10px; padding:12px 14px;
+    }
+    .member-report-hero-title { font-size:15px; font-weight:800; color:#4338ca; line-height:1.35; }
+    .member-report-hero-hint { font-size:11px; color:#64748b; margin-top:4px; font-weight:600; }
+    .member-report-sec {
+      border-radius:10px; border:1px solid var(--border); overflow:hidden; background:#fff;
+    }
+    .member-report-sec-title {
+      font-size:12px; font-weight:800; padding:8px 12px; margin:0;
+      border-bottom:1px solid var(--border); line-height:1.35;
+    }
+    .member-report-sec-body { padding:10px 12px 12px; font-size:13px; line-height:1.6; color:#1e293b; }
+    .member-report-sec-body p { margin:0 0 8px; }
+    .member-report-sec-body p:last-child { margin-bottom:0; }
+    .member-report-list { margin:0; padding:0 0 0 18px; }
+    .member-report-list li { margin:0 0 6px; }
+    .member-report-list li:last-child { margin-bottom:0; }
+    .member-report-sec--state .member-report-sec-title { background:#eff6ff; color:#1d4ed8; border-bottom-color:#bfdbfe; }
+    .member-report-sec--program .member-report-sec-title { background:#f5f3ff; color:#6d28d9; border-bottom-color:#ddd6fe; }
+    .member-report-sec--roadmap .member-report-sec-title { background:#ecfdf5; color:#047857; border-bottom-color:#a7f3d0; }
+    .member-report-sec--medical .member-report-sec-title { background:#fff7ed; color:#c2410c; border-bottom-color:#fed7aa; }
+    .member-report-sec--plan .member-report-sec-title { background:#f0fdfa; color:#0f766e; border-bottom-color:#99f6e4; }
+    .member-report-sec--message .member-report-sec-title { background:#f8fafc; color:#475569; border-bottom-color:#e2e8f0; }
+    .member-report-sec-body strong { color:#0f172a; font-weight:800; }
+    .member-report-plain { white-space:pre-wrap; padding:12px; font-size:13px; line-height:1.65; }
+    .eval-ai-report-hint {
+      font-size:11px; color:#64748b; margin:-2px 0 8px; line-height:1.45; font-weight:600;
+    }
     .eval-send-row { margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
     .eval-send-btns { display:flex; gap:8px; }
     .eval-send-btns .btn { flex:1; }
@@ -2054,7 +2089,7 @@
     .eval-hist-section.eval-hist-hidden,
     .eval-add-pain-wrap.eval-hist-hidden { display: none; }
     .eval-exam-block { margin-top: 0; }
-    /* 초회 평가 — 권장 프로그램·3단계 */
+    /* 초회 평가 — 권장 프로그램·5단계 (회원 상담용) */
     .eval-rec-panel {
       margin-bottom:14px; display:flex; flex-direction:column; gap:10px;
     }
@@ -2071,21 +2106,33 @@
     .eval-rec-block {
       border:1px solid var(--border); border-radius:10px; overflow:hidden; background:#fff;
     }
+    .eval-rec-block--roadmap { border-color:#a7f3d0; }
+    .eval-rec-block--program { border-color:#93c5fd; }
+    .eval-rec-block--stages { border-color:#c4b5fd; }
     .eval-rec-block-title {
       font-size:10px; font-weight:800; color:var(--dim);
       padding:8px 12px; background:#f1f5f9; border-bottom:1px solid var(--border);
       letter-spacing:.04em;
     }
+    .eval-rec-block-title--roadmap { background:#ecfdf5; color:#047857; border-bottom-color:#a7f3d0; }
+    .eval-rec-block-title--program { background:#eff6ff; color:#1d4ed8; border-bottom-color:#bfdbfe; }
+    .eval-rec-block-title--stages { background:#f5f3ff; color:#6d28d9; border-bottom-color:#ddd6fe; }
     .eval-rec-stages {
-      display:flex; flex-direction:column; gap:0; padding:8px;
+      display:grid; grid-template-columns:1fr; gap:6px; padding:10px;
     }
-    @media(min-width:520px){
-      .eval-rec-stages { flex-direction:row; align-items:stretch; }
-      .eval-rec-stages .eval-rec-stage + .eval-rec-stage { border-top:none; border-left:1px solid var(--border); }
+    @media(min-width:560px){
+      .eval-rec-stages { grid-template-columns:repeat(5, minmax(0, 1fr)); gap:4px; }
     }
     .eval-rec-stage {
-      flex:1; padding:8px 6px; text-align:center; border-radius:8px; min-width:0;
+      flex:1; padding:8px 6px 10px; text-align:center; border-radius:8px; min-width:0;
+      border:1px solid var(--border); background:#fafafa;
+      border-top:3px solid #cbd5e1;
     }
+    .eval-rec-stage[data-stage="1"] { border-top-color:#2563eb; }
+    .eval-rec-stage[data-stage="2"] { border-top-color:#0d9488; }
+    .eval-rec-stage[data-stage="3"] { border-top-color:#7c3aed; }
+    .eval-rec-stage[data-stage="4"] { border-top-color:#d97706; }
+    .eval-rec-stage[data-stage="5"] { border-top-color:#059669; }
     .eval-rec-stage .sn {
       width:22px; height:22px; border-radius:50%; font-size:11px; font-weight:800;
       display:inline-flex; align-items:center; justify-content:center;
@@ -2094,10 +2141,15 @@
     .eval-rec-stage .st { font-size:10px; font-weight:800; line-height:1.3; color:var(--text); }
     .eval-rec-stage .sk { font-size:9px; color:var(--dim); margin-top:2px; line-height:1.3; }
     .eval-rec-stage.recommended {
-      background:var(--blue-bg); box-shadow:inset 0 0 0 2px var(--blue);
+      background:#fff; box-shadow:0 0 0 2px currentColor;
     }
-    .eval-rec-stage.recommended .sn { background:var(--blue); color:#fff; }
-    .eval-rec-stage.recommended .st { color:var(--blue); }
+    .eval-rec-stage[data-stage="1"].recommended { color:#2563eb; background:#eff6ff; }
+    .eval-rec-stage[data-stage="2"].recommended { color:#0d9488; background:#f0fdfa; }
+    .eval-rec-stage[data-stage="3"].recommended { color:#7c3aed; background:#f5f3ff; }
+    .eval-rec-stage[data-stage="4"].recommended { color:#d97706; background:#fffbeb; }
+    .eval-rec-stage[data-stage="5"].recommended { color:#059669; background:#ecfdf5; }
+    .eval-rec-stage.recommended .sn { background:currentColor; color:#fff; }
+    .eval-rec-stage.recommended .st { color:inherit; font-weight:800; }
     .eval-rec-stage.always .badge,
     .eval-rec-stage.recommended .badge {
       display:inline-block; margin-top:4px; font-size:9px; font-weight:800;
@@ -2133,8 +2185,13 @@
       border-color:#047857; background:#047857; color:#fff;
     }
     .eval-rec-care-node.on-pstr .lbl { color:#047857; font-weight:800; }
-    .eval-rec-stage.prior { background:var(--green-bg); opacity:.85; }
-    .eval-rec-stage.prior .sn { background:var(--green); color:#fff; }
+    .eval-rec-stage.prior { background:#f0fdf4; opacity:.92; border-top-color:#22c55e !important; }
+    .eval-rec-stage.prior .sn { background:#16a34a; color:#fff; }
+    .eval-rec-stage.future { opacity:.45; }
+    .eval-rec-care-node[data-care="invasive"].on .dot { border-color:#dc2626; background:#dc2626; }
+    .eval-rec-care-node[data-care="invasive"].on .lbl { color:#b91c1c; }
+    .eval-rec-care-node[data-care="manual"].on .dot { border-color:#ea580c; background:#ea580c; }
+    .eval-rec-care-node[data-care="manual"].on .lbl { color:#c2410c; }
     .eval-rec-care { padding:10px 12px 12px; }
     .eval-rec-care-track {
       display:flex; justify-content:space-between; gap:4px; position:relative;
@@ -2169,11 +2226,21 @@
     .eval-rec-next strong { color:var(--blue); }
     .eval-report-label {
       font-size:11px; font-weight:800; color:var(--blue); margin:4px 0 6px;
+      display:flex; align-items:center; gap:6px;
     }
+    .eval-report-label::before {
+      content:''; width:4px; height:14px; border-radius:2px; background:var(--blue); flex-shrink:0;
+    }
+    .eval-report-label--summary { color:#1e40af; }
+    .eval-report-label--summary::before { background:#2563eb; }
+    .eval-report-label--ai { color:#6d28d9; }
+    .eval-report-label--ai::before { background:#7c3aed; }
     .eval-consult-summary {
       white-space:pre-wrap; font-size:13px; line-height:1.65;
-      background:#fff; padding:12px; border-radius:8px;
-      border:1px solid var(--border); margin-bottom:12px;
+      background:linear-gradient(90deg,#f8fafc 0%,#fff 48%);
+      padding:12px 12px 12px 14px; border-radius:8px;
+      border:1px solid #bfdbfe; border-left:4px solid #2563eb;
+      margin-bottom:12px;
       max-height:28vh; overflow:auto;
     }
     .eval-ai-status {
@@ -2748,12 +2815,13 @@
         <p id="evalViewEmpty" class="empty-hint">작성 탭에서 평가한 뒤 「AI 리포트 생성」을 누르면 상담 요약과 프로그램 추천이 바로 나옵니다.</p>
         <div id="evalViewContent" hidden>
           <p style="font-size:11px;color:var(--dim);margin-bottom:8px;" id="evalViewDate"></p>
-          <div class="eval-report-label">상담 요약</div>
+          <div class="eval-report-label eval-report-label--summary">상담 요약</div>
           <div class="eval-consult-summary" id="evalConsultSummary"></div>
           <div id="evalProgramRecommendation"></div>
-          <div class="eval-report-label">AI 회원 리포트</div>
+          <div class="eval-report-label eval-report-label--ai">AI 회원 리포트</div>
+          <p class="eval-ai-report-hint">회원과 함께 읽는 안내입니다 · 불릿(·) 위주로 짧게 정리됩니다</p>
           <p class="eval-ai-status" id="evalAiStatus" hidden></p>
-          <div class="report-box" id="evalReportBody"></div>
+          <div class="report-box member-report-box" id="evalReportBody"></div>
           <div class="eval-send-row">
             <p style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.5;">
               <strong>저장</strong> — 주의·특이사항을 회원정보에 남기고, 당일 오늘의 컨디션에도 한 번 반영한 뒤 창을 닫습니다.<br>
@@ -15631,31 +15699,39 @@
     var EVAL_REAL_MOVEMENT_STAGES = [
       {
         num: 1,
-        title: '패시브 스트레칭 / 셀프 통증 케어',
+        title: '패시브 스트레칭',
         short: '패시브 스트레칭',
-        sub: '셀프 통증 케어',
-        desc: '굳은 근육·관절을 안전하게 풀고, 스스로 통증을 관리하는 단계입니다.',
+        sub: '강사가 ROM 제공',
+        desc: '굳은 근육·관절을 안전하게 풀어, 통증 없이 가동범위를 확보하는 단계입니다.',
       },
       {
         num: 2,
-        title: '생활 습관 및 자세 교정 운동',
-        short: '생활습관·자세 교정',
-        sub: '자세 교정 운동',
-        desc: '같은 문제가 반복되지 않도록 일상 습관과 자세를 바꿉니다.',
+        title: '셀프 케어',
+        short: '셀프 케어',
+        sub: '소도구·자가 관리',
+        desc: '집·센터에서 스스로 통증과 긴장을 관리하는 방법을 익히는 단계입니다.',
       },
       {
         num: 3,
-        title: '기초 체력 및 기능 운동',
+        title: '유연성',
+        short: '유연성',
+        sub: '스트레칭·ROM',
+        desc: '유연성과 움직임 범위를 넓혀, 같은 자세에서 덜 당기게 만드는 단계입니다.',
+      },
+      {
+        num: 4,
+        title: '생활습관 · 자세 교정',
+        short: '생활습관·자세',
+        sub: '자세 교정 운동',
+        desc: '일상 습관과 자세를 바꿔, 같은 문제가 반복되지 않게 하는 단계입니다.',
+      },
+      {
+        num: 5,
+        title: '기초 체력 · 기능',
         short: '기초 체력·기능',
         sub: '기능 운동',
-        desc: '기초 체력을 키우고, 균형 있게 움직이는 힘을 만듭니다.',
+        desc: '기초 체력과 균형·기능을 키워, 움직임을 일상에 옮기는 단계입니다.',
       },
-    ];
-
-    var EVAL_POSITION_FLOW = [
-      { num: 1, title: '누운 자세', sub: '가장 안전한 시작' },
-      { num: 2, title: '앉은 자세', sub: '일상 정렬' },
-      { num: 3, title: '선 자세', sub: '균형·기능' },
     ];
 
     function evalNeedsMedicalParallel_(histState) {
@@ -15688,12 +15764,18 @@
       var medicalKind = evalMedicalKind_(histState);
 
       var movementStage = 1;
-      if (needsMedical || goalId === 'stretch' || goalId === 'prevention' || histHasAny(histState, 'goal', [/통증/])) {
+      if (needsMedical || histHasAny(histState, 'goal', [/통증/])) {
         movementStage = 1;
-      } else if (goalId === 'fitness') {
-        movementStage = 3;
-      } else {
+      } else if (goalId === 'prevention') {
         movementStage = 2;
+      } else if (goalId === 'stretch') {
+        movementStage = 3;
+      } else if (goalId === 'posture' || goalId === 'face') {
+        movementStage = 4;
+      } else if (goalId === 'fitness') {
+        movementStage = 5;
+      } else {
+        movementStage = 1;
       }
 
       var stageInfo = EVAL_REAL_MOVEMENT_STAGES[movementStage - 1] || EVAL_REAL_MOVEMENT_STAGES[0];
@@ -15708,14 +15790,13 @@
       if (needsMedical) {
         extra = '통증 정도나 양상(날카로움·이상감각 등)을 보면 주사·보존 치료가 필요할 수 있어, 전문 의료 또는 비침습 치료를 병행하는 것이 좋습니다. 이와 함께 안전한 패시브 스트레칭은 항상 진행합니다.';
       }
-      var positionNote = '이후 운동은 안전하게 누운 자세에서 시작하고, 앉은 자세 → 선 자세 순으로 진행합니다.';
-      var programDesc = [stageInfo.desc, extra, positionNote].filter(Boolean).join(' ');
+      var programDesc = [stageInfo.desc, extra].filter(Boolean).join(' ');
 
       return {
         goalId: goalId,
         programName: movementStage + '단계 · ' + stageInfo.title,
         programDesc: programDesc,
-        programNext: positionNote,
+        programNext: '',
         needsMedicalParallel: needsMedical,
         medicalKind: medicalKind,
         careSteps: careSteps,
@@ -15732,6 +15813,99 @@
       };
     }
 
+    function memberReportSectionKind_(title) {
+      var t = String(title || '');
+      if (/^6\.|문자|알림톡|보내.*메시지|보내.*메세지/.test(t)) return 'message';
+      if (/^1\.|알아두|몸 상태|몸상태/.test(t)) return 'state';
+      if (/^2\.|프로그램|시작할/.test(t)) return 'program';
+      if (/^3\.|로드맵|관리 순서|PAR/.test(t)) return 'roadmap';
+      if (/^4\.|병원|병행|의료|센터/.test(t)) return 'medical';
+      if (/^5\.|계획|앞으로|다음/.test(t)) return 'plan';
+      return 'default';
+    }
+
+    function memberReportInlineFormat_(escaped) {
+      return String(escaped || '')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    }
+
+    function memberReportBodyToHtml_(body) {
+      body = String(body || '').trim();
+      if (!body) return '';
+      var lines = body.split('\n');
+      var parts = [];
+      var listItems = [];
+      function flushList() {
+        if (!listItems.length) return;
+        parts.push('<ul class="member-report-list">' + listItems.join('') + '</ul>');
+        listItems = [];
+      }
+      lines.forEach(function (line) {
+        var t = String(line || '').trim();
+        if (!t) {
+          flushList();
+          return;
+        }
+        var bullet = t.match(/^[-•·*]\s+(.+)/);
+        if (bullet) {
+          listItems.push(
+            '<li>' + memberReportInlineFormat_(escapeHtml(bullet[1])) + '</li>'
+          );
+        } else {
+          flushList();
+          parts.push('<p>' + memberReportInlineFormat_(escapeHtml(t)) + '</p>');
+        }
+      });
+      flushList();
+      return parts.join('');
+    }
+
+    /** AI 리포트 plain text → 회원 상담용 카드 HTML */
+    function renderEvalMemberReportHtml_(raw) {
+      var text = String(raw || '').trim();
+      if (!text) return '';
+      var hasStructured = /^##\s/m.test(text) || /^###\s/m.test(text) || /^\d+\.\s/m.test(text);
+      if (!hasStructured) {
+        return '<div class="member-report-plain">' + escapeHtml(text) + '</div>';
+      }
+      var lines = text.split('\n');
+      var heroTitle = '';
+      var startIdx = 0;
+      if (lines[0] && /^##\s+/.test(lines[0])) {
+        heroTitle = lines[0].replace(/^##\s+/, '').trim();
+        startIdx = 1;
+      }
+      var rest = lines.slice(startIdx).join('\n').trim();
+      var chunks = rest.split(/\n(?=###\s+)/);
+      if (chunks.length <= 1) {
+        chunks = rest.split(/\n(?=\d+\.\s+)/);
+      }
+      var html = ['<div class="member-report">'];
+      if (heroTitle) {
+        html.push(
+          '<header class="member-report-hero">' +
+            '<h3 class="member-report-hero-title">' + escapeHtml(heroTitle) + '</h3>' +
+            '<p class="member-report-hero-hint">강사와 함께 읽는 안내입니다</p>' +
+          '</header>'
+        );
+      }
+      chunks.forEach(function (chunk) {
+        chunk = String(chunk || '').trim();
+        if (!chunk) return;
+        var nl = chunk.indexOf('\n');
+        var titleLine = nl >= 0 ? chunk.slice(0, nl).trim() : chunk;
+        var body = nl >= 0 ? chunk.slice(nl + 1).trim() : '';
+        titleLine = titleLine.replace(/^###\s+/, '').trim();
+        var kind = memberReportSectionKind_(titleLine);
+        html.push('<section class="member-report-sec member-report-sec--' + kind + '">');
+        html.push('<h4 class="member-report-sec-title">' + escapeHtml(titleLine) + '</h4>');
+        html.push('<div class="member-report-sec-body">' + memberReportBodyToHtml_(body) + '</div>');
+        html.push('</section>');
+      });
+      html.push('</div>');
+      return html.join('');
+    }
+
     function renderEvalProgramRecommendation(rec) {
       var root = document.getElementById('evalProgramRecommendation');
       if (!root) return;
@@ -15739,22 +15913,24 @@
         root.innerHTML = '';
         return;
       }
-      var stageNum = Math.min(3, Math.max(1, Number(rec.movementStage) || 1));
+      var stageNum = Math.min(5, Math.max(1, Number(rec.movementStage) || 1));
       var stagesHtml = EVAL_REAL_MOVEMENT_STAGES.map(function (st) {
         var cls = 'eval-rec-stage';
         var badge = '';
         if (st.num === 1) {
           cls += ' always';
-          badge = '<div class="badge">항상 권장</div>';
+          badge = '<div class="badge">항상 병행</div>';
         }
         if (st.num === stageNum) {
           cls += ' recommended';
           badge = '<div class="badge">지금 필요</div>';
         } else if (st.num < stageNum) {
           cls += ' prior';
+        } else {
+          cls += ' future';
         }
         return (
-          '<div class="' + cls + '">' +
+          '<div class="' + cls + '" data-stage="' + st.num + '">' +
             '<div class="sn">' + st.num + '</div>' +
             '<div class="st">' + escapeHtml(st.short) + '</div>' +
             '<div class="sk">' + escapeHtml(st.sub) + '</div>' +
@@ -15772,22 +15948,10 @@
           cls += step.id === 'pstr' ? ' on-pstr' : ' on';
         }
         return (
-          '<div class="' + cls + '">' +
+          '<div class="' + cls + '" data-care="' + escapeHtml(step.id) + '">' +
             '<div class="dot">' + escapeHtml(step.short) + '</div>' +
             '<div class="lbl">' + escapeHtml(step.label) + '</div>' +
           '</div>'
-        );
-      }).join('');
-
-      var posHtml = EVAL_POSITION_FLOW.map(function (pos, i) {
-        var cls = 'eval-rec-pos' + (i === 0 ? ' start' : '');
-        var arrow = i < EVAL_POSITION_FLOW.length - 1 ? '<div class="eval-rec-pos-arrow" aria-hidden="true">→</div>' : '';
-        return (
-          '<div class="' + cls + '">' +
-            '<div class="pn">' + pos.num + '</div>' +
-            '<div class="pt">' + escapeHtml(pos.title) + '</div>' +
-            '<div class="ps">' + escapeHtml(pos.sub) + '</div>' +
-          '</div>' + arrow
         );
       }).join('');
 
@@ -15797,23 +15961,19 @@
 
       root.innerHTML =
         '<div class="eval-rec-panel">' +
+          consultHtml +
+          '<div class="eval-rec-block eval-rec-block--roadmap">' +
+            '<div class="eval-rec-block-title eval-rec-block-title--roadmap">관리 로드맵 (PAR) — ' + escapeHtml(rec.careStepLabel || '') + '</div>' +
+            '<div class="eval-rec-care"><div class="eval-rec-care-track">' + careHtml + '</div></div>' +
+          '</div>' +
           '<div class="eval-rec-hero">' +
             '<div class="rec-tag">리얼 무브먼트 프로그램 추천</div>' +
             '<div class="rec-name">' + escapeHtml(rec.programName) + '</div>' +
             '<div class="rec-desc">' + escapeHtml(rec.programDesc) + '</div>' +
           '</div>' +
-          consultHtml +
-          '<div class="eval-rec-block">' +
-            '<div class="eval-rec-block-title">Re:Al Movement 3단계 — 현재 필요 · ' + stageNum + '단계</div>' +
+          '<div class="eval-rec-block eval-rec-block--stages">' +
+            '<div class="eval-rec-block-title eval-rec-block-title--stages">Re:Al Movement 5단계 — 현재 필요 · ' + stageNum + '단계</div>' +
             '<div class="eval-rec-stages">' + stagesHtml + '</div>' +
-          '</div>' +
-          '<div class="eval-rec-block">' +
-            '<div class="eval-rec-block-title">운동 진행 순서 — 누운 자세에서 안전하게 시작</div>' +
-            '<div class="eval-rec-posflow">' + posHtml + '</div>' +
-          '</div>' +
-          '<div class="eval-rec-block">' +
-            '<div class="eval-rec-block-title">관리 로드맵 (PAR) — ' + escapeHtml(rec.careStepLabel || '') + '</div>' +
-            '<div class="eval-rec-care"><div class="eval-rec-care-track">' + careHtml + '</div></div>' +
           '</div>' +
         '</div>';
     }
@@ -15961,16 +16121,21 @@
           aiStatus.textContent = '';
           aiStatus.classList.remove('is-pending');
         }
-        if (body) body.textContent = report;
+        if (body) body.innerHTML = renderEvalMemberReportHtml_(report);
         state.evalAiReport = report;
         state.evalReportText = report;
       } else if (opts.aiPending) {
         if (aiStatus) {
           aiStatus.hidden = false;
           aiStatus.classList.add('is-pending');
-          aiStatus.textContent = 'AI 리포트 생성 중… 상담은 위 요약으로 진행해 주세요.';
+          aiStatus.textContent = 'AI 리포트 생성 중… 상담은 위 요약·프로그램 추천으로 진행해 주세요.';
         }
-        if (body) body.textContent = 'AI 리포트는 생성되는 대로 여기에 표시됩니다.';
+        if (body) {
+          body.innerHTML =
+            '<div class="member-report-plain" style="padding:12px;color:#64748b;">' +
+            '회원 안내 리포트가 준비되는 대로 아래에 카드 형식으로 표시됩니다.' +
+            '</div>';
+        }
       } else if (opts.aiWaitingPhone) {
         if (aiStatus) {
           aiStatus.hidden = false;
