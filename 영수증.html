@@ -379,6 +379,25 @@
   body.mode-links .receipt-dock,
   body.mode-unbooked .receipt-dock,
   body.mode-docs .receipt-dock { display: none; }
+  .unbooked-hd {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .unbooked-refresh {
+    display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto;
+    border: 1.5px solid #d7d0c4; background: #fff; color: var(--ink);
+    font-size: 12px; font-weight: 800; padding: 6px 10px; border-radius: 999px; cursor: pointer;
+  }
+  .unbooked-refresh-ico { width: 14px; height: 14px; flex: 0 0 auto; display: block; }
+  .unbooked-refresh-label { font-variant-numeric: tabular-nums; }
+  .unbooked-refresh.is-loading,
+  .unbooked-refresh.is-loading:hover {
+    background: #dc2626; border-color: #fecaca; color: #fff;
+  }
+  .unbooked-refresh.is-loading .unbooked-refresh-ico {
+    animation: unbooked-refresh-spin .8s linear infinite;
+  }
+  .unbooked-refresh.is-loading .unbooked-refresh-label { min-width: 5.6em; text-align: center; }
+  @keyframes unbooked-refresh-spin { to { transform: rotate(360deg); } }
   .unbooked-summary {
     font-size: 13px; font-weight: 700; line-height: 1.5; color: var(--ink); margin: 0 0 12px;
   }
@@ -390,14 +409,42 @@
   }
   .unbooked-card.is-gap { background: #fffbeb; border-color: #fcd34d; }
   .unbooked-card.is-over { background: #fef2f2; border-color: #fecaca; }
+  .unbooked-card.is-yaksu { background: #FFF3E0; border-color: #E8C48A; }
+  .unbooked-card.is-incheon { background: #E8F4FC; border-color: #9ECAE8; }
+  .unbooked-card.is-yaksu.is-gap { background: #FFE4C2; border-color: #E8A317; }
+  .unbooked-card.is-incheon.is-gap { background: #D4ECFA; border-color: #3B82C4; }
+  .unbooked-card.is-yaksu.is-over,
+  .unbooked-card.is-incheon.is-over { box-shadow: inset 3px 0 0 #ef4444; }
+  .unbooked-filterbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    margin: 0 0 8px; padding: 8px 10px; border-radius: 12px;
+    background: var(--ink); color: #fff; font-size: 13px; font-weight: 800;
+  }
+  .unbooked-filter-clear {
+    border: 0; background: #fff; color: var(--ink);
+    font-size: 12px; font-weight: 800; padding: 5px 10px; border-radius: 999px; cursor: pointer;
+  }
   .unbooked-card-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .unbooked-name { display: flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; }
   .unbooked-card-top strong { font-size: 14px; }
+  .unbooked-inst {
+    border: 0; background: rgba(255,255,255,.82); color: var(--ink);
+    font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 999px; cursor: pointer;
+  }
+  .unbooked-inst.is-on { background: var(--ink); color: #fff; }
   .unbooked-phone { font-size: 12px; color: var(--mute); font-weight: 700; white-space: nowrap; }
   .unbooked-nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
   .unbooked-nums div { background: #f4f1ea; border-radius: 10px; padding: 8px 6px; text-align: center; }
-  .unbooked-card.is-gap .unbooked-nums div { background: rgba(255,255,255,.72); }
+  .unbooked-card.is-gap .unbooked-nums div,
+  .unbooked-card.is-yaksu .unbooked-nums div,
+  .unbooked-card.is-incheon .unbooked-nums div { background: rgba(255,255,255,.82); }
   .unbooked-nums dt { font-size: 10px; color: var(--mute); font-weight: 800; }
   .unbooked-nums dd { font-size: 16px; font-weight: 800; margin: 2px 0 0; }
+  .unbooked-dates {
+    display: flex; flex-wrap: wrap; gap: 6px 14px;
+    margin: 8px 0 0; font-size: 12px; font-weight: 700; color: #92400e;
+  }
+  .unbooked-card.is-incheon .unbooked-dates { color: #1e4e6b; }
   .unbooked-last { margin: 8px 0 0; font-size: 12px; font-weight: 700; color: #92400e; }
 
   .docs-work-tabs {
@@ -1151,12 +1198,20 @@
 
     <div id="panelUnbooked" class="panel">
       <section class="card">
-        <div class="card-title">미예약 확인</div>
+        <div class="card-title unbooked-hd">
+          <span>미예약 확인</span>
+          <button type="button" class="unbooked-refresh" id="btnUnbookedRefresh" title="새로고침" aria-label="새로고침">
+            <svg class="unbooked-refresh-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 2v6h-6"></path>
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+              <path d="M3 22v-6h6"></path>
+              <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+            </svg>
+            <span class="unbooked-refresh-label" id="unbookedRefreshLabel">새로고침</span>
+          </button>
+        </div>
         <p class="unbooked-summary" id="unbookedSummary">남은 횟수가 있는 회원의 예약과 비교합니다.</p>
         <div id="unbookedBody"><p class="unbooked-wait">탭을 열면 확인을 시작합니다.</p></div>
-        <div class="chat-actions" style="margin-top:12px;">
-          <button type="button" class="btn btn-print" id="btnUnbookedRefresh">다시 확인</button>
-        </div>
       </section>
     </div>
 
@@ -2192,7 +2247,7 @@
   }
   var chatImages = [];
   var chatImages2 = [];
-  var faqId = 'hello';
+  var faqId = 'consult';
   var consultFollow = 0;
   var ocrWorker = null;
   var tesseractLoading = null;
@@ -2904,6 +2959,19 @@
     if (isAcademyBranch()) return academyFaqs();
     var b = BRANCH[consultBranch];
     return [
+      { id: 'consult', label: '상담 신청', text: [
+        '안녕하세요, OO님! 리얼무브먼트 입니다 😊',
+        '',
+        '남겨주신 고민 내용 잘 확인했습니다. 내원하셨을 때 자세히 살펴보고 방향을 같이 잡아보면 좋을 것 같습니다.',
+        '',
+        '희망 일정에 맞춰 아래 시간으로 예약을 잡아두려고 하는데 이 시간 괜찮으실까요?',
+        '',
+        '📌 월 일() 시 분 또는 시 분',
+        '',
+        '두 시간대 중 편하신 시간을 말씀해주시면 확정해드리겠습니다. 혹시 두 시간 모두 어려우시면 편하신 다른 시간도 알려주세요.',
+        '',
+        '감사합니다.'
+      ].join('\n') },
       { id: 'hello', label: '첫 인사', text: [
         '안녕하세요. 반갑습니다.',
         '움직임을 편하게, Better Movement, Better Life.',
@@ -4591,6 +4659,10 @@
   var unbookedLeft = 0;
   var unbookedGen = 0;
   var unbookedAbort = null;
+  var unbookedRows = [];
+  var unbookedInstFilter = '';
+  var unbookedReady = false;
+  var unbookedBusy = false;
 
   function escHtml_(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -4605,67 +4677,121 @@
   }
   function resetUnbookedButton_() {
     var btn = $('btnUnbookedRefresh');
-    if (!btn) return;
+    var label = $('unbookedRefreshLabel');
+    if (!btn || !label) return;
+    btn.classList.remove('is-loading');
     btn.disabled = false;
-    btn.textContent = '다시 확인';
+    label.textContent = '새로고침';
+    btn.title = '새로고침';
+    btn.setAttribute('aria-label', '새로고침');
+  }
+  function paintUnbookedRefresh_() {
+    var btn = $('btnUnbookedRefresh');
+    var label = $('unbookedRefreshLabel');
+    if (!btn || !label) return;
+    btn.classList.add('is-loading');
+    var left = unbookedLeft;
+    if (left > 0) {
+      label.textContent = '예상 ' + left + '초';
+      btn.title = '새로고침 중 · 예상 ' + left + '초';
+      btn.setAttribute('aria-label', '새로고침 중, 예상 ' + left + '초');
+      return;
+    }
+    label.textContent = '지연 중';
+    btn.title = '새로고침 지연 중';
+    btn.setAttribute('aria-label', '새로고침 지연 중');
   }
   function paintUnbookedWait_() {
+    paintUnbookedRefresh_();
+    if (unbookedReady || unbookedRows.length) return;
     var summary = $('unbookedSummary');
     var body = $('unbookedBody');
-    var btn = $('btnUnbookedRefresh');
     var wait = unbookedLeft > 0
       ? ('예상 ' + UNBOOKED_EST_SEC + '초 · ' + unbookedLeft + '초 남음')
       : ('예상 ' + UNBOOKED_EST_SEC + '초 · 조금 더 걸리고 있어요');
     if (summary) summary.textContent = '회원정보와 스케줄표를 비교하는 중입니다. (' + wait + ')';
     if (body) body.innerHTML = '<p class="unbooked-wait" aria-live="polite">확인하는 중…<b>' + wait + '</b></p>';
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = unbookedLeft > 0 ? ('확인 중 ' + unbookedLeft + '초') : '확인 중…';
-    }
   }
   function showUnbookedFail_(msg) {
-    var summary = $('unbookedSummary');
-    var body = $('unbookedBody');
-    if (summary) summary.textContent = msg;
-    if (body) body.innerHTML = '<p class="unbooked-wait">' + escHtml_(msg) + '</p>';
+    if (!unbookedRows.length) {
+      var summary = $('unbookedSummary');
+      var body = $('unbookedBody');
+      if (summary) summary.textContent = msg;
+      if (body) body.innerHTML = '<p class="unbooked-wait">' + escHtml_(msg) + '</p>';
+    }
     resetUnbookedButton_();
   }
+  function unbookedBranchClass_(branch) {
+    var b = String(branch || '');
+    if (/인천|작전/.test(b)) return ' is-incheon';
+    if (/약수/.test(b)) return ' is-yaksu';
+    return '';
+  }
   function renderUnbookedList_(data) {
+    unbookedRows = (data && data.rows) || [];
+    unbookedInstFilter = '';
+    paintUnbookedRows_();
+  }
+  function paintUnbookedRows_() {
     var summary = $('unbookedSummary');
     var body = $('unbookedBody');
     if (!body) return;
-    var rows = (data && data.rows) || [];
+    var rows = unbookedRows.filter(function (row) {
+      if (!unbookedInstFilter) return true;
+      return String(row.instructor || '').trim() === unbookedInstFilter;
+    });
     var gapN = 0;
     rows.forEach(function (row) {
       if ((parseInt(row.unbooked, 10) || 0) > 0) gapN += 1;
     });
     if (summary) {
+      var head = unbookedInstFilter ? (unbookedInstFilter + ' 담당 ') : '남은 횟수 있는 회원 ';
       summary.textContent = rows.length
-        ? ('남은 횟수 있는 회원 ' + rows.length + '명 · 아직 예약이 부족한 회원 ' + gapN + '명. 예약횟수는 오늘부터 출석 체크 전인 예약입니다.')
-        : '남은 횟수가 있는 회원이 없습니다.';
+        ? (head + rows.length + '명 · 아직 예약이 부족한 회원 ' + gapN + '명. 예약횟수는 오늘부터 출석 체크 전인 예약입니다.')
+        : (unbookedInstFilter ? (unbookedInstFilter + ' 담당 회원이 없습니다.') : '남은 횟수가 있는 회원이 없습니다.');
     }
     if (!rows.length) {
-      body.innerHTML = '<p class="unbooked-wait">남은 횟수가 있는 회원이 없습니다.</p>';
+      body.innerHTML = (unbookedInstFilter
+        ? '<div class="unbooked-filterbar"><span>' + escHtml_(unbookedInstFilter) + ' 담당만</span><button type="button" class="unbooked-filter-clear">전체</button></div>'
+        : '') + '<p class="unbooked-wait">' + (unbookedInstFilter ? '이 담당 강사의 회원이 없습니다.' : '남은 횟수가 있는 회원이 없습니다.') + '</p>';
       resetUnbookedButton_();
       return;
     }
-    body.innerHTML = '<div class="unbooked-list">' + rows.map(function (row) {
+    var filterBar = unbookedInstFilter
+      ? '<div class="unbooked-filterbar"><span>' + escHtml_(unbookedInstFilter) + ' 담당만</span><button type="button" class="unbooked-filter-clear">전체</button></div>'
+      : '';
+    body.innerHTML = filterBar + '<div class="unbooked-list">' + rows.map(function (row) {
       var unbooked = parseInt(row.unbooked, 10) || 0;
-      var cls = unbooked > 0 ? ' is-gap' : (unbooked < 0 ? ' is-over' : '');
-      var last = '';
-      if (unbooked > 0) {
-        last = '<p class="unbooked-last">마지막 예약일 ' + escHtml_(row.lastDateLabel || '없음') + '</p>';
-      }
+      var cls = (unbooked > 0 ? ' is-gap' : (unbooked < 0 ? ' is-over' : '')) + unbookedBranchClass_(row.branch);
+      var inst = String(row.instructor || '').trim();
+      var instHtml = inst
+        ? '<button type="button" class="unbooked-inst' + (unbookedInstFilter === inst ? ' is-on' : '') + '" data-inst="' + escHtml_(inst) + '">' + escHtml_(inst) + '</button>'
+        : '';
+      var dates = '<p class="unbooked-dates"><span>마지막 출석일 ' + escHtml_(row.lastAttendLabel || '없음') + '</span><span>마지막 예약일 ' + escHtml_(row.lastDateLabel || '없음') + '</span></p>';
       return '<article class="unbooked-card' + cls + '">' +
-        '<div class="unbooked-card-top"><strong>' + escHtml_(row.name || '—') + '</strong>' +
+        '<div class="unbooked-card-top"><div class="unbooked-name"><strong>' + escHtml_(row.name || '—') + '</strong>' + instHtml + '</div>' +
         '<span class="unbooked-phone">' + escHtml_(row.phone || '—') + '</span></div>' +
         '<dl class="unbooked-nums">' +
         '<div><dt>남은횟수</dt><dd>' + escHtml_(row.remain) + '</dd></div>' +
         '<div><dt>예약횟수</dt><dd>' + escHtml_(row.reserved) + '</dd></div>' +
         '<div><dt>예약되지 않은 횟수</dt><dd>' + escHtml_(row.unbooked) + '</dd></div>' +
-        '</dl>' + last + '</article>';
+        '</dl>' + dates + '</article>';
     }).join('') + '</div>';
     resetUnbookedButton_();
+  }
+  function onUnbookedBodyClick_(ev) {
+    var clearBtn = ev.target.closest && ev.target.closest('.unbooked-filter-clear');
+    if (clearBtn) {
+      unbookedInstFilter = '';
+      paintUnbookedRows_();
+      return;
+    }
+    var btn = ev.target.closest && ev.target.closest('.unbooked-inst');
+    if (!btn) return;
+    var name = btn.getAttribute('data-inst') || '';
+    if (!name) return;
+    unbookedInstFilter = unbookedInstFilter === name ? '' : name;
+    paintUnbookedRows_();
   }
   function cancelUnbookedCheck_() {
     unbookedGen += 1;
@@ -4678,6 +4804,7 @@
   }
   function startUnbookedCheck_() {
     unbookedGen += 1;
+    unbookedBusy = true;
     var gen = unbookedGen;
     if (unbookedAbort) {
       try { unbookedAbort.abort(); } catch (eAbort) {}
@@ -4704,6 +4831,8 @@
       try { data = JSON.parse(text); } catch (eParse) { data = { ok: false, message: '응답을 읽지 못했습니다.' }; }
       stopUnbookedCountdown_();
       unbookedAbort = null;
+      unbookedBusy = false;
+      unbookedReady = true;
       if (!data || data.ok === false) {
         showUnbookedFail_((data && data.message) || '목록을 불러오지 못했습니다.');
         return;
@@ -4714,6 +4843,8 @@
       if (gen !== unbookedGen) return;
       stopUnbookedCountdown_();
       unbookedAbort = null;
+      unbookedBusy = false;
+      unbookedReady = true;
       if (err && err.name === 'AbortError') {
         showUnbookedFail_('서버 응답 시간 초과(약 ' + Math.round(UNBOOKED_TIMEOUT_MS / 1000) + '초). 다시 확인해 주세요.');
         return;
@@ -4762,8 +4893,7 @@
         if (ok) fillDocsScreen();
       });
     }
-    if (which === 'unbooked') startUnbookedCheck_();
-    else cancelUnbookedCheck_();
+    if (which === 'unbooked' && !unbookedReady && !unbookedBusy) startUnbookedCheck_();
   }
   function applyQuery() {
     var q = new URLSearchParams(location.search);
@@ -4847,6 +4977,7 @@
   document.getElementById('appTabUnbooked').addEventListener('click', function () { setAppTab('unbooked'); });
   document.getElementById('appTabReceipt').addEventListener('click', function () { setAppTab('receipt'); });
   document.getElementById('btnUnbookedRefresh').addEventListener('click', startUnbookedCheck_);
+  document.getElementById('unbookedBody').addEventListener('click', onUnbookedBodyClick_);
   document.getElementById('appTabDocs').addEventListener('click', function () { setAppTab('docs'); });
   $('docsPinCancel').addEventListener('click', closeDocsPin);
   $('docsPinOverlay').addEventListener('click', function (e) {
