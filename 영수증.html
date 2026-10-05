@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="리얼무브먼트_링크_로고.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700&family=Great+Vibes&family=Montserrat:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
   :root {
@@ -725,6 +725,78 @@
     .doc-payer-info .span2 { grid-column: span 1; }
   }
 
+  #certPanel { display: none; }
+  body.academy-mode #consultChatBlocks { display: none !important; }
+  body.academy-mode #certPanel { display: block; }
+  #consultChatBlocks[hidden] { display: none !important; }
+  #certPanel:not([hidden]) { display: block; }
+  .cert-lead {
+    font-size: 12.5px; color: var(--mute); font-weight: 650;
+    line-height: 1.55; margin: 0 0 10px;
+  }
+  .cert-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .cert-actions .btn { flex: 1; }
+  .cert-note {
+    font-size: 12px; color: var(--mute); font-weight: 650;
+    line-height: 1.45; margin: 8px 0 0;
+  }
+  .cert-list {
+    max-height: 280px; overflow: auto;
+    display: flex; flex-direction: column; gap: 6px;
+    margin-top: 8px;
+  }
+  .cert-row {
+    display: flex; align-items: flex-start; gap: 8px;
+    border: 1px solid #e2ddd3; border-radius: 12px;
+    background: #fff; padding: 8px 10px; cursor: pointer;
+  }
+  .cert-row.is-on { border-color: var(--ink); background: #f7f5f0; }
+  .cert-row input { margin-top: 3px; }
+  .cert-row b { display: block; font-size: 14px; }
+  .cert-row small { display: block; color: var(--mute); font-weight: 650; font-size: 11.5px; line-height: 1.4; }
+  .cert-search {
+    width: 100%; margin-top: 10px;
+    border: 1px solid #e2ddd3; background: #faf9f6;
+    border-radius: 10px; padding: 10px 11px; font-size: 14px;
+  }
+  .cert-person {
+    border: 1px solid #e2ddd3; border-radius: 14px;
+    padding: 10px; margin-top: 8px; background: #fff;
+  }
+  .cert-person.is-on { border-color: var(--ink); }
+  .cert-person-hd {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-bottom: 8px;
+  }
+  .cert-person-hd strong { font-size: 13px; }
+  .cert-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cert-fields .span2 { grid-column: span 2; }
+  .cert-fields label { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .cert-fields label span { font-size: 11px; font-weight: 800; color: var(--mute); }
+  .cert-fields input, .cert-fields select, .cert-fields textarea {
+    width: 100%; border: 1px solid #e2ddd3; background: #faf9f6;
+    border-radius: 10px; padding: 9px 10px; font-size: 14px; color: var(--ink);
+  }
+  .cert-fields textarea { min-height: 72px; resize: vertical; line-height: 1.45; }
+  .cert-preview {
+    margin-top: 12px; overflow: hidden; border-radius: 12px;
+    box-shadow: 0 12px 36px rgba(18,20,26,.12); background: #fff;
+  }
+  .cert-preview canvas { width: 100%; height: auto; display: block; }
+  .cert-add { margin-top: 8px; }
+  .cert-names {
+    width: 100%; min-height: 88px; resize: vertical;
+    border: 1px solid #e2ddd3; background: #faf9f6;
+    border-radius: 10px; padding: 10px 11px; font-size: 15px;
+    color: var(--ink); line-height: 1.5;
+  }
+  .cert-draft-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .cert-draft-chips .chip { cursor: pointer; }
+  @media (max-width: 520px) {
+    .cert-fields { grid-template-columns: 1fr; }
+    .cert-fields .span2 { grid-column: auto; }
+  }
+
   .card {
     background: #fff;
     border-radius: 18px;
@@ -997,6 +1069,7 @@
         <a class="btn-sm faq-dl" id="btnSaveDiffFront">차별성 앞</a>
         <a class="btn-sm faq-dl" id="btnSaveDiffBack">차별성 뒤</a>
       </div>
+      <div id="consultChatBlocks">
       <section class="card no-print">
         <div class="field">
           <label>회원 질문</label>
@@ -1035,6 +1108,28 @@
         </div>
         <textarea class="reply-box is-copy" id="chatFollow" readonly title="누르면 복사됩니다" placeholder="이어서 넣으면 다음 멘트가 생깁니다. 멘트를 누르면 복사됩니다."></textarea>
       </section>
+      </div>
+      <section class="card no-print" id="certPanel" hidden>
+        <div class="reply-label"><span>수료증 발급</span></div>
+        <p class="cert-lead" id="certLead"></p>
+        <div class="chips" id="certTemplates"></div>
+        <p class="cert-note" id="certNote"></p>
+        <div class="cert-actions">
+          <button type="button" class="btn btn-ghost" id="btnCertLoad">불러오기</button>
+          <button type="button" class="btn btn-ghost" id="btnCertAddManual">직접 추가</button>
+          <button type="button" class="btn btn-print" id="btnCertMake">만들기</button>
+        </div>
+        <p class="ocr-status" id="certStatus"></p>
+        <div id="certEditor"></div>
+        <div class="cert-preview-wrap" id="certPreviewWrap">
+          <div class="preview-label">미리보기</div>
+          <div class="cert-preview"><canvas id="certCanvas"></canvas></div>
+          <div class="cert-actions">
+            <button type="button" class="btn btn-ghost" id="btnCertSaveOne" hidden>이 수료증 저장</button>
+            <button type="button" class="btn btn-print" id="btnCertSaveAll" hidden>모두 저장</button>
+          </div>
+        </div>
+      </section>
     </div>
 
     <div id="panelLinks" class="panel">
@@ -1057,6 +1152,14 @@
           <div class="link-card">
             <a class="link-card-go" href="https://breezefeel.github.io/Thewellness/" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🗓</span><span class="link-card-txt"><span class="link-card-name">플래너</span><span class="link-card-sub">콘텐츠 · 발행 일정</span></span></a>
             <button type="button" class="link-copy" data-copy="https://breezefeel.github.io/Thewellness/">복사</button>
+          </div>
+          <div class="link-card">
+            <a class="link-card-go" href="https://breezefeel.github.io/drpark/?flow=psp" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">📘</span><span class="link-card-txt"><span class="link-card-name">PSP 임상 프로토콜</span><span class="link-card-sub">컨셉 요약 · 1 / 2</span></span></a>
+            <button type="button" class="link-copy" data-copy="https://breezefeel.github.io/drpark/?flow=psp">복사</button>
+          </div>
+          <div class="link-card">
+            <a class="link-card-go" href="https://breezefeel.github.io/drpark/?flow=psp&page=2" target="_blank" rel="noopener noreferrer"><span class="link-card-ico">🗂</span><span class="link-card-txt"><span class="link-card-name">전체 구조 상세보기</span><span class="link-card-sub">PSP · 2 / 2</span></span></a>
+            <button type="button" class="link-copy" data-copy="https://breezefeel.github.io/drpark/?flow=psp&page=2">복사</button>
           </div>
         </div>
         <div class="links-grid" style="margin-top:6px">
@@ -1899,6 +2002,23 @@
     return consultBranch === 'cmt' || consultBranch === 'ifc' || consultBranch === 'real';
   }
   var ACADEMY_ASK = '일정·수강료·현장 준비 관련해서 궁금한 점 있으신가요?';
+  function academyWeekNotice_(courseName, url) {
+    return [
+      '안녕하세요.',
+      courseName + ' 수업이 1주일 앞으로 다가왔습니다.',
+      '',
+      '스케줄 변동 없이 참여하시는지 확인 부탁드립니다.',
+      '일정이 어려우시면 오늘 저녁까지는 알려 주세요.',
+      '',
+      '수업 전에 사전 영상과 이전 실습 영상을 시청해 주시고요.',
+      url,
+      '',
+      '교육에서 뵙겠습니다.',
+      '',
+      '교육장 오는길',
+      'https://blog.naver.com/allenjoy/224307689748'
+    ].join('\n');
+  }
   var ACADEMY_BANK = '우리 583-373-1970-2001';
   var ACADEMY_DEPOSIT = [
     '신청서 작성만으로는 자리가 확정되지 않습니다.',
@@ -2026,7 +2146,8 @@
           '재수강은 세션당 대관비 2만 원입니다.',
           '',
           ACADEMY_ASK
-        ].join('\n') }
+        ].join('\n') },
+        { id: 'week', label: '1주전 안내', text: academyWeekNotice_('CMT 임상도수치료', 'https://cafe.naver.com/ksnim/1076') }
       ]
     },
     ifc: {
@@ -2119,7 +2240,8 @@
           '세부는 입금 확인 후 일정·오시는 길과 함께 보내드립니다.',
           '',
           ACADEMY_ASK
-        ].join('\n') }
+        ].join('\n') },
+        { id: 'week', label: '1주전 안내', text: academyWeekNotice_('IFC 얼굴교정', 'https://cafe.naver.com/ifc/51') }
       ]
     },
     real: {
@@ -2211,7 +2333,8 @@
           '세부는 입금 확인 후 일정·오시는 길과 함께 보내드립니다.',
           '',
           ACADEMY_ASK
-        ].join('\n') }
+        ].join('\n') },
+        { id: 'week', label: '1주전 안내', text: academyWeekNotice_('Re:Al 움직임', 'https://cafe.naver.com/koreaposture/359') }
       ]
     }
   };
@@ -2235,6 +2358,7 @@
     }
     if (/입금|정원|등록|신청만|확정|계좌/.test(q) || wantsBooking(q)) return academyFaqText('deposit');
     if (/준비|복장|가져|수건|화장/.test(q)) return academyFaqText('prep');
+    if (/1\s*주|일주일|사전\s*영상|실습\s*영상|안내\s*문자/.test(q)) return academyFaqText('week');
     if (/대상|자격|누가|의료인|에스테|트레이너/.test(q)) return academyFaqText('who');
     if (/통합|같이 들|CMT\s*\+|Re:?Al.*CMT/.test(q)) return academyFaqText('bundle') || academyFaqText('hello');
     if (/원데이|10월\s*11|패시브/.test(q)) return academyFaqText('oneday') || academyFaqText('hello');
@@ -2933,27 +3057,1549 @@
       setStatus('이 칸을 누른 뒤 Ctrl+V로 글이나 캡처를 넣으세요.');
     });
   }
+  var CERT_TEMPLATES = {
+    cmt: [{
+      id: 'cmt-full', label: '전신 과정', file: '', kind: 'cmt',
+      moduleEn: 'Full-Body Course', moduleKo: '전신 과정', hours: '48 hours'
+    }],
+    ifc: [
+      {
+        id: 'ifc-anatomy', label: '해부학', file: '', kind: 'course',
+        moduleEn: 'Face Anatomy', moduleKo: '얼굴 해부학', hours: '8 hours',
+        ink: '#6B1E2E', accent: '#C4A056', ribbon: '#5A1826'
+      },
+      {
+        id: 'ifc-palp', label: '촉진법', file: '', kind: 'course',
+        moduleEn: 'Facial Palpation', moduleKo: '얼굴 촉진법', hours: '8 hours',
+        ink: '#1A3358', accent: '#C4A056', ribbon: '#122640'
+      },
+      {
+        id: 'ifc-slim', label: '축소법', file: '', kind: 'course',
+        moduleEn: 'Facial Contouring', moduleKo: '얼굴 축소법', hours: '8 hours',
+        ink: '#0E4F4A', accent: '#3DA89A', ribbon: '#0A3A36'
+      },
+      { id: 'ifc-member', label: '학회원증', file: '', kind: 'member' }
+    ],
+    real: [
+      { id: 'real-oneday', label: '원데이 패시브', file: '', kind: 'real', courseKind: 'oneday' },
+      { id: 'real-regular', label: '정규반', file: '', kind: 'real', courseKind: 'regular' },
+      { id: 'real-par', label: 'PAR', file: '', kind: 'real', courseKind: 'regular' }
+    ]
+  };
+  var REAL_LOGO_FILE = '수료증/ReAl 로고-02.png';
+  var CMT_LOGO_FILE = '수료증/CMT 로고.png';
+  var CMT_MARK_FILE = '수료증/CMT 마크.png';
+  var IFC_LOGO_FILE = '수료증/IFC학회 로고.png';
+  var REAL_THEME = {
+    id: 'sky', label: '하늘색',
+    paper: '#F4F8FB', ink: '#1F5F7A', deep: '#123F54', mute: '#5A7A8A',
+    line: '#7EB6C9', accent: '#C4A056', wash: 'rgba(126,182,201,.14)',
+    badge: '#E7F4F8', badgeInk: '#1F5F7A'
+  };
+  var CMT_THEME = {
+    paper: '#F7F4EE', ink: '#1D4696', deep: '#0B2048', mute: '#5A6578',
+    line: '#8FA4C8', accent: '#C4A056', wash: 'rgba(29,70,150,.10)',
+    badge: '#E8EEF8', badgeInk: '#1D4696'
+  };
+  var IFC_MEMBER_THEME = {
+    paper: '#FBF8F2', ink: '#1A2744', deep: '#10182B', mute: '#6A6570',
+    line: '#D4B56A', accent: '#C4A056', wash: 'rgba(196,160,86,.12)',
+    badge: '#F3EBD6', badgeInk: '#1A2744'
+  };
+  var CERT_LAYOUT = {
+    cmt: {
+      name: { x: 78, y: 648, w: 1180, h: 190, align: 'left', family: 'Montserrat, sans-serif', weight: '800', size: 96, min: 36, pad: 8 },
+      date: { x: 1168, y: 1168, w: 350, h: 48, align: 'center', family: 'Montserrat, sans-serif', weight: '600', size: 32, min: 18, pad: 8 },
+      certNo: { x: 700, y: 1290, w: 600, h: 36, align: 'center', family: '"Source Sans 3", sans-serif', weight: '600', size: 20, min: 12 }
+    },
+    member: {
+      name: { x: 500, y: 540, w: 1000, h: 200, align: 'center', family: 'script', weight: '400', size: 118, min: 42, dy: 8 },
+      date: { x: 760, y: 948, w: 500, h: 70, align: 'center', family: '"Source Sans 3", sans-serif', weight: '500', size: 26, min: 16 },
+      certNo: { x: 1248, y: 1218, w: 280, h: 32, align: 'center', family: '"Source Sans 3", sans-serif', weight: '500', size: 20, min: 12 }
+    },
+    course: {
+      name: { x: 230, y: 888, w: 980, h: 196, align: 'center', family: 'script', weight: '400', size: 120, min: 42, dy: 10 },
+      certNo: { x: 357, y: 1888, w: 700, h: 36, align: 'center', family: '"Source Sans 3", sans-serif', weight: '600', size: 18, min: 12 }
+    }
+  };
+  var certStore = {};
+  var certImgCache = {};
+  var certPreviewGen = 0;
+  var certPreviewTimer = 0;
+  var certLoadGen = 0;
+  var certBound = false;
+  function pad2(n) { n = String(n); return n.length < 2 ? '0' + n : n; }
+  function pad4(n) { n = String(n); while (n.length < 4) n = '0' + n; return n; }
+  function certSrc(file) {
+    return String(file || '').split('/').map(function (part) { return encodeURIComponent(part); }).join('/');
+  }
+  function certTemplates() { return CERT_TEMPLATES[consultBranch] || []; }
+  function certBranchState() {
+    if (!certStore[consultBranch]) {
+      var first = certTemplates()[0];
+      certStore[consultBranch] = {
+        templateId: first ? first.id : '',
+        nameList: '',
+        shared: null,
+        applicants: null,
+        drafts: [],
+        active: 0,
+        loading: false
+      };
+    }
+    ensureCertShared(certStore[consultBranch]);
+    return certStore[consultBranch];
+  }
+  function ensureCertShared(st) {
+    if (!st.shared) {
+      var tmpl = (CERT_TEMPLATES[consultBranch] || []).filter(function (t) { return t.id === st.templateId; })[0]
+        || (CERT_TEMPLATES[consultBranch] || [])[0]
+        || { kind: 'cmt', courseKind: 'regular' };
+      var courseKind = tmpl.courseKind || 'regular';
+      var hours = tmpl.hours || (tmpl.kind === 'real' ? realHoursDefault(courseKind) : '');
+      st.shared = {
+        courseKind: courseKind,
+        hours: hours,
+        date: defaultCertDate(tmpl.kind || 'real'),
+        body: '',
+        certNo: ''
+      };
+      st.shared.body = certBodyText(tmpl, st.shared);
+    }
+    if (st.nameList == null) st.nameList = '';
+  }
+  function certBodyText(tmpl, draft) {
+    tmpl = tmpl || certTemplate();
+    draft = draft || {};
+    if (tmpl.kind === 'real') return realBodyText(draft);
+    if (tmpl.kind === 'cmt') {
+      var h = String(draft.hours || tmpl.hours || '48 hours').trim();
+      return 'This certificate is issued in recognition of successful completion of the Chiropractic Manipulation ‘Full-Body Course’ (' + h + ') for treating musculoskeletal patients at the Clinical Manual Therapy Academy.';
+    }
+    if (tmpl.kind === 'member') {
+      return 'This certifies that the above person is a regular member of the International Face Correction Society, in accordance with the bylaws of this Society, and is authorized to represent professional face-structure education under IFC standards.';
+    }
+    if (tmpl.kind === 'course') {
+      var mod = tmpl.moduleEn || tmpl.label || 'Course';
+      var modKo = tmpl.moduleKo || tmpl.label || '';
+      var hours = String(draft.hours || tmpl.hours || '8 hours').trim();
+      return 'This certificate recognizes completion of the ' + mod + ' module (' + hours + ') at the International Face Correction Society. The holder completed structured training in assessment, hands-on technique, and clinical application' + (modKo ? ' — ' + modKo : '') + '.';
+    }
+    return '';
+  }
+  function realLogoFile() { return REAL_LOGO_FILE; }
+  function realTheme() { return REAL_THEME; }
+  function certTemplate() {
+    var list = certTemplates();
+    var st = certBranchState();
+    for (var i = 0; i < list.length; i++) if (list[i].id === st.templateId) return list[i];
+    return list[0] || { id: '', label: '', file: '', kind: 'cmt' };
+  }
+  function draftIndex(st, key) {
+    for (var i = 0; i < st.drafts.length; i++) if (st.drafts[i].key === key) return i;
+    return -1;
+  }
+  function defaultCertDate(kind) {
+    var d = new Date();
+    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    if (kind === 'cmt') return String(d.getFullYear()).slice(2) + '. ' + pad2(d.getMonth() + 1) + '. ' + pad2(d.getDate());
+    if (kind === 'member') return months[d.getMonth()] + ' ' + d.getFullYear();
+    return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+  }
+  function realHoursDefault(kind) { return kind === 'oneday' ? '7 hours' : '18 hours'; }
+  function realKindFromType(applyType, course) {
+    return /원데이|패시브/.test(String(applyType || '') + ' ' + String(course || '')) ? 'oneday' : 'regular';
+  }
+  function realBodyText(draft) {
+    var hours = String((draft && draft.hours) || realHoursDefault(draft && draft.courseKind)).trim();
+    if (draft && draft.courseKind === 'oneday') {
+      return 'This certificate recognizes completion of the Passive Stretching one-day course (' + hours + ') at PAR Re:Alignment.';
+    }
+    return 'This certificate recognizes completion of the PAR regular course (' + hours + '), from Passive through Resistive, at PAR Re:Alignment.';
+  }
+  function certPrefixForTemplate(tmpl) {
+    tmpl = tmpl || certTemplate();
+    if (tmpl.id === 'cmt-full') return 'CMT';
+    if (tmpl.id === 'ifc-member') return 'IFC';
+    if (tmpl.id === 'ifc-anatomy') return 'IFC-AN';
+    if (tmpl.id === 'ifc-palp') return 'IFC-PA';
+    if (tmpl.id === 'ifc-slim') return 'IFC-SL';
+    if (tmpl.kind === 'real') return 'REAL';
+    return 'CERT';
+  }
+  function fillSerialNumbers(drafts, startRaw) {
+    var prefix = certPrefixForTemplate();
+    var year = new Date().getFullYear();
+    var used = 0;
+    var startMatch = String(startRaw || '').match(/(\d+)\s*$/);
+    if (startMatch) used = Math.max(0, parseInt(startMatch[1], 10) - 1);
+    drafts.forEach(function (d, i) {
+      d.certNo = prefix + '-' + year + '-' + pad4(used + i + 1);
+    });
+  }
+  function fillMemberNumbers(drafts) { fillSerialNumbers(drafts, certBranchState().shared && certBranchState().shared.certNo); }
+  function fillRealNumbers(drafts, startRaw) { fillSerialNumbers(drafts, startRaw); }
+  function parseCertNames(raw) {
+    return String(raw || '')
+      .split(/[,，\n;/]+/)
+      .map(function (n) { return n.replace(/\s+/g, ' ').trim(); })
+      .filter(Boolean);
+  }
+  function formatCertNames(list) {
+    if (!list || !list.length) return '';
+    return list.join(', ') + ', ';
+  }
+  function blankDraft(from) {
+    var st = certBranchState();
+    ensureCertShared(st);
+    var tmpl = certTemplate();
+    var sh = st.shared;
+    var courseKind = tmpl.courseKind || sh.courseKind || (from ? realKindFromType(from.applyType, from.course) : 'regular');
+    var d = {
+      key: '',
+      name: from ? from.name : '',
+      role: from ? from.role : '',
+      applyType: from ? from.applyType : '',
+      when: from ? from.when : '',
+      course: from ? from.course : '',
+      date: sh.date || defaultCertDate(tmpl.kind),
+      certNo: '',
+      courseKind: courseKind,
+      hours: sh.hours || tmpl.hours || realHoursDefault(courseKind),
+      body: sh.body || ''
+    };
+    var autoPrev = certBodyText(tmpl, { courseKind: sh.courseKind, hours: sh.hours });
+    if (!d.body || d.body === autoPrev) d.body = certBodyText(tmpl, d);
+    return d;
+  }
+  function setCertStatus(msg) {
+    var el = $('certStatus');
+    if (el) el.textContent = msg || '';
+  }
+  function loadCertImg(file) {
+    if (certImgCache[file]) return Promise.resolve(certImgCache[file]);
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      img.onload = function () { certImgCache[file] = img; resolve(img); };
+      img.onerror = function () { reject(new Error('image')); };
+      img.src = certSrc(file);
+    });
+  }
+  function ensureCertFonts() {
+    if (!document.fonts || !document.fonts.load) return Promise.resolve();
+    return Promise.all([
+      document.fonts.load('800 96px Montserrat'),
+      document.fonts.load('400 120px "Great Vibes"'),
+      document.fonts.load('800 96px Pretendard'),
+      document.fonts.load('600 32px "Source Sans 3"')
+    ]).catch(function () { return null; });
+  }
+  function scriptFamily() {
+    if (document.fonts && document.fonts.check && document.fonts.check('400 40px "Great Vibes"')) return '"Great Vibes", cursive';
+    return '"Cormorant Garamond", serif';
+  }
+  function sampleBox(ctx, box) {
+    var data = ctx.getImageData(box.x, box.y, box.w, box.h).data;
+    var dark = { l: 999, r: 20, g: 30, b: 80 };
+    var light = { l: -1, r: 255, g: 255, b: 255 };
+    var step = 16;
+    for (var i = 0; i < data.length; i += 4 * step) {
+      var r = data[i], g = data[i + 1], b = data[i + 2];
+      var l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      if (l < dark.l) dark = { l: l, r: r, g: g, b: b };
+      if (l > light.l) light = { l: l, r: r, g: g, b: b };
+    }
+    return {
+      ink: 'rgb(' + dark.r + ',' + dark.g + ',' + dark.b + ')',
+      paper: 'rgb(' + light.r + ',' + light.g + ',' + light.b + ')'
+    };
+  }
+  function drawFittedText(ctx, text, box, color) {
+    var hangul = /[ㄱ-ㅎ가-힣]/.test(text);
+    var family = hangul ? 'Pretendard, sans-serif' : (box.family === 'script' ? scriptFamily() : box.family);
+    var weight = hangul ? '800' : (box.weight || '700');
+    var px = hangul ? Math.min(box.size || 90, Math.round((box.h || 140) * 0.58)) : (box.size || 80);
+    var min = box.min || 28;
+    var align = box.align || 'center';
+    var maxW = box.w - (box.pad || 24) * 2;
+    ctx.fillStyle = color;
+    ctx.textAlign = align;
+    ctx.textBaseline = 'middle';
+    while (px > min) {
+      ctx.font = weight + ' ' + px + 'px ' + family;
+      if (ctx.measureText(text).width <= maxW) break;
+      px -= 2;
+    }
+    var x = align === 'left' ? box.x + (box.pad || 12) : align === 'right' ? box.x + box.w - (box.pad || 12) : box.x + box.w / 2;
+    var y = box.y + box.h / 2 + (hangul ? 0 : (box.dy || 0));
+    ctx.fillText(text, x, y);
+    ctx.textBaseline = 'alphabetic';
+  }
+  function paintCertField(ctx, box, text, withDateLabel) {
+    if (!box) return;
+    var colors = sampleBox(ctx, box);
+    ctx.fillStyle = colors.paper;
+    ctx.fillRect(box.x, box.y, box.w, box.h);
+    text = String(text || '').trim();
+    if (withDateLabel && text && !/^date\s*:/i.test(text)) text = 'Date: ' + text;
+    if (!text) return;
+    drawFittedText(ctx, text, box, colors.ink);
+  }
+  function fillCenterLines(ctx, text, cx, y, maxW, lineH) {
+    var words = String(text || '').split(/\s+/);
+    var lines = [];
+    var line = '';
+    var i;
+    for (i = 0; i < words.length; i++) {
+      var test = line ? line + ' ' + words[i] : words[i];
+      if (line && ctx.measureText(test).width > maxW) {
+        lines.push(line);
+        line = words[i];
+      } else line = test;
+    }
+    if (line) lines.push(line);
+    ctx.textAlign = 'center';
+    for (i = 0; i < lines.length; i++) ctx.fillText(lines[i], cx, y + i * lineH);
+  }
+  function drawTemplateCert(canvas, img, tmpl, draft) {
+    canvas.width = img.naturalWidth || img.width;
+    canvas.height = img.naturalHeight || img.height;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    var layout = CERT_LAYOUT[tmpl.kind] || CERT_LAYOUT.course;
+    paintCertField(ctx, layout.name, draft.name, false);
+    if (layout.date) paintCertField(ctx, layout.date, draft.date, tmpl.kind === 'member');
+    if (layout.certNo) paintCertField(ctx, layout.certNo, draft.certNo, false);
+  }
+  function cutLogoWhite(img, fileKey) {
+    var key = (fileKey || realLogoFile()) + ':cutv3';
+    if (certImgCache[key]) return certImgCache[key];
+    try {
+      var c = document.createElement('canvas');
+      c.width = img.naturalWidth || img.width;
+      c.height = img.naturalHeight || img.height;
+      if (!c.width || !c.height) throw new Error('size');
+      var x = c.getContext('2d', { willReadFrequently: true });
+      x.clearRect(0, 0, c.width, c.height);
+      x.drawImage(img, 0, 0);
+      var image = x.getImageData(0, 0, c.width, c.height);
+      var d = image.data;
+      var i, r, g, b, a, max, min, lum, t;
+      for (i = 0; i < d.length; i += 4) {
+        r = d[i]; g = d[i + 1]; b = d[i + 2]; a = d[i + 3];
+        if (!a) continue;
+        max = r > g ? (r > b ? r : b) : (g > b ? g : b);
+        min = r < g ? (r < b ? r : b) : (g < b ? g : b);
+        lum = 0.299 * r + 0.587 * g + 0.114 * b;
+        if (lum >= 232 && (max - min) <= 36) {
+          t = Math.min(1, Math.max(0, (lum - 220) / 28));
+          d[i + 3] = Math.round(a * (1 - t));
+        }
+      }
+      x.putImageData(image, 0, 0);
+      certImgCache[key] = c;
+      return c;
+    } catch (errCut) {
+      return img;
+    }
+  }
+  function logoOpaqueBox(src, fileKey, opts) {
+    opts = opts || {};
+    var key = (fileKey || '') + ':boxv1' + (opts.emblemOnly ? ':emblem' : '');
+    if (certImgCache[key]) return certImgCache[key];
+    var w = src.width || src.naturalWidth || 1;
+    var h = src.height || src.naturalHeight || 1;
+    var box = { x: 0, y: 0, w: w, h: h };
+    try {
+      var c = src;
+      var ctx;
+      if (!(src instanceof HTMLCanvasElement)) {
+        c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        ctx = c.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(src, 0, 0);
+      } else ctx = c.getContext('2d', { willReadFrequently: true });
+      var data = ctx.getImageData(0, 0, w, h).data;
+      var minX = w, minY = h, maxX = 0, maxY = 0, found = false;
+      var x, y, i, step = Math.max(1, Math.floor(Math.min(w, h) / 280));
+      var rowHits = [];
+      for (y = 0; y < h; y += step) {
+        var hits = 0;
+        for (x = 0; x < w; x += step) {
+          i = (y * w + x) * 4;
+          if (data[i + 3] > 24) {
+            found = true;
+            hits++;
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+          }
+        }
+        rowHits.push({ y: y, hits: hits });
+      }
+      if (found) {
+        minX = Math.max(0, minX - step);
+        minY = Math.max(0, minY - step);
+        maxX = Math.min(w - 1, maxX + step);
+        maxY = Math.min(h - 1, maxY + step);
+        if (opts.emblemOnly && rowHits.length > 8) {
+          var mid = Math.floor(rowHits.length * 0.35);
+          var gapY = null;
+          var r;
+          for (r = mid; r < rowHits.length - 2; r++) {
+            if (rowHits[r].hits <= 3 && rowHits[r + 1].hits <= 4) {
+              gapY = rowHits[r].y;
+              break;
+            }
+          }
+          if (gapY != null && gapY > minY + 20) maxY = Math.min(maxY, gapY - step);
+        }
+        box = { x: minX, y: minY, w: Math.max(1, maxX - minX + 1), h: Math.max(1, maxY - minY + 1) };
+      }
+    } catch (errBox) {}
+    certImgCache[key] = box;
+    return box;
+  }
+  function drawCertLogo(ctx, img, fileKey, dx, dy, maxW, maxH, opts) {
+    if (!img) return null;
+    opts = opts || {};
+    try {
+      var prepared = cutLogoWhite(img, fileKey);
+      var box = logoOpaqueBox(prepared, fileKey, opts);
+      if (opts.trimBottom && !opts.emblemOnly) {
+        box = {
+          x: box.x,
+          y: box.y,
+          w: box.w,
+          h: Math.max(1, Math.round(box.h * (1 - opts.trimBottom)))
+        };
+      }
+      if (opts.trimTop) {
+        var cutTop = Math.round(box.h * opts.trimTop);
+        box = { x: box.x, y: box.y + cutTop, w: box.w, h: Math.max(1, box.h - cutTop) };
+      }
+      var aspect = box.w / Math.max(1, box.h);
+      var dh = maxH;
+      var dw = Math.round(dh * aspect);
+      if (dw > maxW) { dw = maxW; dh = Math.round(dw / Math.max(0.01, aspect)); }
+      if (dw < 1 || dh < 1) return null;
+      if (ctx) ctx.drawImage(prepared, box.x, box.y, box.w, box.h, dx, dy, dw, dh);
+      return { w: dw, h: dh, x: dx, y: dy };
+    } catch (errDrawLogo) {
+      return null;
+    }
+  }
+  function drawRealRoundRect(ctx, x, y, rw, rh, r) {
+    var rad = Math.min(r, rw / 2, rh / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + rad, y);
+    ctx.arcTo(x + rw, y, x + rw, y + rh, rad);
+    ctx.arcTo(x + rw, y + rh, x, y + rh, rad);
+    ctx.arcTo(x, y + rh, x, y, rad);
+    ctx.arcTo(x, y, x + rw, y, rad);
+    ctx.closePath();
+  }
+  function drawRealCert(canvas, draft, logo) {
+    var w = 2000, h = 1414;
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    var t = realTheme();
+    var ink = t.ink;
+    var mute = t.mute;
+    var deep = t.deep;
+    var oneday = draft && draft.courseKind === 'oneday';
+    var hours = String((draft && draft.hours) || realHoursDefault(oneday ? 'oneday' : 'regular')).trim();
+    var grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, t.paper);
+    grad.addColorStop(1, '#FFFFFF');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = t.line;
+    ctx.lineWidth = 18;
+    ctx.strokeRect(36, 36, w - 72, h - 72);
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(58, 58, w - 116, h - 116);
+    ctx.fillStyle = t.accent;
+    [[70, 70], [w - 94, 70], [70, h - 94], [w - 94, h - 94]].forEach(function (p) {
+      ctx.fillRect(p[0], p[1], 24, 4);
+      ctx.fillRect(p[0], p[1], 4, 24);
+    });
+    if (logo) {
+      try {
+        var realCut = cutLogoWhite(logo, realLogoFile());
+        var realBox = logoOpaqueBox(realCut, realLogoFile());
+        ctx.save();
+        ctx.globalAlpha = 0.07;
+        var wmH = 820;
+        var wmW = Math.round(wmH * realBox.w / Math.max(1, realBox.h));
+        ctx.drawImage(realCut, realBox.x, realBox.y, realBox.w, realBox.h, w - wmW + 40, h - wmH - 40, wmW, wmH);
+        ctx.restore();
+        var realSize = drawCertLogo(null, logo, realLogoFile(), 0, 0, 520, 180);
+        if (realSize) drawCertLogo(ctx, logo, realLogoFile(), Math.round((w - realSize.w) / 2), 80, 520, 180);
+      } catch (errLogo) {}
+    }
+    try {
+      drawRealSeal(ctx, 1680, 430, oneday, hours, draft && draft.certNo, t);
+    } catch (errSeal) {}
+    ctx.textAlign = 'center';
+    ctx.fillStyle = mute;
+    ctx.font = '700 22px Pretendard, sans-serif';
+    ctx.fillText('움직임 전문가 과정 수료증', w / 2, 292);
+    ctx.fillStyle = ink;
+    ctx.font = '800 54px Montserrat, sans-serif';
+    ctx.fillText('CERTIFICATE', w / 2, 350);
+    ctx.font = '600 20px Montserrat, sans-serif';
+    ctx.fillStyle = mute;
+    ctx.fillText('OF PROFESSIONAL COMPLETION', w / 2, 384);
+    ctx.strokeStyle = t.accent;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(w / 2 - 90, 408);
+    ctx.lineTo(w / 2 + 90, 408);
+    ctx.stroke();
+    ctx.fillStyle = mute;
+    ctx.font = '500 24px "Source Sans 3", sans-serif';
+    ctx.fillText('This certificate is proudly presented to', w / 2, 452);
+    var name = String(draft.name || '').trim();
+    if (name) {
+      var hangul = /[ㄱ-ㅎ가-힣]/.test(name);
+      var family = hangul ? 'Pretendard, sans-serif' : 'Montserrat, sans-serif';
+      var px = hangul ? 92 : 100;
+      ctx.fillStyle = deep;
+      ctx.textBaseline = 'middle';
+      while (px > 40) {
+        ctx.font = '800 ' + px + 'px ' + family;
+        if (ctx.measureText(name).width <= 1500) break;
+        px -= 2;
+      }
+      ctx.fillText(name, w / 2, 530);
+      ctx.textBaseline = 'alphabetic';
+    } else {
+      ctx.fillStyle = t.line;
+      ctx.font = '700 44px Montserrat, sans-serif';
+      ctx.fillText('NAME', w / 2, 530);
+    }
+    ctx.strokeStyle = t.line;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(w / 2 - 220, 590);
+    ctx.lineTo(w / 2 + 220, 590);
+    ctx.stroke();
+    var stages = oneday
+      ? [{ k: 'Passive', s: '스트레칭 · 셀프케어' }]
+      : [
+        { k: 'Passive', s: '이완 · 정렬' },
+        { k: 'Active', s: '안정 · 제어' },
+        { k: 'Resistive', s: '부하 · 기능' }
+      ];
+    var boxW = oneday ? 420 : 300;
+    var gap = 28;
+    var totalW = stages.length * boxW + (stages.length - 1) * gap;
+    var startX = Math.round((w - totalW) / 2);
+    var boxY = 622;
+    stages.forEach(function (st, i) {
+      var x = startX + i * (boxW + gap);
+      ctx.fillStyle = t.badge;
+      drawRealRoundRect(ctx, x, boxY, boxW, 92, 16);
+      ctx.fill();
+      ctx.strokeStyle = t.line;
+      ctx.lineWidth = 2;
+      drawRealRoundRect(ctx, x, boxY, boxW, 92, 16);
+      ctx.stroke();
+      ctx.fillStyle = t.badgeInk;
+      ctx.font = '800 28px Montserrat, sans-serif';
+      ctx.fillText(st.k, x + boxW / 2, boxY + 38);
+      ctx.fillStyle = mute;
+      ctx.font = '600 18px Pretendard, sans-serif';
+      ctx.fillText(st.s, x + boxW / 2, boxY + 68);
+      if (!oneday && i < stages.length - 1) {
+        ctx.fillStyle = t.accent;
+        ctx.font = '700 28px Montserrat, sans-serif';
+        ctx.fillText('→', x + boxW + gap / 2, boxY + 54);
+      }
+    });
+    ctx.fillStyle = deep;
+    ctx.font = '400 27px "Source Sans 3", sans-serif';
+    fillCenterLines(ctx, draft.body || realBodyText(draft), w / 2, 780, 1380, 40);
+    ctx.fillStyle = ink;
+    ctx.font = '600 22px "Cormorant Garamond", serif';
+    ctx.fillText('Better Movement, Better Life', w / 2, 920);
+    ctx.fillStyle = mute;
+    ctx.font = '600 18px Pretendard, sans-serif';
+    ctx.fillText(oneday
+      ? 'Passive Stretching · PAR Re:Alignment'
+      : 'PAR Curriculum · Passive → Active → Resistive', w / 2, 956);
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(280, 1148);
+    ctx.lineTo(720, 1148);
+    ctx.moveTo(1280, 1148);
+    ctx.lineTo(1720, 1148);
+    ctx.stroke();
+    ctx.fillStyle = deep;
+    ctx.font = '600 26px "Source Sans 3", sans-serif';
+    ctx.fillText('Joonkyu Park DC. PT.', 500, 1120);
+    ctx.fillStyle = ink;
+    ctx.font = '600 28px Montserrat, sans-serif';
+    ctx.fillText(String(draft.date || ''), 1500, 1120);
+    ctx.font = '700 14px Montserrat, sans-serif';
+    ctx.fillStyle = mute;
+    ctx.fillText('DIRECTOR · PAR RE:ALIGNMENT', 500, 1184);
+    ctx.fillText('DATE OF ISSUE', 1500, 1184);
+    ctx.fillStyle = mute;
+    ctx.font = '600 16px Montserrat, sans-serif';
+    ctx.fillText('PAR Re:Alignment  ·  Clinical Movement Education', w / 2, 1288);
+    ctx.font = '700 18px Montserrat, sans-serif';
+    ctx.fillStyle = ink;
+    ctx.fillText(String((draft && draft.certNo) || ''), w / 2, 1324);
+  }
+  function drawRealSeal(ctx, cx, cy, oneday, hours, certNo, t, opt) {
+    opt = opt || {};
+    var r = 96;
+    var label = opt.label || (oneday ? 'ONE-DAY' : 'PAR');
+    var ring = opt.ring || 'PAR RE:ALIGNMENT  ·  OFFICIAL SEAL  ·  ';
+    var deep = t.deep || t.ink;
+    ctx.save();
+    ctx.fillStyle = t.wash;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r + 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = t.accent;
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r - 12, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = t.ink;
+    ctx.font = '700 11px Montserrat, sans-serif';
+    var i;
+    var chars = ring.split('');
+    for (i = 0; i < chars.length; i++) {
+      var ang = -Math.PI / 2 + (i / chars.length) * Math.PI * 2;
+      ctx.save();
+      ctx.translate(cx + Math.cos(ang) * (r - 28), cy + Math.sin(ang) * (r - 28));
+      ctx.rotate(ang + Math.PI / 2);
+      ctx.textAlign = 'center';
+      ctx.fillText(chars[i], 0, 0);
+      ctx.restore();
+    }
+    ctx.textAlign = 'center';
+    ctx.fillStyle = deep;
+    ctx.font = '800 22px Montserrat, sans-serif';
+    ctx.fillText(label, cx, cy - 8);
+    ctx.font = '700 24px Montserrat, sans-serif';
+    ctx.fillText(String(hours || '').replace(/\s*hours?/i, 'H'), cx, cy + 22);
+    if (certNo) {
+      ctx.fillStyle = t.mute || t.ink;
+      ctx.font = '700 11px Montserrat, sans-serif';
+      ctx.fillText(String(certNo).replace(/^(REAL|CMT|IFC)-/, ''), cx, cy + 48);
+    }
+    ctx.restore();
+  }
+  function drawFittedName(ctx, name, cx, cy, maxW, sizeEn, sizeKo, color) {
+    name = String(name || '').trim();
+    if (!name) {
+      ctx.fillStyle = '#C5CCD4';
+      ctx.font = '700 44px Montserrat, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('NAME', cx, cy);
+      return;
+    }
+    var hangul = /[ㄱ-ㅎ가-힣]/.test(name);
+    var family = hangul ? 'Pretendard, sans-serif' : scriptFamily();
+    var px = hangul ? sizeKo : sizeEn;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    while (px > 36) {
+      ctx.font = (hangul ? '800 ' : '400 ') + px + 'px ' + family;
+      if (ctx.measureText(name).width <= maxW) break;
+      px -= 2;
+    }
+    ctx.fillText(name, cx, cy);
+    ctx.textBaseline = 'alphabetic';
+  }
+  function drawCmtHex(ctx, cx, cy, r, color) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    var i;
+    for (i = 0; i < 6; i++) {
+      var a = -Math.PI / 2 + i * Math.PI / 3;
+      var x = cx + Math.cos(a) * r;
+      var y = cy + Math.sin(a) * r;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+    ctx.font = '800 34px Montserrat, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('M', cx, cy + 2);
+    ctx.textBaseline = 'alphabetic';
+    ctx.restore();
+  }
+  function drawCmtCert(canvas, draft, logo) {
+    var w = 2000, h = 1414;
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    var t = CMT_THEME;
+    var tmpl = certTemplate();
+    var hours = String((draft && draft.hours) || tmpl.hours || '48 hours').trim();
+    var grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, t.paper);
+    grad.addColorStop(1, '#FFFFFF');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = t.line;
+    ctx.lineWidth = 16;
+    ctx.strokeRect(36, 36, w - 72, h - 72);
+    ctx.strokeStyle = t.ink;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(56, 56, w - 112, h - 112);
+    var markLeft = 118;
+    var headerX = 280;
+    var koLine = 'CMT임상도수치료아카데미';
+    var enLine = 'CLINICAL MANUAL THERAPY ACADEMY';
+    var koSize = 32;
+    var enSize = 15;
+    var koBaseline = 186;
+    var enBaseline = 220;
+    var textTop = koBaseline - Math.round(koSize * 0.86);
+    var textBot = enBaseline + Math.round(enSize * 0.24);
+    var markH = textBot - textTop;
+    if (logo) {
+      try {
+        ctx.save();
+        ctx.globalAlpha = 0.06;
+        var wm = drawCertLogo(null, logo, CMT_MARK_FILE, 0, 0, 520, 360);
+        if (wm) drawCertLogo(ctx, logo, CMT_MARK_FILE, w - wm.w - 80, h - wm.h - 80, 520, 360);
+        ctx.restore();
+        var placed = drawCertLogo(ctx, logo, CMT_MARK_FILE, markLeft, textTop, 220, markH);
+        if (placed) {
+          headerX = markLeft + placed.w + 28;
+        } else {
+          drawCmtHex(ctx, markLeft + 40, textTop + markH / 2, Math.round(markH / 2), t.ink);
+          headerX = markLeft + markH + 28;
+        }
+      } catch (errCmtLogo) {
+        ctx.save();
+        ctx.globalAlpha = 0.06;
+        drawCmtHex(ctx, w - 280, h - 220, 220, t.ink);
+        ctx.restore();
+        drawCmtHex(ctx, markLeft + 40, textTop + markH / 2, Math.round(markH / 2), t.ink);
+        headerX = markLeft + markH + 28;
+      }
+    } else {
+      ctx.save();
+      ctx.globalAlpha = 0.06;
+      drawCmtHex(ctx, w - 280, h - 220, 220, t.ink);
+      ctx.restore();
+      drawCmtHex(ctx, markLeft + 40, textTop + markH / 2, Math.round(markH / 2), t.ink);
+      headerX = markLeft + markH + 28;
+    }
+    ctx.textAlign = 'left';
+    ctx.fillStyle = t.deep;
+    ctx.font = '800 ' + koSize + 'px Pretendard, sans-serif';
+    ctx.fillText(koLine, headerX, koBaseline);
+    ctx.fillStyle = t.mute;
+    ctx.font = '600 ' + enSize + 'px Montserrat, sans-serif';
+    ctx.fillText(enLine, headerX, enBaseline);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = t.ink;
+    ctx.font = '800 64px Montserrat, sans-serif';
+    ctx.fillText('CERTIFICATE', w / 2, 320);
+    ctx.fillStyle = t.mute;
+    ctx.font = '600 22px Montserrat, sans-serif';
+    ctx.fillText('OF PROFESSIONAL COMPLETION', w / 2, 360);
+    ctx.strokeStyle = t.accent;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(w / 2 - 90, 388);
+    ctx.lineTo(w / 2 + 90, 388);
+    ctx.stroke();
+    ctx.fillStyle = t.mute;
+    ctx.font = '500 24px "Source Sans 3", sans-serif';
+    ctx.fillText('This certificate is proudly presented to', w / 2, 440);
+    drawFittedName(ctx, draft && draft.name, w / 2, 530, 1500, 96, 90, t.deep);
+    ctx.strokeStyle = t.line;
+    ctx.beginPath();
+    ctx.moveTo(w / 2 - 240, 590);
+    ctx.lineTo(w / 2 + 240, 590);
+    ctx.stroke();
+    var badges = [
+      { k: 'Full-Body', s: '전신 과정' },
+      { k: hours.replace(/\s*hours?/i, 'H'), s: '이수 시간' },
+      { k: 'Clinical', s: '도수 · 평가' }
+    ];
+    var boxW = 300, gap = 28, totalW = badges.length * boxW + (badges.length - 1) * gap;
+    var startX = Math.round((w - totalW) / 2);
+    badges.forEach(function (b, i) {
+      var x = startX + i * (boxW + gap);
+      ctx.fillStyle = t.badge;
+      drawRealRoundRect(ctx, x, 620, boxW, 88, 16);
+      ctx.fill();
+      ctx.strokeStyle = t.line;
+      ctx.lineWidth = 2;
+      drawRealRoundRect(ctx, x, 620, boxW, 88, 16);
+      ctx.stroke();
+      ctx.fillStyle = t.badgeInk;
+      ctx.font = '800 26px Montserrat, sans-serif';
+      ctx.fillText(b.k, x + boxW / 2, 656);
+      ctx.fillStyle = t.mute;
+      ctx.font = '600 16px Pretendard, sans-serif';
+      ctx.fillText(b.s, x + boxW / 2, 688);
+    });
+    ctx.fillStyle = t.deep;
+    ctx.font = '400 26px "Source Sans 3", sans-serif';
+    fillCenterLines(ctx, (draft && draft.body) || certBodyText(tmpl, draft), w / 2, 780, 1400, 40);
+    ctx.fillStyle = t.ink;
+    ctx.font = '600 20px "Cormorant Garamond", serif';
+    ctx.fillText('Hands find the cause. Movement keeps the change.', w / 2, 920);
+    drawRealSeal(ctx, 1680, 430, false, hours, draft && draft.certNo, t, {
+      label: 'CMT',
+      ring: 'CMT ACADEMY  ·  OFFICIAL SEAL  ·  '
+    });
+    ctx.strokeStyle = t.ink;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(220, 1140);
+    ctx.lineTo(620, 1140);
+    ctx.moveTo(780, 1140);
+    ctx.lineTo(1180, 1140);
+    ctx.moveTo(1340, 1140);
+    ctx.lineTo(1780, 1140);
+    ctx.stroke();
+    ctx.fillStyle = t.deep;
+    ctx.font = '600 22px "Source Sans 3", sans-serif';
+    ctx.fillText('Joonkyu Park DC. PT.', 420, 1112);
+    ctx.fillText('Yongwoo Lee PhD. DC. PT.', 980, 1112);
+    ctx.fillStyle = t.ink;
+    ctx.font = '600 26px Montserrat, sans-serif';
+    ctx.fillText(String((draft && draft.date) || ''), 1560, 1112);
+    ctx.fillStyle = t.mute;
+    ctx.font = '700 13px Montserrat, sans-serif';
+    ctx.fillText('VICE PRESIDENT', 420, 1176);
+    ctx.fillText('PRESIDENT', 980, 1176);
+    ctx.fillText('DATE', 1560, 1176);
+    ctx.fillStyle = t.mute;
+    ctx.font = '600 16px Montserrat, sans-serif';
+    ctx.fillText('Clinical Manual Therapy Academy  ·  Musculoskeletal Education', w / 2, 1280);
+    ctx.fillStyle = t.ink;
+    ctx.font = '700 18px Montserrat, sans-serif';
+    ctx.fillText(String((draft && draft.certNo) || ''), w / 2, 1316);
+  }
+  function drawIfcSeal(ctx, cx, cy, logo, t) {
+    ctx.save();
+    t = t || {};
+    var sealSize = t.size || 220;
+    if (logo) {
+      ctx.fillStyle = '#FFFEFB';
+      ctx.beginPath();
+      ctx.arc(cx, cy, sealSize / 2 + 12, 0, Math.PI * 2);
+      ctx.fill();
+      var placed = drawCertLogo(ctx, logo, IFC_LOGO_FILE, cx - sealSize / 2, cy - sealSize / 2, sealSize, sealSize);
+      if (!placed) {
+        ctx.fillStyle = t.ink || '#6B1E2E';
+        ctx.font = '800 28px Montserrat, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('IFC', cx, cy + 8);
+      }
+    } else {
+      ctx.fillStyle = t.wash || 'rgba(196,160,86,.12)';
+      ctx.beginPath();
+      ctx.arc(cx, cy, Math.round(sealSize / 2), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = t.accent || '#C4A056';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(cx, cy, Math.round(sealSize / 2) - 10, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = t.ink || '#6B1E2E';
+      ctx.font = '800 28px Montserrat, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('IFC', cx, cy + 8);
+    }
+    ctx.restore();
+  }
+  function drawIfcMemberCert(canvas, draft, logo) {
+    var w = 2000, h = 1414;
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    var t = IFC_MEMBER_THEME;
+    ctx.fillStyle = t.paper;
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = t.accent;
+    ctx.lineWidth = 14;
+    ctx.strokeRect(40, 40, w - 80, h - 80);
+    ctx.strokeStyle = t.ink;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(62, 62, w - 124, h - 124);
+    [[78, 78], [w - 102, 78], [78, h - 102], [w - 102, h - 102]].forEach(function (p) {
+      ctx.fillStyle = t.accent;
+      ctx.fillRect(p[0], p[1], 28, 4);
+      ctx.fillRect(p[0], p[1], 4, 28);
+    });
+    ctx.textAlign = 'center';
+    var memberTitleY = 210;
+    ctx.fillStyle = t.deep;
+    ctx.font = '800 72px "Cormorant Garamond", serif';
+    ctx.fillText('I.F.C.', w / 2, memberTitleY);
+    ctx.fillStyle = t.mute;
+    ctx.font = '600 24px Montserrat, sans-serif';
+    ctx.fillText('CERTIFICATE OF MEMBERSHIP', w / 2, memberTitleY + 50);
+    ctx.strokeStyle = t.accent;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(w / 2 - 120, memberTitleY + 82);
+    ctx.lineTo(w / 2 + 120, memberTitleY + 82);
+    ctx.stroke();
+    ctx.fillStyle = t.mute;
+    ctx.font = '500 22px "Source Sans 3", sans-serif';
+    ctx.fillText('This certificate is proudly presented to', w / 2, memberTitleY + 140);
+    drawFittedName(ctx, draft && draft.name, w / 2, memberTitleY + 240, 1400, 110, 92, t.ink);
+    ctx.strokeStyle = t.line;
+    ctx.beginPath();
+    ctx.moveTo(w / 2 - 260, memberTitleY + 310);
+    ctx.lineTo(w / 2 + 260, memberTitleY + 310);
+    ctx.stroke();
+    ctx.fillStyle = t.badge;
+    drawRealRoundRect(ctx, w / 2 - 180, memberTitleY + 340, 360, 56, 28);
+    ctx.fill();
+    ctx.strokeStyle = t.accent;
+    ctx.lineWidth = 2;
+    drawRealRoundRect(ctx, w / 2 - 180, memberTitleY + 340, 360, 56, 28);
+    ctx.stroke();
+    ctx.fillStyle = t.badgeInk;
+    ctx.font = '800 22px Montserrat, sans-serif';
+    ctx.fillText('REGULAR MEMBER', w / 2, memberTitleY + 376);
+    ctx.fillStyle = t.deep;
+    ctx.font = '600 30px "Source Sans 3", sans-serif';
+    fillCenterLines(ctx, (draft && draft.body) || certBodyText(certTemplate(), draft), w / 2, memberTitleY + 470, 1380, 44);
+    ctx.fillStyle = t.mute;
+    ctx.font = '700 24px Pretendard, sans-serif';
+    ctx.fillText('정회원  ·  Seoul, Korea', w / 2, memberTitleY + 610);
+    ctx.fillStyle = t.ink;
+    ctx.font = '700 28px Montserrat, sans-serif';
+    ctx.fillText('Date: ' + String((draft && draft.date) || ''), w / 2, memberTitleY + 660);
+    drawIfcSeal(ctx, 380, 1110, logo, {
+      wash: t.wash, accent: t.accent, ink: t.ink, size: 260
+    });
+    ctx.strokeStyle = t.ink;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(1200, 1140);
+    ctx.lineTo(1700, 1140);
+    ctx.stroke();
+    ctx.fillStyle = t.deep;
+    ctx.font = '600 24px Pretendard, sans-serif';
+    ctx.fillText('IFC 학회장 박준규', 1450, 1112);
+    ctx.fillStyle = t.mute;
+    ctx.font = '600 14px Montserrat, sans-serif';
+    ctx.fillText('PRESIDENT · INTERNATIONAL FACE CORRECTION SOCIETY', 1450, 1176);
+    ctx.fillStyle = t.mute;
+    ctx.font = '600 16px Montserrat, sans-serif';
+    ctx.fillText('International Face Correction Society  ·  Professional Membership', w / 2, 1288);
+    ctx.fillStyle = t.ink;
+    ctx.font = '700 18px Montserrat, sans-serif';
+    ctx.fillText(String((draft && draft.certNo) || ''), w / 2, 1324);
+  }
+  function drawIfcCourseCert(canvas, draft, logo) {
+    var w = 1414, h = 2000;
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    var tmpl = certTemplate();
+    var ink = tmpl.ink || '#6B1E2E';
+    var accent = tmpl.accent || '#C4A056';
+    var ribbon = tmpl.ribbon || ink;
+    var hours = String((draft && draft.hours) || tmpl.hours || '8 hours').trim();
+    ctx.fillStyle = '#FFFEFB';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = ribbon;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(w, 0);
+    ctx.lineTo(w, 120);
+    ctx.lineTo(0, 220);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = accent;
+    ctx.fillRect(0, 220, w, 6);
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    ctx.lineTo(w, h);
+    ctx.lineTo(w, h - 220);
+    ctx.lineTo(0, h - 120);
+    ctx.closePath();
+    ctx.fillStyle = ribbon;
+    ctx.fill();
+    ctx.fillStyle = accent;
+    ctx.fillRect(0, h - 226, w, 6);
+    var badgeY = 160;
+    ctx.fillStyle = ribbon;
+    drawRealRoundRect(ctx, w / 2 - 220, badgeY, 440, 70, 8);
+    ctx.fill();
+    ctx.fillStyle = accent;
+    ctx.font = '800 34px Montserrat, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('CERTIFICATE', w / 2, badgeY + 46);
+    ctx.fillStyle = ink;
+    ctx.font = '700 36px "Cormorant Garamond", serif';
+    ctx.fillText('OF ' + String(tmpl.moduleEn || 'COURSE').toUpperCase(), w / 2, badgeY + 120);
+    ctx.fillStyle = '#7A6570';
+    ctx.font = '600 18px Montserrat, sans-serif';
+    ctx.fillText('THIS CERTIFICATE IS PROUDLY AWARDED TO', w / 2, 380);
+    drawFittedName(ctx, draft && draft.name, w / 2, 480, 1100, 104, 92, ink);
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(w / 2 - 220, 548);
+    ctx.lineTo(w / 2 + 220, 548);
+    ctx.stroke();
+    var pills = [
+      { k: tmpl.moduleEn || tmpl.label || 'Module', s: tmpl.moduleKo || '과목' },
+      { k: hours.replace(/\s*hours?/i, 'H'), s: '이수 시간' },
+      { k: 'Clinical', s: '실습 · 적용' }
+    ];
+    var pillW = 280, pillGap = 20, pillsW = pills.length * pillW + (pills.length - 1) * pillGap;
+    var pillX0 = Math.round((w - pillsW) / 2);
+    pills.forEach(function (p, i) {
+      var x = pillX0 + i * (pillW + pillGap);
+      ctx.fillStyle = 'rgba(0,0,0,0.04)';
+      drawRealRoundRect(ctx, x, 580, pillW, 100, 18);
+      ctx.fill();
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 2;
+      drawRealRoundRect(ctx, x, 580, pillW, 100, 18);
+      ctx.stroke();
+      ctx.fillStyle = ink;
+      ctx.font = '800 24px Montserrat, sans-serif';
+      ctx.fillText(p.k, x + pillW / 2, 620);
+      ctx.fillStyle = '#6A6570';
+      ctx.font = '700 17px Pretendard, sans-serif';
+      ctx.fillText(p.s, x + pillW / 2, 656);
+    });
+    var body = (draft && draft.body) || certBodyText(tmpl, draft);
+    ctx.fillStyle = ink;
+    ctx.font = '600 30px "Source Sans 3", sans-serif';
+    fillCenterLines(ctx, body, w / 2, 760, 1080, 46);
+    ctx.fillStyle = '#6A6570';
+    ctx.font = '700 22px Pretendard, sans-serif';
+    ctx.fillText((tmpl.moduleKo || '') + ' 과정 수료', w / 2, 940);
+    ctx.fillStyle = ink;
+    ctx.font = '700 26px Montserrat, sans-serif';
+    ctx.fillText(String((draft && draft.date) || ''), w / 2, 990);
+    drawIfcSeal(ctx, w / 2, 1180, logo, { wash: 'rgba(61,168,154,.12)', accent: accent, ink: ink, size: 240 });
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(180, 1520);
+    ctx.lineTo(520, 1520);
+    ctx.moveTo(894, 1520);
+    ctx.lineTo(1234, 1520);
+    ctx.stroke();
+    ctx.fillStyle = ink;
+    ctx.font = '600 20px "Source Sans 3", sans-serif';
+    ctx.fillText('Instructor', 350, 1492);
+    ctx.fillText('Joonkyu Park DC. PT.', 1064, 1492);
+    ctx.fillStyle = '#6A6570';
+    ctx.font = '700 13px Montserrat, sans-serif';
+    ctx.fillText('INSTRUCTOR', 350, 1556);
+    ctx.fillText('PRESIDENT', 1064, 1556);
+    ctx.fillStyle = '#6A6570';
+    ctx.font = '600 15px Montserrat, sans-serif';
+    ctx.fillText('International Face Correction Society', w / 2, 1700);
+    ctx.fillStyle = ink;
+    ctx.font = '700 18px Montserrat, sans-serif';
+    ctx.fillText(String((draft && draft.certNo) || ''), w / 2, 1740);
+  }
+  function previewDraft() {
+    var st = certBranchState();
+    if (st.drafts.length) return st.drafts[Math.min(st.active, st.drafts.length - 1)];
+    ensureCertShared(st);
+    var empty = blankDraft();
+    var names = parseCertNames(st.nameList);
+    empty.name = names[0] || '';
+    empty.certNo = st.shared.certNo || (certPrefixForTemplate() + '-' + new Date().getFullYear() + '-0001');
+    return empty;
+  }
+  function drawCert(draft) {
+    var tmpl = certTemplate();
+    var canvas = $('certCanvas');
+    return ensureCertFonts().then(function () {
+      if (tmpl.kind === 'real') {
+        return loadCertImg(realLogoFile()).then(function (logo) {
+          drawRealCert(canvas, draft, logo);
+        }).catch(function () {
+          drawRealCert(canvas, draft, null);
+        });
+      }
+      if (tmpl.kind === 'cmt') {
+        return loadCertImg(CMT_MARK_FILE).then(function (logo) {
+          drawCmtCert(canvas, draft, logo);
+        }).catch(function () {
+          return loadCertImg(CMT_LOGO_FILE).then(function (logo) {
+            drawCmtCert(canvas, draft, logo);
+          }).catch(function () {
+            drawCmtCert(canvas, draft, null);
+          });
+        });
+      }
+      if (tmpl.kind === 'member' || tmpl.kind === 'course') {
+        return loadCertImg(IFC_LOGO_FILE).then(function (logo) {
+          if (tmpl.kind === 'member') drawIfcMemberCert(canvas, draft, logo);
+          else drawIfcCourseCert(canvas, draft, logo);
+        }).catch(function () {
+          if (tmpl.kind === 'member') drawIfcMemberCert(canvas, draft, null);
+          else drawIfcCourseCert(canvas, draft, null);
+        });
+      }
+      if (tmpl.file) {
+        return loadCertImg(tmpl.file).then(function (img) { drawTemplateCert(canvas, img, tmpl, draft); });
+      }
+      return null;
+    });
+  }
+  function scheduleCertPreview() {
+    clearTimeout(certPreviewTimer);
+    certPreviewTimer = setTimeout(paintCertPreview, 40);
+  }
+  function paintCertPreview() {
+    var canvas = $('certCanvas');
+    if (!canvas || !isAcademyBranch()) return;
+    var gen = ++certPreviewGen;
+    drawCert(previewDraft()).then(function () {
+      if (gen !== certPreviewGen) return;
+    }).catch(function () {
+      if (gen !== certPreviewGen) return;
+      try {
+        var tmpl = certTemplate();
+        var draft = previewDraft();
+        if (tmpl.kind === 'real') drawRealCert(canvas, draft, null);
+        else if (tmpl.kind === 'cmt') drawCmtCert(canvas, draft, null);
+        else if (tmpl.kind === 'member') drawIfcMemberCert(canvas, draft, null);
+        else if (tmpl.kind === 'course') drawIfcCourseCert(canvas, draft, null);
+        setCertStatus('로고 없이 미리보기를 그렸습니다. 수료증 폴더·로고 파일이 같은 위치에 있는지 확인해 주세요.');
+      } catch (errDraw) {
+        setCertStatus('수료증 그림을 열지 못했습니다. HTML_미리보기.bat으로 연 뒤 다시 확인해 주세요.');
+      }
+    });
+  }
+  function certFileName(draft, index, total, collide) {
+    var who = String(draft.name || '이름없음').replace(/[\\/:*?"<>|]/g, '').trim() || '이름없음';
+    var suffix = collide ? '_' + (index + 1) : '';
+    return '수료증_' + certTemplate().label + '_' + who + suffix + '.png';
+  }
+  function canvasToFile(canvas, filename) {
+    return new Promise(function (resolve, reject) {
+      try {
+        canvas.toBlob(function (blob) {
+          if (!blob) { reject(new Error('blob')); return; }
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(function () { URL.revokeObjectURL(a.href); resolve(); }, 300);
+        }, 'image/png');
+      } catch (err) { reject(err); }
+    });
+  }
+  function saveCertDrafts(drafts) {
+    if (!drafts.length) {
+      setCertStatus('이름을 넣은 뒤 저장해 주세요.');
+      return;
+    }
+    var seen = {};
+    var collide = false;
+    drafts.forEach(function (d) {
+      var n = d.name || '';
+      if (seen[n]) collide = true;
+      seen[n] = 1;
+    });
+    var i = 0;
+    function next() {
+      if (i >= drafts.length) {
+        setCertStatus(drafts.length + '장을 저장했습니다.');
+        paintCertPreview();
+        return;
+      }
+      drawCert(drafts[i]).then(function () {
+        return canvasToFile($('certCanvas'), certFileName(drafts[i], i, drafts.length, collide));
+      }).then(function () {
+        i += 1;
+        next();
+      }).catch(function () {
+        setCertStatus('저장하지 못했습니다. 미리보기 주소로 연 뒤 다시 저장해 주세요.');
+        paintCertPreview();
+      });
+    }
+    setCertStatus('수료증을 저장하는 중입니다.');
+    next();
+  }
+  function paintCertTemplates() {
+    var st = certBranchState();
+    var host = $('certTemplates');
+    if (!host) return;
+    host.innerHTML = certTemplates().map(function (t) {
+      return '<button type="button" class="chip' + (t.id === st.templateId ? ' active' : '') + '" data-template="' + escHtml_(t.id) + '">' + escHtml_(t.label) + '</button>';
+    }).join('');
+    var note = $('certNote');
+    var kind = certTemplate().kind;
+    var text = '불러오기 → 이름 수정 → 만들기 순입니다. 이름은 쉼표로 구분해 적습니다.';
+    if (kind === 'cmt') text += ' 캔버스 수료증 · Full-Body/시간 뱃지 · 발급번호.';
+    if (kind === 'member') text += ' 캔버스 학회원증 · Regular Member · 발급번호 · 실.';
+    if (kind === 'course') text += ' 캔버스 과목증 · 모듈/시간 · 날짜·발급번호 · 과목별 색.';
+    if (kind === 'real') text += ' 하늘색 · PAR Re:Alignment 고정. 발급번호와 실(seal)이 들어갑니다.';
+    if (note) note.textContent = text;
+  }
+  function sharedFieldHtml(field, val) {
+    if (field.type === 'select') {
+      return '<label' + (field.span === 2 ? ' class="span2"' : '') + '><span>' + escHtml_(field.label) + '</span><select data-shared="' + field.key + '">' +
+        field.options.map(function (op) {
+          return '<option value="' + escHtml_(op.v) + '"' + (val === op.v ? ' selected' : '') + '>' + escHtml_(op.t) + '</option>';
+        }).join('') + '</select></label>';
+    }
+    if (field.type === 'textarea') {
+      return '<label class="span2"><span>' + escHtml_(field.label) + '</span><textarea data-shared="' + field.key + '">' + escHtml_(val) + '</textarea></label>';
+    }
+    return '<label' + (field.span === 2 ? ' class="span2"' : '') + '><span>' + escHtml_(field.label) + '</span><input data-shared="' + field.key + '" value="' + escHtml_(val) + '" placeholder="' + escHtml_(field.placeholder || '') + '"></label>';
+  }
+  function sharedFields(kind) {
+    var fields = [];
+    var year = new Date().getFullYear();
+    var prefix = certPrefixForTemplate();
+    var tmpl = certTemplate();
+    if (kind === 'cmt') {
+      fields.push({ key: 'hours', label: '시간', placeholder: tmpl.hours || '48 hours' });
+      fields.push({ key: 'date', label: '날짜', placeholder: '26. 10. 05' });
+      fields.push({ key: 'certNo', label: '시작 발급번호', span: 2, placeholder: 'CMT-' + year + '-0001' });
+      fields.push({ key: 'body', label: '본문', type: 'textarea' });
+    }
+    if (kind === 'member') {
+      fields.push({ key: 'date', label: '날짜', placeholder: 'October 2026' });
+      fields.push({ key: 'certNo', label: '시작 발급번호', placeholder: 'IFC-' + year + '-0001' });
+      fields.push({ key: 'body', label: '본문', type: 'textarea' });
+    }
+    if (kind === 'course') {
+      fields.push({ key: 'hours', label: '시간', placeholder: tmpl.hours || '8 hours' });
+      fields.push({ key: 'date', label: '날짜', placeholder: 'October 5, 2026' });
+      fields.push({ key: 'certNo', label: '시작 발급번호', span: 2, placeholder: prefix + '-' + year + '-0001' });
+      fields.push({ key: 'body', label: '본문', type: 'textarea' });
+    }
+    if (kind === 'real') {
+      fields.push({ key: 'courseKind', label: '과정', type: 'select', options: [{ v: 'oneday', t: '원데이 패시브' }, { v: 'regular', t: '정규반 · PAR' }] });
+      fields.push({ key: 'hours', label: '시간', placeholder: '18 hours' });
+      fields.push({ key: 'date', label: '날짜', placeholder: 'October 5, 2026' });
+      fields.push({ key: 'certNo', label: '시작 발급번호', placeholder: 'REAL-' + year + '-0001' });
+      fields.push({ key: 'body', label: '본문', type: 'textarea' });
+    }
+    return fields;
+  }
+  function paintCertEditor() {
+    var st = certBranchState();
+    var host = $('certEditor');
+    if (!host) return;
+    ensureCertShared(st);
+    var kind = certTemplate().kind;
+    var sh = st.shared;
+    var fields = sharedFields(kind);
+    var html = '<div class="cert-person is-on">' +
+      '<div class="cert-fields">' +
+      '<label class="span2"><span>이름</span><textarea class="cert-names" id="certNamesBulk" placeholder="김미정, 박준규, 최상민,">' + escHtml_(st.nameList || '') + '</textarea></label>' +
+      fields.map(function (field) { return sharedFieldHtml(field, sh[field.key] || ''); }).join('') +
+      '</div></div>';
+    if (st.drafts.length) {
+      html += '<div class="cert-draft-chips" id="certDraftChips">' + st.drafts.map(function (d, i) {
+        return '<button type="button" class="chip' + (i === st.active ? ' active' : '') + '" data-preview="' + i + '">' + escHtml_(d.name || ('대상 ' + (i + 1))) + '</button>';
+      }).join('') + '</div>';
+    }
+    host.innerHTML = html;
+    var one = $('btnCertSaveOne');
+    var all = $('btnCertSaveAll');
+    if (one) one.hidden = !st.drafts.length;
+    if (all) all.hidden = st.drafts.length < 2;
+  }
+  function renderCertChrome() {
+    if (!isAcademyBranch() || !$('certPanel')) return;
+    bindCertPanel();
+    var lead = {
+      cmt: '불러오기 → 이름 수정 → 만들기. CMT 전신 수료증(캔버스) · 시간 뱃지 · 발급번호.',
+      ifc: '불러오기 → 이름 수정 → 만들기. 학회원증·과목증을 캔버스로 만듭니다. 과목별 색·발급번호·실.',
+      real: '불러오기 → 이름 수정 → 만들기. 하늘색 · PAR Re:Alignment 고정. 발급번호와 실이 들어갑니다.'
+    };
+    var leadEl = $('certLead');
+    if (leadEl) leadEl.textContent = lead[consultBranch] || '';
+    paintCertTemplates();
+    paintCertEditor();
+    scheduleCertPreview();
+  }
+  function focusCertNames(appendComma) {
+    var el = $('certNamesBulk');
+    if (!el) return;
+    if (appendComma) {
+      var v = el.value.replace(/\s+$/, '');
+      if (v && !/[,，]$/.test(v)) v += ', ';
+      else if (v && /[,，]$/.test(v)) v = v.replace(/\s*$/, ' ');
+      el.value = v;
+      certBranchState().nameList = el.value;
+    }
+    el.focus();
+    try { el.setSelectionRange(el.value.length, el.value.length); } catch (errSel) {}
+  }
+  function addCertManual() {
+    var st = certBranchState();
+    ensureCertShared(st);
+    if (!String(st.nameList || '').trim()) {
+      paintCertEditor();
+      focusCertNames(false);
+      setCertStatus('이름을 직접 적거나, 불러오기로 시트에서 가져오세요.');
+      return;
+    }
+    paintCertEditor();
+    focusCertNames(true);
+    setCertStatus('이름을 이어서 적고 만들기를 누르세요.');
+  }
+  function loadCertApplicants() {
+    var st = certBranchState();
+    var branch = consultBranch;
+    var gen = ++certLoadGen;
+    st.loading = true;
+    var btn = $('btnCertLoad');
+    if (btn) btn.disabled = true;
+    setCertStatus('신청자를 불러오는 중입니다.');
+    var payload = JSON.stringify({ action: 'listAcademyApplicants', course: branch });
+    var url = PAYROLL_API_URL + (PAYROLL_API_URL.indexOf('?') >= 0 ? '&' : '?') + 'data=' + encodeURIComponent(payload) + '&_=' + Date.now();
+    fetch(url, { method: 'GET', cache: 'no-store' }).then(function (res) {
+      return res.text();
+    }).then(function (text) {
+      st.loading = false;
+      if (btn) btn.disabled = false;
+      if (gen !== certLoadGen) return;
+      var data;
+      try { data = JSON.parse(text); } catch (eParse) { data = null; }
+      if (consultBranch !== branch) return;
+      if (!data || data.ok === false || data.result === 'error') {
+        var msg = (data && data.message) || '';
+        if (/unknown action/i.test(msg)) {
+          setCertStatus('시트 연결을 아직 배포하지 않았습니다. 앱스 스크립트를 다시 배포하면 신청자가 열립니다. 지금은 이름을 직접 적어 주세요.');
+        } else {
+          setCertStatus(msg || '신청자를 불러오지 못했습니다. 이름을 직접 적어 주세요.');
+        }
+        paintCertEditor();
+        focusCertNames(false);
+        return;
+      }
+      st.applicants = data.applicants || [];
+      var names = [];
+      var seen = {};
+      st.applicants.forEach(function (a) {
+        var n = String(a.name || '').trim();
+        if (!n || seen[n]) return;
+        seen[n] = 1;
+        names.push(n);
+      });
+      st.nameList = formatCertNames(names);
+      st.drafts = [];
+      st.active = 0;
+      setCertStatus(names.length
+        ? (names.length + '명을 이름 칸에 넣었습니다. 고친 뒤 만들기를 누르세요.')
+        : '이 과정 신청자가 없습니다. 이름을 직접 적어 주세요.');
+      renderCertChrome();
+      focusCertNames(false);
+    }).catch(function () {
+      st.loading = false;
+      if (btn) btn.disabled = false;
+      if (consultBranch === branch) {
+        setCertStatus('신청자를 불러오지 못했습니다. 이름을 직접 적어 주세요.');
+        paintCertEditor();
+        focusCertNames(false);
+      }
+    });
+  }
+  function makeCertFromNames() {
+    var st = certBranchState();
+    ensureCertShared(st);
+    var bulk = $('certNamesBulk');
+    if (bulk) st.nameList = bulk.value;
+    syncSharedFromDom(st);
+    var names = parseCertNames(st.nameList);
+    if (!names.length) {
+      setCertStatus('이름을 한 명 이상 적어 주세요. 예: 김미정, 박준규,');
+      focusCertNames(false);
+      return;
+    }
+    st.nameList = formatCertNames(names);
+    var tmpl = certTemplate();
+    st.drafts = names.map(function (name, i) {
+      var d = blankDraft(null);
+      d.key = 'name:' + i + ':' + name;
+      d.name = name;
+      d.date = st.shared.date || d.date;
+      d.courseKind = tmpl.courseKind || st.shared.courseKind || d.courseKind;
+      d.hours = st.shared.hours || tmpl.hours || d.hours;
+      d.body = st.shared.body || certBodyText(tmpl, d);
+      d.certNo = '';
+      return d;
+    });
+    st.active = 0;
+    fillSerialNumbers(st.drafts, st.shared.certNo);
+    setCertStatus(st.drafts.length + '장 수료증을 만들었습니다. 미리보기를 확인하고 저장하세요.');
+    renderCertChrome();
+  }
+  function syncSharedFromDom(st) {
+    ensureCertShared(st);
+    document.querySelectorAll('#certEditor [data-shared]').forEach(function (el) {
+      st.shared[el.getAttribute('data-shared')] = el.value;
+    });
+  }
+  function onCertField(e) {
+    var t = e.target;
+    if (!t) return;
+    var st = certBranchState();
+    ensureCertShared(st);
+    if (t.id === 'certNamesBulk') {
+      if (e.type !== 'input') return;
+      st.nameList = t.value;
+      return;
+    }
+    if (!t.getAttribute || !t.getAttribute('data-shared')) return;
+    if (t.tagName === 'SELECT' && e.type !== 'change') return;
+    if (t.tagName !== 'SELECT' && e.type !== 'input') return;
+    var field = t.getAttribute('data-shared');
+    var tmpl = certTemplate();
+    var prevKind = st.shared.courseKind;
+    var prevHours = st.shared.hours;
+    var prevBody = st.shared.body;
+    st.shared[field] = t.value;
+    if (field === 'courseKind' || field === 'hours') {
+      var autoPrev = certBodyText(tmpl, { courseKind: prevKind, hours: prevHours });
+      if (!prevBody || prevBody === autoPrev) {
+        if (field === 'courseKind' && (!prevHours || prevHours === realHoursDefault(prevKind))) {
+          st.shared.hours = realHoursDefault(st.shared.courseKind);
+        }
+        st.shared.body = certBodyText(tmpl, st.shared);
+        paintCertEditor();
+      }
+    }
+    if (st.drafts.length) {
+      st.drafts.forEach(function (d) {
+        if (field === 'date') d.date = st.shared.date;
+        if (field === 'hours') {
+          d.hours = st.shared.hours;
+          if (!d.body || d.body === certBodyText(tmpl, { hours: prevHours, courseKind: d.courseKind })) {
+            d.body = certBodyText(tmpl, d);
+          }
+        }
+        if (field === 'courseKind') {
+          d.courseKind = st.shared.courseKind;
+          d.hours = st.shared.hours;
+          d.body = st.shared.body;
+        }
+        if (field === 'body') d.body = st.shared.body;
+      });
+      if (field === 'certNo') fillSerialNumbers(st.drafts, st.shared.certNo);
+    }
+    scheduleCertPreview();
+  }
+  function onCertClick(e) {
+    var t = e.target;
+    if (t.closest('#btnCertLoad')) { loadCertApplicants(); return; }
+    if (t.closest('#btnCertMake')) { makeCertFromNames(); return; }
+    if (t.closest('#btnCertAddManual')) { addCertManual(); return; }
+    if (t.closest('#btnCertSaveOne')) {
+      var stOne = certBranchState();
+      var cur = stOne.drafts[Math.min(stOne.active, stOne.drafts.length - 1)];
+      if (cur) saveCertDrafts([cur]);
+      else setCertStatus('먼저 만들기를 눌러 수료증을 만든 뒤 저장해 주세요.');
+      return;
+    }
+    if (t.closest('#btnCertSaveAll')) {
+      var stAll = certBranchState();
+      if (!stAll.drafts.length) setCertStatus('먼저 만들기를 눌러 수료증을 만든 뒤 저장해 주세요.');
+      else saveCertDrafts(stAll.drafts.slice());
+      return;
+    }
+    var tmplBtn = t.closest('[data-template]');
+    if (tmplBtn) {
+      var stT = certBranchState();
+      stT.templateId = tmplBtn.getAttribute('data-template');
+      var nextTmpl = certTemplate();
+      ensureCertShared(stT);
+      if (nextTmpl.kind === 'real' && nextTmpl.courseKind) {
+        var prevKind = stT.shared.courseKind;
+        var prevBody = stT.shared.body;
+        var autoPrev = certBodyText({ kind: 'real' }, { courseKind: prevKind, hours: stT.shared.hours });
+        stT.shared.courseKind = nextTmpl.courseKind;
+        if (!stT.shared.hours || stT.shared.hours === realHoursDefault(prevKind)) {
+          stT.shared.hours = realHoursDefault(stT.shared.courseKind);
+        }
+        if (!prevBody || prevBody === autoPrev) stT.shared.body = certBodyText(nextTmpl, stT.shared);
+        stT.shared.date = defaultCertDate('real');
+      } else {
+        stT.shared.date = defaultCertDate(nextTmpl.kind);
+        if (nextTmpl.hours) stT.shared.hours = nextTmpl.hours;
+        stT.shared.body = certBodyText(nextTmpl, stT.shared);
+      }
+      stT.shared.certNo = '';
+      stT.drafts = [];
+      stT.active = 0;
+      renderCertChrome();
+      return;
+    }
+    var prevBtn = t.closest('[data-preview]');
+    if (prevBtn) {
+      var stP = certBranchState();
+      stP.active = parseInt(prevBtn.getAttribute('data-preview'), 10) || 0;
+      document.querySelectorAll('#certDraftChips .chip').forEach(function (el) {
+        el.classList.toggle('active', el === prevBtn);
+      });
+      scheduleCertPreview();
+    }
+  }
+  function bindCertPanel() {
+    var panel = $('certPanel');
+    if (!panel || certBound) return;
+    certBound = true;
+    panel.addEventListener('click', onCertClick);
+    panel.addEventListener('input', onCertField);
+    panel.addEventListener('change', onCertField);
+  }
   function renderConsultBranch() {
     document.querySelectorAll('#consultBranchChips .chip').forEach(function (c) {
       c.classList.toggle('active', c.dataset.branch === consultBranch);
     });
-    document.body.classList.toggle('academy-mode', isAcademyBranch());
+    var academy = isAcademyBranch();
+    document.body.classList.toggle('academy-mode', academy);
+    var chatBlocks = $('consultChatBlocks');
+    var certPanel = $('certPanel');
+    if (chatBlocks) chatBlocks.hidden = academy;
+    if (certPanel) certPanel.hidden = !academy;
     var q1 = $('chatQ');
     var q2 = $('chatQ2');
-    if (q1) {
-      q1.placeholder = isAcademyBranch()
-        ? '신청자 메시지·문의사항을 붙여 넣으세요'
-        : '질문을 붙여 넣거나, 캡처를 여기에 넣으세요';
-    }
-    if (q2) {
-      q2.placeholder = isAcademyBranch()
-        ? '다음 문의나 답장을 붙여 넣으세요'
-        : '다음 메시지를 붙여 넣거나, 캡처를 넣으세요';
-    }
+    if (q1 && !academy) q1.placeholder = '질문을 붙여 넣거나, 캡처를 여기에 넣으세요';
+    if (q2 && !academy) q2.placeholder = '다음 메시지를 붙여 넣거나, 캡처를 넣으세요';
     syncPriceSheet();
     renderFaq();
-    if ($('chatQ').value.trim()) startGreeting('silent');
-    if ($('chatQ2').value.trim()) startFollow('silent');
+    renderCertChrome();
+    if (!academy) {
+      if (q1 && q1.value.trim()) startGreeting('silent');
+      if (q2 && q2.value.trim()) startFollow('silent');
+    }
   }
   function faqItems() {
     if (isAcademyBranch()) return academyFaqs();
