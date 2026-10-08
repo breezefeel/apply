@@ -222,11 +222,87 @@
       background: var(--zone-program-soft);
       border-color: var(--zone-program-border);
       color: var(--zone-program);
+      transition: background .22s ease, border-color .22s ease, color .22s ease;
     }
     .section-zone--program .psp-subsection-hd {
       background: rgba(227, 245, 239, 0.65);
       border-color: var(--zone-program-border);
       color: #0a5c52;
+      transition: background .22s ease, border-color .22s ease, color .22s ease;
+    }
+    /* Real Movement 4섹션 — 위→아래 조화 팔레트 + 오늘 체크 비율(is-progress-lv-1~5) */
+    .section-zone--program .psp-section-hd[class*="sec-tone--"],
+    .section-zone--program .psp-subsection-hd[class*="sec-tone--"] {
+      transition: background .22s ease, border-color .22s ease, color .22s ease;
+    }
+    .section-zone--program .psp-section-hd.sec-tone--self_tool,
+    .section-zone--program .psp-subsection-hd.sec-tone--self_tool {
+      --sec-bg: #ecf8f3; --sec-border: #b8e6d8; --sec-fg: #0f766e;
+    }
+    .section-zone--program .psp-section-hd.sec-tone--self_tool.is-progress-lv-1,
+    .section-zone--program .psp-subsection-hd.sec-tone--self_tool.is-progress-lv-1 { --sec-bg: #d4f0e6; --sec-border: #8fd4bc; --sec-fg: #0d6658; }
+    .section-zone--program .psp-section-hd.sec-tone--self_tool.is-progress-lv-2,
+    .section-zone--program .psp-subsection-hd.sec-tone--self_tool.is-progress-lv-2 { --sec-bg: #b8e4d4; --sec-border: #6ec4aa; --sec-fg: #0a5c52; }
+    .section-zone--program .psp-section-hd.sec-tone--self_tool.is-progress-lv-3,
+    .section-zone--program .psp-subsection-hd.sec-tone--self_tool.is-progress-lv-3 { --sec-bg: #8fd4bc; --sec-border: #4db896; --sec-fg: #064e3b; }
+    .section-zone--program .psp-section-hd.sec-tone--self_tool.is-progress-lv-4,
+    .section-zone--program .psp-subsection-hd.sec-tone--self_tool.is-progress-lv-4 { --sec-bg: #5fbf9e; --sec-border: #2d9f7a; --sec-fg: #022c22; }
+    .section-zone--program .psp-section-hd.sec-tone--self_tool.is-progress-lv-5,
+    .section-zone--program .psp-subsection-hd.sec-tone--self_tool.is-progress-lv-5 { --sec-bg: #3d9a82; --sec-border: #0d7568; --sec-fg: #ecfdf5; }
+
+    .section-zone--program .psp-section-hd.sec-tone--pos1_par,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos1_par {
+      --sec-bg: #eef4fc; --sec-border: #c7daf5; --sec-fg: #1d4ed8;
+    }
+    .section-zone--program .psp-section-hd.sec-tone--pos1_par.is-progress-lv-1,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos1_par.is-progress-lv-1 { --sec-bg: #dce8fb; --sec-border: #a8c4f0; --sec-fg: #1e40af; }
+    .section-zone--program .psp-section-hd.sec-tone--pos1_par.is-progress-lv-2,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos1_par.is-progress-lv-2 { --sec-bg: #c2d8f6; --sec-border: #8fb0e8; --sec-fg: #1e3a8a; }
+    .section-zone--program .psp-section-hd.sec-tone--pos1_par.is-progress-lv-3,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos1_par.is-progress-lv-3 { --sec-bg: #9bbef0; --sec-border: #6b9ae0; --sec-fg: #172554; }
+    .section-zone--program .psp-section-hd.sec-tone--pos1_par.is-progress-lv-4,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos1_par.is-progress-lv-4 { --sec-bg: #6b9ae0; --sec-border: #3b7dd4; --sec-fg: #eff6ff; }
+    .section-zone--program .psp-section-hd.sec-tone--pos1_par.is-progress-lv-5,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos1_par.is-progress-lv-5 { --sec-bg: #4a7fd4; --sec-border: #2563eb; --sec-fg: #eff6ff; }
+
+    .section-zone--program .psp-section-hd.sec-tone--pos2,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos2 {
+      --sec-bg: #f7f3ea; --sec-border: #e8dcc4; --sec-fg: #92400e;
+    }
+    .section-zone--program .psp-section-hd.sec-tone--pos2.is-progress-lv-1,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos2.is-progress-lv-1 { --sec-bg: #f0e8d6; --sec-border: #ddc9a8; --sec-fg: #854d0e; }
+    .section-zone--program .psp-section-hd.sec-tone--pos2.is-progress-lv-2,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos2.is-progress-lv-2 { --sec-bg: #e8dcc4; --sec-border: #d4bc94; --sec-fg: #78350f; }
+    .section-zone--program .psp-section-hd.sec-tone--pos2.is-progress-lv-3,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos2.is-progress-lv-3 { --sec-bg: #ddc9a8; --sec-border: #c4a574; --sec-fg: #451a03; }
+    .section-zone--program .psp-section-hd.sec-tone--pos2.is-progress-lv-4,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos2.is-progress-lv-4 { --sec-bg: #c4a574; --sec-border: #a8844a; --sec-fg: #fffbeb; }
+    .section-zone--program .psp-section-hd.sec-tone--pos2.is-progress-lv-5,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos2.is-progress-lv-5 { --sec-bg: #a8844a; --sec-border: #b45309; --sec-fg: #fffbeb; }
+
+    .section-zone--program .psp-section-hd.sec-tone--pos3,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos3 {
+      --sec-bg: #f0eef8; --sec-border: #d4cff0; --sec-fg: #5b21b6;
+    }
+    .section-zone--program .psp-section-hd.sec-tone--pos3.is-progress-lv-1,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos3.is-progress-lv-1 { --sec-bg: #e4e0f4; --sec-border: #c4bce8; --sec-fg: #6d28d9; }
+    .section-zone--program .psp-section-hd.sec-tone--pos3.is-progress-lv-2,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos3.is-progress-lv-2 { --sec-bg: #d4cff0; --sec-border: #b0a6e0; --sec-fg: #5b21b6; }
+    .section-zone--program .psp-section-hd.sec-tone--pos3.is-progress-lv-3,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos3.is-progress-lv-3 { --sec-bg: #b0a6e0; --sec-border: #9084d4; --sec-fg: #3730a3; }
+    .section-zone--program .psp-section-hd.sec-tone--pos3.is-progress-lv-4,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos3.is-progress-lv-4 { --sec-bg: #9084d4; --sec-border: #7366c7; --sec-fg: #f5f3ff; }
+    .section-zone--program .psp-section-hd.sec-tone--pos3.is-progress-lv-5,
+    .section-zone--program .psp-subsection-hd.sec-tone--pos3.is-progress-lv-5 { --sec-bg: #7366c7; --sec-border: #6366f1; --sec-fg: #f5f3ff; }
+
+    .section-zone--program .psp-section-hd[class*="sec-tone--"],
+    .section-zone--program .psp-subsection-hd[class*="sec-tone--"] {
+      background: var(--sec-bg);
+      border-color: var(--sec-border);
+      color: var(--sec-fg);
+    }
+    .section-zone--program .psp-section.collapsible.collapsed .psp-section-hd[class*="sec-tone--"] {
+      border-bottom-color: var(--sec-border);
     }
     .section-zone--program .psp-section.collapsible.collapsed .psp-section-hd {
       border-bottom-color: var(--zone-program-border);
@@ -949,8 +1025,26 @@
       display:none;
     }
     .session-check-panel.show { display:block; }
+    .session-check-hd {
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      margin-bottom:10px; flex-wrap:wrap;
+    }
     .session-check-title {
-      font-size:12px; font-weight:800; color:var(--text); margin-bottom:10px;
+      font-size:12px; font-weight:800; color:var(--text); margin:0; flex:1 1 auto; min-width:0;
+    }
+    .session-check-title-actions {
+      display:flex; flex-wrap:nowrap; gap:5px; flex:0 0 auto; margin-left:auto;
+    }
+    .session-check-title-actions .session-check-chip {
+      flex:0 0 auto; padding:5px 10px; font-size:10px; border-radius:999px;
+      border:1px solid var(--border); background:#fff; cursor:pointer;
+      box-sizing:border-box; display:inline-flex; justify-content:center; align-items:center;
+      text-align:center;
+    }
+    .session-check-title-actions .session-check-chip[data-area="comfortable"] { width:90px; }
+    .session-check-title-actions .session-check-chip[data-area="same"] { width:72px; }
+    .session-check-title-actions .session-check-chip.on {
+      background:var(--blue-bg); border-color:var(--blue); color:var(--blue); font-weight:700;
     }
     .session-check-row { margin-top:10px; }
     .session-check-row:first-of-type { margin-top:0; }
@@ -996,13 +1090,6 @@
     .session-discomfort-group--quick .session-check-chip {
       font-size:10px; padding:5px 9px;
     }
-    .session-quick-row--special .session-check-chip {
-      box-sizing:border-box;
-      display:inline-flex; justify-content:center; align-items:center;
-      flex:0 0 auto; text-align:center;
-    }
-    .session-quick-row--special .session-check-chip[data-area="comfortable"] { width:90px; }
-    .session-quick-row--special .session-check-chip[data-area="same"] { width:72px; }
     .session-quick-row--sides .session-check-chip {
       width:100%; min-width:0; text-align:center; padding:5px 2px;
     }
@@ -2614,7 +2701,10 @@
           </aside>
         </div>
         <div class="session-check-panel" id="sessionCheckPanel">
-            <div class="session-check-title">불편한 부위 · VAS</div>
+            <div class="session-check-hd">
+              <div class="session-check-title">불편한 부위 · VAS</div>
+              <div class="session-check-title-actions" id="sessionDiscomfortSpecialChips"></div>
+            </div>
             <div class="session-check-row">
               <div class="session-check-chips" id="sessionDiscomfortChips"></div>
             </div>
@@ -3020,7 +3110,9 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec';
     /** GitHub Pages 배포 확인용 — 오류 메시지에 표시됨 */
-    const INSTRUCTOR_HTML_BUILD = '2026-10-01-academy-links';
+    const INSTRUCTOR_HTML_BUILD = '2026-10-08-history-asc-scroll';
+    /** 오늘의 회원 칩 선택 전 히스토리·다음예약 미리 로드 (동시 요청 수) */
+    const MEMBER_EXTRAS_PREFETCH_CONCURRENCY = 2;
     const PROGRAM_PLAN_SLOT_COUNT = 5;
     var _programPlanSaveSlot = 1;
     var _programPlanLoadDirectorTab = 'sangmin';
@@ -3109,13 +3201,26 @@
       return String(progName || '') === FORCE_LINE_PROGRAM;
     }
 
-    /** Lying Passive Stretching — ① 하체 → ② 상체 순 */
+    /** Lying Passive Stretching — ① Supine 상체 → ② Prone 상체 → ③ Supine 하체 → ④ Prone 하체 */
     function p1ItemOrder_(item) {
       var label = String(item && item.label || '');
       if (label.charAt(0) === '*') return 5;
       var m = label.match(/^[①②③④⑤]/);
       var order = { '①': 1, '②': 2, '③': 3, '④': 4, '⑤': 5 };
       return m ? (order[m[0]] || 99) : 99;
+    }
+    /** Force Line — Flexion/Extension/Rotation 각각 상지·하지 짝 */
+    function forceLineItemOrder_(item) {
+      var id = String(item && item.id || '');
+      var order = {
+        p1_fl_ue_flex: 1,
+        p1_fl_le_flex: 2,
+        p1_fl_ue_ext: 3,
+        p1_fl_le_ext: 4,
+        p1_fl_ue_rot: 5,
+        p1_fl_le_rot: 6
+      };
+      return order[id] != null ? order[id] : 99;
     }
     function p1RowLabel(item) {
       return methodDisplayLabel(item);
@@ -3135,10 +3240,10 @@
       '누워서 · 패시브 스트레칭',
       '엎드려서 · 패시브 스트레칭',
       '상지 Flexion',
-      '상지 Extension',
-      '상지 Rotation',
       '하지 Flexion',
+      '상지 Extension',
       '하지 Extension',
+      '상지 Rotation',
       '하지 Rotation',
     ];
 
@@ -3213,16 +3318,16 @@
       { id:'ball_abdomen', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'복부', alimtalkLabel:'마사지볼 · 복부', linkUrl:SELF_GUIDE_PAGE+'#ball_abdomen', thumbUrl:'exercise-thumbs/self_ball_abdomen.jpg', coachingNote:'볼을 복부 근육에 가볍게 두고 깊게 누르지 않습니다. 호흡에 맞춰 작은 범위로 자극하고, 식사 직후·복통이 있으면 하지 않습니다.' },
       { id:'ball_hip', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'엉덩이', alimtalkLabel:'마사지볼 · 엉덩이', linkUrl:SELF_GUIDE_PAGE+'#ball_hip', thumbUrl:'exercise-thumbs/self_ball_hip.jpg', coachingNote:'기둥에 볼을 두고 한쪽 엉덩이 근육에 댑니다. 좌골이 아닌 근육 위에 올리고 체중을 천천히 실어 원을 그리거나 유지합니다. 찌릿하면 중단합니다.' },
       { id:'ball_thigh', uiSection:'self_tool', sectionTitle:'셀프 소도구 자극', program:'12센티 마사지볼', label:'허벅지', alimtalkLabel:'마사지볼 · 허벅지', linkUrl:SELF_GUIDE_PAGE+'#ball_thigh', thumbUrl:'exercise-thumbs/self_ball_thigh.jpg', coachingNote:'기둥에 볼을 두고 허벅지 근육에 댑니다. 무릎 관절은 피하고, 작은 범위로 위아래·원을 그립니다.' },
-      { id:'p1_su_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'② Supine · 상체', linkUrl:SELF_GUIDE_PAGE+'#p_supine_upper', coachingNote:'준비: 오늘 누워서 상체를 풀어 준 동작입니다.\n동작: 손가락 → 손목 → 팔꿈치 → 어깨.\n포인트: 통증 없는 범위. 센터에서 받은 느낌이 기준입니다.\n주의: 찌릿하면 멈추세요.' },
-      { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'① Supine · 하체', linkUrl:SELF_GUIDE_PAGE+'#p_supine_lower', coachingNote:'준비: 오늘 누워서 하체를 풀어 준 동작입니다. 사진으로 장면을 확인하고, 디테일은 영상으로.\n동작: 발 → 발목 → 무릎 → 고관절. 영상이 3편입니다.\n포인트: 억지로 늘리지 마세요. 센터에서 받은 각도만.\n주의: 찌릿함·날카로운 통증이 있으면 중단하고 다음 수업에 말씀하세요.' },
-      { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'④ Prone · 상체', linkUrl:SELF_GUIDE_PAGE+'#p_prone_upper', coachingNote:'준비: 오늘 엎드려 상체를 풀어 준 동작입니다.\n동작: 손가락 → 손목 → 팔꿈치 → 어깨 → 척추.\n포인트: 척추는 한 번에 꺾지 말고, 센터에서 받은 범위만.\n주의: 찌릿하면 멈추세요.' },
-      { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'③ Prone · 하체', linkUrl:SELF_GUIDE_PAGE+'#p_prone_lower', coachingNote:'준비: 오늘 엎드려 하체를 풀어 준 동작입니다.\n동작: 발가락 → 발목 → 무릎 → 고관절.\n포인트: 얼굴·목을 편하게. 허리에 힘을 주지 마세요.\n주의: 찌릿하면 멈추세요.' },
+      { id:'p1_su_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'① Supine · 상체', linkUrl:SELF_GUIDE_PAGE+'#p_supine_upper', coachingNote:'준비: 오늘 누워서 상체를 풀어 준 동작입니다.\n동작: 손가락 → 손목 → 팔꿈치 → 어깨.\n포인트: 통증 없는 범위. 센터에서 받은 느낌이 기준입니다.\n주의: 찌릿하면 멈추세요.' },
+      { id:'p1_pu_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'② Prone · 상체', linkUrl:SELF_GUIDE_PAGE+'#p_prone_upper', coachingNote:'준비: 오늘 엎드려 상체를 풀어 준 동작입니다.\n동작: 손가락 → 손목 → 팔꿈치 → 어깨 → 척추.\n포인트: 척추는 한 번에 꺾지 말고, 센터에서 받은 범위만.\n주의: 찌릿하면 멈추세요.' },
+      { id:'p1_sl_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'③ Supine · 하체', linkUrl:SELF_GUIDE_PAGE+'#p_supine_lower', coachingNote:'준비: 오늘 누워서 하체를 풀어 준 동작입니다. 사진으로 장면을 확인하고, 디테일은 영상으로.\n동작: 발 → 발목 → 무릎 → 고관절. 영상이 3편입니다.\n포인트: 억지로 늘리지 마세요. 센터에서 받은 각도만.\n주의: 찌릿함·날카로운 통증이 있으면 중단하고 다음 수업에 말씀하세요.' },
+      { id:'p1_pl_p', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'④ Prone · 하체', linkUrl:SELF_GUIDE_PAGE+'#p_prone_lower', coachingNote:'준비: 오늘 엎드려 하체를 풀어 준 동작입니다.\n동작: 발가락 → 발목 → 무릎 → 고관절.\n포인트: 얼굴·목을 편하게. 허리에 힘을 주지 마세요.\n주의: 찌릿하면 멈추세요.' },
       { id:'p1_special_care', uiSection:'pos1_par', sectionTitle:'Lying', program:'Passive Stretching', label:'* Special Care', omitFromAlimtalk: true },
       { id:'p1_fl_ue_flex', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'상지 Flexion', alimtalkLabel:'Force Line · 상지 Flexion' },
-      { id:'p1_fl_ue_ext', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'상지 Extension', alimtalkLabel:'Force Line · 상지 Extension' },
-      { id:'p1_fl_ue_rot', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'상지 Rotation', alimtalkLabel:'Force Line · 상지 Rotation' },
       { id:'p1_fl_le_flex', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'하지 Flexion', alimtalkLabel:'Force Line · 하지 Flexion' },
+      { id:'p1_fl_ue_ext', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'상지 Extension', alimtalkLabel:'Force Line · 상지 Extension' },
       { id:'p1_fl_le_ext', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'하지 Extension', alimtalkLabel:'Force Line · 하지 Extension' },
+      { id:'p1_fl_ue_rot', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'상지 Rotation', alimtalkLabel:'Force Line · 상지 Rotation' },
       { id:'p1_fl_le_rot', uiSection:'pos1_par', sectionTitle:'Lying', program:'Force Line 연결', label:'하지 Rotation', alimtalkLabel:'Force Line · 하지 Rotation' },
       { id:'post_breath_relax', uiSection:'pos1_par', sectionTitle:'Lying', program:'1 · 누워서 호흡 운동', label:'편안한 호흡', alimtalkLabel:'누워서 편안한 호흡', linkUrl:SELF_GUIDE_PAGE+'#lie_easy', coachingNote:'준비: 힘을 쓰는 운동이 아닙니다. 허리 힘을 빼고 숨 쉬는 연습입니다.\n동작: 들이쉴 때 아랫배·옆·뒤가 같이 부풀고, 내쉴 때 완전히 힘 뺍니다.\n포인트: 윗배만 먼저 올라오면, 아랫배를 살짝 밀어 내는 느낌을 먼저 익히세요.\n주의: 하루 3~5분이면 충분합니다. 어지럽거나 허리가 세게 아프면 바로 멈추세요.' },
       { id:'post_breath', uiSection:'pos1_par', sectionTitle:'Lying', program:'1 · 누워서 호흡 운동', label:'호흡 운동 + 등척성 정렬', alimtalkLabel:'누워서 호흡 · 자세 정렬', linkUrl:SELF_GUIDE_PAGE+'#lie_align', coachingNote:'준비: 누워서 호흡 운동이 된 다음에 정렬을 얹습니다.\n동작: 내쉴 때 힘을 주며 엉덩이 → 발 → 무릎 → 척추 → 어깨 → 손끝 순으로 맞춥니다.\n포인트: 한쪽에만 신경 쓰이면 다른 쪽이 빠집니다. 한 호흡에 하나씩 더하세요.\n주의: 턱을 누르거나 어깨를 뒤로 밀지 마세요. 길어지게, 바깥으로 늘립니다.' },
@@ -4425,7 +4530,7 @@
         cls += ' collapsible';
         if (secCollapsed) cls += ' collapsed';
         html += '<div class="' + cls + '" data-ht-sec="' + escapeHtml(secKey) + '" data-ht-line="' + escapeHtml(lineId) + '">';
-        html += '<div class="psp-section-hd" onclick="toggleSectionCollapse(\'' + secKey + '\')">' +
+        html += '<div class="psp-section-hd' + progressHeaderTintClass_(g.items, secKey) + '" onclick="toggleSectionCollapse(\'' + secKey + '\')">' +
           escapeHtml(g.title) + sectionHeaderMeta(secKey);
         if (hasPos && isRec && secKey !== 'hongtaek_video') {
           html += ' <span class="section-meta section-meta-done">추천</span>';
@@ -4447,7 +4552,7 @@
           var gst = groupTodayStats_(byProg[pName]);
           html += '<div class="psp-part-wrap psp-subsection collapsible' +
             (stageCollapsed ? ' collapsed' : '') + '" data-ht-stage="' + escapeHtml(st) + '">';
-          html += '<div class="psp-subsection-hd" onclick="toggleSubSectionCollapse(\'' +
+          html += '<div class="psp-subsection-hd' + progressHeaderTintClass_(gst, secKey) + '" onclick="toggleSubSectionCollapse(\'' +
             secKey + '\',\'' + String(stageKey).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + '\')">';
           html += '<span class="psp-subsection-hd-main"><span>' + escapeHtml(pName) + '</span></span>';
           html += progressHeaderMeta({
@@ -5806,7 +5911,7 @@
     };
 
     var SESSION_DISCOMFORT_GROUP_LABELS = {
-      quick: '빠른 선택',
+      quick: '',
       head_spine: '머리 척추',
       upper: '상지',
       lower: '하지',
@@ -7471,6 +7576,164 @@
     var _nextBookingReq = 0;
     var _nextBookingInflight = null; // { key, promise }
 
+    /** 회원별 히스토리·다음예약 프리페치 캐시 (memberKey → entry) */
+    var _memberExtrasCache = Object.create(null);
+    var _memberExtrasPrefetchGen = 0;
+
+    function memberExtrasEntry_(mOrKey) {
+      var key = typeof mOrKey === 'string' ? mOrKey : memberKey(mOrKey);
+      if (!key) return null;
+      if (!_memberExtrasCache[key]) {
+        _memberExtrasCache[key] = {
+          detail: null,
+          detailPromise: null,
+          detailIgnoreToken: 0,
+          nextBooking: null,
+          nextBookingPromise: null,
+          nextBookingIgnoreToken: 0,
+        };
+      }
+      return _memberExtrasCache[key];
+    }
+
+    function clearMemberExtrasCache_() {
+      _memberExtrasPrefetchGen += 1;
+      _memberExtrasCache = Object.create(null);
+    }
+
+    function invalidateMemberExtrasCacheKey_(key, which) {
+      if (!key) return;
+      var e = _memberExtrasCache[key];
+      if (!e) return;
+      which = which || 'all';
+      if (which === 'detail' || which === 'all') {
+        e.detail = null;
+        e.detailPromise = null;
+        e.detailIgnoreToken = (e.detailIgnoreToken || 0) + 1;
+      }
+      if (which === 'nextBooking' || which === 'all') {
+        e.nextBooking = null;
+        e.nextBookingPromise = null;
+        e.nextBookingIgnoreToken = (e.nextBookingIgnoreToken || 0) + 1;
+      }
+    }
+
+    function peekMemberDetailCache_(m) {
+      var e = m && m.suffix8 ? memberExtrasEntry_(m) : null;
+      if (!e || !e.detail || e.detail.ok === false || !e.detail.member) return null;
+      if (e.detail.needPin) return null;
+      return e.detail;
+    }
+
+    function peekNextBookingCache_(m) {
+      var e = m && m.suffix8 ? memberExtrasEntry_(m) : null;
+      if (!e || e.nextBooking == null) return null;
+      return e.nextBooking;
+    }
+
+    function ensureMemberDetailCached_(m) {
+      if (!m || !m.suffix8) return Promise.resolve(null);
+      var entry = memberExtrasEntry_(m);
+      if (entry.detail && entry.detail.ok && entry.detail.member && !entry.detail.needPin) {
+        return Promise.resolve(entry.detail);
+      }
+      if (entry.detailPromise) return entry.detailPromise;
+      var tokenAtStart = entry.detailIgnoreToken || 0;
+      var run = (async function () {
+        try {
+          var detail = await api({
+            action: 'instructorMemberDetail',
+            suffix8: m.suffix8,
+            attendeeName: m.name,
+          }, {
+            timeoutMs: 60000,
+            timeoutMessage:
+              '회원 히스토리 응답 시간 초과(약 60초). Apps Script 배포·새로고침 후 다시 선택해 주세요.',
+          });
+          if ((entry.detailIgnoreToken || 0) === tokenAtStart) {
+            entry.detail = detail;
+          }
+          return detail;
+        } finally {
+          if (entry.detailPromise === run) entry.detailPromise = null;
+        }
+      })();
+      entry.detailPromise = run;
+      return run;
+    }
+
+    function ensureNextBookingCached_(m) {
+      if (!m || !m.suffix8) return Promise.resolve(null);
+      var entry = memberExtrasEntry_(m);
+      if (entry.nextBooking != null) return Promise.resolve(entry.nextBooking);
+      if (entry.nextBookingPromise) return entry.nextBookingPromise;
+      var tokenAtStart = entry.nextBookingIgnoreToken || 0;
+      var run = (async function () {
+        try {
+          var data = await api({
+            action: 'instructorMemberNextBooking',
+            suffix8: m.suffix8,
+            name: m.name,
+            phoneDigits: m.phoneDigits || '',
+            instructorIndex: m.instructorIndex,
+          }, { timeoutMs: 25000 });
+          if ((entry.nextBookingIgnoreToken || 0) === tokenAtStart) {
+            entry.nextBooking = data || { ok: false };
+          }
+          return data;
+        } catch (err) {
+          var fail = {
+            ok: false,
+            message: '다음 예약 조회가 지연되어 건너뜁니다. 필요하면 아래에서 직접 잡아 주세요.',
+            _prefetchError: true,
+          };
+          if ((entry.nextBookingIgnoreToken || 0) === tokenAtStart) {
+            entry.nextBooking = fail;
+          }
+          return fail;
+        } finally {
+          if (entry.nextBookingPromise === run) entry.nextBookingPromise = null;
+        }
+      })();
+      entry.nextBookingPromise = run;
+      return run;
+    }
+
+    function schedulePrefetchTodayMemberExtras_() {
+      var gen = ++_memberExtrasPrefetchGen;
+      setTimeout(function () {
+        prefetchTodayMemberExtras_(gen);
+      }, 120);
+    }
+
+    async function prefetchTodayMemberExtras_(gen) {
+      if (gen !== _memberExtrasPrefetchGen) return;
+      var list = todayMembers().filter(function (m) {
+        return m && m.suffix8;
+      });
+      if (!list.length) return;
+      list.sort(function (a, b) {
+        return parseTime(a.time) - parseTime(b.time) ||
+          String(a.name || '').localeCompare(String(b.name || ''), 'ko');
+      });
+      var i = 0;
+      async function worker() {
+        while (i < list.length) {
+          if (gen !== _memberExtrasPrefetchGen) return;
+          var m = list[i++];
+          try {
+            await ensureMemberDetailCached_(m);
+            if (gen !== _memberExtrasPrefetchGen) return;
+            await ensureNextBookingCached_(m);
+          } catch (ignorePrefetch) { /* 선택 시 다시 시도 */ }
+        }
+      }
+      var n = Math.min(MEMBER_EXTRAS_PREFETCH_CONCURRENCY, list.length);
+      var workers = [];
+      for (var w = 0; w < n; w++) workers.push(worker());
+      await Promise.all(workers);
+    }
+
     function markNextBookingLookupSettled_(m, opts) {
       opts = opts || {};
       m = m || state.selected;
@@ -7519,6 +7782,24 @@
       ) {
         return;
       }
+      var force = !!(state.nextBooking && state.nextBooking.forceReload);
+      if (force) invalidateMemberExtrasCacheKey_(selKey, 'nextBooking');
+
+      var cachedNb = !force ? peekNextBookingCache_(m) : null;
+      if (cachedNb) {
+        var reqCached = ++_nextBookingReq;
+        if (!cachedNb || cachedNb.ok === false) {
+          markNextBookingLookupSettled_(m, {
+            clearBooking: true,
+            noBookingMessage: (cachedNb && cachedNb.message) || '한 달 이내 예약된 일정이 없습니다.',
+          });
+        } else {
+          applyNextBookingApiData_(cachedNb, m);
+        }
+        if (reqCached !== _nextBookingReq || state.selectedKey !== selKey) return;
+        return;
+      }
+
       var reqId = ++_nextBookingReq;
       resetNextBookingState(m);
       state.nextBooking.loading = true;
@@ -7528,13 +7809,7 @@
       renderSessionAlimtalkSection();
       var run = (async function () {
         try {
-          var data = await api({
-            action: 'instructorMemberNextBooking',
-            suffix8: m.suffix8,
-            name: m.name,
-            phoneDigits: m.phoneDigits || '',
-            instructorIndex: m.instructorIndex,
-          }, { timeoutMs: 25000 });
+          var data = await ensureNextBookingCached_(m);
           if (reqId !== _nextBookingReq || state.selectedKey !== selKey) return;
           if (!data || data.ok === false) {
             markNextBookingLookupSettled_(m, {
@@ -7938,12 +8213,12 @@
       }
     }
 
-    /** 「다음 예약」 날짜 블록의 바닥이 보이는 화면 하단에 오도록 한 번 이동 */
-    function scrollNextBookingBlockToViewportBottom_() {
-      var panel = document.getElementById('nextBookingPanel');
-      var target = document.getElementById('nextBookingExisting');
-      if (!panel || panel.hidden || !target || target.hidden) return;
-      var gap = 12;
+    /** 요소 바닥이 보이는 화면 하단에 오도록 스크롤 (필요 시 spacer로 여유 확보) */
+    function scrollElementBottomToViewportBottom_(target, opts) {
+      opts = opts || {};
+      if (!target) return;
+      var gap = opts.gap != null ? opts.gap : 12;
+      var spacerId = opts.spacerId || 'attendScrollSpacer';
       var vv = window.visualViewport;
       var viewH = (vv && vv.height) || window.innerHeight;
       var rect = target.getBoundingClientRect();
@@ -7954,10 +8229,10 @@
         var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
         var room = maxScroll - window.scrollY;
         if (delta > room + 1) {
-          var spacer = document.getElementById('attendScrollSpacer');
+          var spacer = document.getElementById(spacerId);
           if (!spacer) {
             spacer = document.createElement('div');
-            spacer.id = 'attendScrollSpacer';
+            spacer.id = spacerId;
             spacer.setAttribute('aria-hidden', 'true');
             document.body.appendChild(spacer);
           }
@@ -7971,8 +8246,56 @@
         }
       }
       if (Math.abs(delta) < 2) return;
-      markProgrammaticAttendScroll_();
-      window.scrollBy({ top: delta, behavior: 'smooth' });
+      if (opts.markAttendScroll) markProgrammaticAttendScroll_();
+      window.scrollBy({ top: delta, behavior: opts.behavior || 'smooth' });
+    }
+
+    /** 「다음 예약」 날짜 블록의 바닥이 보이는 화면 하단에 오도록 한 번 이동 */
+    function scrollNextBookingBlockToViewportBottom_() {
+      var panel = document.getElementById('nextBookingPanel');
+      var target = document.getElementById('nextBookingExisting');
+      if (!panel || panel.hidden || !target || target.hidden) return;
+      scrollElementBottomToViewportBottom_(target, {
+        gap: 12,
+        spacerId: 'attendScrollSpacer',
+        markAttendScroll: true,
+      });
+    }
+
+    var _memberSelectScrollTimer = null;
+    /** 회원칩 선택 후 히스토리 로드로 레이아웃이 바뀌면 한 번 더 맞춤 */
+    var _memberSelectScrollPending = false;
+
+    /** 회원칩 선택 시 「불편한 부위 · VAS」 박스 하단이 화면 밑에 오도록 이동 */
+    function scrollSessionCheckPanelToViewportBottom_() {
+      var panel = document.getElementById('sessionCheckPanel');
+      if (!panel || !panel.classList.contains('show')) return;
+      scrollElementBottomToViewportBottom_(panel, {
+        gap: 12,
+        spacerId: 'memberSelectScrollSpacer',
+      });
+    }
+
+    function scheduleScrollSessionCheckPanelToBottom_() {
+      if (_memberSelectScrollTimer) {
+        clearTimeout(_memberSelectScrollTimer);
+        _memberSelectScrollTimer = null;
+      }
+      _memberSelectScrollTimer = window.setTimeout(function () {
+        _memberSelectScrollTimer = null;
+        scrollSessionCheckPanelToViewportBottom_();
+        if (!state.memberDetailLoading) _memberSelectScrollPending = false;
+      }, 80);
+    }
+
+    function requestScrollSessionCheckAfterMemberSelect_() {
+      _memberSelectScrollPending = true;
+      scheduleScrollSessionCheckPanelToBottom_();
+    }
+
+    function maybeRescrollSessionCheckAfterHistory_() {
+      if (!_memberSelectScrollPending || state.memberDetailLoading) return;
+      scheduleScrollSessionCheckPanelToBottom_();
     }
 
     /**
@@ -10029,6 +10352,8 @@
       // 버튼 「새로고침」만 선택·결과 초기화. silent(백그라운드 동기화)는 선택 유지
       var clearSelectionOnLoad = !opts.silent && !opts.keepSelection && !!opts.forceRefresh;
       var requestYmd = normalizeBoardYmd_(opts.date || boardDateYmd_());
+      var prevBoardYmd = state.board && state.board.date ? normalizeBoardYmd_(state.board.date) : '';
+      var boardDateChanged = !!(prevBoardYmd && prevBoardYmd !== requestYmd);
       syncBoardDateUi_(requestYmd);
       var usedCache = false;
       try {
@@ -10040,6 +10365,7 @@
             if (cached && cached.board) {
               applyBoardPayload_(cached.board, requestYmd, { fromCache: true, updating: true, keepSelection: true });
               usedCache = true;
+              schedulePrefetchTodayMemberExtras_();
               startMemberLoadCountdown({ keepChips: true });
             } else {
               startMemberLoadCountdown();
@@ -10076,10 +10402,15 @@
         }
 
         writeCachedBoard_(data.date || requestYmd, data);
+        if (clearSelectionOnLoad || opts.forceRefresh || boardDateChanged) {
+          clearMemberExtrasCache_();
+        }
         applyBoardPayload_(data, requestYmd, {
           silent: !!opts.silent,
           clearSelection: clearSelectionOnLoad,
         });
+        // 칩 목록이 뜬 뒤 히스토리·다음예약을 백그라운드로 미리 받아 선택 대기 제거
+        schedulePrefetchTodayMemberExtras_();
       } catch (loadErr) {
         if (myGen !== _boardLoadGen) return;
         var errMsg = (loadErr && loadErr.message) ? String(loadErr.message) : '회원 목록 처리 중 오류';
@@ -10523,10 +10854,11 @@
       }, 1000);
     }
 
+    /** 서버 배열은 최신→과거. 화면은 오래된 것(상단) → 최신(하단) */
     function groupConditionHistoryByDate_(list) {
       var order = [];
       var byDate = {};
-      (list || []).forEach(function(item) {
+      (list || []).slice().reverse().forEach(function(item) {
         var d = String(item.dateStr || '—').trim() || '—';
         if (!byDate[d]) {
           byDate[d] = [];
@@ -10635,7 +10967,10 @@
     }
 
     function toggleConditionHistoryCard_(idx) {
-      if (idx === 0) return;
+      var m = state.selected;
+      var list = dedupeConditionHistoryList_((m && m.conditionHistory) ? m.conditionHistory.slice() : []);
+      var groups = groupConditionHistoryByDate_(list);
+      if (!groups.length || idx === groups.length - 1) return; // 최신(하단)은 항상 펼침
       if (!state.historyExpandedKeys) state.historyExpandedKeys = {};
       state.historyExpandedKeys[idx] = !state.historyExpandedKeys[idx];
       renderConditionHistory(state.selected);
@@ -10650,6 +10985,7 @@
       if (!m || !m.suffix8) {
         html += '<p class="condition-history-empty">전화번호가 등록된 회원만 히스토리를 불러올 수 있습니다.</p>';
         root.innerHTML = html;
+        maybeRescrollSessionCheckAfterHistory_();
         return;
       }
 
@@ -10667,12 +11003,14 @@
       if (!list.length) {
         html += '<p class="condition-history-empty">이전 세션 기록이 없습니다.</p>';
         root.innerHTML = html;
+        maybeRescrollSessionCheckAfterHistory_();
         return;
       }
 
       var groups = groupConditionHistoryByDate_(list);
+      var latestIdx = groups.length - 1;
       html += groups.map(function(group, gIdx) {
-        var isLatest = gIdx === 0;
+        var isLatest = gIdx === latestIdx;
         var expanded = isLatest || !!(state.historyExpandedKeys && state.historyExpandedKeys[gIdx]);
         var cardCls = 'condition-history-card' + (isLatest ? ' is-latest' : '') + (!expanded ? ' is-collapsed' : '');
         var clickAttr = !isLatest
@@ -10691,6 +11029,7 @@
           '<div class="' + bodyCls + '">' + bodyHtml + '</div></article>';
       }).join('');
       root.innerHTML = html;
+      maybeRescrollSessionCheckAfterHistory_();
     }
 
     function renderSessionDiscomfortChipHtml_(opt) {
@@ -10701,6 +11040,7 @@
 
     function initSessionCheckPanel() {
       var areaRoot = document.getElementById('sessionDiscomfortChips');
+      var specialRoot = document.getElementById('sessionDiscomfortSpecialChips');
       var vasRoot = document.getElementById('sessionVasChips');
       if (!areaRoot || areaRoot.dataset.ready) return;
       var byGroup = {};
@@ -10709,39 +11049,42 @@
         if (!byGroup[g]) byGroup[g] = [];
         byGroup[g].push(opt);
       });
+      if (specialRoot) {
+        var specialHtml = '';
+        (byGroup.quick || []).forEach(function (opt) {
+          var rk = opt.row || (opt.id === 'comfortable' || opt.id === 'same' ? 'special' : 'sides');
+          if (rk === 'special') specialHtml += renderSessionDiscomfortChipHtml_(opt);
+        });
+        specialRoot.innerHTML = specialHtml;
+      }
       var html = '';
       SESSION_DISCOMFORT_GROUP_ORDER.forEach(function (gk) {
         var items = byGroup[gk];
         if (!items || !items.length) return;
+        if (gk === 'quick') {
+          var sideItems = items.filter(function (opt) {
+            var rk = opt.row || (opt.id === 'comfortable' || opt.id === 'same' ? 'special' : 'sides');
+            return rk === 'sides' || rk === 'side';
+          });
+          if (!sideItems.length) return;
+          html += '<div class="session-discomfort-group session-discomfort-group--quick">';
+          html += '<div class="session-discomfort-group-chips">';
+          html += '<div class="session-quick-row session-quick-row--sides">';
+          sideItems.forEach(function (opt) {
+            html += renderSessionDiscomfortChipHtml_(opt);
+          });
+          html += '</div></div></div>';
+          return;
+        }
         var glabel = SESSION_DISCOMFORT_GROUP_LABELS[gk] || '';
-        var groupCls = 'session-discomfort-group' + (gk === 'quick' ? ' session-discomfort-group--quick' : '');
-        html += '<div class="' + groupCls + '">';
+        html += '<div class="session-discomfort-group">';
         if (glabel) {
           html += '<div class="session-discomfort-group-label">' + escapeHtml(glabel) + '</div>';
         }
         html += '<div class="session-discomfort-group-chips">';
-        if (gk === 'quick') {
-          var quickRows = { special: [], sides: [] };
-          items.forEach(function (opt) {
-            var rk = opt.row || (opt.id === 'comfortable' || opt.id === 'same' ? 'special' : 'sides');
-            if (rk === 'side') rk = 'sides';
-            if (!quickRows[rk]) quickRows[rk] = [];
-            quickRows[rk].push(opt);
-          });
-          ['special', 'sides'].forEach(function (rk) {
-            var rowItems = quickRows[rk];
-            if (!rowItems || !rowItems.length) return;
-            html += '<div class="session-quick-row session-quick-row--' + rk + '">';
-            rowItems.forEach(function (opt) {
-              html += renderSessionDiscomfortChipHtml_(opt);
-            });
-            html += '</div>';
-          });
-        } else {
-          items.forEach(function (opt) {
-            html += renderSessionDiscomfortChipHtml_(opt);
-          });
-        }
+        items.forEach(function (opt) {
+          html += renderSessionDiscomfortChipHtml_(opt);
+        });
         html += '</div></div>';
       });
       html += renderBodyAreaDropdownsHtml_({
@@ -10777,7 +11120,7 @@
     function renderSessionCheckPanel() {
       initSessionCheckPanel();
       var sc = state.sessionCheck || { areas: [], vas: null, note: '' };
-      document.querySelectorAll('#sessionDiscomfortChips .session-check-chip').forEach(function (btn) {
+      document.querySelectorAll('#sessionDiscomfortSpecialChips .session-check-chip, #sessionDiscomfortChips .session-check-chip').forEach(function (btn) {
         var id = btn.getAttribute('data-area');
         btn.classList.toggle('on', sc.areas.indexOf(id) >= 0);
       });
@@ -11329,11 +11672,9 @@
       if (!m || !m.suffix8) return;
       var reqId = ++_memberDetailReq;
       var selKey = memberKey(m);
+      invalidateMemberExtrasCacheKey_(selKey, 'detail');
       try {
-        var detail = await api({ action: 'instructorMemberDetail', suffix8: m.suffix8, attendeeName: m.name }, {
-          timeoutMs: 60000,
-          timeoutMessage: '회원 히스토리 응답 시간 초과(약 60초).',
-        });
+        var detail = await ensureMemberDetailCached_(m);
         if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
         applyMemberDetailFromResponse_(m, detail, { historyOnly: true });
       } catch (e) {
@@ -11346,11 +11687,7 @@
       var reqId = ++_memberDetailReq;
       var selKey = memberKey(m);
       try {
-        var detail = await api({ action: 'instructorMemberDetail', suffix8: m.suffix8, attendeeName: m.name }, {
-          timeoutMs: 60000,
-          timeoutMessage:
-            '회원 히스토리 응답 시간 초과(약 60초). Apps Script 배포·새로고침 후 다시 선택해 주세요.',
-        });
+        var detail = await ensureMemberDetailCached_(m);
         if (reqId !== _memberDetailReq || state.selectedKey !== selKey) return;
         state.memberDetailLoading = false;
         stopMemberDetailCountdown();
@@ -11398,23 +11735,51 @@
         syncPlannedProgressToMemberStore_();
         renderPinnedProgramPlanList_(m.pinnedPlan, { title: '고정 저장 프로그램' });
       }
+      var warmDetail = m.suffix8 ? peekMemberDetailCache_(m) : null;
+      var warmNextBooking = m.suffix8 ? peekNextBookingCache_(m) : null;
       if (m.suffix8) {
-        state.memberDetailLoading = true;
-        state.memberDetailLoadError = '';
-        startMemberDetailCountdown();
+        if (warmDetail) {
+          state.memberDetailLoading = false;
+          state.memberDetailLoadError = '';
+          stopMemberDetailCountdown();
+        } else {
+          state.memberDetailLoading = true;
+          state.memberDetailLoadError = '';
+          startMemberDetailCountdown();
+        }
       } else {
         m.specialNotes = m.memo || '';
         state.memberDetailLoading = false;
         state.memberDetailLoadError = '';
         stopMemberDetailCountdown();
       }
-      renderSelectedMemberUi();
+      if (warmDetail) {
+        applyMemberDetailFromResponse_(m, warmDetail);
+      } else {
+        renderSelectedMemberUi();
+      }
       attachPendingEvalToMember_(m);
       if (m.suffix8) {
-        if (state.nextBooking) state.nextBooking.forceReload = true;
-        fetchNextBookingForMember_(m);
-        enrichMemberDetailInBackground(m);
+        // 프리페치된 다음 예약이 있으면 즉시 표시, 진행 중이면 같은 Promise 대기
+        if (warmNextBooking) {
+          if (state.nextBooking) state.nextBooking.forceReload = false;
+          if (warmNextBooking.ok === false) {
+            markNextBookingLookupSettled_(m, {
+              clearBooking: true,
+              noBookingMessage: warmNextBooking.message || '한 달 이내 예약된 일정이 없습니다.',
+            });
+          } else {
+            applyNextBookingApiData_(warmNextBooking, m);
+          }
+        } else {
+          var nbEntry = memberExtrasEntry_(m);
+          var nbPrefetching = !!(nbEntry && nbEntry.nextBookingPromise);
+          if (state.nextBooking) state.nextBooking.forceReload = !nbPrefetching;
+          fetchNextBookingForMember_(m);
+        }
+        if (!warmDetail) enrichMemberDetailInBackground(m);
       }
+      if (fromUser) requestScrollSessionCheckAfterMemberSelect_();
     }
 
     function toggleSectionCollapse(key) {
@@ -11467,6 +11832,33 @@
         allToday: total > 0 && todayCount === total,
         partialToday: todayCount > 0 && todayCount < total,
       };
+    }
+
+    var MOVEMENT_SECTION_TONES = { self_tool: 1, pos1_par: 1, pos2: 1, pos3: 1 };
+
+    function movementSectionToneClass_(secKey) {
+      return secKey && MOVEMENT_SECTION_TONES[secKey] ? (' sec-tone--' + secKey) : '';
+    }
+
+    /** 오늘 체크 비율 → 1~4단계, 전부 완료 → 5 */
+    function progressLevelFromTodayStats_(stats) {
+      if (!stats || !stats.total || !stats.todayCount) return 0;
+      if (stats.allToday) return 5;
+      var ratio = stats.todayCount / stats.total;
+      return Math.max(1, Math.min(4, Math.ceil(ratio * 4)));
+    }
+
+    /** 섹션/서브섹션 헤더 — 카테고리 색 + 체크 비율 농도 */
+    function progressHeaderTintClass_(itemsOrStats, secKey) {
+      var tone = movementSectionToneClass_(secKey);
+      if (!state.selected) return tone;
+      var stats = itemsOrStats && typeof itemsOrStats.total === 'number' && ('todayCount' in itemsOrStats || 'allToday' in itemsOrStats)
+        ? itemsOrStats
+        : groupTodayStats_(itemsOrStats);
+      if (!stats || !stats.total) return tone;
+      var lv = progressLevelFromTodayStats_(stats);
+      if (!lv) return tone;
+      return tone + ' is-progress-lv-' + lv;
     }
 
     function renderGroupSelectCheckboxHtml_(items, hasMember, onChangeCall) {
@@ -11616,6 +12008,10 @@
           progItems = progItems.slice().sort(function(a, b) {
             return p1ItemOrder_(a) - p1ItemOrder_(b);
           });
+        } else if (isForceLineProgram(progName)) {
+          progItems = progItems.slice().sort(function(a, b) {
+            return forceLineItemOrder_(a) - forceLineItemOrder_(b);
+          });
         }
         progItems.forEach(function(item) {
           html += renderMethodRowHtml(
@@ -11644,7 +12040,7 @@
       var html = '';
       sectionOrder.forEach(function(secKey) {
         var g = grouped[secKey];
-        html += '<div class="psp-section"><div class="psp-section-hd">' + escapeHtml(g.title) + sectionHeaderMeta(secKey) + '</div><div class="psp-section-body">';
+        html += '<div class="psp-section"><div class="psp-section-hd' + progressHeaderTintClass_(g.items, secKey) + '">' + escapeHtml(g.title) + sectionHeaderMeta(secKey) + '</div><div class="psp-section-body">';
         var byProg = {};
         var progOrder = [];
         g.items.forEach(function(item) {
@@ -11669,7 +12065,7 @@
           }
           if (showSub) {
             html += '<div class="psp-subsection collapsible">';
-            html += '<div class="psp-subsection-hd" onclick="this.parentNode.classList.toggle(\'collapsed\')">';
+            html += '<div class="psp-subsection-hd' + progressHeaderTintClass_(items, secKey) + '" onclick="this.parentNode.classList.toggle(\'collapsed\')">';
             html += '<span class="psp-subsection-hd-main"><span>' + escapeHtml(pName) + '</span></span>';
             html += '</div><div class="psp-subsection-body">';
           }
@@ -11844,9 +12240,9 @@
         const collapsed = isCollapsible && isSectionCollapsed(secKey);
         html += '<div class="psp-section'+(isCollapsible?' collapsible':'')+(collapsed?' collapsed':'')+'">';
         if (isCollapsible) {
-          html += '<div class="psp-section-hd" onclick="toggleSectionCollapse(\''+secKey+'\')">'+escapeHtml(g.title)+sectionHeaderMeta(secKey)+'</div>';
+          html += '<div class="psp-section-hd' + progressHeaderTintClass_(g.items, secKey) + '" onclick="toggleSectionCollapse(\''+secKey+'\')">'+escapeHtml(g.title)+sectionHeaderMeta(secKey)+'</div>';
         } else {
-          html += '<div class="psp-section-hd">'+escapeHtml(g.title)+'</div>';
+          html += '<div class="psp-section-hd' + progressHeaderTintClass_(g.items, secKey) + '">'+escapeHtml(g.title)+'</div>';
         }
         html += '<div class="psp-section-body">';
         if (positionHasSubCategories(secKey)) {
@@ -11855,7 +12251,7 @@
             if (!subItems.length) return;
             var subCollapsed = isSubSectionCollapsed(secKey, subKey);
             html += '<div class="psp-subsection collapsible' + (subCollapsed ? ' collapsed' : '') + '">';
-            html += '<div class="psp-subsection-hd" onclick="toggleSubSectionCollapse(\'' + secKey + '\',\'' + subKey + '\')">';
+            html += '<div class="psp-subsection-hd' + progressHeaderTintClass_(subItems, secKey) + '" onclick="toggleSubSectionCollapse(\'' + secKey + '\',\'' + subKey + '\')">';
             html += '<span class="psp-subsection-hd-main">';
             if (subKey === 'par' || subKey === 'lifestyle' || subKey === 'roller' || subKey === 'ball') {
               html += renderGroupSelectCheckboxHtml_(
@@ -12776,7 +13172,11 @@
           toast('출석은 반영됐지만 고정 프로그램 해제에 실패했습니다. 「고정 해제」를 눌러 주세요.');
         }
       }
+      if (data.completed || data.saved || data.discomfortHistory || data.discomfortHistoryLine != null) {
+        invalidateMemberExtrasCacheKey_(memberKey(m), 'detail');
+      }
       if (data.nextBookingLine || data.nextBookingBooked || data.nextBookingCancelled) {
+        invalidateMemberExtrasCacheKey_(memberKey(m), 'nextBooking');
         if (state.nextBooking) state.nextBooking.forceReload = true;
         fetchNextBookingForMember_(m);
       }
