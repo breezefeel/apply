@@ -725,11 +725,31 @@
     .doc-payer-info .span2 { grid-column: span 1; }
   }
 
-  #certPanel { display: none; }
+  #certPanel, #smsPanel { display: none; }
   body.academy-mode #consultChatBlocks { display: none !important; }
-  body.academy-mode #certPanel { display: block; }
+  body.academy-mode #certPanel, body.academy-mode #smsPanel { display: block; }
   #consultChatBlocks[hidden] { display: none !important; }
-  #certPanel:not([hidden]) { display: block; }
+  #certPanel:not([hidden]), #smsPanel:not([hidden]) { display: block; }
+  .sms-text {
+    width: 100%; min-height: 168px; resize: vertical;
+    border: 1px solid #e2ddd3; background: #faf9f6;
+    border-radius: 10px; padding: 10px 11px; font-size: 14px;
+    color: var(--ink); line-height: 1.55; margin-top: 8px;
+  }
+  .sms-people {
+    max-height: 220px; overflow: auto;
+    display: flex; flex-direction: column; gap: 6px;
+    margin-top: 8px;
+  }
+  .sms-person {
+    display: flex; align-items: flex-start; gap: 8px;
+    border: 1px solid #e2ddd3; border-radius: 12px;
+    background: #fff; padding: 8px 10px; cursor: pointer;
+  }
+  .sms-person.is-on { border-color: var(--ink); background: #f7f5f0; }
+  .sms-person input { margin-top: 3px; }
+  .sms-person b { display: block; font-size: 14px; }
+  .sms-person small { display: block; color: var(--mute); font-weight: 650; font-size: 11.5px; line-height: 1.4; }
   .cert-lead {
     font-size: 12.5px; color: var(--mute); font-weight: 650;
     line-height: 1.55; margin: 0 0 10px;
@@ -783,6 +803,28 @@
     box-shadow: 0 12px 36px rgba(18,20,26,.12); background: #fff;
   }
   .cert-preview canvas { width: 100%; height: auto; display: block; }
+  #posterCard[data-theme="cmt"] .poster-tracks .chip.active { background: #1F4B99; border-color: #1F4B99; }
+  #posterCard[data-theme="ifc"] .poster-tracks .chip.active { background: #DC143C; border-color: #DC143C; }
+  #posterCard[data-theme="real"] .poster-tracks .chip.active { background: #8A5A24; border-color: #8A5A24; }
+  .poster-tracks { margin: 0 0 10px; }
+  .poster-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .poster-actions .btn { flex: 1; }
+  .poster-preview {
+    margin-top: 12px;
+    max-height: 72vh;
+    overflow: auto;
+    background: #E7E0D8;
+    border-radius: 12px;
+    padding: 10px;
+  }
+  .poster-preview canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(18,20,26,.16);
+  }
+  .poster-preview canvas + canvas { margin-top: 10px; }
   .cert-add { margin-top: 8px; }
   .cert-names {
     width: 100%; min-height: 88px; resize: vertical;
@@ -1053,6 +1095,34 @@
     </nav>
 
     <div id="panelConsult" class="panel active">
+      <section class="card no-print" id="posterCard" hidden>
+        <div class="reply-label"><span>포스터 만들기</span></div>
+        <p class="cert-lead">일정과 수강료를 입력하면, 선택한 과정 색으로 두 장 포스터가 만들어집니다.</p>
+        <div class="chips poster-tracks" id="posterTracks"></div>
+        <div class="cert-fields" id="posterFields">
+          <label class="span2"><span>일정 한 줄</span><input data-k="ribbon" autocomplete="off"></label>
+          <label class="span2"><span>날짜</span><input data-k="date" autocomplete="off"></label>
+          <label><span>시간</span><input data-k="time" autocomplete="off"></label>
+          <label><span>장소</span><input data-k="place" autocomplete="off"></label>
+          <label><span>정가</span><input data-k="price" autocomplete="off"></label>
+          <label><span>얼리버드</span><input data-k="early" autocomplete="off"></label>
+          <label><span>추가 할인 이름</span><input data-k="extraLabel" autocomplete="off" placeholder="없으면 비움"></label>
+          <label><span>추가 할인 금액</span><input data-k="extraPrice" autocomplete="off" placeholder="없으면 비움"></label>
+          <label class="span2"><span>수강료 안내</span><input data-k="note" autocomplete="off"></label>
+        </div>
+        <div class="poster-actions">
+          <button type="button" class="btn btn-print" id="btnPosterSaveAll">이미지 저장</button>
+        </div>
+        <div class="poster-actions">
+          <button type="button" class="btn btn-ghost" id="btnPosterSave1">1쪽 PNG</button>
+          <button type="button" class="btn btn-ghost" id="btnPosterSave2">2쪽 PNG</button>
+        </div>
+        <p class="cert-note" id="posterStatus">미리보기입니다. 이미지 저장을 누르면 PNG 파일로 받아집니다.</p>
+        <div class="poster-preview" id="posterPreview">
+          <canvas id="posterCanvas1" width="1080" height="1528"></canvas>
+          <canvas id="posterCanvas2" width="1080" height="1528"></canvas>
+        </div>
+      </section>
       <section class="card no-print" id="faqCard">
         <div class="reply-label">
           <span>FAQ</span>
@@ -1109,6 +1179,24 @@
         <textarea class="reply-box is-copy" id="chatFollow" readonly title="누르면 복사됩니다" placeholder="이어서 넣으면 다음 멘트가 생깁니다. 멘트를 누르면 복사됩니다."></textarea>
       </section>
       </div>
+      <section class="card no-print" id="smsPanel" hidden>
+        <div class="reply-label"><span>수강생 문자</span></div>
+        <p class="cert-lead">신청서 알림톡과 별도입니다. 안내를 고른 뒤 내용을 고치고, 받을 사람을 정한 다음 보내면 솔라피 문자로 나갑니다.</p>
+        <div class="chips" id="smsTemplates"></div>
+        <textarea class="sms-text" id="smsText"></textarea>
+        <p class="cert-note" id="smsCount"></p>
+        <div class="cert-actions">
+          <button type="button" class="btn btn-ghost" id="btnSmsLoad">신청자 불러오기</button>
+          <button type="button" class="btn btn-ghost" id="btnSmsAll">전체 선택</button>
+        </div>
+        <div class="sms-people" id="smsPeople"></div>
+        <label class="cert-note" for="smsExtra" style="display:block;margin-top:10px">연락처 직접 입력 · 쉼표나 줄바꿈</label>
+        <textarea class="sms-text" id="smsExtra" style="min-height:72px" placeholder="010-0000-0000"></textarea>
+        <div class="cert-actions">
+          <button type="button" class="btn btn-print" id="btnSmsSend">보내기</button>
+        </div>
+        <p class="ocr-status" id="smsStatus"></p>
+      </section>
       <section class="card no-print" id="certPanel" hidden>
         <div class="reply-label"><span>수료증 발급</span></div>
         <p class="cert-lead" id="certLead"></p>
@@ -4579,6 +4667,898 @@
     panel.addEventListener('input', onCertField);
     panel.addEventListener('change', onCertField);
   }
+  var POSTER_THEMES = {
+    cmt: { paper: '#D7E2F3', header: '#0B2048', cream: '#F4E6C4', accent: '#1F4B99', card: '#F7FBFF', ink: '#1C2C4E', mute: '#4A5A78', hi: '#D6E6F8', step: '#E4EEF8' },
+    ifc: { paper: '#F7E4EA', header: '#0B2048', cream: '#F4E6C4', accent: '#DC143C', card: '#FFFBF4', ink: '#1C2C4E', mute: '#4A5A78', hi: '#F3D5DE', step: '#F8E7EC' },
+    real: { paper: '#F6E7C8', header: '#3E2A16', cream: '#FFF6E4', accent: '#A56B2A', card: '#FFFBF4', ink: '#2C2416', mute: '#6B5640', hi: '#F3D7A4', step: '#F8EBD2' }
+  };
+  var posterEdits = {};
+  var posterTrackId = {};
+  var posterBound = false;
+  var posterPaintTimer = 0;
+  var posterFontsReady = false;
+  function posterTrackList() {
+    if (consultBranch === 'cmt') {
+      return [
+        { id: 'fall', label: '하반기', vars: { ribbon: '정규과정  |  9월 시작  |  6일 과정', date: '26년 9월 시작', time: '09:00–18:00 · 8시간씩 6일', place: '삼육보건대학교', price: '150만', early: '135만', extraLabel: '신졸·동반', extraPrice: '120만', note: '얼리버드는 수업 시작 1개월 전까지 신청 완료 기준입니다. 정원은 입금 완료 순으로 마감됩니다.' } },
+        { id: 'spring', label: '상반기', vars: { ribbon: '정규과정  |  3월 시작  |  6일 과정', date: '26년 3월 시작', time: '09:00–18:00 · 8시간씩 6일', place: '삼육보건대학교', price: '150만', early: '135만', extraLabel: '신졸·동반', extraPrice: '120만', note: '얼리버드는 수업 시작 1개월 전까지 신청 완료 기준입니다. 정원은 입금 완료 순으로 마감됩니다.' } }
+      ];
+    }
+    if (consultBranch === 'ifc') {
+      return [
+        { id: 'fall', label: '하반기', vars: { ribbon: '정규과정  |  11월 8 · 22 · 29일 (일요일)  |  3일 과정', date: '26년 11월 8일 · 22일 · 29일 (일요일)', time: '10:00–17:00 · 3일간 진행', place: '약수역 도보 약 3분', price: '240만', early: '210만', extraLabel: '', extraPrice: '', note: '정원은 입금 완료 순입니다. 신청만으로는 자리가 확정되지 않으며, 안내에 따라 입금까지 해야 접수가 완료됩니다.' } },
+        { id: 'spring', label: '상반기', vars: { ribbon: '정규과정  |  4월 시작  |  3일 과정', date: '26년 4월 시작', time: '10:00–17:00 · 6시간씩 3일', place: '약수역 도보 약 3분', price: '240만', early: '210만', extraLabel: '', extraPrice: '', note: '정원은 입금 완료 순입니다. 신청만으로는 자리가 확정되지 않으며, 안내에 따라 입금까지 해야 접수가 완료됩니다.' } }
+      ];
+    }
+    return [
+      { id: 'oneday', label: '원데이', vars: { ribbon: '원데이  |  10월 11일  |  하루 과정', date: '26년 10월 11일', time: '10:00–17:00', place: '리얼무브먼트 약수점', price: '30만', early: '27만', extraLabel: '동반', extraPrice: '25만', note: '얼리버드는 9월 27일까지 신청 완료입니다. 동반 금액은 1인 기준입니다.' } },
+      { id: 'regular', label: '정규', vars: { ribbon: '정규과정  |  6월 · 12월 시작  |  3일 과정', date: '26년 6월 · 12월 시작', time: '10:00–17:00 · 6시간씩 3일', place: '리얼무브먼트 약수점', price: '128만', early: '108만', extraLabel: '', extraPrice: '', note: '정원은 입금 완료 순입니다. 신청 후 개별 연락으로 등록·입금 절차를 안내드립니다.' } }
+    ];
+  }
+  function posterTrackDef() {
+    var list = posterTrackList();
+    var id = posterTrackId[consultBranch] || list[0].id;
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return list[0];
+  }
+  function posterVars() {
+    var key = consultBranch + ':' + (posterTrackId[consultBranch] || posterTrackList()[0].id);
+    return Object.assign({}, posterTrackDef().vars, posterEdits[key] || {});
+  }
+  function posterPriceLine(v) {
+    var bits = [];
+    if (v.price) bits.push(v.price);
+    if (v.early) bits.push('얼리버드 ' + v.early);
+    if (v.extraLabel && v.extraPrice) bits.push(v.extraLabel + ' ' + v.extraPrice);
+    else if (v.extraPrice) bits.push(v.extraPrice);
+    return bits.join(' · ');
+  }
+  function posterModel() {
+    var v = posterVars();
+    var common = {
+      ribbon: v.ribbon, date: v.date, time: v.time, place: v.place,
+      priceLine: posterPriceLine(v), note: v.note
+    };
+    if (consultBranch === 'cmt') {
+      return Object.assign(common, {
+        file: 'CMT', kicker: 'CMT 임상도수치료 · 2026', title: 'CMT 도수치료 과정', brand: '평가 → 손',
+        lead: '평가로 원인을 가른 뒤, 연부조직과 관절을 손으로 다룹니다. 평가 → 손 → 움직임 흐름에서 CMT는 손(도구) 축입니다.',
+        overviewH: '이 과정은',
+        overview: '의료인·의료기사가 평가와 함께 도수 테크닉을 부위별로 익히는 과정입니다. 골반부터 경추까지, 연부조직 다음 관절로 들어가는 같은 순서를 내일 베드에서 바로 꺼내 쓰게 됩니다.',
+        pathLead: '평가 → ', pathHot: '손(CMT)', pathTail: ' → 움직임',
+        fits: [
+          { h: '이런 분께', p: '도수·카이로 테크닉을 평가와 함께 체계화하고 싶은 의료인·의료기사.' },
+          { h: '듣고 나면', p: '골반·허리·흉추·경추에서 연부조직 다음 관절로 들어가는 순서를 말할 수 있습니다.' }
+        ],
+        currIntro: '동일한 순서로 진행합니다. 평가 → 연부조직(Fascia → Muscle) → 관절(Joint) → 재평가.',
+        days: [
+          { d: 'DAY 1–2', h: '골반 · 고관절', p: '하지·골반 정렬을 본 뒤 요추 연부조직과 관절을 연결합니다.' },
+          { d: 'DAY 3–4', h: '요추 · 흉추', p: '체간에서 복부를 중심으로 평가·치료·재평가를 반복합니다.' },
+          { d: 'DAY 5–6', h: '경추 · 종합', p: '목과 어깨, 배운 부위를 한 흐름으로 이어 임상 케이스를 살펴봅니다.' }
+        ],
+        footLeft: '수기 / 도구 · 의료인 · 의료기사만',
+        checks: [
+          '대상은 의료인·의료기사만입니다. 비의료 직군은 Re:Al·IFC를 먼저 보시면 됩니다.',
+          '병원·클리닉과 다른 점: 테크닉 나열이 아니라 평가 → 손 → 재평가 순서로 판단력을 쌓습니다.',
+          '과정 이후: 무료 재수강과 스터디로 손이 이어집니다.'
+        ],
+        who: '의료인 · 의료기사만',
+        afterH: '과정을 마친 뒤',
+        afterP: '정규 이수 후 무료 재수강과 스터디 모임으로 손이 이어집니다.',
+        steps: [
+          { b: '정규 6일', s: '현장 수업' },
+          { b: '이수', s: '과정 이후' },
+          { b: '무료 재수강', s: '세션당 대관비' },
+          { b: '스터디', s: '연습 · 사례' }
+        ],
+        applyUrl: 'breezefeel.github.io/academy/#cmt',
+        barSub: 'CMT 도수치료 과정'
+      });
+    }
+    if (consultBranch === 'ifc') {
+      return Object.assign(common, {
+        file: 'IFC', kicker: '국제얼굴교정학회 · 2026', title: 'IFC 얼굴 교정 과정', brand: 'Re:Al FACE',
+        lead: '얼굴 해부학과 촉진으로 핵심 포인트를 찾고, 수기·괄사·고주파로 변화를 만듭니다. 평가 → 손 → 움직임 흐름에서 IFC는 얼굴의 손(도구/기기) 축입니다.',
+        overviewH: '이 과정은',
+        overview: '비수술 얼굴 윤곽·비대칭을 해부 → 촉진 → 수기·괄사·고주파 순으로 익힙니다. 손으로 원인을 읽은 뒤, 수기와 기기를 같은 시퀀스로 연결하는 감각을 가져갑니다.',
+        pathLead: '평가 → ', pathHot: '손(IFC)', pathTail: ' → 움직임',
+        fits: [
+          { h: '이런 분께', p: '얼굴 케어·바디 현장에서 평가 기반 수기·기기 시퀀스를 배우고 싶은 분. 비의료인도 가능합니다.' },
+          { h: '듣고 나면', p: '핵심 포인트를 손으로 찾고, 수기·괄사·고주파를 같은 순서로 연결할 수 있습니다.' }
+        ],
+        currIntro: '해부학(DAY 0)은 온라인입니다. 과제가 있어 현장 4주 전 시작을 권장하고, 오프라인 3일은 촉진·수기·기기에 집중합니다.',
+        days: [
+          { d: 'DAY 0', h: '얼굴 해부학 · 온라인', p: '표정·입 모양 변화까지 읽어 원인을 가늠하는 기초입니다.' },
+          { d: 'DAY 1', h: '촉진 실습', p: '핵심 포인트를 손으로 스스로 인식하게 만드는 평가가 중심입니다.' },
+          { d: 'DAY 2', h: '25분 기본 시퀀스', p: 'Fascia · Muscle 수기 테크닉을 배워, 25분 기본 시퀀스로 연결합니다.' },
+          { d: 'DAY 3', h: '고주파 · 괄사 · 종합', p: '기본 시퀀스에 고주파와 괄사를 더하고, 전체 흐름을 종합합니다.' }
+        ],
+        footLeft: '수기 / 도구 / 기기 · 누구나',
+        checks: [
+          'DAY 0 해부학(온라인)은 현장 4주 전 시작을 권장합니다. 과제가 있어 준비 시간이 필요합니다.',
+          '병원·성형과 다른 점: 수술·시술이 아니라 촉진으로 원인을 읽고 수기·기기로 시퀀스를 만듭니다.',
+          '과정 이후: 종합시험 통과 시 학회원 → 두 달마다 연구 모임(업데이트·케이스).'
+        ],
+        who: '누구나\n학회원·연구 모임 연계',
+        afterH: '과정을 마친 뒤',
+        afterP: '종합시험을 통과하면 학회원이 되고, 두 달마다 연구 모임에 참여합니다.',
+        steps: [
+          { b: '정규 3일', s: '현장 수업' },
+          { b: '종합시험', s: '과정 이후' },
+          { b: '학회원', s: '통과 시' },
+          { b: '연구 모임', s: '두 달마다' }
+        ],
+        applyUrl: 'breezefeel.github.io/academy/#ifc',
+        barSub: 'IFC 얼굴 교정 과정'
+      });
+    }
+    var oneday = posterTrackDef().id === 'oneday';
+    return Object.assign(common, {
+      file: 'ReAl', kicker: 'Re:Alignment · 2026', title: 'Re:Al 움직임 과정', brand: oneday ? '패시브 스트레칭' : 'PAR 전체',
+      lead: oneday
+        ? '강사가 움직임을 유도하는 패시브 스트레칭을 하루 만에 익힙니다. 말단에서 근위로 잇는 플로우를, 매트와 베드 모두에서 쓸 수 있게 됩니다.'
+        : '푼 몸을 움직임으로 지킵니다. 누워서 → 네발·앉기 → 서서, 각 자세에서 P · AA · A · R을 익힙니다.',
+      overviewH: '이 과정은',
+      overview: oneday
+        ? '원데이는 패시브 스트레칭입니다. 강사 부담이 적은 자세로, 말단에서 근위로 잇는 시퀀스를 하루 동안 익힙니다.'
+        : '풀어 준 몸을 생활습관·자세교정과 저항까지 이어, 유지되는 움직임으로 만듭니다.',
+      pathLead: '평가 → 손 → ', pathHot: oneday ? '움직임(패시브)' : '움직임(PAR)', pathTail: '',
+      fits: oneday ? [
+        { h: '이런 분께', p: '트레이너·필라테스·에스테티션 등, 캐딜락·샵 베드에서도 쓸 수 있는 패시브 플로우가 필요한 분.' },
+        { h: '이 원데이의 핵심', p: '강사 부담이 적은 자세. 말단에서 근위로 잇는 시퀀스. 매트와 베드 모두 가능합니다.' }
+      ] : [
+        { h: '이런 분께', p: '몸을 풀고 난 다음을 설계하고 싶은 분. 패시브만으로는 유지가 안 되는 케이스를 다루는 분.' },
+        { h: '듣고 나면', p: '각 자세에서 P→AA→A→R을 연결하고, 일상·저항까지 유지되는 움직임으로 가져갈 수 있습니다.' }
+      ],
+      currIntro: oneday
+        ? 'Supine · Prone 각각 상지와 하지. 말단에서 근위로 연결하는 플로우입니다.'
+        : '3일 × 6시간. 포지션을 올리며, 각 자세에서 P · AA · A · R을 배웁니다.',
+      days: oneday ? [
+        { d: '01', h: 'SUPINE 하지', p: '발 → 발목 → 무릎 → 고관절. 중력 부하를 줄인 상태에서 하체를 엽니다.' },
+        { d: '02', h: 'SUPINE 상지', p: '손가락 → 손목 → 팔꿈치 → 어깨. 누운 자세에서 상지를 연결합니다.' },
+        { d: '03', h: 'PRONE 하지', p: '엎드린 자세에서 하체 후방을 다루며, Supine과 대비되는 접근을 익힙니다.' },
+        { d: '04', h: 'PRONE 상지', p: '엎드린 자세의 상지·체간 연결. 베드 위에서도 진행할 수 있습니다.' }
+      ] : [
+        { d: 'DAY 1', h: 'Supine / Prone', p: '누워서·엎드려서. 가장 안전한 자세에서 P → AA → A → R을 익힙니다.' },
+        { d: 'DAY 2', h: 'Quadruped / Sitting', p: '네발기기·앉아서. 같은 순서를 체간·사지 연결에 적용합니다.' },
+        { d: 'DAY 3', h: 'Standing', p: '서서. 보행·계단처럼 실제로 쓰는 동작으로 연결합니다.' }
+      ],
+      footLeft: '운동 관리 · 누구나',
+      checks: oneday ? [
+        '원데이는 일정과 가격을 먼저 확인한 뒤, 맞으면 바로 신청하시면 됩니다.',
+        '강사가 크게 힘들이지 않는 자세라, 하루 종일 반복할 수 있습니다.',
+        'PAR 전체로 이어가려면 정규반(6·12월 시작, 3일)이 있습니다.'
+      ] : [
+        '원데이(패시브)만 필요하면 원데이를, PAR 전체가 필요하면 이 정규반을 고르세요.',
+        '테크닉 나열이 아니라, 포지션을 올리며 같은 순서를 반복합니다.',
+        'CMT와 함께면 통합 신청이 있습니다. CMT 안내에서 통합과정을 확인하세요.'
+      ],
+      who: oneday ? '누구나\n하루 · 패시브' : '누구나\nPAR 전체 3일',
+      afterH: oneday ? '이어서' : '과정을 마친 뒤',
+      afterP: oneday
+        ? '패시브 하루를 익힌 뒤, 정규반에서 PAR 전체로 이어갈 수 있습니다.'
+        : '각 자세의 P · AA · A · R을 현장에 꺼내 쓸 수 있습니다.',
+      steps: oneday ? [
+        { b: '원데이', s: '하루' },
+        { b: '패시브', s: 'Supine · Prone' },
+        { b: '매트·베드', s: '둘 다 가능' },
+        { b: '정규반', s: 'PAR 전체' }
+      ] : [
+        { b: 'DAY 1', s: '누워·엎드려' },
+        { b: 'DAY 2', s: '네발·앉아' },
+        { b: 'DAY 3', s: '서서' },
+        { b: 'PAR', s: 'P→R' }
+      ],
+      applyUrl: oneday ? 'breezefeel.github.io/academy/#real-oneday' : 'breezefeel.github.io/academy/#real-regular',
+      barSub: oneday ? 'Re:Al 원데이' : 'Re:Al 정규과정'
+    });
+  }
+  function posterWrap(ctx, text, maxW) {
+    var out = [];
+    String(text || '').split('\n').forEach(function (para) {
+      var line = '';
+      para.split(' ').forEach(function (tok) {
+        if (!tok) return;
+        var trial = line ? line + ' ' + tok : tok;
+        if (ctx.measureText(trial).width <= maxW) { line = trial; return; }
+        if (line) out.push(line);
+        if (ctx.measureText(tok).width <= maxW) { line = tok; return; }
+        var buf = '';
+        tok.split('').forEach(function (ch) {
+          if (ctx.measureText(buf + ch).width <= maxW) buf += ch;
+          else { if (buf) out.push(buf); buf = ch; }
+        });
+        line = buf;
+      });
+      if (line) out.push(line);
+    });
+    return out.length ? out : [''];
+  }
+  function posterFillLines(ctx, lines, x, y, lh) {
+    lines.forEach(function (ln, i) { ctx.fillText(ln, x, y + i * lh); });
+    return lines.length * lh;
+  }
+  function posterCard(ctx, x, y, w, h, th) {
+    ctx.fillStyle = th.card;
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = th.accent;
+    ctx.fillRect(x, y, 8, h);
+  }
+  function drawPosterFront(ctx, W, H, m, th) {
+    var pad = 56;
+    var inner = W - pad * 2;
+    ctx.fillStyle = th.paper;
+    ctx.fillRect(0, 0, W, H);
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    ctx.font = '500 26px Pretendard, sans-serif';
+    var leadLines = posterWrap(ctx, m.lead, inner);
+    var heroH = Math.max(420, 268 + leadLines.length * 38 + 40);
+    ctx.fillStyle = th.header;
+    ctx.fillRect(0, 0, W, heroH);
+    ctx.fillStyle = th.cream;
+    ctx.font = '700 22px Pretendard, sans-serif';
+    ctx.fillText(m.kicker, pad, 48);
+    ctx.font = '800 58px Pretendard, sans-serif';
+    ctx.fillText(m.title, pad, 92);
+    ctx.fillStyle = '#FFFBF4';
+    ctx.font = '800 50px Pretendard, sans-serif';
+    ctx.fillText(m.brand, pad, 164);
+    ctx.fillStyle = 'rgba(255,251,244,0.92)';
+    ctx.font = '500 26px Pretendard, sans-serif';
+    posterFillLines(ctx, leadLines, pad, 248, 38);
+
+    var y = heroH + 26;
+    ctx.font = '800 26px Pretendard, sans-serif';
+    var rib = posterWrap(ctx, m.ribbon, inner - 36);
+    var ribH = Math.max(64, rib.length * 36 + 28);
+    ctx.fillStyle = th.card;
+    ctx.fillRect(pad, y, inner, ribH);
+    ctx.strokeStyle = th.accent;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(pad + 2, y + 2, inner - 4, ribH - 4);
+    ctx.fillStyle = th.ink;
+    ctx.textAlign = 'center';
+    rib.forEach(function (ln, i) { ctx.fillText(ln, W / 2, y + 16 + i * 36); });
+    ctx.textAlign = 'left';
+    y += ribH + 26;
+
+    ctx.fillStyle = th.accent;
+    ctx.font = '800 18px Pretendard, sans-serif';
+    ctx.fillText('OVERVIEW', pad, y);
+    y += 28;
+    ctx.fillStyle = th.ink;
+    ctx.font = '800 40px Pretendard, sans-serif';
+    ctx.fillText(m.overviewH, pad, y);
+    y += 52;
+    ctx.fillStyle = th.mute;
+    ctx.font = '500 24px Pretendard, sans-serif';
+    var ov = posterWrap(ctx, m.overview, inner);
+    y += posterFillLines(ctx, ov, pad, y, 34) + 16;
+
+    ctx.font = '800 30px Pretendard, sans-serif';
+    ctx.fillStyle = th.ink;
+    ctx.fillText(m.pathLead, pad, y);
+    var w1 = ctx.measureText(m.pathLead).width;
+    ctx.fillStyle = th.accent;
+    ctx.fillText(m.pathHot, pad + w1, y);
+    var w2 = ctx.measureText(m.pathHot).width;
+    ctx.fillStyle = th.ink;
+    ctx.fillText(m.pathTail, pad + w1 + w2, y);
+    y += 50;
+
+    var gap = 16;
+    var colW = (inner - gap) / 2;
+    ctx.font = '500 22px Pretendard, sans-serif';
+    var fitH = 0;
+    m.fits.forEach(function (f) {
+      var n = posterWrap(ctx, f.p, colW - 40).length;
+      fitH = Math.max(fitH, 24 + 34 + n * 30 + 18);
+    });
+    m.fits.forEach(function (f, i) {
+      var x = pad + i * (colW + gap);
+      posterCard(ctx, x, y, colW, fitH, th);
+      ctx.fillStyle = th.ink;
+      ctx.font = '800 26px Pretendard, sans-serif';
+      ctx.fillText(f.h, x + 24, y + 16);
+      ctx.fillStyle = th.mute;
+      ctx.font = '500 22px Pretendard, sans-serif';
+      posterFillLines(ctx, posterWrap(ctx, f.p, colW - 40), x + 24, y + 52, 30);
+    });
+    y += fitH + 26;
+
+    ctx.fillStyle = th.accent;
+    ctx.font = '800 18px Pretendard, sans-serif';
+    ctx.fillText('CURRICULUM', pad, y);
+    y += 26;
+    ctx.fillStyle = th.ink;
+    ctx.font = '800 36px Pretendard, sans-serif';
+    ctx.fillText('세부 커리큘럼', pad, y);
+    y += 48;
+    ctx.fillStyle = th.mute;
+    ctx.font = '500 22px Pretendard, sans-serif';
+    var intro = posterWrap(ctx, m.currIntro, inner);
+    y += posterFillLines(ctx, intro, pad, y, 32) + 14;
+
+    var rowGap = 10;
+    var rowsLeft = H - 64 - y;
+    var rowH = Math.max(78, Math.min(108, Math.floor((rowsLeft - rowGap * (m.days.length - 1)) / m.days.length)));
+    m.days.forEach(function (day) {
+      posterCard(ctx, pad, y, inner, rowH, th);
+      ctx.fillStyle = th.accent;
+      ctx.font = '800 22px Pretendard, sans-serif';
+      ctx.fillText(day.d, pad + 24, y + 16);
+      ctx.fillStyle = th.ink;
+      ctx.font = '800 24px Pretendard, sans-serif';
+      ctx.fillText(day.h, pad + 168, y + 14);
+      ctx.fillStyle = th.mute;
+      ctx.font = '500 20px Pretendard, sans-serif';
+      var body = posterWrap(ctx, day.p, inner - 190);
+      var maxLines = rowH >= 104 ? 2 : 1;
+      posterFillLines(ctx, body.slice(0, maxLines), pad + 168, y + 46, 24);
+      y += rowH + rowGap;
+    });
+
+    ctx.fillStyle = th.mute;
+    ctx.font = '600 20px Pretendard, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(m.footLeft, pad, H - 44);
+    ctx.textAlign = 'right';
+    ctx.fillText('1 / 2', W - pad, H - 44);
+    ctx.textAlign = 'left';
+  }
+  function drawPosterBack(ctx, W, H, m, th) {
+    var pad = 56;
+    var inner = W - pad * 2;
+    ctx.fillStyle = th.paper;
+    ctx.fillRect(0, 0, W, H);
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = th.header;
+    ctx.fillRect(0, 0, W, 128);
+    ctx.fillStyle = th.cream;
+    ctx.font = '800 36px Pretendard, sans-serif';
+    ctx.fillText('신청 전에 먼저 확인하세요', pad, 32);
+    ctx.fillStyle = 'rgba(244,230,196,0.82)';
+    ctx.font = '600 22px Pretendard, sans-serif';
+    ctx.fillText(m.barSub, pad, 80);
+
+    var y = 152;
+    ctx.font = '500 22px Pretendard, sans-serif';
+    var checkLines = m.checks.map(function (c) { return posterWrap(ctx, c, inner - 52); });
+    var checkH = 24;
+    checkLines.forEach(function (ls) { checkH += ls.length * 30 + 8; });
+    posterCard(ctx, pad, y, inner, checkH, th);
+    var cy = y + 18;
+    checkLines.forEach(function (ls) {
+      ctx.fillStyle = th.ink;
+      ctx.fillRect(pad + 24, cy + 8, 8, 8);
+      ctx.fillStyle = th.mute;
+      cy += posterFillLines(ctx, ls, pad + 44, cy, 30) + 8;
+    });
+    y += checkH + 18;
+
+    ctx.font = '800 28px Pretendard, sans-serif';
+    var dateLines = posterWrap(ctx, m.date, inner - 48);
+    var timeLines = posterWrap(ctx, m.time, inner - 48);
+    var whenH = 28 + 26 + dateLines.length * 40 + 8 + timeLines.length * 36 + 20;
+    ctx.fillStyle = th.card;
+    ctx.fillRect(pad, y, inner, whenH);
+    ctx.strokeStyle = th.accent;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(pad + 2, y + 2, inner - 4, whenH - 4);
+    ctx.fillStyle = th.mute;
+    ctx.font = '700 20px Pretendard, sans-serif';
+    ctx.fillText('일정', pad + 24, y + 16);
+    var dy = y + 46;
+    dateLines.forEach(function (ln) {
+      ctx.font = '800 30px Pretendard, sans-serif';
+      var tw = ctx.measureText(ln).width;
+      ctx.fillStyle = th.hi;
+      ctx.fillRect(pad + 20, dy - 4, Math.min(tw + 16, inner - 44), 40);
+      ctx.fillStyle = th.ink;
+      ctx.fillText(ln, pad + 28, dy);
+      dy += 42;
+    });
+    ctx.font = '800 28px Pretendard, sans-serif';
+    ctx.fillStyle = th.ink;
+    posterFillLines(ctx, timeLines, pad + 24, dy + 4, 36);
+    y += whenH + 18;
+
+    var colW = (inner - 16) / 2;
+    ctx.font = '800 26px Pretendard, sans-serif';
+    var whoLines = posterWrap(ctx, m.who, colW - 40);
+    var metaH = 24 + 28 + Math.max(36, whoLines.length * 34) + 16;
+    posterCard(ctx, pad, y, colW, metaH, th);
+    posterCard(ctx, pad + colW + 16, y, colW, metaH, th);
+    ctx.fillStyle = th.mute;
+    ctx.font = '700 20px Pretendard, sans-serif';
+    ctx.fillText('장소', pad + 24, y + 14);
+    ctx.fillText('대상', pad + colW + 40, y + 14);
+    ctx.fillStyle = th.ink;
+    ctx.font = '800 26px Pretendard, sans-serif';
+    posterFillLines(ctx, posterWrap(ctx, m.place, colW - 40), pad + 24, y + 46, 34);
+    posterFillLines(ctx, whoLines, pad + colW + 40, y + 46, 34);
+    y += metaH + 18;
+
+    ctx.font = '500 22px Pretendard, sans-serif';
+    var afterLines = posterWrap(ctx, m.afterP, inner - 40);
+    var stepH = 78;
+    var afterH = 18 + 32 + afterLines.length * 30 + 12 + stepH + 16;
+    posterCard(ctx, pad, y, inner, afterH, th);
+    ctx.fillStyle = th.ink;
+    ctx.font = '800 26px Pretendard, sans-serif';
+    ctx.fillText(m.afterH, pad + 24, y + 14);
+    ctx.fillStyle = th.mute;
+    ctx.font = '500 22px Pretendard, sans-serif';
+    var ay = y + 50;
+    ay += posterFillLines(ctx, afterLines, pad + 24, ay, 30) + 12;
+    var stepGap = 10;
+    var stepW = (inner - 48 - stepGap * 3) / 4;
+    m.steps.forEach(function (st, i) {
+      var sx = pad + 24 + i * (stepW + stepGap);
+      ctx.fillStyle = th.step;
+      ctx.fillRect(sx, ay, stepW, stepH);
+      ctx.fillStyle = th.ink;
+      ctx.font = '800 20px Pretendard, sans-serif';
+      ctx.fillText(st.b, sx + 10, ay + 12);
+      ctx.fillStyle = th.mute;
+      ctx.font = '600 16px Pretendard, sans-serif';
+      posterFillLines(ctx, posterWrap(ctx, st.s, stepW - 18).slice(0, 2), sx + 10, ay + 40, 20);
+    });
+    y += afterH + 18;
+
+    ctx.font = '500 22px Pretendard, sans-serif';
+    var noteLines = posterWrap(ctx, m.note, inner - 48);
+    ctx.font = '800 32px Pretendard, sans-serif';
+    var priceSize = 32;
+    while (priceSize > 22 && ctx.measureText(m.priceLine || ' ').width > inner - 64) {
+      priceSize -= 2;
+      ctx.font = '800 ' + priceSize + 'px Pretendard, sans-serif';
+    }
+    var priceH = 18 + 32 + 12 + priceSize + 16 + noteLines.length * 30 + 16;
+    posterCard(ctx, pad, y, inner, priceH, th);
+    ctx.fillStyle = th.ink;
+    ctx.font = '800 26px Pretendard, sans-serif';
+    ctx.fillText('수강료', pad + 24, y + 14);
+    var py = y + 52;
+    ctx.font = '800 ' + priceSize + 'px Pretendard, sans-serif';
+    var pw = ctx.measureText(m.priceLine || '').width;
+    if (m.priceLine) {
+      ctx.fillStyle = th.hi;
+      ctx.fillRect(pad + 20, py - 4, Math.min(pw + 18, inner - 48), priceSize + 12);
+      ctx.fillStyle = th.ink;
+      ctx.fillText(m.priceLine, pad + 28, py);
+    }
+    ctx.fillStyle = th.mute;
+    ctx.font = '500 22px Pretendard, sans-serif';
+    posterFillLines(ctx, noteLines.slice(0, 3), pad + 24, py + priceSize + 16, 30);
+    y += priceH + 18;
+
+    ctx.fillStyle = th.ink;
+    ctx.font = '800 28px Pretendard, sans-serif';
+    ctx.fillText('신청', pad, y);
+    y += 40;
+    ctx.fillStyle = th.mute;
+    ctx.font = '500 22px Pretendard, sans-serif';
+    y += posterFillLines(ctx, posterWrap(ctx, '신청 정보 제출 후 개별 연락으로 등록·입금 절차를 안내드립니다.', inner), pad, y, 30) + 14;
+    var btnH = 64;
+    if (y + btnH < H - 70) {
+      ctx.fillStyle = th.accent;
+      ctx.fillRect(pad, y, inner, btnH);
+      ctx.fillStyle = '#fff';
+      ctx.font = '800 28px Pretendard, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('수강 신청하기', W / 2, y + 16);
+      ctx.textAlign = 'left';
+      y += btnH + 12;
+      ctx.fillStyle = th.mute;
+      ctx.font = '600 18px Pretendard, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(m.applyUrl, W / 2, y);
+      ctx.fillText('문의 카카오톡 상담', W / 2, y + 26);
+      ctx.textAlign = 'left';
+    }
+    ctx.fillStyle = th.mute;
+    ctx.font = '600 20px Pretendard, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(m.barSub + ' · 2026', pad, H - 44);
+    ctx.textAlign = 'right';
+    ctx.fillText('2 / 2', W - pad, H - 44);
+    ctx.textAlign = 'left';
+  }
+  function paintPosterNow() {
+    var c1 = $('posterCanvas1');
+    var c2 = $('posterCanvas2');
+    if (!c1 || !c2 || !isAcademyBranch()) return;
+    var m = posterModel();
+    var th = POSTER_THEMES[consultBranch] || POSTER_THEMES.cmt;
+    var ctx1 = c1.getContext('2d');
+    var ctx2 = c2.getContext('2d');
+    drawPosterFront(ctx1, c1.width, c1.height, m, th);
+    drawPosterBack(ctx2, c2.width, c2.height, m, th);
+  }
+  function ensurePosterFonts() {
+    if (posterFontsReady || !document.fonts || !document.fonts.load) {
+      posterFontsReady = true;
+      return Promise.resolve();
+    }
+    return Promise.all([500, 600, 700, 800].map(function (w) {
+      return document.fonts.load(w + ' 28px Pretendard');
+    })).then(function () { posterFontsReady = true; }).catch(function () { posterFontsReady = true; });
+  }
+  function schedulePosterPaint() {
+    clearTimeout(posterPaintTimer);
+    posterPaintTimer = setTimeout(function () {
+      ensurePosterFonts().then(paintPosterNow);
+    }, 30);
+  }
+  function fillPosterInputs() {
+    var v = posterVars();
+    document.querySelectorAll('#posterFields [data-k]').forEach(function (el) {
+      var k = el.getAttribute('data-k');
+      el.value = v[k] || '';
+    });
+  }
+  function readPosterInputs() {
+    var v = {};
+    var missing = false;
+    document.querySelectorAll('#posterFields [data-k]').forEach(function (el) {
+      var k = el.getAttribute('data-k');
+      v[k] = el.value.trim();
+    });
+    ['ribbon', 'date', 'time', 'place', 'price'].forEach(function (k) {
+      if (!v[k]) missing = true;
+    });
+    posterEdits[consultBranch + ':' + posterTrackId[consultBranch]] = v;
+    var status = $('posterStatus');
+    if (status) status.textContent = missing
+      ? '일정 한 줄, 날짜, 시간, 장소, 정가를 넣으면 미리보기와 이미지 저장이 됩니다.'
+      : '미리보기입니다. 이미지 저장을 누르면 PNG 파일로 받아집니다.';
+    ['btnPosterSaveAll', 'btnPosterSave1', 'btnPosterSave2'].forEach(function (id) {
+      var btn = $(id);
+      if (btn) btn.disabled = missing;
+    });
+    return !missing;
+  }
+  function posterFileName(page) {
+    var m = posterModel();
+    var track = posterTrackDef();
+    return m.file + '-' + track.label + '-포스터' + (page ? '-' + page : '-전체') + '.png';
+  }
+  function triggerImageDownload(href, name) {
+    var a = document.createElement('a');
+    a.href = href;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+  function paintPosterTracks() {
+    var box = $('posterTracks');
+    if (!box) return;
+    var list = posterTrackList();
+    if (!posterTrackId[consultBranch]) posterTrackId[consultBranch] = list[0].id;
+    box.innerHTML = list.map(function (t) {
+      return '<button type="button" class="chip' + (t.id === posterTrackId[consultBranch] ? ' active' : '') + '" data-poster-track="' + t.id + '">' + t.label + '</button>';
+    }).join('');
+  }
+  function savePosterPng(page) {
+    if (!readPosterInputs()) return;
+    paintPosterNow();
+    var canvas = $(page === 2 ? 'posterCanvas2' : 'posterCanvas1');
+    var name = posterFileName(page);
+    triggerImageDownload(canvas.toDataURL('image/png'), name);
+    var status = $('posterStatus');
+    if (status) status.textContent = name + ' 이미지를 저장했습니다.';
+  }
+  function savePosterImage() {
+    if (!readPosterInputs()) return;
+    paintPosterNow();
+    var c1 = $('posterCanvas1');
+    var c2 = $('posterCanvas2');
+    var gap = 28;
+    var out = document.createElement('canvas');
+    out.width = c1.width;
+    out.height = c1.height + gap + c2.height;
+    var g = out.getContext('2d');
+    g.fillStyle = '#E7E0D8';
+    g.fillRect(0, 0, out.width, out.height);
+    g.drawImage(c1, 0, 0);
+    g.drawImage(c2, 0, c1.height + gap);
+    var name = posterFileName();
+    triggerImageDownload(out.toDataURL('image/png'), name);
+    var status = $('posterStatus');
+    if (status) status.textContent = name + ' 이미지를 저장했습니다.';
+  }
+  function bindPoster() {
+    if (posterBound || !$('posterCard')) return;
+    posterBound = true;
+    $('posterCard').addEventListener('input', function (e) {
+      if (!e.target.closest('#posterFields')) return;
+      readPosterInputs();
+      schedulePosterPaint();
+    });
+    $('posterCard').addEventListener('click', function (e) {
+      var track = e.target.closest('[data-poster-track]');
+      if (track) {
+        posterTrackId[consultBranch] = track.getAttribute('data-poster-track');
+        paintPosterTracks();
+        fillPosterInputs();
+        readPosterInputs();
+        schedulePosterPaint();
+        return;
+      }
+      if (e.target.closest('#btnPosterSaveAll')) savePosterImage();
+      if (e.target.closest('#btnPosterSave1')) savePosterPng(1);
+      if (e.target.closest('#btnPosterSave2')) savePosterPng(2);
+    });
+  }
+  function syncPoster() {
+    var card = $('posterCard');
+    if (!card) return;
+    var on = isAcademyBranch();
+    card.hidden = !on;
+    if (!on) return;
+    bindPoster();
+    card.setAttribute('data-theme', consultBranch);
+    if (!posterTrackId[consultBranch]) posterTrackId[consultBranch] = posterTrackList()[0].id;
+    paintPosterTracks();
+    fillPosterInputs();
+    readPosterInputs();
+    schedulePosterPaint();
+  }
+  var SMS_WAY = 'https://blog.naver.com/allenjoy/224307689748';
+  var smsTemplateId = {};
+  var smsEdits = {};
+  var smsPeople = [];
+  var smsChecked = {};
+  var smsBound = false;
+  var smsLoadGen = 0;
+  var smsSending = false;
+  function smsCourseName() {
+    if (consultBranch === 'cmt') return 'CMT 임상도수치료';
+    if (consultBranch === 'ifc') return 'IFC 얼굴교정';
+    return 'Re:Al 움직임';
+  }
+  function smsVideoUrl() {
+    if (consultBranch === 'cmt') return 'https://cafe.naver.com/ksnim/1076';
+    if (consultBranch === 'ifc') return 'https://cafe.naver.com/ifc/51';
+    return 'https://cafe.naver.com/koreaposture/359';
+  }
+  function smsTemplates() {
+    var name = smsCourseName();
+    var list = [];
+    if (consultBranch === 'ifc') {
+      list.push({ id: 'anatomy', label: '3주 전 해부학', text: [
+        '안녕하세요. IFC 얼굴교정 과정입니다.',
+        '',
+        '현장 수업 3주 전입니다.',
+        'DAY 0 얼굴 해부학은 온라인으로 먼저 봐 주세요.',
+        '과제가 있어 준비 시간이 필요합니다.',
+        '',
+        '영상',
+        smsVideoUrl(),
+        '',
+        '현장 3일은 촉진·수기·기기에 집중합니다.'
+      ].join('\n') });
+    }
+    list.push({ id: 'week', label: '1주 전 영상', text: academyWeekNotice_(name, smsVideoUrl()) });
+    var d3 = [
+      '안녕하세요. ' + name + '입니다.',
+      '',
+      '수업이 3일 남았습니다.'
+    ];
+    if (consultBranch === 'cmt') {
+      d3.push('장소: 삼육보건대학교 (서울 동대문구)', '시간: 09:00–18:00', '', '준비물: 실습 복장, 필기도구, 개인 수건');
+    } else if (consultBranch === 'ifc') {
+      d3.push('일정: 11월 8·22·29일(일요일) 10:00–17:00', '장소: 약수역 도보 약 3분', '', '준비물: 실습 복장, 필기도구, 개인 수건', '얼굴 실습이 있어 화장은 지우고 오시면 편합니다.');
+    } else {
+      d3.push('장소: 리얼무브먼트 약수점', '시간: 10:00–17:00', '', '움직이기 편한 복장으로 오시면 됩니다.');
+    }
+    d3.push('', '일정이 어려우시면 오늘 중으로 알려 주세요.', '', '오는 길', SMS_WAY);
+    list.push({ id: 'd3', label: '3일 전', text: d3.join('\n') });
+    list.push({ id: 'unpaid', label: '등록 전', text: ACADEMY_DEPOSIT });
+    list.push({ id: 'feedback', label: '피드백', text: [
+      '안녕하세요. ' + name + ' 수업을 함께해 주셔서 감사합니다.',
+      '',
+      '도움이 된 점과 아쉬운 점을 아래에 짧게 남겨 주세요.',
+      'https://breezefeel.github.io/feedback/',
+      '',
+      '다음 수업에 반영하겠습니다.'
+    ].join('\n') });
+    return list;
+  }
+  function smsCurrentId() {
+    var list = smsTemplates();
+    var id = smsTemplateId[consultBranch];
+    if (!list.some(function (t) { return t.id === id; })) id = list[0].id;
+    smsTemplateId[consultBranch] = id;
+    return id;
+  }
+  function smsTextFor(id) {
+    var key = consultBranch + ':' + id;
+    if (smsEdits[key] != null) return smsEdits[key];
+    var hit = smsTemplates().filter(function (t) { return t.id === id; })[0];
+    return hit ? hit.text : '';
+  }
+  function formatSmsPhone(raw) {
+    var d = String(raw || '').replace(/\D/g, '');
+    if (d.length === 10 && d.charAt(0) === '1') d = '0' + d;
+    if (d.length === 11) return d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
+    if (d.length === 10) return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+    return d;
+  }
+  function smsDigits(raw) {
+    var d = String(raw || '').replace(/\D/g, '');
+    if (d.length === 10 && d.charAt(0) === '1') d = '0' + d;
+    return (d.length === 10 || d.length === 11) ? d : '';
+  }
+  function setSmsStatus(msg) {
+    var el = $('smsStatus');
+    if (el) el.textContent = msg || '';
+  }
+  function paintSmsCount() {
+    var el = $('smsCount');
+    var text = ($('smsText') && $('smsText').value) || '';
+    if (el) el.textContent = text.length ? (text.length + '자') : '';
+  }
+  function paintSmsTemplates() {
+    var box = $('smsTemplates');
+    if (!box) return;
+    var cur = smsCurrentId();
+    box.innerHTML = smsTemplates().map(function (t) {
+      return '<button type="button" class="chip' + (t.id === cur ? ' active' : '') + '" data-sms-template="' + t.id + '">' + t.label + '</button>';
+    }).join('');
+    var ta = $('smsText');
+    if (ta) ta.value = smsTextFor(cur);
+    paintSmsCount();
+  }
+  function paintSmsPeople() {
+    var box = $('smsPeople');
+    if (!box) return;
+    if (!smsPeople.length) {
+      box.innerHTML = '';
+      return;
+    }
+    box.innerHTML = smsPeople.map(function (p, i) {
+      var on = !!smsChecked[p.phone];
+      var meta = [formatSmsPhone(p.phone), p.applyType, p.when].filter(Boolean).join(' · ');
+      return '<label class="sms-person' + (on ? ' is-on' : '') + '">' +
+        '<input type="checkbox" data-sms-phone="' + i + '"' + (on ? ' checked' : '') + '>' +
+        '<span><b>' + (p.name || '이름 없음') + '</b><small>' + meta + '</small></span></label>';
+    }).join('');
+  }
+  function collectSmsPhones() {
+    var out = [];
+    var seen = {};
+    smsPeople.forEach(function (p) {
+      if (!smsChecked[p.phone]) return;
+      if (seen[p.phone]) return;
+      seen[p.phone] = true;
+      out.push(p.phone);
+    });
+    String(($('smsExtra') && $('smsExtra').value) || '').split(/[\s,，]+/).forEach(function (raw) {
+      var d = smsDigits(raw);
+      if (!d || seen[d]) return;
+      seen[d] = true;
+      out.push(d);
+    });
+    return out;
+  }
+  function loadSmsPeople() {
+    var branch = consultBranch;
+    var gen = ++smsLoadGen;
+    var btn = $('btnSmsLoad');
+    if (btn) btn.disabled = true;
+    setSmsStatus('신청자를 불러오는 중입니다.');
+    var payload = JSON.stringify({ action: 'listAcademyNoticeRecipients', course: branch });
+    var url = PAYROLL_API_URL + (PAYROLL_API_URL.indexOf('?') >= 0 ? '&' : '?') + 'data=' + encodeURIComponent(payload) + '&_=' + Date.now();
+    fetch(url, { method: 'GET', cache: 'no-store' }).then(function (res) {
+      return res.text();
+    }).then(function (text) {
+      if (btn) btn.disabled = false;
+      if (gen !== smsLoadGen || consultBranch !== branch) return;
+      var data;
+      try { data = JSON.parse(text); } catch (eParse) { data = null; }
+      if (!data || data.ok === false || data.result === 'error') {
+        var msg = (data && data.message) || '';
+        if (/unknown action/i.test(msg)) setSmsStatus('문자 발송을 쓰려면 Apps Script를 다시 배포해 주세요. 그동안은 아래에 연락처를 직접 적을 수 있습니다.');
+        else setSmsStatus(msg || '신청자를 불러오지 못했습니다. 연락처를 직접 적어 주세요.');
+        return;
+      }
+      smsPeople = data.recipients || [];
+      smsChecked = {};
+      paintSmsPeople();
+      setSmsStatus(smsPeople.length ? (smsPeople.length + '명을 불러왔습니다. 보낼 사람을 선택하세요.') : '이 과정 신청자가 없습니다. 연락처를 직접 적어 주세요.');
+    }).catch(function () {
+      if (btn) btn.disabled = false;
+      setSmsStatus('시트에 연결하지 못했습니다.');
+    });
+  }
+  function sendSmsNow() {
+    if (smsSending) return;
+    var text = ($('smsText') && $('smsText').value || '').trim();
+    if (!text) { setSmsStatus('문자 내용을 적어 주세요.'); return; }
+    var phones = collectSmsPhones();
+    if (!phones.length) { setSmsStatus('보낼 연락처를 선택하거나 직접 적어 주세요.'); return; }
+    if (phones.length > 30) { setSmsStatus('한 번에 30명까지 보낼 수 있습니다. 나눠 보내 주세요.'); return; }
+    if (!window.confirm(phones.length + '명에게 솔라피 문자를 보냅니다.')) return;
+    smsSending = true;
+    var btn = $('btnSmsSend');
+    if (btn) btn.disabled = true;
+    setSmsStatus('보내는 중입니다.');
+    fetch(PAYROLL_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'academySendNoticeSms', text: text, phones: phones, course: consultBranch })
+    }).then(function (res) { return res.text(); }).then(function (raw) {
+      smsSending = false;
+      if (btn) btn.disabled = false;
+      var data;
+      try { data = JSON.parse(raw); } catch (eParse) { data = null; }
+      if (!data || data.ok === false || data.result === 'error') {
+        var msg = (data && (data.message || data.error)) || '';
+        if (/unknown action/i.test(msg)) setSmsStatus('Apps Script를 다시 배포하면 솔라피 발송이 연결됩니다.');
+        else setSmsStatus(msg || '문자를 보내지 못했습니다.');
+        return;
+      }
+      var failed = data.failed || [];
+      if (!failed.length) setSmsStatus(data.sent + '명에게 문자를 보냈습니다.');
+      else setSmsStatus(data.sent + '명 발송, ' + failed.length + '명 실패. ' + failed.map(function (f) { return f.phoneTail || ''; }).filter(Boolean).join(', '));
+    }).catch(function () {
+      smsSending = false;
+      if (btn) btn.disabled = false;
+      setSmsStatus('시트에 연결하지 못했습니다.');
+    });
+  }
+  function bindSms() {
+    if (smsBound || !$('smsPanel')) return;
+    smsBound = true;
+    $('smsPanel').addEventListener('input', function (e) {
+      if (e.target.id === 'smsText') {
+        smsEdits[consultBranch + ':' + smsCurrentId()] = e.target.value;
+        paintSmsCount();
+      }
+    });
+    $('smsPanel').addEventListener('change', function (e) {
+      var box = e.target.closest('[data-sms-phone]');
+      if (!box) return;
+      var person = smsPeople[parseInt(box.getAttribute('data-sms-phone'), 10)];
+      if (!person) return;
+      smsChecked[person.phone] = box.checked;
+      var row = box.closest('.sms-person');
+      if (row) row.classList.toggle('is-on', box.checked);
+    });
+    $('smsPanel').addEventListener('click', function (e) {
+      var tmpl = e.target.closest('[data-sms-template]');
+      if (tmpl) {
+        var ta = $('smsText');
+        if (ta) smsEdits[consultBranch + ':' + smsCurrentId()] = ta.value;
+        smsTemplateId[consultBranch] = tmpl.getAttribute('data-sms-template');
+        paintSmsTemplates();
+        return;
+      }
+      if (e.target.closest('#btnSmsLoad')) loadSmsPeople();
+      if (e.target.closest('#btnSmsAll')) {
+        var allOn = smsPeople.length && smsPeople.every(function (p) { return smsChecked[p.phone]; });
+        smsPeople.forEach(function (p) { smsChecked[p.phone] = !allOn; });
+        paintSmsPeople();
+      }
+      if (e.target.closest('#btnSmsSend')) sendSmsNow();
+    });
+  }
+  function syncSms() {
+    var card = $('smsPanel');
+    if (!card) return;
+    if (!isAcademyBranch()) return;
+    bindSms();
+    smsPeople = [];
+    smsChecked = {};
+    paintSmsTemplates();
+    paintSmsPeople();
+    setSmsStatus('');
+  }
   function renderConsultBranch() {
     document.querySelectorAll('#consultBranchChips .chip').forEach(function (c) {
       c.classList.toggle('active', c.dataset.branch === consultBranch);
@@ -4587,13 +5567,17 @@
     document.body.classList.toggle('academy-mode', academy);
     var chatBlocks = $('consultChatBlocks');
     var certPanel = $('certPanel');
+    var smsPanel = $('smsPanel');
     if (chatBlocks) chatBlocks.hidden = academy;
     if (certPanel) certPanel.hidden = !academy;
+    if (smsPanel) smsPanel.hidden = !academy;
     var q1 = $('chatQ');
     var q2 = $('chatQ2');
     if (q1 && !academy) q1.placeholder = '질문을 붙여 넣거나, 캡처를 여기에 넣으세요';
     if (q2 && !academy) q2.placeholder = '다음 메시지를 붙여 넣거나, 캡처를 넣으세요';
     syncPriceSheet();
+    syncPoster();
+    syncSms();
     renderFaq();
     renderCertChrome();
     if (!academy) {
