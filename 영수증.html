@@ -5167,16 +5167,30 @@
     ctx.fillText('2 / 2', W - pad, H - 44);
     ctx.textAlign = 'left';
   }
+  var POSTER_W = 1080;
+  var POSTER_H = 1528;
+  var POSTER_SCALE = 3;
+  function posterSurface(canvas) {
+    var bw = POSTER_W * POSTER_SCALE;
+    var bh = POSTER_H * POSTER_SCALE;
+    if (canvas.width !== bw || canvas.height !== bh) {
+      canvas.width = bw;
+      canvas.height = bh;
+    }
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(POSTER_SCALE, 0, 0, POSTER_SCALE, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    return ctx;
+  }
   function paintPosterNow() {
     var c1 = $('posterCanvas1');
     var c2 = $('posterCanvas2');
     if (!c1 || !c2 || !isAcademyBranch()) return;
     var m = posterModel();
     var th = POSTER_THEMES[consultBranch] || POSTER_THEMES.cmt;
-    var ctx1 = c1.getContext('2d');
-    var ctx2 = c2.getContext('2d');
-    drawPosterFront(ctx1, c1.width, c1.height, m, th);
-    drawPosterBack(ctx2, c2.width, c2.height, m, th);
+    drawPosterFront(posterSurface(c1), POSTER_W, POSTER_H, m, th);
+    drawPosterBack(posterSurface(c2), POSTER_W, POSTER_H, m, th);
   }
   function ensurePosterFonts() {
     if (posterFontsReady || !document.fonts || !document.fonts.load) {
@@ -5257,7 +5271,7 @@
     paintPosterNow();
     var c1 = $('posterCanvas1');
     var c2 = $('posterCanvas2');
-    var gap = 28;
+    var gap = 28 * POSTER_SCALE;
     var out = document.createElement('canvas');
     out.width = c1.width;
     out.height = c1.height + gap + c2.height;
