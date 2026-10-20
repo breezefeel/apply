@@ -1020,7 +1020,15 @@
   .sign-box { width: 240px; text-align: center; }
   .sign-line { border-top: 1px solid var(--ink); padding-top: 8px; font-size: 13px; font-weight: 700; }
   .sign-role { font-size: 11px; color: var(--mute); margin-top: 2px; }
-  .sign-hint { font-size: 10px; color: var(--mute); margin-bottom: 36px; letter-spacing: .08em; text-transform: uppercase; }
+  .sign-hint { font-size: 10px; color: var(--mute); margin-bottom: 2px; letter-spacing: .08em; text-transform: uppercase; }
+  .sign-stamp {
+    display: block;
+    width: 22mm;
+    height: auto;
+    margin: 0 auto -10px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 
   .foot {
     margin-top: 22px; padding-top: 10px;
@@ -1030,13 +1038,13 @@
   }
 
   @media print {
-    @page { size: A4; margin: 12mm; }
+    @page { size: A4; margin: 0; }
     html, body { background: #fff; }
     .app { max-width: none; padding: 0; }
     .no-print { display: none !important; }
     .preview { overflow: visible; box-shadow: none; border-radius: 0; background: transparent; }
     .sheet-frame { height: auto !important; width: auto !important; overflow: visible; }
-    .sheet { width: auto; min-height: 0; padding: 0; transform: none !important; }
+    .sheet { width: auto; min-height: 0; padding: 14mm 16mm 12mm; transform: none !important; }
     body:not(.printing-docs):not(.printing-plan) #panelConsult,
     body:not(.printing-docs):not(.printing-plan) #panelLinks,
     body:not(.printing-docs):not(.printing-plan) #panelDocs,
@@ -1060,7 +1068,7 @@
     body.printing-plan.printing-plan-proposal #planProposal { display: block !important; }
     body.printing-plan.printing-plan-custom #planSeed { display: none !important; }
     body.printing-plan.printing-plan-custom #planCustom { display: block !important; }
-    body.printing-plan .plan-doc { box-shadow: none; border: 0; padding: 0; }
+    body.printing-plan .plan-doc { box-shadow: none; border: 0; padding: 12mm; }
     body.printing-docs .head,
     body.printing-docs .app-tabs,
     body.printing-docs #panelConsult,
@@ -1073,6 +1081,7 @@
       display: block !important;
       background: #fff; color: #111;
       font-size: 13px; line-height: 1.5;
+      padding: 12mm;
     }
     body.printing-docs .docs-sheet h1 { font-size: 20px; margin-bottom: 4px; }
     body.printing-docs .docs-sheet .sub { color: #555; margin-bottom: 16px; }
@@ -1931,6 +1940,7 @@
         <div class="sign">
           <div class="sign-box">
             <div class="sign-hint">Authorized signature / stamp</div>
+            <img class="sign-stamp" src="도장.png" alt="">
             <div class="sign-line" id="vIssuer">—</div>
             <div class="sign-role" id="vRole">—</div>
           </div>
@@ -2156,7 +2166,7 @@
   <div class="dock no-print receipt-dock">
     <div class="dock-inner">
       <button type="button" class="btn btn-ghost" id="btnClear">입력 지우기</button>
-      <button type="button" class="btn btn-print" onclick="window.print()">인쇄 / PDF 저장</button>
+      <button type="button" class="btn btn-print" id="btnPrint">인쇄 / PDF 저장</button>
     </div>
   </div>
 
@@ -2290,11 +2300,11 @@
     var first = o.packs[0];
     var d = {
       clientName: '',
-      nationality: '',
+      nationality: 'South of Korea',
       payMethod: 'Credit / debit card',
       issueDate: todayISO(),
       payDate: todayISO(),
-      svcName: first.name,
+      svcName: '8 sessions',
       svcDesc: first.desc,
       sessions: String(first.sessions || 1),
       amount: first.amount ? first.amount.toLocaleString('en-US') : '',
@@ -2304,7 +2314,7 @@
       issuerRole: o.role,
       addr: o.addr,
       phone: o.phone,
-      bizNo: '',
+      bizNo: '801-86-01629',
       notes: '',
       packId: first.id
     };
@@ -8051,9 +8061,7 @@
   $('btnClear').addEventListener('click', function () {
     var d = defaults(orgId);
     d.clientName = '';
-    d.nationality = '';
     d.amount = '';
-    d.svcName = '';
     d.packId = 'custom';
     writeForm(d);
     persist();
@@ -9249,7 +9257,24 @@
     fitFaqBox();
     if (document.body.classList.contains('mode-receipt')) fitPreview();
   });
+  var pageTitle = document.title;
+  function receiptPdfName() {
+    var name = ($('clientName') && $('clientName').value || '').trim();
+    name = name.replace(/[\\/:*?"<>|\u0000-\u001f]/g, ' ').replace(/\s+/g, ' ').trim();
+    name = name.replace(/[. ]+$/g, '');
+    return name || '영수증';
+  }
+  function applyReceiptPrintTitle() {
+    if (document.body.classList.contains('mode-receipt')) document.title = receiptPdfName();
+  }
+  if ($('btnPrint')) {
+    $('btnPrint').addEventListener('click', function () {
+      applyReceiptPrintTitle();
+      window.print();
+    });
+  }
   window.addEventListener('beforeprint', function () {
+    applyReceiptPrintTitle();
     if (document.body.classList.contains('mode-docs')) {
       document.body.classList.add('printing-docs');
       renderPrintSheet();
@@ -9260,6 +9285,7 @@
     if (frame) frame.style.height = 'auto';
   });
   window.addEventListener('afterprint', function () {
+    document.title = pageTitle;
     document.body.classList.remove('printing-docs');
     fitPreview();
   });
