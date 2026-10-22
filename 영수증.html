@@ -1333,7 +1333,9 @@
     flex-direction: column;
     background: #f7f3ec;
     border-radius: 18px;
-    padding: 14px 28px 10px;
+    justify-content: flex-start;
+    padding: 16px 28px 16px;
+    position: relative;
     box-shadow: none;
     color: #2a2622;
     font-family: Pretendard, "Apple SD Gothic Neo", sans-serif;
@@ -1363,32 +1365,60 @@
   .pcard-sig-name { font-size: 19px; font-weight: 700; letter-spacing: -.02em; color: #5c554e; }
   .pcard-sig-note { font-size: 16px; color: #8a8178; }
   .pcard-money { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-  .pcard-prog { margin-top: 8px; padding-top: 8px; border-top: 1px solid #e6dccf; }
-  .pcard-prog:first-of-type { margin-top: 10px; padding-top: 8px; }
+  .pcard-prog { margin-top: 22px; padding-top: 12px; border-top: 1px solid #e6dccf; }
+  .pcard-prog:first-of-type { margin-top: 0; padding-top: 12px; }
   .pcard-prog h2 { margin: 0; font-size: 26px; line-height: 1.3; letter-spacing: -.03em; font-weight: 800; }
+  .pcard-titleline { display: flex; justify-content: space-between; align-items: baseline; gap: 8px 12px; flex-wrap: wrap; }
+  .pcard-titleline h2 { flex: 1 1 auto; min-width: 0; white-space: nowrap; }
+  .pcard-aside { flex: 0 0 auto; margin-left: auto; font-size: 16px; font-weight: 700; color: #5c5348; white-space: nowrap; }
+  .pcard-lead { margin: 0 0 6px; text-align: center; font-size: 17px; line-height: 1.4; color: #5c5348; }
+  .pcard-center { margin: 6px 0 8px; text-align: center; font-size: 17px; line-height: 1.4; color: #5c5348; }
   .pcard-sub { margin: 4px 0 6px; font-size: 17px; line-height: 1.4; color: #5c5348; }
-  .pcard-line { padding: 6px 8px; }
+  .pcard-line { padding: 10px 8px; }
   .pcard-line .pcard-name { font-size: 18px; }
   .pcard-total { font-size: 21px; font-weight: 700; }
   .pcard-unit { display: block; margin-top: 1px; font-size: 16px; font-weight: 600; color: #5c5348; }
   .pcard-rec {
-    margin: 4px 0 2px; padding: 10px 12px 8px; border-radius: 14px; background: #f3e7d4;
+    margin: 4px 0; padding: 8px 12px; border-radius: 14px; background: #f3e7d4;
   }
-  .pcard-rec .pcard-name { font-weight: 700; font-size: 18px; }
+  .pcard-rec .pcard-line { align-items: center; }
+  .pcard-rec .pcard-name {
+    display: flex; align-items: baseline; gap: 8px; min-width: 0;
+    font-weight: 700; font-size: 18px; white-space: nowrap;
+  }
   .pcard-badge {
-    display: inline-block; margin-right: 6px; padding: 2px 8px 3px; border-radius: 999px;
+    display: inline-block; flex: 0 0 auto; padding: 2px 8px 3px; border-radius: 999px;
     background: #8d6840; color: #fff; font-size: 13px; font-weight: 700; vertical-align: 1px;
   }
-  .pcard-save { margin: 4px 4px 0; font-size: 16px; font-weight: 700; color: #8d6840; line-height: 1.35; }
+  .pcard-save { margin: 0; font-size: 16px; font-weight: 700; color: #8d6840; line-height: 1.2; white-space: nowrap; }
+  .pcard-logo-block { flex: 0 0 auto; }
+  .pcard-sig-slot {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 0;
+  }
+  .pcard-sig-slot .pcard-anchor { width: 100%; }
+  .pcard-progs { flex: 0 0 auto; }
+  .pcard-mid {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
+  }
   .pcard-bottom {
-    margin-top: 8px;
-    flex: 1;
+    margin-top: 0;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
+    gap: 10px;
     min-height: 0;
   }
   .pcard-pace {
-    margin: 0 0 8px;
+    margin: 0;
     padding: 0 4px;
     border-top: 0;
     font-size: 18px; line-height: 1.45; color: #3f3832; text-align: center; font-weight: 700;
@@ -1396,12 +1426,12 @@
   .pcard-merits {
     list-style: none;
     margin: 0;
-    flex: 1;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: flex-start;
     gap: 8px;
-    padding: 12px 14px 12px 16px;
+    padding: 12px 14px;
     background: #f3eee4;
     border-radius: 14px;
   }
@@ -1421,7 +1451,7 @@
     background: #8d6840;
   }
   .pcard-foot {
-    margin-top: 8px; background: #e7e1d8; border-radius: 12px; text-align: center;
+    margin-top: 0; background: #e7e1d8; border-radius: 12px; text-align: center;
     padding: 10px 10px; font-size: 16px; font-weight: 700;
   }
   .pcard-foot span { font-weight: 600; letter-spacing: .04em; }
@@ -1976,7 +2006,8 @@
             <label>요일<input data-k="days" placeholder="예: 화, 금"></label>
             <label>시간<input data-k="time" placeholder="예: 10:00–10:50"></label>
             <label>장소<input data-k="room" placeholder="커뮤니티 룸"></label>
-            <label>회신 연락처<input data-k="contact" placeholder="전화번호 또는 채널"></label>
+            <label data-sched="contact">회신 연락처<input data-k="contact" placeholder="전화번호 또는 채널"></label>
+            <label data-sched="size" hidden>인원<input data-k="size" placeholder="6~8명"></label>
             <label>수강료<input data-k="fee" placeholder="인원과 일정이 정해진 뒤 협의"></label>
           </div>
           </div>
@@ -2462,9 +2493,8 @@
         { id: 'ic50-1', label: '50분 1회 45,000', name: 'Single session (50 min)', sessions: 1, amount: 45000, desc: DESC + ' 50 minutes.' },
         { id: 'ic50-8', label: '50분 8회 320,000', name: '8-session pass (50 min)', sessions: 8, amount: 320000, desc: DESC + ' 50 minutes per session. 8 sessions.' },
         { id: 'ic50-24', label: '50분 24회 900,000', name: '24-session pass (50 min)', sessions: 24, amount: 900000, desc: DESC + ' 50 minutes per session. 24 sessions.' },
-        { id: 'ic80-1', label: '80분 1회 90,000', name: 'Single session (80 min)', sessions: 1, amount: 90000, desc: DESC + ' 80 minutes.' },
         { id: 'ic80-8', label: '80분 8회 620,000', name: '8-session pass (80 min)', sessions: 8, amount: 620000, desc: DESC + ' 80 minutes per session. 8 sessions.' },
-        { id: 'ic80-24', label: '80분 24회 1,800,000', name: '24-session pass (80 min)', sessions: 24, amount: 1800000, desc: DESC + ' 80 minutes per session. 24 sessions.' },
+        { id: 'ic80-24', label: '80분 24회 1,740,000', name: '24-session pass (80 min)', sessions: 24, amount: 1740000, desc: DESC + ' 80 minutes per session. 24 sessions.' },
         { id: 'custom', label: '직접 입력', name: '', sessions: 1, amount: 0, desc: DESC }
       ]
     },
@@ -8228,20 +8258,22 @@
         programs: [
           {
             title: '50분 · 1:1 리얼 무브먼트',
-            sub: '레슨 40분 + 두타 마사지 10분',
+            sub: '레슨 40분 + 두타 10분',
+            note: '움직인 뒤 부드럽게 두드려줍니다.',
             rows: [
               { name: '1회', total: '8.5만원', unit: '', save: '', recommend: false },
               { name: '8회권', total: '66만원', unit: '회당 8.25만원', save: '', recommend: false },
-              { name: '24회권', total: '192만원', unit: '회당 8만원', save: '1회보다 회당 5,000원 적습니다', recommend: true }
+              { name: '24회권', total: '192만원', unit: '회당 8만원', save: '8회권을 세 번 등록하는 것보다 약 6만원 적습니다', recommend: true }
             ]
           },
           {
             title: '70분 · 1:1 리얼무브먼트 + 컨디셔닝',
-            sub: '레슨 40분 + 두타 마사지 10분 + 컨디셔닝 20분',
+            sub: '레슨 40분 + 두타 10분 + 컨디셔닝 20분',
+            note: '프리미엄 근막 컨디셔닝을 병행합니다.',
             rows: [
               { name: '1회', total: '12.5만원', unit: '', save: '', recommend: false },
               { name: '8회권', total: '76만원', unit: '회당 9.5만원', save: '', recommend: false },
-              { name: '24회권', total: '216만원', unit: '회당 9만원', save: '1회보다 회당 35,000원 적습니다', recommend: true }
+              { name: '24회권', total: '216만원', unit: '회당 9만원', save: '8회권을 세 번 등록하는 것보다 약 12만원 적습니다', recommend: true }
             ]
           }
         ]
@@ -8257,19 +8289,21 @@
         programs: [
           {
             title: '50분 · 1:1 리얼무브먼트 / 리얼페이스',
-            sub: '1:1 레슨 25분, 온열 돔 25분. 움직인 뒤를 따뜻하게 마무리합니다.',
+            sub: '레슨 25분, 온열 돔 25분',
+            note: '움직인 뒤를 따뜻하게 마무리합니다.',
             rows: [
               { name: '1회', total: '4.5만원', unit: '', save: '', recommend: false },
               { name: '8회권', total: '32만원', unit: '회당 4만원', save: '', recommend: false },
-              { name: '24회권', total: '90만원', unit: '회당 3.75만원', save: '1회보다 회당 7,500원 적습니다', recommend: true }
+              { name: '24회권', total: '90만원', unit: '회당 3.75만원', save: '8회권을 세 번 등록하는 것보다 약 6만원 적습니다', recommend: true }
             ]
           },
           {
             title: '80분 · 1:1 리얼무브먼트 / 리얼페이스',
-            sub: '1:1 레슨 55분, 온열 돔 25분. 맞추는 시간이 더 길고, 마무리는 같습니다.',
+            sub: '레슨 55분, 온열 돔 25분',
+            note: '프리미엄 집중 레슨으로 진행합니다.',
             rows: [
               { name: '8회권', total: '62만원', unit: '회당 7.75만원', save: '', recommend: false },
-              { name: '24회권', total: '164만원', unit: '회당 6.8만원', save: '8회를 세 번 사는 것보다 약 22만원 적습니다', recommend: true }
+              { name: '24회권', total: '174만원', unit: '회당 7.25만원', save: '8회권을 세 번 등록하는 것보다 약 12만원 적습니다', recommend: true }
             ]
           }
         ]
@@ -8306,15 +8340,64 @@
         (saved.yaksu.programs || []).forEach(function (p) {
           if (p.title === '70분 · 1:1 리얼 컨디셔닝') p.title = '70분 · 1:1 리얼무브먼트 + 컨디셔닝';
           if (p.title === '50분 · 1:1 리얼 무브먼트' && (!p.sub || p.sub === '1:1로 오늘 움직임을 보고, 집에서 할 동작 하나를 정합니다.')) {
-            p.sub = '레슨 40분 + 두타 마사지 10분';
+            p.sub = '레슨 40분 + 두타 10분';
+            changed = true;
           }
           if (p.title === '70분 · 1:1 리얼무브먼트 + 컨디셔닝' && (!p.sub || p.sub === '50분에 기능 운동을 더합니다. 버티는 힘을 같이 봅니다.')) {
-            p.sub = '레슨 40분 + 두타 마사지 10분 + 컨디셔닝 20분';
+            p.sub = '레슨 40분 + 두타 10분 + 컨디셔닝 20분';
+            changed = true;
           }
-          if (p.title === '70분 · 1:1 리얼무브먼트 + 컨디셔닝') {
+          if (p.sub && p.sub.indexOf('두타 마사지') >= 0) {
+            p.sub = p.sub.replace(/두타 마사지/g, '두타');
+            changed = true;
+          }
+          if (p.title.indexOf('50분') === 0 && !String(p.note || '').trim()) {
+            p.note = '움직인 뒤 부드럽게 두드려줍니다.';
+            changed = true;
+          }
+          if (p.title.indexOf('70분') === 0 && !String(p.note || '').trim()) {
+            p.note = '프리미엄 근막 컨디셔닝을 병행합니다.';
+            changed = true;
+          }
+          (p.rows || []).forEach(function (row) {
+            if (row.name !== '24회권' || !row.recommend) return;
+            var nextSave = '';
+            if (p.title.indexOf('50분') === 0 && (row.save === '1회보다 회당 5,000원 적습니다' || !String(row.save || '').trim())) nextSave = '8회권을 세 번 등록하는 것보다 약 6만원 적습니다';
+            if (p.title.indexOf('70분') === 0 && (row.save === '1회보다 회당 35,000원 적습니다' || !String(row.save || '').trim())) nextSave = '8회권을 세 번 등록하는 것보다 약 12만원 적습니다';
+            if (nextSave && row.save !== nextSave) { row.save = nextSave; changed = true; }
+          });
+        });
+        (saved.incheon.programs || []).forEach(function (p) {
+          if (p.title === '50분 · 1:1') { p.title = '50분 · 1:1 리얼무브먼트 / 리얼페이스'; changed = true; }
+          if (p.title === '80분 · 1:1') { p.title = '80분 · 1:1 리얼무브먼트 / 리얼페이스'; changed = true; }
+          var old50 = ['레슨 25분 뒤 돔 25분', '1:1 레슨 25분, 온열 돔 25분. 움직인 뒤를 따뜻하게 마무리합니다.'];
+          var old80 = ['레슨 55분 뒤 돔 25분', '1:1 레슨 55분, 온열 돔 25분. 맞추는 시간이 더 길고, 마무리는 같습니다.'];
+          if (p.title.indexOf('50분') === 0) {
             (p.rows || []).forEach(function (row) {
-              if (row.name === '24회권' && row.recommend && !String(row.save || '').trim()) {
-                row.save = '1회보다 회당 35,000원 적습니다';
+              if (row.name === '24회권' && row.recommend && row.save === '1회보다 회당 7,500원 적습니다') {
+                row.save = '8회권을 세 번 등록하는 것보다 약 6만원 적습니다';
+                changed = true;
+              }
+            });
+          }
+          if (p.title.indexOf('50분') === 0 && old50.indexOf(p.sub) >= 0) {
+            p.sub = '레슨 25분, 온열 돔 25분';
+            p.note = '움직인 뒤를 따뜻하게 마무리합니다.';
+            changed = true;
+          }
+          if (p.title.indexOf('80분') === 0 && old80.indexOf(p.sub) >= 0) {
+            p.sub = '레슨 55분, 온열 돔 25분';
+            p.note = '프리미엄 집중 레슨으로 진행합니다.';
+            changed = true;
+          }
+          if (p.title.indexOf('80분') === 0) {
+            (p.rows || []).forEach(function (row) {
+              if (row.name !== '24회권') return;
+              var oldSave = row.save === '8회를 세 번 사는 것보다 약 22만원 적습니다' || row.save === '8회권을 세 번 등록하는 것보다 약 22만원 적습니다';
+              if (row.total === '164만원' || oldSave) {
+                row.total = '174만원';
+                row.unit = '회당 7.25만원';
+                row.save = '8회권을 세 번 등록하는 것보다 약 12만원 적습니다';
                 changed = true;
               }
             });
@@ -8323,12 +8406,6 @@
         if (changed) {
           try { localStorage.setItem(PRICE_CARD_KEY, JSON.stringify(saved)); } catch (eSave) {}
         }
-        (saved.incheon.programs || []).forEach(function (p) {
-          if (p.title === '50분 · 1:1') p.title = '50분 · 1:1 리얼무브먼트 / 리얼페이스';
-          if (p.title === '80분 · 1:1') p.title = '80분 · 1:1 리얼무브먼트 / 리얼페이스';
-          if (p.sub === '레슨 25분 뒤 돔 25분') p.sub = '1:1 레슨 25분, 온열 돔 25분. 움직인 뒤를 따뜻하게 마무리합니다.';
-          if (p.sub === '레슨 55분 뒤 돔 25분') p.sub = '1:1 레슨 55분, 온열 돔 25분. 맞추는 시간이 더 길고, 마무리는 같습니다.';
-        });
         return saved;
       }
     } catch (e) {}
@@ -8362,7 +8439,8 @@
         '<button type="button" class="btn-sm" data-act="del-prog">프로그램 빼기</button></div>' +
         '<div class="price-grid">' +
         priceField_('title', '제목', prog.title, true) +
-        priceField_('sub', '제목 아래 한 줄', prog.sub, true) +
+        priceField_('note', '윗줄', prog.note || '', true) +
+        priceField_('sub', '제목 옆', prog.sub, true) +
         '</div>';
       prog.rows.forEach(function (row, ri) {
         html += '<div class="price-row" data-row="' + ri + '">' +
@@ -8408,6 +8486,7 @@
       programs.push({
         title: (prog.querySelector('[data-k="title"]') || {}).value || '',
         sub: (prog.querySelector('[data-k="sub"]') || {}).value || '',
+        note: (prog.querySelector('[data-k="note"]') || {}).value || '',
         rows: rows
       });
     });
@@ -8428,9 +8507,9 @@
       (row.unit ? '<span class="pcard-unit">' + escPrice_(row.unit) + '</span>' : '') + '</div>';
     var name = escPrice_(row.name);
     if (row.recommend) {
-      return '<div class="pcard-rec"><div class="pcard-line" style="padding:0"><div class="pcard-name"><span class="pcard-badge">추천</span>' + name +
-        '</div>' + money + '</div>' +
-        (row.save ? '<p class="pcard-save">' + escPrice_(row.save) + '</p>' : '') + '</div>';
+      return '<div class="pcard-rec"><div class="pcard-line" style="padding:0"><div class="pcard-name"><span class="pcard-badge">추천</span><span>' + name + '</span>' +
+        (row.save ? '<span class="pcard-save">' + escPrice_(row.save) + '</span>' : '') +
+        '</div>' + money + '</div></div>';
     }
     return '<div class="pcard-line"><div class="pcard-name">' + name + '</div>' + money + '</div>';
   }
@@ -8442,19 +8521,26 @@
     var footBits = String(card.foot || '').split('|');
     var foot = escPrice_(footBits[0].trim()) + (footBits.length > 1 ? ' <span>| ' + escPrice_(footBits.slice(1).join('|').trim()) + '</span>' : '');
     var pace = escPrice_(card.pace || '').replace(/\n/g, '<br>');
-    var html = priceLogoSvg_() +
-      '<p class="pcard-script">Re &amp; Alignment</p><div class="pcard-rule"></div>' +
-      '<div class="pcard-anchor"><p class="pcard-kicker">SIGNATURE CARE</p>' +
+    var html = '<div class="pcard-logo-block">' + priceLogoSvg_() +
+      '<p class="pcard-script">Re &amp; Alignment</p><div class="pcard-rule"></div></div>' +
+      '<div class="pcard-sig-slot"><div class="pcard-anchor"><p class="pcard-kicker">SIGNATURE CARE</p>' +
       '<div class="pcard-sig"><div class="pcard-sig-name">' + escPrice_(card.sigName) + '</div><div class="pcard-sig-note">' + escPrice_(card.sigNote) + '</div></div>' +
-      '<div class="pcard-line"><div class="pcard-name">' + escPrice_(card.sigItem) + '</div><div class="pcard-money"><span class="pcard-total">' + escPrice_(card.sigPrice) + '</span></div></div></div>';
+      '<div class="pcard-line"><div class="pcard-name">' + escPrice_(card.sigItem) + '</div><div class="pcard-money"><span class="pcard-total">' + escPrice_(card.sigPrice) + '</span></div></div></div></div>';
+    html += '<div class="pcard-progs">';
     (card.programs || []).forEach(function (prog) {
-      html += '<section class="pcard-prog"><h2>' + escPrice_(prog.title) + '</h2>' +
-        (prog.sub ? '<p class="pcard-sub">' + escPrice_(prog.sub) + '</p>' : '');
+      var titleLine = '<div class="pcard-titleline"><h2>' + escPrice_(prog.title) + '</h2>' +
+        (prog.sub ? '<span class="pcard-aside">' + escPrice_(prog.sub) + '</span>' : '') + '</div>';
+      var head = prog.sub ? titleLine : ('<h2>' + escPrice_(prog.title) + '</h2>');
+      if (prog.note) head = '<p class="pcard-lead">' + escPrice_(prog.note) + '</p>' + titleLine;
+      html += '<section class="pcard-prog">' + head;
       (prog.rows || []).forEach(function (row) { html += priceRowHtml_(row); });
       html += '</section>';
     });
-    html += '<div class="pcard-bottom">';
+    html += '</div>';
+    html += '<div class="pcard-mid">';
     if (pace) html += '<p class="pcard-pace">' + pace + '</p>';
+    html += '</div>';
+    html += '<div class="pcard-bottom">';
     if (card.notes && card.notes.length) {
       html += '<ul class="pcard-merits">' + card.notes.map(function (line) {
         return '<li>' + escPrice_(line) + '</li>';
@@ -8465,11 +8551,46 @@
     box.innerHTML = html;
     fitPriceSheet_();
   }
+  function placePriceRegions_() {
+    var card = $('priceCard');
+    if (!card) return;
+    var logo = card.querySelector('.pcard-logo-block');
+    var sig = card.querySelector('.pcard-sig-slot');
+    var progs = card.querySelector('.pcard-progs');
+    var mid = card.querySelector('.pcard-mid');
+    var bottom = card.querySelector('.pcard-bottom');
+    var secs = card.querySelectorAll('.pcard-prog');
+    var prog2 = secs[1] || secs[0];
+    if (!logo || !sig || !progs || !mid || !bottom || !prog2) return;
+    sig.style.flex = '0 0 auto';
+    sig.style.height = 'auto';
+    mid.style.flex = '0 0 auto';
+    mid.style.height = 'auto';
+    var cs = window.getComputedStyle(card);
+    var padT = parseFloat(cs.paddingTop) || 0;
+    var padB = parseFloat(cs.paddingBottom) || 0;
+    var inner = card.clientHeight - padT - padB;
+    var mark = prog2.querySelector('h2') || prog2;
+    var y = 0;
+    var node = mark;
+    while (node && node !== card) {
+      y += node.offsetTop;
+      node = node.offsetParent;
+    }
+    var delta = Math.round(card.clientHeight / 2 - (y + mark.offsetHeight / 2));
+    var free = inner - logo.offsetHeight - sig.offsetHeight - progs.offsetHeight - mid.offsetHeight - bottom.offsetHeight;
+    if (free < 0) free = 0;
+    if (delta < 0) delta = 0;
+    if (delta > free) delta = free;
+    sig.style.height = (sig.offsetHeight + delta) + 'px';
+    mid.style.height = (mid.offsetHeight + (free - delta)) + 'px';
+  }
   function fitPriceSheet_() {
     var fit = $('priceFit');
     var sheet = $('priceSheet');
     if (!fit || !sheet || !fit.clientWidth) return;
     sheet.style.transform = 'none';
+    placePriceRegions_();
     var natural = sheet.offsetWidth || 1;
     var scale = fit.clientWidth / natural;
     if (!scale || scale > 1) scale = 1;
@@ -8561,7 +8682,7 @@
       var ri = row ? Number(row.getAttribute('data-row')) : -1;
       var programs = priceCards[priceBranch].programs;
       var act = btn.getAttribute('data-act');
-      if (act === 'add-prog') programs.push({ title: '', sub: '', rows: [{ name: '', total: '', unit: '', save: '', recommend: false }] });
+      if (act === 'add-prog') programs.push({ title: '', sub: '', note: '', rows: [{ name: '', total: '', unit: '', save: '', recommend: false }] });
       if (act === 'del-prog' && pi >= 0) programs.splice(pi, 1);
       if (act === 'add-row' && programs[pi]) programs[pi].rows.push({ name: '', total: '', unit: '', save: '', recommend: false });
       if (act === 'del-row' && programs[pi]) programs[pi].rows.splice(ri, 1);
@@ -8913,27 +9034,27 @@
         kicker: '리얼무브먼트',
         program: '힐스테이트 자이 계양',
         hook: '커뮤니티 프로그램 제안',
-        lead: '한 자세로 지속하면, 어깨나 허리 근육이 뭉칩니다. 폼롤러와 소도구로 뭉친 근육을 풀고, 스트레칭과 바른 자세까지 스스로 잡는 법을 배웁니다.\n4주 과정으로, 집에서도 같은 순서로 진행하시면 셀프 통증 케어에 많은 도움이 됩니다.',
+        lead: '어깨나 허리 근육이 뭉칩니다. 폼롤러와 소도구로 뭉친 근육을 풀고, 스트레칭과 바른 자세까지 스스로 잡는 법을 배웁니다.\n4주 과정으로, 집에서도 같은 순서로 진행하시면 셀프 통증 케어에 많은 도움이 됩니다.',
         facts: [
           { b: '주 2회 · 4주', s: '총 8회, 커뮤니티 그룹운동실' },
-          { b: '한 회 50분', s: '자극 · 스트레칭 · 바른 자세' },
+          { b: '50분 진행', s: '자극 · 스트레칭 · 바른 자세' },
           { b: '6~8명', s: '근골격계 전문강사가 진행합니다' }
         ],
         photoCap: '',
         meritTitle: '이 수업을 통해서',
         merits: [
-          { h: '집에서도 할 수 있는 셀프케어를 배웁니다', p: '배운 순서를 홈트해보세요. 뭉친 허리와 어깨를 같은 방법으로 풀어갑니다.' },
-          { h: '셀프케어에도 순서가 있습니다', p: '폼롤러와 소도구로 풀고, 스트레칭 다음 바른 자세를 잡습니다.' },
-          { h: '근골격계 전문가가 동작을 바로잡아줍니다', p: '아프면 멈춰야 하는 곳도 알려 줍니다.' }
+          { h: '집에서도 할 수 있는 셀프케어 방법을 배웁니다', p: '뭉친 허리와 어깨를 스스로 관리할 수 있어요.' },
+          { h: '셀프케어에도 순서가 있습니다', p: '자극하고 스트레칭, 그 다음 바른 자세로 유지합니다.' },
+          { h: '근골격계 전문가가 동작을 바로잡아줍니다', p: '안전하게 진행! 아프면 멈춰야 하는 지점도 알려드려요.' }
         ],
-        meritFoot: '8회가 끝나도, 집에서 계속 하면 가벼운 근골격계 통증을 케어하는 데 큰 도움이 됩니다.',
+        meritFoot: '8회가 끝나도, 집에서 꾸준히 하면 가벼운 근골격계 통증을 케어하는 데 큰 도움이 됩니다.',
         weeks: [
-          { d: '1주', h: '누워서', why: '가장 안전하게 시작할 수 있는 자세입니다.', gain: '부상 위험을 최대한 줄여, 누구나 쉽게 시작합니다.' },
-          { d: '2주', h: '앉아서', why: '바르게 앉는 자세와 스트레칭을 배웁니다.', gain: '앉아 있는 시간이 많은 분도, 그날 바로 쓸 수 있습니다.' },
-          { d: '3주', h: '바르게 서서', why: '설 때와 걸을 때도 같은 자세를 유지합니다.', gain: '오래 서 있는 분도, 그 자리에서 바로 쓸 수 있습니다.' },
-          { d: '4주', h: '전신', why: '풀었던 곳을 전신 한 순서로 잇습니다.', gain: '4주가 끝나면 집에서도 혼자 같은 순서로 합니다.' }
+          { d: '1주', h: '누워서', why: '가장 안전하게 시작할 수 있는 자세입니다.', gain: '부상 위험을 최대한 줄여, 누구나 안전하게 시작합니다.' },
+          { d: '2주', h: '앉아서', why: '바르게 앉는 자세와 스트레칭을 배웁니다.', gain: '앉아 있는 시간이 많은 분이라면, 그날 바로 적용해 볼 수 있습니다.' },
+          { d: '3주', h: '바르게 서서', why: '설 때와 걸을 때도 바른 자세를 유지합니다.', gain: '오래 서 있는 분이라면, 필수적으로 적용해보세요.' },
+          { d: '4주', h: '전신', why: '부분적으로 풀었던 곳을 전신으로 엮는 시간입니다.', gain: '4주가 끝나면 집에서도 스스로 할 수 있게 됩니다.' }
         ],
-        beatTitle: '한 회 50분',
+        beatTitle: '한 회 50분 진행',
         beats: [
           { t: '셀프 자극', h: '폼롤러와 공으로 뭉친 부위를 자극합니다' },
           { t: '스트레칭', h: '자극한 부위를 아프지 않은 범위만큼 늘립니다' },
@@ -9051,7 +9172,33 @@
     return S[key] == null ? '' : String(S[key]);
   }
   function planApplySheetEdits_(sheet) {
-    var bag = planSheetEdits_()[planPosterBrand] || {};
+    var all = planSheetEdits_();
+    var bag = all[planPosterBrand] || {};
+    var stale = {
+      lead: '한 자세로 지속하면, 어깨나 허리 근육이 뭉칩니다. 폼롤러와 소도구로 뭉친 근육을 풀고, 스트레칭과 바른 자세까지 스스로 잡는 법을 배웁니다.\n4주 과정으로, 집에서도 같은 순서로 진행하시면 셀프 통증 케어에 많은 도움이 됩니다.',
+      'fact.1.b': '한 회 50분',
+      beatTitle: '한 회 50분',
+      'merit.0.h': '집에서도 할 수 있는 셀프케어를 배웁니다',
+      'merit.0.p': '배운 순서를 홈트해보세요. 뭉친 허리와 어깨를 같은 방법으로 풀어갑니다.',
+      'merit.1.p': ['폼롤러와 소도구로 풀고, 스트레칭 다음 바른 자세를 잡습니다.', '스트레칭, 그 다음 바른 자세로 유지합니다.'],
+      'merit.2.p': ['아프면 멈춰야 하는 곳도 알려 줍니다.', '안전하게 진행! 아프면 멈춰야~'],
+      meritFoot: '8회가 끝나도, 집에서 계속 하면 가벼운 근골격계 통증을 케어하는 데 큰 도움이 됩니다.',
+      'week.0.gain': '부상 위험을 최대한 줄여, 누구나 쉽게 시작합니다.',
+      'week.1.gain': '앉아 있는 시간이 많은 분도, 그날 바로 쓸 수 있습니다.',
+      'week.2.why': '설 때와 걸을 때도 같은 자세를 유지합니다.',
+      'week.2.gain': '오래 서 있는 분도, 그 자리에서 바로 쓸 수 있습니다.',
+      'week.3.why': '풀었던 곳을 전신 한 순서로 잇습니다.',
+      'week.3.gain': '4주가 끝나면 집에서도 혼자 같은 순서로 합니다.'
+    };
+    var dropped = false;
+    Object.keys(stale).forEach(function (k) {
+      var olds = Array.isArray(stale[k]) ? stale[k] : [stale[k]];
+      if (olds.indexOf(bag[k]) >= 0) { delete bag[k]; dropped = true; }
+    });
+    if (dropped) {
+      all[planPosterBrand] = bag;
+      try { localStorage.setItem(PLAN_SHEET_EDIT_KEY, JSON.stringify(all)); } catch (eDrop) {}
+    }
     var next = JSON.parse(JSON.stringify(sheet || {}));
     function put(key, apply) {
       if (Object.prototype.hasOwnProperty.call(bag, key)) apply(bag[key]);
@@ -9567,6 +9714,10 @@
     $('planDownload').hidden = showPoster;
     var sched = $('planSchedule');
     if (sched) sched.hidden = !!item.example;
+    var hillSched = planCurrentId === 'community-8';
+    document.querySelectorAll('#planSchedule [data-sched]').forEach(function (el) {
+      el.hidden = hillSched ? el.getAttribute('data-sched') === 'contact' : el.getAttribute('data-sched') === 'size';
+    });
     var kick = document.querySelector('#planProgram .plan-week-pane[data-week="all"] .plan-kicker');
     if (kick) kick.textContent = item.example ? '프로그램 · 리얼무브먼트 · 예시' : '프로그램 · 힐자계 그룹 운동';
     document.querySelectorAll('#planSwitch button').forEach(function (b) {
@@ -9591,8 +9742,16 @@
   }
   function fillPlanMeta() {
     var meta = planMeta();
+    var defaults = planCurrentId === 'community-8' ? {
+      placeName: '힐스테이트자이 계양',
+      days: '일주일에 2회',
+      time: '한 회 50분 진행',
+      room: '커뮤니티 그룹운동실',
+      size: '6~8명'
+    } : {};
     document.querySelectorAll('#planProposal input[data-k]').forEach(function (input) {
       if (meta[input.dataset.k]) input.value = meta[input.dataset.k];
+      else if (!input.value && defaults[input.dataset.k]) input.value = defaults[input.dataset.k];
     });
   }
   function savePlanMeta() {
@@ -9766,6 +9925,24 @@
       whoH = 208;
       if (photoH + extraWho < 430) photoH += extraWho;
     }
+    var weekMeasure = S.weeks || [];
+    var weekWw = (inner - 12 * (Math.max(weekMeasure.length, 1) - 1)) / Math.max(weekMeasure.length, 1);
+    var weekBlock = 0;
+    weekMeasure.forEach(function (w) {
+      if (!w.gain) return;
+      var titleN = fontWrap(w.h, '800 24px Pretendard, sans-serif', weekWw - 32).slice(0, 2).length;
+      var whyN = fontWrap(w.why || '', '500 18px Pretendard, sans-serif', weekWw - 32).slice(0, 3).length;
+      var gainN = fontWrap(w.gain || '', '500 18px Pretendard, sans-serif', weekWw - 32).slice(0, 3).length;
+      var blockH = 20 + titleN * 28 + 8 + 18 + whyN * 22 + 10 + gainN * 22;
+      if (blockH > weekBlock) weekBlock = blockH;
+    });
+    if (weekBlock) {
+      var weekFit = 6 + weekBlock + 36;
+      if (weekFit < weekH) {
+        photoH += weekH - weekFit;
+        weekH = weekFit;
+      }
+    }
     var photoW = Math.round(inner * 0.36);
     var meritX = pad + photoW + 14;
     var meritW = inner - photoW - 14;
@@ -9785,12 +9962,12 @@
     ctx.restore();
     rrect(meritX, y, meritW, photoH, 14, '#FFFCF8');
     var meritTitle = S.meritTitle || '이 수업을 하면';
-    paint([meritTitle], meritX + 22, y + 16, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
-    hit('meritTitle', meritTitle, meritX + 18, y + 12, meritW - 36, 30);
+    paint([meritTitle], meritX + 22, y + 32, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
+    hit('meritTitle', meritTitle, meritX + 18, y + 28, meritW - 36, 30);
     var merits = S.merits || [];
-    var meritTop = y + 54;
+    var meritTop = y + 88;
     var meritFootH = S.meritFoot ? 70 : 16;
-    var meritRoom = photoH - 54 - meritFootH - 8;
+    var meritRoom = photoH - 88 - meritFootH - 8;
     var slot = meritRoom / Math.max(merits.length, 1);
     merits.forEach(function (m, i) {
       var rowY = meritTop + i * slot;
@@ -9835,23 +10012,31 @@
       rrect(x, y, ww, weekH, 14, '#FFFCF8');
       ctx.fillStyle = '#C4A056';
       ctx.fillRect(x, y, ww, 6);
-      paint([w.d], x + 16, y + 16, 18, '#A6844A', '800 15px Pretendard, sans-serif');
-      hit('week.' + i + '.d', w.d, x + 12, y + 14, ww - 24, 18);
       var titleLines = fontWrap(w.h, '800 24px Pretendard, sans-serif', ww - 32).slice(0, 2);
-      paint(titleLines, x + 16, y + 36, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
-      hit('week.' + i + '.h', w.h, x + 12, y + 34, ww - 24, titleLines.length * 28);
       if (w.gain) {
         var whyLines = fontWrap(w.why || '', weekBody, ww - 32).slice(0, 3);
         var gainLines = fontWrap(w.gain || '', weekBody, ww - 32).slice(0, 3);
-        var whyY = y + 36 + titleLines.length * 28 + 10;
-        paint(['이유'], x + 16, whyY, 18, '#A6844A', '800 14px Pretendard, sans-serif');
-        paint(whyLines, x + 16, whyY + 18, 22, '#243044', weekBody);
-        hit('week.' + i + '.why', w.why, x + 12, whyY + 16, ww - 24, Math.max(whyLines.length, 1) * 22);
-        var gainTop = whyY + 18 + whyLines.length * 22 + 12;
-        paint(['이점'], x + 16, gainTop, 18, '#A6844A', '800 14px Pretendard, sans-serif');
-        paint(gainLines, x + 16, gainTop + 20, 22, '#243044', weekBody);
-        hit('week.' + i + '.gain', w.gain, x + 12, gainTop + 18, ww - 24, Math.max(gainLines.length, 1) * 22);
+        var blockH = 20 + titleLines.length * 28 + 8 + 18 + whyLines.length * 22 + 10 + gainLines.length * 22;
+        var topPad = Math.max(12, Math.round((weekH - 6 - blockH) / 2));
+        var cy = y + 6 + topPad;
+        paint([w.d], x + 16, cy, 18, '#A6844A', '800 15px Pretendard, sans-serif');
+        hit('week.' + i + '.d', w.d, x + 12, cy - 2, ww - 24, 18);
+        cy += 20;
+        paint(titleLines, x + 16, cy, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
+        hit('week.' + i + '.h', w.h, x + 12, cy - 2, ww - 24, titleLines.length * 28);
+        cy += titleLines.length * 28 + 8;
+        paint(['좋은점'], x + 16, cy, 18, '#A6844A', '800 14px Pretendard, sans-serif');
+        cy += 18;
+        paint(whyLines, x + 16, cy, 22, '#243044', weekBody);
+        hit('week.' + i + '.why', w.why, x + 12, cy - 2, ww - 24, Math.max(whyLines.length, 1) * 22);
+        cy += whyLines.length * 22 + 10;
+        paint(gainLines, x + 16, cy, 22, '#243044', weekBody);
+        hit('week.' + i + '.gain', w.gain, x + 12, cy - 2, ww - 24, Math.max(gainLines.length, 1) * 22);
       } else {
+        paint([w.d], x + 16, y + 16, 18, '#A6844A', '800 15px Pretendard, sans-serif');
+        hit('week.' + i + '.d', w.d, x + 12, y + 14, ww - 24, 18);
+        paint(titleLines, x + 16, y + 36, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
+        hit('week.' + i + '.h', w.h, x + 12, y + 34, ww - 24, titleLines.length * 28);
         var pl = fontWrap(w.p || w.why || '', weekBody, ww - 32).slice(0, 6);
         paint(pl, x + 16, y + 100, 24, '#243044', weekBody);
         hit('week.' + i + '.p', w.p || w.why, x + 12, y + 98, ww - 24, Math.max(pl.length, 1) * 24);
@@ -9876,31 +10061,41 @@
     var colW = (inner - 14) / 2;
     rrect(pad, y, colW, whoH, 14, '#FFFCF8');
     rrect(pad + colW + 14, y, colW, whoH, 14, '#FFFCF8');
-    paint([S.whoTitle || '이런 분께'], pad + 18, y + 12, 30, '#1B2A4A', '800 26px Pretendard, sans-serif');
-    hit('whoTitle', S.whoTitle || '이런 분께', pad + 14, y + 10, colW - 28, 30);
     var whoList = S.who || [];
-    var whoY = y + 48;
-    whoList.forEach(function (line, i) {
+    var whoBlocks = whoList.map(function (line) {
+      return fontWrap(line, '600 24px Pretendard, sans-serif', colW - 62).slice(0, 2);
+    });
+    var whoBody = 0;
+    whoBlocks.forEach(function (wl, i) {
+      whoBody += Math.max(wl.length, 1) * 32 + (i < whoBlocks.length - 1 ? 8 : 0);
+    });
+    var whoBlock = 30 + 8 + whoBody;
+    var whoTop = y + Math.max(14, Math.round((whoH - whoBlock) / 2));
+    paint([S.whoTitle || '이런 분께'], pad + 18, whoTop, 30, '#1B2A4A', '800 26px Pretendard, sans-serif');
+    hit('whoTitle', S.whoTitle || '이런 분께', pad + 14, whoTop - 2, colW - 28, 30);
+    var whoY = whoTop + 38;
+    whoBlocks.forEach(function (wl, i) {
       ctx.fillStyle = '#C4A056';
       ctx.beginPath();
       ctx.arc(pad + 30, whoY + 14, 7, 0, Math.PI * 2);
       ctx.fill();
-      var wl = fontWrap(line, '600 24px Pretendard, sans-serif', colW - 62).slice(0, 2);
       paint(wl, pad + 46, whoY, 32, '#1B2A4A', '600 24px Pretendard, sans-serif');
-      hit('who.' + i, line, pad + 42, whoY, colW - 56, Math.max(wl.length, 1) * 32);
+      hit('who.' + i, whoList[i], pad + 42, whoY, colW - 56, Math.max(wl.length, 1) * 32);
       whoY += Math.max(wl.length, 1) * 32 + 8;
     });
     var tx = pad + colW + 14;
-    paint(['진행'], tx + 18, y + 12, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
-    paint([S.teacher || ''], tx + 18, y + 42, 32, '#1B2A4A', '800 28px Pretendard, sans-serif');
-    hit('teacher', S.teacher, tx + 14, y + 40, colW - 28, 32);
-    paint([S.teacherLine || ''], tx + 18, y + 76, 22, '#8A5A32', '700 18px Pretendard, sans-serif');
-    hit('teacherLine', S.teacherLine, tx + 14, y + 74, colW - 28, 22);
     var tb = fontWrap(S.teacherBody || '', '500 18px Pretendard, sans-serif', colW - 36).slice(0, 3);
-    paint(tb, tx + 18, y + 102, 24, '#243044', '500 18px Pretendard, sans-serif');
-    hit('teacherBody', S.teacherBody, tx + 14, y + 100, colW - 28, Math.max(tb.length, 1) * 24);
     var sp = fontWrap(S.space || '', '600 18px Pretendard, sans-serif', colW - 36).slice(0, 2);
-    var spY = y + 102 + tb.length * 24 + 6;
+    var teachBlock = 96 + tb.length * 24 + sp.length * 22;
+    var teachTop = y + Math.max(12, Math.round((whoH - teachBlock) / 2));
+    paint(['진행'], tx + 18, teachTop, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
+    paint([S.teacher || ''], tx + 18, teachTop + 30, 32, '#1B2A4A', '800 28px Pretendard, sans-serif');
+    hit('teacher', S.teacher, tx + 14, teachTop + 28, colW - 28, 32);
+    paint([S.teacherLine || ''], tx + 18, teachTop + 64, 22, '#8A5A32', '700 18px Pretendard, sans-serif');
+    hit('teacherLine', S.teacherLine, tx + 14, teachTop + 62, colW - 28, 22);
+    paint(tb, tx + 18, teachTop + 90, 24, '#243044', '500 18px Pretendard, sans-serif');
+    hit('teacherBody', S.teacherBody, tx + 14, teachTop + 88, colW - 28, Math.max(tb.length, 1) * 24);
+    var spY = teachTop + 90 + tb.length * 24 + 6;
     paint(sp, tx + 18, spY, 22, '#5C4A38', '600 18px Pretendard, sans-serif');
     hit('space', S.space, tx + 14, spY, colW - 28, Math.max(sp.length, 1) * 22);
     y += whoH + sectionGap;
@@ -9910,12 +10105,15 @@
     ctx.fillStyle = '#C4A056';
     ctx.fillRect(pad, y, 6, sh);
     paint(['일정'], pad + 22, y + 14, 24, '#1B2A4A', '800 20px Pretendard, sans-serif');
+    var hillSched = planCurrentId === 'community-8';
     var meta = [
-      ['아파트', planField('placeName'), '이름을 적어 주세요'],
-      ['요일', planField('days'), '요일 협의'],
-      ['시간', planField('time'), '한 회 50분'],
-      ['장소', planField('room'), '커뮤니티 룸'],
-      ['회신', planField('contact'), '요일과 인원을 회신'],
+      ['아파트', planField('placeName') || (hillSched ? '힐스테이트자이 계양' : ''), '이름을 적어 주세요'],
+      ['요일', planField('days') || (hillSched ? '일주일에 2회' : ''), '요일 협의'],
+      ['시간', planField('time') || (hillSched ? '한 회 50분 진행' : ''), '한 회 50분'],
+      ['장소', planField('room') || (hillSched ? '커뮤니티 그룹운동실' : ''), '커뮤니티 룸'],
+      hillSched
+        ? ['인원', planField('size') || '6~8명', '6~8명']
+        : ['회신', planField('contact'), '요일과 인원을 회신'],
       ['수강료', planField('fee'), '일정 뒤 협의']
     ];
     var cellW = (inner - 44) / 3;
