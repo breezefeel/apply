@@ -1500,34 +1500,6 @@
     </nav>
 
     <div id="panelConsult" class="panel active">
-      <section class="card no-print" id="posterCard" hidden>
-        <div class="reply-label"><span>포스터 만들기</span></div>
-        <p class="cert-lead">일정과 수강료를 입력하면, 선택한 과정 색으로 두 장 포스터가 만들어집니다.</p>
-        <div class="chips poster-tracks" id="posterTracks"></div>
-        <div class="cert-fields" id="posterFields">
-          <label class="span2"><span>일정 한 줄</span><input data-k="ribbon" autocomplete="off"></label>
-          <label class="span2"><span>날짜</span><input data-k="date" autocomplete="off"></label>
-          <label><span>시간</span><input data-k="time" autocomplete="off"></label>
-          <label><span>장소</span><input data-k="place" autocomplete="off"></label>
-          <label><span>정가</span><input data-k="price" autocomplete="off"></label>
-          <label><span>얼리버드</span><input data-k="early" autocomplete="off"></label>
-          <label><span>추가 할인 이름</span><input data-k="extraLabel" autocomplete="off" placeholder="없으면 비움"></label>
-          <label><span>추가 할인 금액</span><input data-k="extraPrice" autocomplete="off" placeholder="없으면 비움"></label>
-          <label class="span2"><span>수강료 안내</span><input data-k="note" autocomplete="off"></label>
-        </div>
-        <div class="poster-actions">
-          <button type="button" class="btn btn-print" id="btnPosterSaveAll">이미지 저장</button>
-        </div>
-        <div class="poster-actions">
-          <button type="button" class="btn btn-ghost" id="btnPosterSave1">1쪽 PNG</button>
-          <button type="button" class="btn btn-ghost" id="btnPosterSave2">2쪽 PNG</button>
-        </div>
-        <p class="cert-note" id="posterStatus">미리보기입니다. 이미지 저장을 누르면 PNG 파일로 받아집니다.</p>
-        <div class="poster-preview" id="posterPreview">
-          <canvas id="posterCanvas1" width="1080" height="1528"></canvas>
-          <canvas id="posterCanvas2" width="1080" height="1528"></canvas>
-        </div>
-      </section>
       <section class="card no-print" id="faqCard">
         <div class="reply-label">
           <span>FAQ</span>
@@ -1601,6 +1573,34 @@
           <button type="button" class="btn btn-print" id="btnSmsSend">보내기</button>
         </div>
         <p class="ocr-status" id="smsStatus"></p>
+      </section>
+      <section class="card no-print" id="posterCard" hidden>
+        <div class="reply-label"><span>포스터 만들기</span></div>
+        <p class="cert-lead">일정과 수강료를 입력하면, 선택한 과정 색으로 두 장 포스터가 만들어집니다.</p>
+        <div class="chips poster-tracks" id="posterTracks"></div>
+        <div class="cert-fields" id="posterFields">
+          <label class="span2"><span>일정 한 줄</span><input data-k="ribbon" autocomplete="off"></label>
+          <label class="span2"><span>날짜</span><input data-k="date" autocomplete="off"></label>
+          <label><span>시간</span><input data-k="time" autocomplete="off"></label>
+          <label><span>장소</span><input data-k="place" autocomplete="off"></label>
+          <label><span>정가</span><input data-k="price" autocomplete="off"></label>
+          <label><span>얼리버드</span><input data-k="early" autocomplete="off"></label>
+          <label><span>추가 할인 이름</span><input data-k="extraLabel" autocomplete="off" placeholder="없으면 비움"></label>
+          <label><span>추가 할인 금액</span><input data-k="extraPrice" autocomplete="off" placeholder="없으면 비움"></label>
+          <label class="span2"><span>수강료 안내</span><input data-k="note" autocomplete="off"></label>
+        </div>
+        <div class="poster-actions">
+          <button type="button" class="btn btn-print" id="btnPosterSaveAll">이미지 저장</button>
+        </div>
+        <div class="poster-actions">
+          <button type="button" class="btn btn-ghost" id="btnPosterSave1">1쪽 PNG</button>
+          <button type="button" class="btn btn-ghost" id="btnPosterSave2">2쪽 PNG</button>
+        </div>
+        <p class="cert-note" id="posterStatus">미리보기입니다. 이미지 저장을 누르면 PNG 파일로 받아집니다.</p>
+        <div class="poster-preview" id="posterPreview">
+          <canvas id="posterCanvas1" width="1080" height="1528"></canvas>
+          <canvas id="posterCanvas2" width="1080" height="1528"></canvas>
+        </div>
       </section>
       <section class="card no-print" id="certPanel" hidden>
         <div class="reply-label"><span>수료증 발급</span></div>
@@ -2755,7 +2755,7 @@
       '스케줄 변동 없이 참여하시는지 확인 부탁드립니다.',
       '일정이 어려우시면 오늘 저녁까지는 알려 주세요.',
       '',
-      '수업 전에 사전 영상과 이전 실습 영상을 시청해 주시고요.',
+      '수업 전에 사전 영상을 시작해 주세요. 시작하셨는지도 답장으로 알려 주세요.',
       url,
       '',
       '교육에서 뵙겠습니다.',
@@ -6005,13 +6005,24 @@
         '안녕하세요. IFC 얼굴교정 과정입니다.',
         '',
         'IFC 전문가 과정 오프라인 수업이 3주 앞으로 다가왔습니다.',
-        '이번 수업에는 사전 과제가 있어 준비 시간이 필요하니, 지금부터 DAY 0 \'얼굴 해부학\' 영상을 시청해 주시기를 꼭 권해드립니다.',
+        '사전 과제가 있어 준비 시간이 필요합니다. 지금부터 DAY 0 얼굴 해부학 영상을 시청해 주세요.',
+        smsVideoUrl(),
         '',
-        '■ 과제 예시',
+        '궁금하신 점은 이 문자로 답장해 주세요.',
+        '감사합니다.'
+      ].join('\n') });
+      list.push({ id: 'twoWeek', label: '2주 전', text: [
+        '안녕하세요. IFC 얼굴교정 과정입니다.',
+        '',
+        '오프라인 수업이 2주 남았습니다.',
+        '얼굴 해부학은 지금부터 시작해야 현장 실습을 따라가실 수 있습니다.',
+        '',
+        '영상을 시작하셨는지, 과제를 올리는 데 어려움은 없으신지 답장으로 알려 주세요.',
+        '',
+        '■ 과제 올리는 방법',
         'https://cafe.naver.com/ifc/127',
         '',
-        '궁금하신 점은 언제든 문의해 주세요.',
-        '감사합니다.'
+        '막히는 곳이 있으면 이 문자로 말씀해 주세요.'
       ].join('\n') });
     }
     if (consultBranch === 'ifc') {
@@ -6055,6 +6066,40 @@
       d3.push('', '일정이 어려우시면 오늘 중으로 알려 주세요.', '', '오는 길', SMS_WAY);
     }
     list.push({ id: 'd3', label: '3일 전', text: d3.join('\n') });
+    var before2 = [
+      '안녕하세요. ' + name + '입니다.',
+      '',
+      '다음 수업 전에 한 가지만 여쭙니다.',
+      '지난 수업에서 다시 해보고 싶은 동작이 있으면 답장으로 알려 주세요.'
+    ];
+    var before3 = [
+      '안녕하세요. ' + name + '입니다.',
+      '',
+      '다음 수업에서 이어서 보겠습니다.',
+      '질문이 있으면 오늘 답장해 주세요.'
+    ];
+    if (consultBranch === 'ifc') {
+      before2 = [
+        '안녕하세요. IFC 얼굴교정입니다.',
+        '',
+        '다음 수업은 25분 수기 시퀀스입니다.',
+        '지난 촉진에서 다시 만져 보고 싶은 곳이 있으면 한 가지만 답장해 주세요.'
+      ];
+      before3 = [
+        '안녕하세요. IFC 얼굴교정입니다.',
+        '',
+        '다음 수업은 괄사와 고주파로 이어집니다.',
+        '손이 피곤하시면 미리 알려 주세요. 범위를 조절하겠습니다.'
+      ];
+    }
+    list.push({ id: 'day2', label: '2회 전', text: before2.join('\n') });
+    list.push({ id: 'day3', label: '3회 전', text: before3.join('\n') });
+    list.push({ id: 'after', label: '다음 날', text: [
+      '안녕하세요. ' + name + '입니다.',
+      '',
+      '어제 수업 후 컨디션은 괜찮으신가요?',
+      '불편한 곳이 있으면 이 문자로 알려 주세요.'
+    ].join('\n') });
     var unpaid = [
       '안녕하세요, IFC 국제얼굴교정학회입니다.',
       '2026년 마지막 과정은 11월 8·22·29일입니다.',
