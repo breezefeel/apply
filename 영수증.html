@@ -1317,20 +1317,21 @@
     flex-direction: column;
     background: #f7f3ec;
     border-radius: 18px;
-    padding: 28px 32px 24px;
+    padding: 22px 32px 18px;
     box-shadow: none;
     color: #2a2622;
     font-family: Pretendard, "Apple SD Gothic Neo", sans-serif;
+    overflow: hidden;
   }
   .pcard-logo { display: flex; justify-content: center; }
   .pcard-logo svg { width: 72px; height: 78px; }
   .pcard-script {
-    margin: 2px 0 0;
+    margin: 0;
     text-align: center;
     font-family: Italianno, "Great Vibes", cursive;
-    font-size: 78px;
+    font-size: 64px;
     font-weight: 400;
-    line-height: 1;
+    line-height: 0.9;
     color: #2f2a26;
   }
   .pcard-rule { height: 1px; background: #d9cfc2; margin: 8px 36px 18px; }
@@ -1346,8 +1347,8 @@
   .pcard-sig-name { font-size: 16px; font-weight: 700; letter-spacing: -.02em; color: #5c554e; }
   .pcard-sig-note { font-size: 13px; color: #8a8178; }
   .pcard-money { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-  .pcard-prog { margin-top: 18px; padding-top: 16px; border-top: 1px solid #e6dccf; }
-  .pcard-prog:first-of-type { margin-top: 48px; padding-top: 28px; }
+  .pcard-prog { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e6dccf; }
+  .pcard-prog:first-of-type { margin-top: 22px; padding-top: 16px; }
   .pcard-prog h2 { margin: 0; font-size: 22px; line-height: 1.35; letter-spacing: -.03em; font-weight: 800; }
   .pcard-sub { margin: 6px 0 12px; font-size: 14px; line-height: 1.45; color: #5c5348; }
   .pcard-line { padding: 9px 8px; }
@@ -1364,11 +1365,11 @@
   }
   .pcard-save { margin: 2px 4px 0; font-size: 12px; color: #8d6840; }
   .pcard-bottom {
-    margin-top: 28px;
+    margin-top: 14px;
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 168px;
+    min-height: 0;
   }
   .pcard-pace {
     margin: 0 0 12px;
@@ -8203,8 +8204,8 @@
         sigNote: '정상가',
         sigItem: '시그니처 1회',
         sigPrice: '12.5만원',
-        pace: '주 2회가 적당합니다.\n한 주 쉬어도 횟수는 남습니다.',
-        notes: ['한 번에 한 분입니다. 오늘 컨디션에 맞춰 진행합니다.', '끝나면 집에서 할 동작 하나를 가져갑니다.'],
+        pace: '주 2회가 적당합니다.\n한 주를 쉬어도, 남은 수업은 그대로입니다.',
+        notes: ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 끝난 뒤에도 스스로 유지할 수 있습니다.'],
         foot: '움직임이 편해지는 시간 | REAL MOVEMENT',
         programs: [
           {
@@ -8232,8 +8233,8 @@
         sigNote: '정상가',
         sigItem: '시그니처 1회',
         sigPrice: '12.5만원',
-        pace: '주 2회가 적당합니다.\n한 주 쉬어도 횟수는 남습니다.',
-        notes: ['한 번에 한 분입니다. 오늘 컨디션에 맞춰 진행합니다.', '끝나면 집에서 할 동작 하나를 가져갑니다.'],
+        pace: '주 2회가 적당합니다.\n한 주를 쉬어도, 남은 수업은 그대로입니다.',
+        notes: ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 끝난 뒤에도 스스로 유지할 수 있습니다.'],
         foot: '움직임이 편해지는 시간 | REAL MOVEMENT',
         programs: [
           {
@@ -8262,13 +8263,17 @@
     try {
       var saved = JSON.parse(localStorage.getItem(PRICE_CARD_KEY) || 'null');
       if (saved && saved.yaksu && saved.yaksu.programs && saved.incheon && saved.incheon.programs) {
-        var oldPace = '주 2회를 권합니다.\n매주 두 번을 지키지 못해도 횟수는 남습니다.';
-        var newPace = '주 2회가 적당합니다.\n한 주 쉬어도 횟수는 남습니다.';
-        var defaultNotes = ['한 번에 한 분입니다. 오늘 컨디션에 맞춰 진행합니다.', '끝나면 집에서 할 동작 하나를 가져갑니다.'];
+        var oldPaces = [
+          '주 2회를 권합니다.\n매주 두 번을 지키지 못해도 횟수는 남습니다.',
+          '주 2회가 적당합니다.\n한 주 쉬어도 횟수는 남습니다.'
+        ];
+        var newPace = '주 2회가 적당합니다.\n한 주를 쉬어도, 남은 수업은 그대로입니다.';
+        var oldNotes = ['한 번에 한 분입니다. 오늘 컨디션에 맞춰 진행합니다.', '끝나면 집에서 할 동작 하나를 가져갑니다.'];
+        var newNotes = ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 끝난 뒤에도 스스로 유지할 수 있습니다.'];
         ['yaksu', 'incheon'].forEach(function (key) {
           var card = saved[key];
-          if (card.pace === oldPace) card.pace = newPace;
-          if (!card.notes || !card.notes.length) card.notes = defaultNotes.slice();
+          if (oldPaces.indexOf(card.pace) >= 0) card.pace = newPace;
+          if (!card.notes || !card.notes.length || JSON.stringify(card.notes) === JSON.stringify(oldNotes)) card.notes = newNotes.slice();
         });
         (saved.yaksu.programs || []).forEach(function (p) {
           if (p.title === '70분 · 1:1 리얼 컨디셔닝') p.title = '70분 · 1:1 리얼무브먼트 + 컨디셔닝';
@@ -8866,44 +8871,45 @@
       space: '매트, 폼롤러, 12cm 마사지볼, 의자, 손을 댈 수 있는 벽. 사람 사이는 팔 하나 정도면 됩니다.',
       foot: '리얼무브먼트 · 힐자계 그룹 운동. 수강료는 인원과 일정이 정해진 뒤 위 칸에서 정합니다. 찌릿함, 저림, 최근 다친 부위가 있으면 병원 진료를 먼저 합니다.',
       sheet: {
-        kicker: '아파트 커뮤니티 프로그램 제안',
-        program: '리얼무브먼트',
-        hook: '앉아 있는 하루가 길다면, 바닥에서 같이 움직입니다',
-        lead: '오래 앉은 몸을 바닥에 누워 풀고, 의자에서 움직인 뒤, 벽 옆에서 서는 순서로 잇는 소그룹 수업입니다. 8회가 끝나면 집에서 혼자 하는 10분이 남습니다.',
+        kicker: '리얼무브먼트',
+        program: '힐스테이트 자이 계양',
+        hook: '커뮤니티 프로그램 제안',
+        lead: '오래 앉으면 허리와 어깨가 뭉칩니다. 폼롤러와 공으로 그곳을 풀고, 스트레칭과 바른 자세까지 스스로 하는 법을 배웁니다. 4주가 끝나면 집에서도 같은 순서로 아픈 곳을 돌볼 수 있습니다.',
         facts: [
-          { b: '주 2회 · 4주', s: '총 8회' },
-          { b: '한 회 50분', s: '자극 · 스트레칭 · 기능' },
-          { b: '6~8명', s: '강사 1명이 전원을 봅니다' }
+          { b: '주 2회 · 4주', s: '총 8회, 커뮤니티실' },
+          { b: '한 회 50분', s: '자극 · 스트레칭 · 바른 자세' },
+          { b: '6~8명', s: '근골격계 전문가 강사가 진행합니다' }
         ],
-        photoCap: '창가에서 같이 움직이는 수업',
+        photoCap: '',
         merits: [
-          { h: '따라가기 쉽습니다', p: '같은 동작을 세 번만 합니다. 개수를 늘리지 않습니다.' },
-          { h: '4주가 한 줄입니다', p: '눕기, 앉기, 서기, 집에 남기기로 이어집니다.' },
-          { h: '10분이 남습니다', p: '자극 하나, 스트레칭 하나, 기능 하나를 가져갑니다.' }
+          { h: '집에서도 스스로 풉니다', p: '배운 순서를 집에 가져갑니다. 뭉친 허리와 어깨를 같은 방법으로 돌봅니다.' },
+          { h: '소도구로 순서가 있습니다', p: '폼롤러와 공으로 풀고, 스트레칭으로 늘린 뒤, 바른 자세를 잡습니다.' },
+          { h: '전문가가 옆에서 봐 줍니다', p: '근골격계 전문가가 동작을 고칩니다. 아프면 멈추는 곳도 알려 줍니다.' }
         ],
+        meritFoot: '8회가 끝나면, 집에서도 같은 순서로 합니다.',
         weeks: [
-          { d: '1주', h: '눕기', p: '바닥에 누워 호흡을 맞춥니다. 통증 없는 범위만 열고, 오늘 처음 하는 동작만 설명합니다.' },
-          { d: '2주', h: '앉기', p: '의자와 네 발에서 같은 동작을 세 번 합니다. 지난주에 연 동작은 설명 없이 다시 합니다.' },
-          { d: '3주', h: '서기', p: '벽 옆에서 한 발로 균형을 잡습니다. 좌우로 짧게 세 번, 무리하지 않습니다.' },
-          { d: '4주', h: '남기기', p: '자극 하나, 스트레칭 하나, 기능 하나. 이 순서를 10분으로 집에 가져갑니다.' }
+          { d: '1주', h: '누워서', why: '누우면 허리 힘이 빠져, 처음에도 따라갑니다.', gain: '아픈 범위는 피하고, 오늘 풀 곳만 알게 됩니다.' },
+          { d: '2주', h: '앉아서', why: '평소 앉는 의자에서 같은 동작을 합니다.', gain: '집에 앉아서도 허리와 골반을 풀 수 있습니다.' },
+          { d: '3주', h: '바르게 서서', why: '선 자세에도 남아야 걷고 설 때 힘이 됩니다.', gain: '벽이나 의자를 잡고 바르게 서는 연습입니다.' },
+          { d: '4주', h: '전신', why: '한 곳만 풀면 금방 돌아옵니다.', gain: '집에서도 전신을 한 순서로 반복합니다.' }
         ],
         beatTitle: '한 회 50분',
         beats: [
-          { t: '3분', h: '오늘 단계' },
-          { t: '7분', h: '셀프 자극' },
-          { t: '8분', h: '호흡·스트레칭' },
-          { t: '30분', h: '기능 운동' },
-          { t: '2분', h: '집에 갈 동작' }
+          { t: '셀프 자극', h: '폼롤러와 공으로 뭉친 곳을 엽니다' },
+          { t: '스트레칭', h: '그 부위를 아프지 않은 만큼 늘립니다' },
+          { t: '바른 자세', h: '앉고 설 때 같은 정렬을 잡습니다' },
+          { t: '기능 운동', h: '그 자세로 걷고 서는 동작까지 잇습니다' }
         ],
+        whoTitle: '이런 분께 도움이 됩니다',
         who: [
-          '통증 없이 굳은 느낌으로, 바닥에서 시작하고 싶은 분',
-          '집에서 따라 할 순서를 갖고 싶은 분',
-          '여럿이 해도, 강사 한 명이 전원을 보는 수업'
+          '오래 앉아 허리나 어깨가 자주 뭉치는 분',
+          '헬스장보다, 집에서 혼자 풀 순서가 필요한 분',
+          '바로 세게 운동하기는 부담인 분'
         ],
-        teacher: '박준규',
-        teacherLine: '물리치료사 · 리얼무브먼트',
-        teacherBody: '이마트 컬처클럽, 웰니스 리조트, 전문가 교육에서 움직임 클래스를 진행합니다.',
-        space: '준비: 매트, 폼롤러, 12cm 볼, 의자, 손을 댈 수 있는 벽.',
+        teacher: '이상민 원장',
+        teacherLine: '물리치료사 · 카이로프랙터',
+        teacherBody: '서울아산병원 도수치료과장, 연세척추재활 도수운동치료센터장을 지냈습니다. 폼롤러와 공으로, 집에서도 따라 하는 순서를 알려 드립니다.',
+        space: '준비: 매트, 폼롤러, 12cm 볼 등',
         cta: '가능하신 요일과 인원을 회신해 주시면, 그 일정으로 시작합니다.',
         foot: '수강료는 인원과 일정이 정해진 뒤 정합니다. 찌릿함, 저림, 최근 다친 부위가 있으면 병원 진료를 먼저 합니다.'
       }
@@ -9515,137 +9521,181 @@
       ctx.closePath();
       ctx.clip();
     }
-    var leadFont = '500 20px Pretendard, sans-serif';
-    var leadLines = fontWrap(S.lead || '', leadFont, inner);
-    var headerH = 28 + 24 + 54 + 8 + 28 + 10 + leadLines.length * 28 + 22;
+    var leadFont = '500 24px Pretendard, sans-serif';
+    var leadLines = fontWrap(S.lead || '', leadFont, inner).slice(0, 4);
+    var programFont = '800 48px Pretendard, sans-serif';
+    var programLines = fontWrap(S.program || '', programFont, inner).slice(0, 2);
+    var hookFont = '700 30px Pretendard, sans-serif';
+    var hookLines = fontWrap(S.hook || '', hookFont, inner).slice(0, 2);
+    var headerH = 30 + 26 + programLines.length * 56 + 6 + hookLines.length * 36 + 10 + leadLines.length * 32 + 24;
     ctx.fillStyle = '#1B2A4A';
     ctx.fillRect(0, 0, W, headerH);
     ctx.fillStyle = '#C4A056';
-    ctx.fillRect(0, headerH - 5, W, 5);
-    var y = 26;
-    ctx.letterSpacing = '1.2px';
-    paint([S.kicker || ''], pad, y, 20, '#E4C98A', '700 14px Pretendard, sans-serif');
+    ctx.fillRect(0, headerH - 6, W, 6);
+    var y = 28;
+    ctx.letterSpacing = '1.4px';
+    paint([S.kicker || ''], pad, y, 22, '#E4C98A', '700 16px Pretendard, sans-serif');
     ctx.letterSpacing = '0px';
-    y += 24;
-    paint([S.program || ''], pad, y, 52, '#FFFFFF', '800 44px Pretendard, sans-serif');
-    y += 54;
-    paint([S.hook || ''], pad, y, 26, '#F6E7D2', '600 20px Pretendard, sans-serif');
-    y += 32;
-    paint(leadLines, pad, y, 28, '#E6D5C0', leadFont);
+    y += 26;
+    paint(programLines, pad, y, 56, '#FFFFFF', programFont);
+    y += programLines.length * 56 + 4;
+    paint(hookLines, pad, y, 36, '#F3D48A', hookFont);
+    y += hookLines.length * 36 + 8;
+    paint(leadLines, pad, y, 32, '#F4E6D4', leadFont);
     y = headerH + 16;
     var facts = S.facts || [];
-    var gap = 10;
-    var fw = (inner - gap * (facts.length - 1)) / Math.max(facts.length, 1);
+    var gap = 12;
+    var factH = 92;
+    var fw = (inner - gap * (Math.max(facts.length, 1) - 1)) / Math.max(facts.length, 1);
     facts.forEach(function (f, i) {
       var x = pad + i * (fw + gap);
-      rrect(x, y, fw, 58, 10, '#FFFCF8');
+      rrect(x, y, fw, factH, 12, '#FFFCF8');
       ctx.fillStyle = '#C4A056';
-      ctx.fillRect(x, y + 10, 4, 38);
-      paint([f.b], x + 16, y + 8, 22, '#1B2A4A', '800 18px Pretendard, sans-serif');
-      paint([f.s], x + 16, y + 32, 18, '#6E5A45', '500 13px Pretendard, sans-serif');
+      ctx.fillRect(x, y + 16, 5, factH - 32);
+      paint(fontWrap(f.b, '800 22px Pretendard, sans-serif', fw - 36).slice(0, 1), x + 20, y + 14, 26, '#1B2A4A', '800 22px Pretendard, sans-serif');
+      paint(fontWrap(f.s, '600 18px Pretendard, sans-serif', fw - 36).slice(0, 2), x + 20, y + 46, 22, '#5C4A38', '600 18px Pretendard, sans-serif');
     });
-    y += 58 + 14;
+    y += factH + 14;
     var bottom = 28;
-    var scheduleH = 196;
-    var whoH = 188;
-    var beatH = 92;
-    var weekH = 124;
-    var gaps = 12 * 4;
-    var photoH = H - bottom - y - scheduleH - whoH - beatH - weekH - gaps - 22;
-    if (photoH > 530) photoH = 530;
-    if (photoH < 260) photoH = 260;
-    var photoW = Math.round(inner * 0.4);
-    var meritX = pad + photoW + 12;
-    var meritW = inner - photoW - 12;
+    var sectionGap = 14;
+    var weekHead = 36;
+    var scheduleH = 208;
+    var avail = H - bottom - y - scheduleH - sectionGap * 4 - weekHead;
+    var photoH = Math.round(avail * 0.36);
+    var weekH = Math.round(avail * 0.27);
+    var beatH = Math.round(avail * 0.14);
+    if (photoH > 400) photoH = 400;
+    if (photoH < 348) photoH = 348;
+    if (weekH < 232) weekH = 232;
+    if (weekH > 246) weekH = 246;
+    if (beatH < 136) beatH = 136;
+    if (beatH > 158) beatH = 158;
+    var whoH = avail - photoH - weekH - beatH;
+    if (whoH < 250) {
+      weekH -= 250 - whoH;
+      whoH = 250;
+    }
+    if (whoH > 272) {
+      var extraWho = whoH - 272;
+      whoH = 272;
+      if (photoH + extraWho < 430) photoH += extraWho;
+    }
+    var photoW = Math.round(inner * 0.36);
+    var meritX = pad + photoW + 14;
+    var meritW = inner - photoW - 14;
     var img = (photos || [])[0];
     ctx.save();
-    clipRound(pad, y, photoW, photoH, 12);
+    clipRound(pad, y, photoW, photoH, 14);
     if (img) planDrawCover(ctx, img, pad, y, photoW, photoH);
     else {
       ctx.fillStyle = '#E4D9C8';
       ctx.fillRect(pad, y, photoW, photoH);
     }
     if (S.photoCap) {
-      ctx.fillStyle = 'rgba(27,42,74,0.78)';
-      ctx.fillRect(pad, y + photoH - 34, photoW, 34);
-      paint([S.photoCap], pad + 12, y + photoH - 24, 16, '#FFFFFF', '600 13px Pretendard, sans-serif');
+      ctx.fillStyle = 'rgba(27,42,74,0.82)';
+      ctx.fillRect(pad, y + photoH - 40, photoW, 40);
+      paint(fontWrap(S.photoCap, '600 16px Pretendard, sans-serif', photoW - 24).slice(0, 1), pad + 12, y + photoH - 28, 20, '#FFFFFF', '600 16px Pretendard, sans-serif');
     }
     ctx.restore();
-    rrect(meritX, y, meritW, photoH, 12, '#FFFCF8');
-    paint(['이 수업을 하면'], meritX + 18, y + 14, 24, '#1B2A4A', '800 18px Pretendard, sans-serif');
+    rrect(meritX, y, meritW, photoH, 14, '#FFFCF8');
+    paint(['이 수업을 하면'], meritX + 22, y + 16, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
     var merits = S.merits || [];
-    var slot = (photoH - 52) / Math.max(merits.length, 1);
+    var meritTop = y + 54;
+    var meritFootH = S.meritFoot ? 48 : 16;
+    var meritRoom = photoH - 54 - meritFootH - 8;
+    var slot = meritRoom / Math.max(merits.length, 1);
     merits.forEach(function (m, i) {
-      var rowY = y + 46 + i * slot;
+      var rowY = meritTop + i * slot;
       ctx.fillStyle = '#C4A056';
       ctx.beginPath();
-      ctx.arc(meritX + 30, rowY + 11, 11, 0, Math.PI * 2);
+      ctx.arc(meritX + 36, rowY + 14, 14, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = '800 13px Pretendard, sans-serif';
+      ctx.font = '800 16px Pretendard, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(String(i + 1), meritX + 30, rowY + 12);
+      ctx.fillText(String(i + 1), meritX + 36, rowY + 15);
       ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
-      paint([m.h], meritX + 50, rowY, 20, '#1B2A4A', '800 16px Pretendard, sans-serif');
-      var body = fontWrap(m.p, '500 14px Pretendard, sans-serif', meritW - 70);
-      paint(body.slice(0, 3), meritX + 50, rowY + 22, 18, '#3E4A5C', '500 14px Pretendard, sans-serif');
+      paint([m.h], meritX + 60, rowY, 26, '#1B2A4A', '800 22px Pretendard, sans-serif');
+      var body = fontWrap(m.p, '500 20px Pretendard, sans-serif', meritW - 84);
+      var maxBody = Math.max(2, Math.floor((slot - 30) / 26));
+      paint(body.slice(0, maxBody), meritX + 60, rowY + 30, 26, '#243044', '500 20px Pretendard, sans-serif');
     });
-    y += photoH + 12;
-    paint(['4주가 이렇게 이어집니다'], pad, y, 20, '#1B2A4A', '800 15px Pretendard, sans-serif');
-    y += 22;
+    if (S.meritFoot) {
+      ctx.fillStyle = '#F6E7C8';
+      ctx.fillRect(meritX + 18, y + photoH - 48, meritW - 36, 32);
+      paint(fontWrap(S.meritFoot, '700 18px Pretendard, sans-serif', meritW - 56).slice(0, 1), meritX + 28, y + photoH - 40, 22, '#1B2A4A', '700 18px Pretendard, sans-serif');
+    }
+    y += photoH + sectionGap;
+    paint(['4주가 이렇게 이어집니다'], pad, y, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
+    y += weekHead;
     var weeks = S.weeks || [];
-    var wg = 10;
-    var ww = (inner - wg * (weeks.length - 1)) / Math.max(weeks.length, 1);
+    var wg = 12;
+    var ww = (inner - wg * (Math.max(weeks.length, 1) - 1)) / Math.max(weeks.length, 1);
+    var weekBody = '500 18px Pretendard, sans-serif';
     weeks.forEach(function (w, i) {
       var x = pad + i * (ww + wg);
-      rrect(x, y, ww, weekH, 12, '#FFFCF8');
+      rrect(x, y, ww, weekH, 14, '#FFFCF8');
       ctx.fillStyle = '#C4A056';
-      ctx.fillRect(x, y, ww, 5);
-      paint([w.d], x + 14, y + 14, 16, '#A6844A', '800 12px Pretendard, sans-serif');
-      paint([w.h], x + 14, y + 32, 22, '#1B2A4A', '800 18px Pretendard, sans-serif');
-      var pl = fontWrap(w.p, '500 14px Pretendard, sans-serif', ww - 28);
-      paint(pl.slice(0, 4), x + 14, y + 58, 20, '#3E4A5C', '500 14px Pretendard, sans-serif');
+      ctx.fillRect(x, y, ww, 6);
+      paint([w.d], x + 16, y + 16, 18, '#A6844A', '800 15px Pretendard, sans-serif');
+      var titleLines = fontWrap(w.h, '800 24px Pretendard, sans-serif', ww - 32).slice(0, 2);
+      paint(titleLines, x + 16, y + 36, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
+      if (w.gain) {
+        var whyLines = fontWrap(w.why || '', weekBody, ww - 32).slice(0, 3);
+        var gainLines = fontWrap(w.gain || '', weekBody, ww - 32).slice(0, 3);
+        var whyY = y + 36 + titleLines.length * 28 + 10;
+        paint(['이유'], x + 16, whyY, 18, '#A6844A', '800 14px Pretendard, sans-serif');
+        paint(whyLines, x + 16, whyY + 18, 22, '#243044', weekBody);
+        var gainTop = whyY + 18 + whyLines.length * 22 + 12;
+        paint(['이점'], x + 16, gainTop, 18, '#A6844A', '800 14px Pretendard, sans-serif');
+        paint(gainLines, x + 16, gainTop + 20, 22, '#243044', weekBody);
+      } else {
+        var pl = fontWrap(w.p || w.why || '', weekBody, ww - 32);
+        paint(pl.slice(0, 6), x + 16, y + 100, 24, '#243044', weekBody);
+      }
     });
-    y += weekH + 12;
-    rrect(pad, y, inner, beatH, 12, '#1B2A4A');
-    paint([S.beatTitle || '한 회'], pad + 16, y + 10, 16, '#E4C98A', '700 12px Pretendard, sans-serif');
+    y += weekH + sectionGap;
+    rrect(pad, y, inner, beatH, 14, '#1B2A4A');
+    paint([S.beatTitle || '한 회'], pad + 22, y + 14, 22, '#E4C98A', '800 16px Pretendard, sans-serif');
     var beats = S.beats || [];
-    var bw = (inner - 28) / Math.max(beats.length, 1);
+    var bw = (inner - 36) / Math.max(beats.length, 1);
     beats.forEach(function (b, i) {
-      var x = pad + 16 + i * bw;
-      paint([b.t], x, y + 30, 26, '#FFFFFF', '800 20px Pretendard, sans-serif');
-      paint([b.h], x, y + 58, 16, '#E6D5C0', '500 13px Pretendard, sans-serif');
+      var x = pad + 22 + i * bw;
+      paint(fontWrap(b.t, '800 22px Pretendard, sans-serif', bw - 16).slice(0, 1), x, y + 42, 26, '#FFFFFF', '800 22px Pretendard, sans-serif');
+      paint(fontWrap(b.h, '500 16px Pretendard, sans-serif', bw - 16).slice(0, 2), x, y + 74, 20, '#F0E0CC', '500 16px Pretendard, sans-serif');
     });
-    y += beatH + 12;
-    var colW = (inner - 12) / 2;
-    rrect(pad, y, colW, whoH, 12, '#FFFCF8');
-    rrect(pad + colW + 12, y, colW, whoH, 12, '#FFFCF8');
-    paint(['이런 분께'], pad + 16, y + 12, 20, '#1B2A4A', '800 15px Pretendard, sans-serif');
-    (S.who || []).forEach(function (line, i) {
-      var ly = y + 40 + i * 46;
+    y += beatH + sectionGap;
+    var colW = (inner - 14) / 2;
+    rrect(pad, y, colW, whoH, 14, '#FFFCF8');
+    rrect(pad + colW + 14, y, colW, whoH, 14, '#FFFCF8');
+    paint([S.whoTitle || '이런 분께'], pad + 20, y + 16, 26, '#1B2A4A', '800 22px Pretendard, sans-serif');
+    var whoList = S.who || [];
+    whoList.forEach(function (line, i) {
+      var ly = y + 54 + i * 58;
       ctx.fillStyle = '#C4A056';
       ctx.beginPath();
-      ctx.arc(pad + 26, ly + 8, 4, 0, Math.PI * 2);
+      ctx.arc(pad + 32, ly + 12, 6, 0, Math.PI * 2);
       ctx.fill();
-      var wl = fontWrap(line, '500 14px Pretendard, sans-serif', colW - 52);
-      paint(wl.slice(0, 2), pad + 40, ly, 18, '#1B2A4A', '500 14px Pretendard, sans-serif');
+      var wl = fontWrap(line, '500 20px Pretendard, sans-serif', colW - 64);
+      paint(wl.slice(0, 2), pad + 48, ly, 26, '#1B2A4A', '500 20px Pretendard, sans-serif');
     });
-    var tx = pad + colW + 12;
-    paint(['진행'], tx + 16, y + 12, 20, '#1B2A4A', '800 15px Pretendard, sans-serif');
-    paint([S.teacher || ''], tx + 16, y + 36, 26, '#1B2A4A', '800 20px Pretendard, sans-serif');
-    paint([S.teacherLine || ''], tx + 16, y + 64, 18, '#8A5A32', '700 13px Pretendard, sans-serif');
-    var tb = fontWrap(S.teacherBody || '', '500 13px Pretendard, sans-serif', colW - 32);
-    paint(tb.slice(0, 3), tx + 16, y + 86, 18, '#3E4A5C', '500 13px Pretendard, sans-serif');
-    var sp = fontWrap(S.space || '', '500 13px Pretendard, sans-serif', colW - 32);
-    paint(sp.slice(0, 2), tx + 16, y + 86 + Math.min(tb.length, 3) * 18 + 6, 17, '#6E5A45', '500 13px Pretendard, sans-serif');
-    y += whoH + 12;
-    var sh = H - y - bottom;
-    rrect(pad, y, inner, sh, 12, '#FFFCF8');
+    var tx = pad + colW + 14;
+    paint(['진행'], tx + 20, y + 16, 26, '#1B2A4A', '800 22px Pretendard, sans-serif');
+    paint([S.teacher || ''], tx + 20, y + 50, 32, '#1B2A4A', '800 28px Pretendard, sans-serif');
+    paint([S.teacherLine || ''], tx + 20, y + 88, 22, '#8A5A32', '700 18px Pretendard, sans-serif');
+    var tb = fontWrap(S.teacherBody || '', '500 18px Pretendard, sans-serif', colW - 40);
+    paint(tb.slice(0, 4), tx + 20, y + 118, 24, '#243044', '500 18px Pretendard, sans-serif');
+    var sp = fontWrap(S.space || '', '600 18px Pretendard, sans-serif', colW - 40);
+    paint(sp.slice(0, 2), tx + 20, y + 118 + Math.min(tb.length, 4) * 24 + 10, 24, '#5C4A38', '600 18px Pretendard, sans-serif');
+    y += whoH + sectionGap;
+    var sh = Math.min(scheduleH, H - y - bottom);
+    if (sh < 180) sh = H - y - bottom;
+    rrect(pad, y, inner, sh, 14, '#FFFCF8');
     ctx.fillStyle = '#C4A056';
-    ctx.fillRect(pad, y, 5, sh);
-    paint(['일정'], pad + 18, y + 12, 20, '#1B2A4A', '800 15px Pretendard, sans-serif');
+    ctx.fillRect(pad, y, 6, sh);
+    paint(['일정'], pad + 22, y + 14, 24, '#1B2A4A', '800 20px Pretendard, sans-serif');
     var meta = [
       ['아파트', planField('placeName'), '이름을 적어 주세요'],
       ['요일', planField('days'), '요일 협의'],
@@ -9654,20 +9704,20 @@
       ['회신', planField('contact'), '요일과 인원을 회신'],
       ['수강료', planField('fee'), '일정 뒤 협의']
     ];
-    var cellW = (inner - 36) / 3;
+    var cellW = (inner - 44) / 3;
     meta.forEach(function (row, i) {
-      var cx = pad + 18 + (i % 3) * cellW;
-      var cy = y + 40 + Math.floor(i / 3) * 44;
-      paint([row[0]], cx, cy, 14, '#A6844A', '700 11px Pretendard, sans-serif');
+      var cx = pad + 22 + (i % 3) * cellW;
+      var cy = y + 46 + Math.floor(i / 3) * 48;
+      paint([row[0]], cx, cy, 16, '#A6844A', '700 13px Pretendard, sans-serif');
       var val = row[1] || row[2];
-      var vl = fontWrap(val, '700 15px Pretendard, sans-serif', cellW - 14);
-      paint(vl.slice(0, 1), cx, cy + 15, 18, row[1] ? '#1B2A4A' : '#8A8175', '700 15px Pretendard, sans-serif');
+      var vl = fontWrap(val, '700 18px Pretendard, sans-serif', cellW - 16);
+      paint(vl.slice(0, 1), cx, cy + 16, 22, row[1] ? '#1B2A4A' : '#8A8175', '700 18px Pretendard, sans-serif');
     });
-    var ctaY = y + 40 + 44 * 2 + 4;
-    var cta = fontWrap(S.cta || '', '800 15px Pretendard, sans-serif', inner - 36);
-    paint(cta.slice(0, 1), pad + 18, ctaY, 20, '#1B2A4A', '800 15px Pretendard, sans-serif');
-    var foot = fontWrap(S.foot || '', '500 12px Pretendard, sans-serif', inner - 36);
-    paint(foot.slice(0, 2), pad + 18, ctaY + 22, 16, '#6E5A45', '500 12px Pretendard, sans-serif');
+    var ctaY = y + 46 + 48 * 2 + 6;
+    var cta = fontWrap(S.cta || '', '800 18px Pretendard, sans-serif', inner - 44);
+    paint(cta.slice(0, 1), pad + 22, ctaY, 22, '#1B2A4A', '800 18px Pretendard, sans-serif');
+    var foot = fontWrap(S.foot || '', '500 15px Pretendard, sans-serif', inner - 44);
+    paint(foot.slice(0, 2), pad + 22, ctaY + 26, 18, '#5C4A38', '500 15px Pretendard, sans-serif');
     return [canvas];
   }
   function drawTextPdfPages(title, text) {
