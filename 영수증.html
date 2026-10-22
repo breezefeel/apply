@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="리얼무브먼트_링크_로고.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700&family=Great+Vibes&family=Montserrat:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700&family=Great+Vibes&family=Italianno&family=Montserrat:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
   :root {
@@ -80,12 +80,14 @@
   body.mode-docs #consultBranchChips,
   body.mode-links #consultBranchChips,
   body.mode-unbooked #consultBranchChips,
-  body.mode-plan #consultBranchChips { display: none; }
+  body.mode-plan #consultBranchChips,
+  body.mode-price #consultBranchChips { display: none; }
   body.mode-consult #pageSub,
   body.mode-links #pageSub,
   body.mode-unbooked #pageSub { display: none; }
   body.mode-links .app { max-width: 1040px; }
   body.mode-plan .app { max-width: 920px; }
+  body.mode-price .app { max-width: 980px; }
 
   .app-tabs {
     display: flex; gap: 6px;
@@ -385,7 +387,8 @@
   body.mode-links .receipt-dock,
   body.mode-unbooked .receipt-dock,
   body.mode-docs .receipt-dock,
-  body.mode-plan .receipt-dock { display: none; }
+  body.mode-plan .receipt-dock,
+  body.mode-price .receipt-dock { display: none; }
   .unbooked-hd {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
@@ -1050,6 +1053,7 @@
     body:not(.printing-docs):not(.printing-plan) #panelDocs,
     body:not(.printing-docs):not(.printing-plan) #panelPlan,
     body:not(.printing-docs):not(.printing-plan) #panelUnbooked,
+    body:not(.printing-docs):not(.printing-plan) #panelPrice,
     body:not(.printing-docs):not(.printing-plan) .app-tabs { display: none !important; }
     body:not(.printing-docs):not(.printing-plan) #panelReceipt { display: block !important; }
     body.printing-plan .head,
@@ -1058,6 +1062,7 @@
     body.printing-plan #panelConsult,
     body.printing-plan #panelLinks,
     body.printing-plan #panelUnbooked,
+    body.printing-plan #panelPrice,
     body.printing-plan #panelReceipt,
     body.printing-plan #panelDocs,
     body.printing-plan .receipt-dock { display: none !important; }
@@ -1073,6 +1078,7 @@
     body.printing-docs .app-tabs,
     body.printing-docs #panelConsult,
     body.printing-docs #panelLinks,
+    body.printing-docs #panelPrice,
     body.printing-docs #panelReceipt,
     body.printing-docs .receipt-dock,
     body.printing-docs .doc-screen { display: none !important; }
@@ -1217,6 +1223,137 @@
     .plan-photos { grid-template-columns: 1fr; }
     .plan-photos .span2 { grid-column: auto; }
   }
+
+  #panelPrice .price-wrap {
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) 468px;
+    gap: 16px;
+    align-items: start;
+  }
+  #panelPrice .price-tools { margin-bottom: 0; }
+  #panelPrice .price-branch { margin: 0 0 12px; }
+  #panelPrice .price-prog {
+    border: 1px solid #e6dfd2;
+    border-radius: 14px;
+    padding: 10px;
+    margin: 10px 0;
+    background: #fff;
+  }
+  #panelPrice .price-prog-hd {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 8px; margin-bottom: 8px;
+  }
+  #panelPrice .price-prog-hd strong { font-size: 13px; }
+  #panelPrice .price-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  #panelPrice .price-grid .span2 { grid-column: 1 / -1; }
+  #panelPrice .price-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #efe8dc;
+  }
+  #panelPrice .price-row label,
+  #panelPrice .price-grid label {
+    display: flex; flex-direction: column; gap: 4px;
+    font-size: 11px; font-weight: 800; color: var(--mute);
+  }
+  #panelPrice .price-row input[type="text"],
+  #panelPrice .price-grid input[type="text"],
+  #panelPrice .price-pace {
+    width: 100%;
+    border: 1.5px solid #d7d0c4;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 14px; font-weight: 700;
+    color: var(--ink); background: #fff;
+  }
+  #panelPrice .price-pace { min-height: 64px; resize: vertical; line-height: 1.45; font-weight: 600; }
+  #panelPrice .price-row-actions {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  #panelPrice .price-rec {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 800; color: var(--ink);
+  }
+  #panelPrice .price-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  #panelPrice .price-actions .btn { flex: 0 0 auto; padding: 12px 16px; }
+  .price-stage {
+    background:
+      radial-gradient(420px 280px at 20% 0%, #4a403a 0%, transparent 60%),
+      #3c342f;
+    border-radius: 22px;
+    padding: 28px 18px;
+    display: flex;
+    justify-content: center;
+  }
+  .pcard {
+    width: 440px;
+    max-width: 100%;
+    background: #f7f3ec;
+    border-radius: 28px;
+    padding: 34px 30px 26px;
+    box-shadow: 0 24px 60px rgba(0,0,0,.28);
+    color: #2a2622;
+    font-family: Pretendard, "Apple SD Gothic Neo", sans-serif;
+  }
+  .pcard-logo { display: flex; justify-content: center; }
+  .pcard-logo svg { width: 72px; height: 78px; }
+  .pcard-script {
+    margin: 2px 0 0;
+    text-align: center;
+    font-family: Italianno, "Great Vibes", cursive;
+    font-size: 64px;
+    font-weight: 400;
+    line-height: 1;
+    color: #2f2a26;
+  }
+  .pcard-rule { height: 1px; background: #d9cfc2; margin: 8px 36px 18px; }
+  .pcard-kicker {
+    margin: 0; text-align: center; letter-spacing: .22em;
+    font-size: 11px; color: #8a8178;
+  }
+  .pcard-sig, .pcard-line {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  }
+  .pcard-sig { margin-top: 6px; }
+  .pcard-sig-name { font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
+  .pcard-sig-note { font-size: 14px; color: #5e574f; }
+  .pcard-money { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .pcard-prog { margin-top: 22px; padding-top: 16px; border-top: 1px solid #e6dccf; }
+  .pcard-prog h2 { margin: 0; font-size: 20px; letter-spacing: -.03em; font-weight: 800; }
+  .pcard-sub { margin: 4px 0 10px; font-size: 13px; color: #8a8178; }
+  .pcard-line { padding: 9px 8px; }
+  .pcard-line .pcard-name { font-size: 15px; }
+  .pcard-total { font-size: 17px; font-weight: 700; }
+  .pcard-unit { display: block; margin-top: 1px; font-size: 12px; font-weight: 500; color: #8a8178; }
+  .pcard-rec {
+    margin: 4px 0 2px; padding: 12px 12px 11px; border-radius: 14px; background: #f3e7d4;
+  }
+  .pcard-rec .pcard-name { font-weight: 700; }
+  .pcard-badge {
+    display: inline-block; margin-right: 6px; padding: 1px 7px 2px; border-radius: 999px;
+    background: #8d6840; color: #fff; font-size: 11px; font-weight: 700; vertical-align: 1px;
+  }
+  .pcard-save { margin: 2px 4px 0; font-size: 12px; color: #8d6840; }
+  .pcard-pace {
+    margin: 18px 0 0; padding-top: 14px; border-top: 1px solid #e6dccf;
+    font-size: 13px; line-height: 1.55; color: #5c554e; text-align: center;
+  }
+  .pcard-foot {
+    margin-top: 16px; background: #e7e1d8; border-radius: 12px; text-align: center;
+    padding: 12px 10px; font-size: 14px; font-weight: 700;
+  }
+  .pcard-foot span { font-weight: 600; letter-spacing: .04em; }
+  @media (max-width: 860px) {
+    #panelPrice .price-wrap { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body class="mode-consult">
@@ -1253,6 +1390,7 @@
       <button type="button" class="app-tab" data-app="links" id="appTabLinks">링크 모음</button>
       <button type="button" class="app-tab" data-app="unbooked" id="appTabUnbooked">미예약 확인</button>
       <button type="button" class="app-tab" data-app="plan" id="appTabPlan">제안서·기획</button>
+      <button type="button" class="app-tab" data-app="price" id="appTabPrice">가격표</button>
       <button type="button" class="app-tab" data-app="receipt" id="appTabReceipt">영수증</button>
       <button type="button" class="app-tab" data-app="docs" id="appTabDocs">세금 서류</button>
     </nav>
@@ -1793,6 +1931,28 @@
             <canvas id="planPosterCanvas" width="1240" height="1754"></canvas>
           </div>
         </section>
+      </div>
+    </div>
+
+    <div id="panelPrice" class="panel">
+      <div class="price-wrap">
+        <section class="card no-print price-tools">
+          <div class="card-title">가격표 고치기</div>
+          <p class="cert-lead">글자와 금액을 고치면 미리보기 카드가 바로 바뀝니다. PNG 저장으로 받아 인쇄합니다.</p>
+          <div class="chips price-branch" id="priceBranchChips">
+            <button type="button" class="chip active" data-price-branch="yaksu">약수</button>
+            <button type="button" class="chip" data-price-branch="incheon">인천</button>
+          </div>
+          <div id="priceEditor"></div>
+          <div class="price-actions">
+            <button type="button" class="btn btn-print" id="btnPricePng">PNG 저장</button>
+            <button type="button" class="btn btn-ghost" id="btnPriceReset">이 지점 처음 금액</button>
+          </div>
+          <p class="cert-note" id="priceStatus">고친 내용은 이 브라우저에 남습니다. 다른 컴퓨터에는 받은 PNG를 가져가면 됩니다.</p>
+        </section>
+        <div class="price-stage" id="priceStage">
+          <article class="pcard" id="priceCard"></article>
+        </div>
       </div>
     </div>
 
@@ -7975,6 +8135,287 @@
     });
   }
 
+  var PRICE_CARD_KEY = 'rm-price-card-v1';
+  var priceBranch = 'yaksu';
+  var priceCards = null;
+
+  function priceCardDefaults_() {
+    return {
+      yaksu: {
+        sigName: '대표 원장 직접 레슨',
+        sigNote: '정상가',
+        sigItem: '시그니처 1회',
+        sigPrice: '12.5만원',
+        pace: '주 2회를 권합니다.\n매주 두 번을 지키지 못해도 횟수는 남습니다.',
+        foot: '움직임이 편해지는 시간 | REAL MOVEMENT',
+        programs: [
+          {
+            title: '50분 · 1:1 리얼 무브먼트',
+            sub: '',
+            rows: [
+              { name: '1회', total: '8.5만원', unit: '', save: '', recommend: false },
+              { name: '8회권', total: '66만원', unit: '회당 8.25만원', save: '', recommend: false },
+              { name: '24회권', total: '192만원', unit: '회당 8만원', save: '1회보다 회당 5,000원 적습니다', recommend: true }
+            ]
+          },
+          {
+            title: '70분 · 1:1 리얼 컨디셔닝',
+            sub: '',
+            rows: [
+              { name: '1회', total: '12.5만원', unit: '', save: '', recommend: false },
+              { name: '8회권', total: '76만원', unit: '회당 9.5만원', save: '', recommend: false },
+              { name: '24회권', total: '216만원', unit: '회당 9만원', save: '', recommend: true }
+            ]
+          }
+        ]
+      },
+      incheon: {
+        sigName: '대표 원장 직접 레슨',
+        sigNote: '정상가',
+        sigItem: '시그니처 1회',
+        sigPrice: '12.5만원',
+        pace: '주 2회를 권합니다.\n매주 두 번을 지키지 못해도 횟수는 남습니다.',
+        foot: '움직임이 편해지는 시간 | REAL MOVEMENT',
+        programs: [
+          {
+            title: '50분 · 1:1',
+            sub: '레슨 25분 뒤 돔 25분',
+            rows: [
+              { name: '1회', total: '4.5만원', unit: '', save: '', recommend: false },
+              { name: '8회권', total: '32만원', unit: '회당 4만원', save: '', recommend: false },
+              { name: '24회권', total: '90만원', unit: '회당 3.75만원', save: '1회보다 회당 7,500원 적습니다', recommend: true }
+            ]
+          },
+          {
+            title: '80분 · 1:1',
+            sub: '레슨 55분 뒤 돔 25분',
+            rows: [
+              { name: '8회권', total: '62만원', unit: '회당 7.75만원', save: '', recommend: false },
+              { name: '24회권', total: '164만원', unit: '회당 6.8만원', save: '8회를 세 번 사는 것보다 약 22만원 적습니다', recommend: true }
+            ]
+          }
+        ]
+      }
+    };
+  }
+  function loadPriceCards_() {
+    var defaults = priceCardDefaults_();
+    try {
+      var saved = JSON.parse(localStorage.getItem(PRICE_CARD_KEY) || 'null');
+      if (saved && saved.yaksu && saved.yaksu.programs && saved.incheon && saved.incheon.programs) return saved;
+    } catch (e) {}
+    return defaults;
+  }
+  function savePriceCards_() {
+    try { localStorage.setItem(PRICE_CARD_KEY, JSON.stringify(priceCards)); } catch (e) {}
+  }
+  function escPrice_(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function priceField_(k, label, value, span) {
+    return '<label class="' + (span ? 'span2' : '') + '"><span>' + label + '</span><input type="text" data-k="' + k + '" value="' + escPrice_(value) + '" autocomplete="off"></label>';
+  }
+  function renderPriceEditor_() {
+    var root = $('priceEditor');
+    if (!root) return;
+    if (!priceCards) priceCards = loadPriceCards_();
+    var card = priceCards[priceBranch];
+    var html = '<div class="price-grid">' +
+      priceField_('sigName', '윗줄 이름', card.sigName, false) +
+      priceField_('sigNote', '윗줄 오른쪽', card.sigNote, false) +
+      priceField_('sigItem', '기준 상품', card.sigItem, false) +
+      priceField_('sigPrice', '기준 금액', card.sigPrice, false) +
+      '</div>';
+    card.programs.forEach(function (prog, pi) {
+      html += '<div class="price-prog" data-prog="' + pi + '">' +
+        '<div class="price-prog-hd"><strong>프로그램 ' + (pi + 1) + '</strong>' +
+        '<button type="button" class="btn-sm" data-act="del-prog">프로그램 빼기</button></div>' +
+        '<div class="price-grid">' +
+        priceField_('title', '제목', prog.title, true) +
+        priceField_('sub', '제목 아래 한 줄', prog.sub, true) +
+        '</div>';
+      prog.rows.forEach(function (row, ri) {
+        html += '<div class="price-row" data-row="' + ri + '">' +
+          priceField_('name', '이름', row.name, false) +
+          priceField_('total', '금액', row.total, false) +
+          priceField_('unit', '회당', row.unit, false) +
+          priceField_('save', '추천 설명', row.save, false) +
+          '<div class="price-row-actions"><label class="price-rec"><input type="checkbox" data-k="recommend"' + (row.recommend ? ' checked' : '') + '> 추천</label>' +
+          '<button type="button" class="btn-sm" data-act="del-row">항목 빼기</button></div></div>';
+      });
+      html += '<div class="price-actions"><button type="button" class="btn-sm" data-act="add-row">항목 추가</button></div></div>';
+    });
+    html += '<div class="price-actions"><button type="button" class="btn-sm" data-act="add-prog">프로그램 추가</button></div>' +
+      '<label class="span2" style="display:flex;flex-direction:column;gap:4px;margin-top:12px;font-size:11px;font-weight:800;color:var(--mute)">하단 안내<textarea class="price-pace" data-k="pace">' + escPrice_(card.pace) + '</textarea></label>' +
+      '<div class="price-grid" style="margin-top:8px">' + priceField_('foot', '맨 아래 줄', card.foot, true) + '</div>';
+    root.innerHTML = html;
+  }
+  function readPriceEditor_() {
+    var root = $('priceEditor');
+    if (!root || !priceCards) return;
+    var card = priceCards[priceBranch];
+    ['sigName', 'sigNote', 'sigItem', 'sigPrice', 'foot'].forEach(function (k) {
+      var el = root.querySelector('[data-k="' + k + '"]');
+      if (el && !el.closest('[data-prog]')) card[k] = el.value;
+    });
+    var pace = root.querySelector('textarea[data-k="pace"]');
+    if (pace) card.pace = pace.value;
+    var programs = [];
+    root.querySelectorAll('[data-prog]').forEach(function (prog) {
+      var rows = [];
+      prog.querySelectorAll('[data-row]').forEach(function (row) {
+        rows.push({
+          name: (row.querySelector('[data-k="name"]') || {}).value || '',
+          total: (row.querySelector('[data-k="total"]') || {}).value || '',
+          unit: (row.querySelector('[data-k="unit"]') || {}).value || '',
+          save: (row.querySelector('[data-k="save"]') || {}).value || '',
+          recommend: !!((row.querySelector('[data-k="recommend"]') || {}).checked)
+        });
+      });
+      programs.push({
+        title: (prog.querySelector('[data-k="title"]') || {}).value || '',
+        sub: (prog.querySelector('[data-k="sub"]') || {}).value || '',
+        rows: rows
+      });
+    });
+    card.programs = programs;
+  }
+  function priceLogoSvg_() {
+    return '<div class="pcard-logo" aria-hidden="true"><svg viewBox="0 0 72 78" fill="none" stroke="#2f2a26" stroke-width="1.15" stroke-linecap="round">' +
+      '<polygon points="36,5 63,20 63,51 36,67 9,51 9,20" />' +
+      '<path d="M36 40c0-8-7-12-10-20 6 4 10 10 10 20z" />' +
+      '<path d="M36 40c0-8 7-12 10-20-6 4-10 10-10 20z" />' +
+      '<path d="M36 40c-8 2-14 8-16 16 6-2 12-6 16-16z" />' +
+      '<path d="M36 40c8 2 14 8 16 16-6-2-12-6-16-16z" />' +
+      '<path d="M36 40c-1 8 0 14 0 20 0-6 1-12 0-20z" />' +
+      '<circle cx="36" cy="40" r="1.6" fill="#2f2a26" stroke="none" /></svg></div>';
+  }
+  function priceRowHtml_(row) {
+    var money = '<div class="pcard-money"><span class="pcard-total">' + escPrice_(row.total) + '</span>' +
+      (row.unit ? '<span class="pcard-unit">' + escPrice_(row.unit) + '</span>' : '') + '</div>';
+    var name = escPrice_(row.name);
+    if (row.recommend) {
+      return '<div class="pcard-rec"><div class="pcard-line" style="padding:0"><div class="pcard-name"><span class="pcard-badge">추천</span>' + name +
+        '</div>' + money + '</div>' +
+        (row.save ? '<p class="pcard-save">' + escPrice_(row.save) + '</p>' : '') + '</div>';
+    }
+    return '<div class="pcard-line"><div class="pcard-name">' + name + '</div>' + money + '</div>';
+  }
+  function renderPricePreview_() {
+    var box = $('priceCard');
+    if (!box) return;
+    if (!priceCards) priceCards = loadPriceCards_();
+    var card = priceCards[priceBranch];
+    var footBits = String(card.foot || '').split('|');
+    var foot = escPrice_(footBits[0].trim()) + (footBits.length > 1 ? ' <span>| ' + escPrice_(footBits.slice(1).join('|').trim()) + '</span>' : '');
+    var pace = escPrice_(card.pace || '').replace(/\n/g, '<br>');
+    var html = priceLogoSvg_() +
+      '<p class="pcard-script">Re &amp; Alignment</p><div class="pcard-rule"></div>' +
+      '<p class="pcard-kicker">SIGNATURE CARE</p>' +
+      '<div class="pcard-sig"><div class="pcard-sig-name">' + escPrice_(card.sigName) + '</div><div class="pcard-sig-note">' + escPrice_(card.sigNote) + '</div></div>' +
+      '<div class="pcard-line"><div class="pcard-name">' + escPrice_(card.sigItem) + '</div><div class="pcard-money"><span class="pcard-total">' + escPrice_(card.sigPrice) + '</span></div></div>';
+    (card.programs || []).forEach(function (prog) {
+      html += '<section class="pcard-prog"><h2>' + escPrice_(prog.title) + '</h2>' +
+        (prog.sub ? '<p class="pcard-sub">' + escPrice_(prog.sub) + '</p>' : '');
+      (prog.rows || []).forEach(function (row) { html += priceRowHtml_(row); });
+      html += '</section>';
+    });
+    if (pace) html += '<p class="pcard-pace">' + pace + '</p>';
+    if (foot) html += '<div class="pcard-foot">' + foot + '</div>';
+    box.innerHTML = html;
+  }
+  function paintPriceBranch_() {
+    var box = $('priceBranchChips');
+    if (!box) return;
+    box.querySelectorAll('[data-price-branch]').forEach(function (btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-price-branch') === priceBranch);
+    });
+  }
+  function loadHtml2Canvas_() {
+    if (window.html2canvas) return Promise.resolve(window.html2canvas);
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      s.onload = function () { window.html2canvas ? resolve(window.html2canvas) : reject(new Error('missing')); };
+      s.onerror = function () { reject(new Error('load')); };
+      document.head.appendChild(s);
+    });
+  }
+  function savePricePng_() {
+    readPriceEditor_();
+    savePriceCards_();
+    renderPricePreview_();
+    var status = $('priceStatus');
+    if (status) status.textContent = '이미지를 만드는 중…';
+    var ready = (document.fonts && document.fonts.load) ? document.fonts.load('64px Italianno').catch(function () {}) : Promise.resolve();
+    Promise.resolve(ready).then(function () { return loadHtml2Canvas_(); }).then(function (h2c) {
+      return h2c($('priceStage'), { scale: 2, backgroundColor: '#3c342f', useCORS: true });
+    }).then(function (canvas) {
+      var name = (priceBranch === 'incheon' ? '가격표-인천' : '가격표-약수') + '.png';
+      triggerImageDownload(canvas.toDataURL('image/png'), name);
+      if (status) status.textContent = name + ' 이미지를 저장했습니다.';
+    }).catch(function () {
+      if (status) status.textContent = '이미지를 만들지 못했습니다. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.';
+    });
+  }
+  var priceCardBound = false;
+  function bindPriceCard_() {
+    if (priceCardBound) return;
+    priceCardBound = true;
+    if (!priceCards) priceCards = loadPriceCards_();
+    var editor = $('priceEditor');
+    if (!editor) return;
+    editor.addEventListener('input', function () {
+      readPriceEditor_();
+      savePriceCards_();
+      renderPricePreview_();
+    });
+    editor.addEventListener('change', function () {
+      readPriceEditor_();
+      savePriceCards_();
+      renderPricePreview_();
+    });
+    editor.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      readPriceEditor_();
+      var prog = btn.closest('[data-prog]');
+      var pi = prog ? Number(prog.getAttribute('data-prog')) : -1;
+      var row = btn.closest('[data-row]');
+      var ri = row ? Number(row.getAttribute('data-row')) : -1;
+      var programs = priceCards[priceBranch].programs;
+      var act = btn.getAttribute('data-act');
+      if (act === 'add-prog') programs.push({ title: '', sub: '', rows: [{ name: '', total: '', unit: '', save: '', recommend: false }] });
+      if (act === 'del-prog' && pi >= 0) programs.splice(pi, 1);
+      if (act === 'add-row' && programs[pi]) programs[pi].rows.push({ name: '', total: '', unit: '', save: '', recommend: false });
+      if (act === 'del-row' && programs[pi]) programs[pi].rows.splice(ri, 1);
+      savePriceCards_();
+      renderPriceEditor_();
+      renderPricePreview_();
+    });
+    $('priceBranchChips').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-price-branch]');
+      if (!b) return;
+      readPriceEditor_();
+      savePriceCards_();
+      priceBranch = b.getAttribute('data-price-branch');
+      paintPriceBranch_();
+      renderPriceEditor_();
+      renderPricePreview_();
+    });
+    $('btnPricePng').addEventListener('click', savePricePng_);
+    $('btnPriceReset').addEventListener('click', function () {
+      priceCards[priceBranch] = priceCardDefaults_()[priceBranch];
+      savePriceCards_();
+      renderPriceEditor_();
+      renderPricePreview_();
+      var status = $('priceStatus');
+      if (status) status.textContent = '이 지점을 페이지에 들어 있는 처음 금액으로 되돌렸습니다.';
+    });
+  }
+
   function setAppTab(which) {
     if (which === 'docs' && !docsUnlocked()) {
       openDocsPin();
@@ -7984,27 +8425,36 @@
       setDocsUnlocked(false);
       closeDocsPin();
     }
-    if (which !== 'consult' && which !== 'links' && which !== 'unbooked' && which !== 'plan' && which !== 'receipt' && which !== 'docs') which = 'consult';
+    if (which !== 'consult' && which !== 'links' && which !== 'unbooked' && which !== 'plan' && which !== 'price' && which !== 'receipt' && which !== 'docs') which = 'consult';
     document.body.classList.toggle('mode-consult', which === 'consult');
     document.body.classList.toggle('mode-links', which === 'links');
     document.body.classList.toggle('mode-unbooked', which === 'unbooked');
     document.body.classList.toggle('mode-plan', which === 'plan');
+    document.body.classList.toggle('mode-price', which === 'price');
     document.body.classList.toggle('mode-receipt', which === 'receipt');
     document.body.classList.toggle('mode-docs', which === 'docs');
     $('panelConsult').classList.toggle('active', which === 'consult');
     $('panelLinks').classList.toggle('active', which === 'links');
     $('panelUnbooked').classList.toggle('active', which === 'unbooked');
     $('panelPlan').classList.toggle('active', which === 'plan');
+    $('panelPrice').classList.toggle('active', which === 'price');
     $('panelReceipt').classList.toggle('active', which === 'receipt');
     $('panelDocs').classList.toggle('active', which === 'docs');
     $('appTabConsult').classList.toggle('active', which === 'consult');
     $('appTabLinks').classList.toggle('active', which === 'links');
     $('appTabUnbooked').classList.toggle('active', which === 'unbooked');
     $('appTabPlan').classList.toggle('active', which === 'plan');
+    $('appTabPrice').classList.toggle('active', which === 'price');
     $('appTabReceipt').classList.toggle('active', which === 'receipt');
     $('appTabDocs').classList.toggle('active', which === 'docs');
-    $('pageTitle').textContent = which === 'consult' ? '상담 메뉴얼' : which === 'links' ? '링크 모음' : which === 'unbooked' ? '미예약 확인' : which === 'plan' ? '제안서·기획' : which === 'receipt' ? '영문 영수증' : '세금 서류';
-    $('pageSub').textContent = which === 'plan' ? '힐자계는 준비 중이고, 리얼무브먼트와 리얼페이스는 프로그램 예시입니다' : which === 'receipt' ? '발급 기관을 고른 뒤 항목을 입력하세요' : '프리랜서를 고른 뒤 지급액을 입력하세요';
+    $('pageTitle').textContent = which === 'consult' ? '상담 메뉴얼' : which === 'links' ? '링크 모음' : which === 'unbooked' ? '미예약 확인' : which === 'plan' ? '제안서·기획' : which === 'price' ? '가격표' : which === 'receipt' ? '영문 영수증' : '세금 서류';
+    $('pageSub').textContent = which === 'price' ? '금액을 고친 뒤 PNG로 받으세요. 고친 내용은 이 브라우저에 남습니다' : which === 'plan' ? '힐자계는 준비 중이고, 리얼무브먼트와 리얼페이스는 프로그램 예시입니다' : which === 'receipt' ? '발급 기관을 고른 뒤 항목을 입력하세요' : '프리랜서를 고른 뒤 지급액을 입력하세요';
+    if (which === 'price') {
+      bindPriceCard_();
+      paintPriceBranch_();
+      renderPriceEditor_();
+      renderPricePreview_();
+    }
     if (which === 'receipt') {
       if (receiptPrefillFromQuery && !receiptPrefillApplied) {
         applyReceiptPrefill(receiptPrefillFromQuery);
@@ -8036,7 +8486,7 @@
       receiptPrefillFromQuery = { name: name, branch: branch, sessions: sessions, instructor: instructor };
     }
     renderConsultBranch();
-    setAppTab(tab === 'receipt' ? 'receipt' : tab === 'docs' ? 'docs' : tab === 'links' ? 'links' : tab === 'unbooked' ? 'unbooked' : tab === 'plan' ? 'plan' : 'consult');
+    setAppTab(tab === 'receipt' ? 'receipt' : tab === 'docs' ? 'docs' : tab === 'links' ? 'links' : tab === 'unbooked' ? 'unbooked' : tab === 'plan' ? 'plan' : tab === 'price' ? 'price' : 'consult');
   }
 
   buildTabs();
@@ -9096,6 +9546,7 @@
   document.getElementById('appTabLinks').addEventListener('click', function () { setAppTab('links'); });
   document.getElementById('appTabUnbooked').addEventListener('click', function () { setAppTab('unbooked'); });
   document.getElementById('appTabPlan').addEventListener('click', function () { setAppTab('plan'); });
+  document.getElementById('appTabPrice').addEventListener('click', function () { setAppTab('price'); });
   document.getElementById('appTabReceipt').addEventListener('click', function () { setAppTab('receipt'); });
   document.getElementById('btnUnbookedRefresh').addEventListener('click', startUnbookedCheck_);
   document.getElementById('unbookedBody').addEventListener('click', onUnbookedBodyClick_);
