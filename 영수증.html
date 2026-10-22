@@ -5999,9 +5999,9 @@
   }
   function smsTemplates() {
     var name = smsCourseName();
-    var list = [];
+    var items = {};
     if (consultBranch === 'ifc') {
-      list.push({ id: 'anatomy', label: '3주 전 해부학', text: [
+      items.anatomy = { id: 'anatomy', label: '3주 전 해부학', text: [
         '안녕하세요. IFC 얼굴교정 과정입니다.',
         '',
         'IFC 전문가 과정 오프라인 수업이 3주 앞으로 다가왔습니다.',
@@ -6010,8 +6010,8 @@
         '',
         '궁금하신 점은 이 문자로 답장해 주세요.',
         '감사합니다.'
-      ].join('\n') });
-      list.push({ id: 'twoWeek', label: '2주 전', text: [
+      ].join('\n') };
+      items.twoWeek = { id: 'twoWeek', label: '2주 전 과제', text: [
         '안녕하세요. IFC 얼굴교정 과정입니다.',
         '',
         '오프라인 수업이 2주 남았습니다.',
@@ -6023,10 +6023,10 @@
         'https://cafe.naver.com/ifc/127',
         '',
         '막히는 곳이 있으면 이 문자로 말씀해 주세요.'
-      ].join('\n') });
+      ].join('\n') };
     }
     if (consultBranch === 'ifc') {
-      list.push({ id: 'week', label: '1주 전 영상', text: [
+      items.week = { id: 'week', label: '1주 전 영상', text: [
         '안녕하세요.',
         'IFC 얼굴교정 수업이 1주일 앞으로 다가왔습니다.',
         '스케줄 변동 없이 참여하시는지 확인 부탁드립니다.',
@@ -6038,9 +6038,9 @@
         '',
         '교육장 오는길',
         SMS_WAY
-      ].join('\n') });
+      ].join('\n') };
     } else {
-      list.push({ id: 'week', label: '1주 전 영상', text: academyWeekNotice_(name, smsVideoUrl()) });
+      items.week = { id: 'week', label: '1주 전 영상', text: academyWeekNotice_(name, smsVideoUrl()) };
     }
     var d3 = [
       '안녕하세요. ' + name + '입니다.',
@@ -6065,7 +6065,7 @@
       d3.push('장소: 리얼무브먼트 약수점', '시간: 10:00–17:00', '', '움직이기 편한 복장으로 오시면 됩니다.');
       d3.push('', '일정이 어려우시면 오늘 중으로 알려 주세요.', '', '오는 길', SMS_WAY);
     }
-    list.push({ id: 'd3', label: '3일 전', text: d3.join('\n') });
+    items.d3 = { id: 'd3', label: '3일 전', text: d3.join('\n') };
     var before2 = [
       '안녕하세요. ' + name + '입니다.',
       '',
@@ -6080,26 +6080,26 @@
     ];
     if (consultBranch === 'ifc') {
       before2 = [
-        '안녕하세요. IFC 얼굴교정입니다.',
+        '안녕하세요. IFC 얼굴교정 학회입니다.',
         '',
         '다음 수업은 25분 수기 시퀀스입니다.',
-        '지난 촉진에서 다시 만져 보고 싶은 곳이 있으면 한 가지만 답장해 주세요.'
+        '지난 촉진에서 다시 연습해보고 싶은 곳이 있다면 편하게 말씀해 주세요.'
       ];
       before3 = [
-        '안녕하세요. IFC 얼굴교정입니다.',
+        '안녕하세요. IFC 얼굴교정 학회입니다.',
         '',
         '다음 수업은 괄사와 고주파로 이어집니다.',
-        '손이 피곤하시면 미리 알려 주세요. 범위를 조절하겠습니다.'
+        '진도 따라가기 힘든 부분이 있었다면 미리 알려 주세요. 수업 시작 전 복습 한 번 더 진행하고, 진도 범위도 조절해볼게요 ^^'
       ];
     }
-    list.push({ id: 'day2', label: '2회 전', text: before2.join('\n') });
-    list.push({ id: 'day3', label: '3회 전', text: before3.join('\n') });
-    list.push({ id: 'after', label: '다음 날', text: [
+    items.day2 = { id: 'day2', label: '2회 전', text: before2.join('\n') };
+    items.day3 = { id: 'day3', label: '3회 전', text: before3.join('\n') };
+    items.after = { id: 'after', label: '다음 날', text: [
       '안녕하세요. ' + name + '입니다.',
       '',
       '어제 수업 후 컨디션은 괜찮으신가요?',
       '불편한 곳이 있으면 이 문자로 알려 주세요.'
-    ].join('\n') });
+    ].join('\n') };
     var unpaid = [
       '안녕하세요, IFC 국제얼굴교정학회입니다.',
       '2026년 마지막 과정은 11월 8·22·29일입니다.',
@@ -6151,16 +6151,21 @@
         '바로 안내드릴게요 ^^'
       ];
     }
-    list.push({ id: 'unpaid', label: '등록 전', text: unpaid.join('\n') });
-    list.push({ id: 'feedback', label: '피드백', text: [
+    items.unpaid = { id: 'unpaid', label: '등록 전', text: unpaid.join('\n') };
+    items.feedback = { id: 'feedback', label: '종합시험안내 및 리뷰 부탁', text: [
       '안녕하세요. ' + name + ' 수업을 함께해 주셔서 감사합니다.',
       '',
-      '도움이 된 점과 아쉬운 점을 아래에 짧게 남겨 주세요.',
+      '과정 이후 종합시험 안내입니다. 일정과 준비는 이 문자로 질문해 주세요.',
+      '',
+      '도움이 된 점과 아쉬운 점도 아래에 짧게 남겨 주세요.',
       'https://breezefeel.github.io/feedback/',
       '',
       '다음 수업에 반영하겠습니다.'
-    ].join('\n') });
-    return list;
+    ].join('\n') };
+    var order = consultBranch === 'ifc'
+      ? ['unpaid', 'anatomy', 'twoWeek', 'week', 'd3', 'after', 'day2', 'day3', 'feedback']
+      : ['unpaid', 'week', 'd3', 'after', 'day2', 'day3', 'feedback'];
+    return order.map(function (id) { return items[id]; });
   }
   function smsCurrentId() {
     var list = smsTemplates();
