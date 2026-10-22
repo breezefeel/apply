@@ -1284,22 +1284,33 @@
   }
   #panelPrice .price-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
   #panelPrice .price-actions .btn { flex: 0 0 auto; padding: 12px 16px; }
-  .price-stage {
+  .price-fit {
+    width: min(100%, 440px);
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+  }
+  .price-sheet {
+    width: 210mm;
+    height: 297mm;
+    box-sizing: border-box;
     background:
-      radial-gradient(420px 280px at 20% 0%, #4a403a 0%, transparent 60%),
+      radial-gradient(900px 520px at 18% 0%, #4a403a 0%, transparent 55%),
       #3c342f;
-    border-radius: 22px;
-    padding: 28px 18px;
+    padding: 11mm;
     display: flex;
-    justify-content: center;
+    transform-origin: top left;
   }
   .pcard {
-    width: 440px;
-    max-width: 100%;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     background: #f7f3ec;
-    border-radius: 28px;
-    padding: 34px 30px 26px;
-    box-shadow: 0 24px 60px rgba(0,0,0,.28);
+    border-radius: 18px;
+    padding: 28px 32px 24px;
+    box-shadow: none;
     color: #2a2622;
     font-family: Pretendard, "Apple SD Gothic Neo", sans-serif;
   }
@@ -1309,7 +1320,7 @@
     margin: 2px 0 0;
     text-align: center;
     font-family: Italianno, "Great Vibes", cursive;
-    font-size: 64px;
+    font-size: 78px;
     font-weight: 400;
     line-height: 1;
     color: #2f2a26;
@@ -1327,7 +1338,7 @@
   .pcard-sig-note { font-size: 14px; color: #5e574f; }
   .pcard-money { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
   .pcard-prog { margin-top: 22px; padding-top: 16px; border-top: 1px solid #e6dccf; }
-  .pcard-prog h2 { margin: 0; font-size: 20px; letter-spacing: -.03em; font-weight: 800; }
+  .pcard-prog h2 { margin: 0; font-size: 22px; line-height: 1.35; letter-spacing: -.03em; font-weight: 800; }
   .pcard-sub { margin: 4px 0 10px; font-size: 13px; color: #8a8178; }
   .pcard-line { padding: 9px 8px; }
   .pcard-line .pcard-name { font-size: 15px; }
@@ -1343,7 +1354,7 @@
   }
   .pcard-save { margin: 2px 4px 0; font-size: 12px; color: #8d6840; }
   .pcard-pace {
-    margin: 18px 0 0; padding-top: 14px; border-top: 1px solid #e6dccf;
+    margin: auto 0 0; padding-top: 14px; border-top: 1px solid #e6dccf;
     font-size: 13px; line-height: 1.55; color: #5c554e; text-align: center;
   }
   .pcard-foot {
@@ -1950,8 +1961,10 @@
           </div>
           <p class="cert-note" id="priceStatus">고친 내용은 이 브라우저에 남습니다. 다른 컴퓨터에는 받은 PNG를 가져가면 됩니다.</p>
         </section>
-        <div class="price-stage" id="priceStage">
-          <article class="pcard" id="priceCard"></article>
+        <div class="price-fit" id="priceFit">
+          <div class="price-sheet" id="priceSheet">
+            <article class="pcard" id="priceCard"></article>
+          </div>
         </div>
       </div>
     </div>
@@ -8178,7 +8191,7 @@
         foot: '움직임이 편해지는 시간 | REAL MOVEMENT',
         programs: [
           {
-            title: '50분 · 1:1',
+            title: '50분 · 1:1 리얼무브먼트 / 리얼페이스',
             sub: '레슨 25분 뒤 돔 25분',
             rows: [
               { name: '1회', total: '4.5만원', unit: '', save: '', recommend: false },
@@ -8187,7 +8200,7 @@
             ]
           },
           {
-            title: '80분 · 1:1',
+            title: '80분 · 1:1 리얼무브먼트 / 리얼페이스',
             sub: '레슨 55분 뒤 돔 25분',
             rows: [
               { name: '8회권', total: '62만원', unit: '회당 7.75만원', save: '', recommend: false },
@@ -8202,7 +8215,13 @@
     var defaults = priceCardDefaults_();
     try {
       var saved = JSON.parse(localStorage.getItem(PRICE_CARD_KEY) || 'null');
-      if (saved && saved.yaksu && saved.yaksu.programs && saved.incheon && saved.incheon.programs) return saved;
+      if (saved && saved.yaksu && saved.yaksu.programs && saved.incheon && saved.incheon.programs) {
+        (saved.incheon.programs || []).forEach(function (p) {
+          if (p.title === '50분 · 1:1') p.title = '50분 · 1:1 리얼무브먼트 / 리얼페이스';
+          if (p.title === '80분 · 1:1') p.title = '80분 · 1:1 리얼무브먼트 / 리얼페이스';
+        });
+        return saved;
+      }
     } catch (e) {}
     return defaults;
   }
@@ -8325,6 +8344,18 @@
     if (pace) html += '<p class="pcard-pace">' + pace + '</p>';
     if (foot) html += '<div class="pcard-foot">' + foot + '</div>';
     box.innerHTML = html;
+    fitPriceSheet_();
+  }
+  function fitPriceSheet_() {
+    var fit = $('priceFit');
+    var sheet = $('priceSheet');
+    if (!fit || !sheet || !fit.clientWidth) return;
+    sheet.style.transform = 'none';
+    var natural = sheet.offsetWidth || 1;
+    var scale = fit.clientWidth / natural;
+    if (!scale || scale > 1) scale = 1;
+    sheet.style.transform = 'scale(' + scale + ')';
+    fit.style.height = Math.ceil(sheet.offsetHeight * scale) + 'px';
   }
   function paintPriceBranch_() {
     var box = $('priceBranchChips');
@@ -8349,14 +8380,38 @@
     renderPricePreview_();
     var status = $('priceStatus');
     if (status) status.textContent = '이미지를 만드는 중…';
-    var ready = (document.fonts && document.fonts.load) ? document.fonts.load('64px Italianno').catch(function () {}) : Promise.resolve();
+    var ready = (document.fonts && document.fonts.load) ? document.fonts.load('78px Italianno').catch(function () {}) : Promise.resolve();
+    var sheet = $('priceSheet');
+    var prev = sheet.style.transform;
+    sheet.style.transform = 'none';
+    sheet.style.position = 'fixed';
+    sheet.style.left = '-12000px';
+    sheet.style.top = '0';
     Promise.resolve(ready).then(function () { return loadHtml2Canvas_(); }).then(function (h2c) {
-      return h2c($('priceStage'), { scale: 2, backgroundColor: '#3c342f', useCORS: true });
+      return h2c(sheet, {
+        scale: 2,
+        backgroundColor: '#3c342f',
+        useCORS: true,
+        width: sheet.offsetWidth,
+        height: sheet.offsetHeight,
+        windowWidth: sheet.offsetWidth,
+        windowHeight: sheet.offsetHeight
+      });
     }).then(function (canvas) {
+      sheet.style.transform = prev;
+      sheet.style.position = '';
+      sheet.style.left = '';
+      sheet.style.top = '';
+      fitPriceSheet_();
       var name = (priceBranch === 'incheon' ? '가격표-인천' : '가격표-약수') + '.png';
       triggerImageDownload(canvas.toDataURL('image/png'), name);
       if (status) status.textContent = name + ' 이미지를 저장했습니다.';
     }).catch(function () {
+      sheet.style.transform = prev;
+      sheet.style.position = '';
+      sheet.style.left = '';
+      sheet.style.top = '';
+      fitPriceSheet_();
       if (status) status.textContent = '이미지를 만들지 못했습니다. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.';
     });
   }
@@ -9717,6 +9772,7 @@
   window.addEventListener('resize', function () {
     fitFaqBox();
     if (document.body.classList.contains('mode-receipt')) fitPreview();
+    if (document.body.classList.contains('mode-price')) fitPriceSheet_();
   });
   var pageTitle = document.title;
   function receiptPdfName() {
