@@ -1190,9 +1190,25 @@
     font-size: 15px; font-weight: 800; line-height: 1.5;
   }
   .plan-foot { margin-top: 12px; font-size: 12px; color: var(--mute); line-height: 1.5; }
+  #planProposalStage { position: relative; margin-top: 14px; }
   #planProposalCanvas {
-    width: 100%; height: auto; display: block; margin-top: 14px;
+    width: 100%; height: auto; display: block;
     border-radius: 12px; background: #f6f1e8;
+  }
+  #planProposalHits { position: absolute; inset: 0; pointer-events: none; }
+  .plan-hit {
+    position: absolute; pointer-events: auto; border: 0; padding: 0; margin: 0;
+    background: transparent; cursor: text; border-radius: 4px;
+  }
+  .plan-hit:hover, .plan-hit:focus-visible {
+    outline: 2px solid rgba(196, 160, 86, .95);
+    background: rgba(255, 252, 248, .22);
+  }
+  .plan-hit-edit {
+    position: absolute; z-index: 4; box-sizing: border-box;
+    border: 2px solid #C4A056; border-radius: 8px; padding: 6px 8px;
+    font: 600 15px/1.45 Pretendard, sans-serif; color: #1B2A4A; background: #fff;
+    resize: vertical; min-height: 42px;
   }
   .plan-scroll { overflow-x: auto; margin: 8px 0 12px; }
   .plan-doc table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 640px; }
@@ -1317,65 +1333,65 @@
     flex-direction: column;
     background: #f7f3ec;
     border-radius: 18px;
-    padding: 22px 32px 18px;
+    padding: 14px 28px 10px;
     box-shadow: none;
     color: #2a2622;
     font-family: Pretendard, "Apple SD Gothic Neo", sans-serif;
     overflow: hidden;
   }
   .pcard-logo { display: flex; justify-content: center; }
-  .pcard-logo svg { width: 72px; height: 78px; }
+  .pcard-logo svg { width: 48px; height: 52px; }
   .pcard-script {
     margin: 0;
     text-align: center;
     font-family: Italianno, "Great Vibes", cursive;
-    font-size: 64px;
+    font-size: 46px;
     font-weight: 400;
-    line-height: 0.9;
+    line-height: 0.8;
     color: #2f2a26;
   }
-  .pcard-rule { height: 1px; background: #d9cfc2; margin: 8px 36px 18px; }
+  .pcard-rule { height: 1px; background: #d9cfc2; margin: 2px 36px 8px; }
   .pcard-kicker {
-    margin: 0; text-align: center; letter-spacing: .22em;
-    font-size: 11px; color: #8a8178;
+    margin: 0; text-align: center; letter-spacing: .18em;
+    font-size: 13px; color: #8a8178;
   }
   .pcard-sig, .pcard-line {
     display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
   }
-  .pcard-anchor .pcard-total { font-size: 22px; }
-  .pcard-sig { margin-top: 6px; }
-  .pcard-sig-name { font-size: 16px; font-weight: 700; letter-spacing: -.02em; color: #5c554e; }
-  .pcard-sig-note { font-size: 13px; color: #8a8178; }
+  .pcard-anchor .pcard-total { font-size: 26px; }
+  .pcard-sig { margin-top: 4px; }
+  .pcard-sig-name { font-size: 19px; font-weight: 700; letter-spacing: -.02em; color: #5c554e; }
+  .pcard-sig-note { font-size: 16px; color: #8a8178; }
   .pcard-money { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-  .pcard-prog { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e6dccf; }
-  .pcard-prog:first-of-type { margin-top: 22px; padding-top: 16px; }
-  .pcard-prog h2 { margin: 0; font-size: 22px; line-height: 1.35; letter-spacing: -.03em; font-weight: 800; }
-  .pcard-sub { margin: 6px 0 12px; font-size: 14px; line-height: 1.45; color: #5c5348; }
-  .pcard-line { padding: 9px 8px; }
-  .pcard-line .pcard-name { font-size: 15px; }
-  .pcard-total { font-size: 17px; font-weight: 700; }
-  .pcard-unit { display: block; margin-top: 1px; font-size: 12px; font-weight: 500; color: #8a8178; }
+  .pcard-prog { margin-top: 8px; padding-top: 8px; border-top: 1px solid #e6dccf; }
+  .pcard-prog:first-of-type { margin-top: 10px; padding-top: 8px; }
+  .pcard-prog h2 { margin: 0; font-size: 26px; line-height: 1.3; letter-spacing: -.03em; font-weight: 800; }
+  .pcard-sub { margin: 4px 0 6px; font-size: 17px; line-height: 1.4; color: #5c5348; }
+  .pcard-line { padding: 6px 8px; }
+  .pcard-line .pcard-name { font-size: 18px; }
+  .pcard-total { font-size: 21px; font-weight: 700; }
+  .pcard-unit { display: block; margin-top: 1px; font-size: 16px; font-weight: 600; color: #5c5348; }
   .pcard-rec {
-    margin: 4px 0 2px; padding: 12px 12px 11px; border-radius: 14px; background: #f3e7d4;
+    margin: 4px 0 2px; padding: 10px 12px 8px; border-radius: 14px; background: #f3e7d4;
   }
-  .pcard-rec .pcard-name { font-weight: 700; }
+  .pcard-rec .pcard-name { font-weight: 700; font-size: 18px; }
   .pcard-badge {
-    display: inline-block; margin-right: 6px; padding: 1px 7px 2px; border-radius: 999px;
-    background: #8d6840; color: #fff; font-size: 11px; font-weight: 700; vertical-align: 1px;
+    display: inline-block; margin-right: 6px; padding: 2px 8px 3px; border-radius: 999px;
+    background: #8d6840; color: #fff; font-size: 13px; font-weight: 700; vertical-align: 1px;
   }
-  .pcard-save { margin: 2px 4px 0; font-size: 12px; color: #8d6840; }
+  .pcard-save { margin: 4px 4px 0; font-size: 16px; font-weight: 700; color: #8d6840; line-height: 1.35; }
   .pcard-bottom {
-    margin-top: 14px;
+    margin-top: 8px;
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 0;
   }
   .pcard-pace {
-    margin: 0 0 12px;
-    padding: 0 6px;
+    margin: 0 0 8px;
+    padding: 0 4px;
     border-top: 0;
-    font-size: 14px; line-height: 1.55; color: #3f3832; text-align: center; font-weight: 700;
+    font-size: 18px; line-height: 1.45; color: #3f3832; text-align: center; font-weight: 700;
   }
   .pcard-merits {
     list-style: none;
@@ -1384,29 +1400,29 @@
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    gap: 10px;
-    padding: 16px 16px 16px 18px;
+    gap: 8px;
+    padding: 12px 14px 12px 16px;
     background: #f3eee4;
     border-radius: 14px;
   }
   .pcard-merits li {
     position: relative;
-    padding-left: 14px;
-    font-size: 14.5px;
-    line-height: 1.45;
+    padding-left: 16px;
+    font-size: 18px;
+    line-height: 1.4;
     color: #3f3832;
   }
   .pcard-merits li:before {
     content: "";
     position: absolute;
     left: 0; top: .55em;
-    width: 5px; height: 5px;
+    width: 6px; height: 6px;
     border-radius: 50%;
     background: #8d6840;
   }
   .pcard-foot {
-    margin-top: 14px; background: #e7e1d8; border-radius: 12px; text-align: center;
-    padding: 12px 10px; font-size: 14px; font-weight: 700;
+    margin-top: 8px; background: #e7e1d8; border-radius: 12px; text-align: center;
+    padding: 10px 10px; font-size: 16px; font-weight: 700;
   }
   .pcard-foot span { font-weight: 600; letter-spacing: .04em; }
   @media (max-width: 860px) {
@@ -1964,7 +1980,9 @@
             <label>수강료<input data-k="fee" placeholder="인원과 일정이 정해진 뒤 협의"></label>
           </div>
           </div>
-          <canvas id="planProposalCanvas" width="2480" height="3508"></canvas>
+          <div id="planProposalStage">
+            <canvas id="planProposalCanvas" width="2480" height="3508"></canvas>
+          </div>
         </article>
         <section class="card no-print" id="planPoster" hidden>
           <div class="reply-label"><span>포스터 · A3 한 장</span></div>
@@ -8204,8 +8222,8 @@
         sigNote: '정상가',
         sigItem: '시그니처 1회',
         sigPrice: '12.5만원',
-        pace: '주 2회가 적당합니다.\n한 주를 쉬어도, 남은 수업은 그대로입니다.',
-        notes: ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 끝난 뒤에도 스스로 유지할 수 있습니다.'],
+        pace: '초기에는 주2회를 추천합니다.\n홈트가 가능해지면 주1회도 괜찮습니다.',
+        notes: ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'],
         foot: '움직임이 편해지는 시간 | REAL MOVEMENT',
         programs: [
           {
@@ -8223,7 +8241,7 @@
             rows: [
               { name: '1회', total: '12.5만원', unit: '', save: '', recommend: false },
               { name: '8회권', total: '76만원', unit: '회당 9.5만원', save: '', recommend: false },
-              { name: '24회권', total: '216만원', unit: '회당 9만원', save: '', recommend: true }
+              { name: '24회권', total: '216만원', unit: '회당 9만원', save: '1회보다 회당 35,000원 적습니다', recommend: true }
             ]
           }
         ]
@@ -8233,8 +8251,8 @@
         sigNote: '정상가',
         sigItem: '시그니처 1회',
         sigPrice: '12.5만원',
-        pace: '주 2회가 적당합니다.\n한 주를 쉬어도, 남은 수업은 그대로입니다.',
-        notes: ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 끝난 뒤에도 스스로 유지할 수 있습니다.'],
+        pace: '초기에는 주2회를 추천합니다.\n홈트가 가능해지면 주1회도 괜찮습니다.',
+        notes: ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'],
         foot: '움직임이 편해지는 시간 | REAL MOVEMENT',
         programs: [
           {
@@ -8265,15 +8283,25 @@
       if (saved && saved.yaksu && saved.yaksu.programs && saved.incheon && saved.incheon.programs) {
         var oldPaces = [
           '주 2회를 권합니다.\n매주 두 번을 지키지 못해도 횟수는 남습니다.',
-          '주 2회가 적당합니다.\n한 주 쉬어도 횟수는 남습니다.'
+          '주 2회가 적당합니다.\n한 주 쉬어도 횟수는 남습니다.',
+          '주 2회가 적당합니다.\n한 주를 쉬어도, 남은 수업은 그대로입니다.'
         ];
-        var newPace = '주 2회가 적당합니다.\n한 주를 쉬어도, 남은 수업은 그대로입니다.';
+        var newPace = '초기에는 주2회를 추천합니다.\n홈트가 가능해지면 주1회도 괜찮습니다.';
         var oldNotes = ['한 번에 한 분입니다. 오늘 컨디션에 맞춰 진행합니다.', '끝나면 집에서 할 동작 하나를 가져갑니다.'];
-        var newNotes = ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 끝난 뒤에도 스스로 유지할 수 있습니다.'];
+        var prevNotes = ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 끝난 뒤에도 스스로 유지할 수 있습니다.'];
+        var newNotes = ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'];
+        var changed = false;
         ['yaksu', 'incheon'].forEach(function (key) {
           var card = saved[key];
-          if (oldPaces.indexOf(card.pace) >= 0) card.pace = newPace;
-          if (!card.notes || !card.notes.length || JSON.stringify(card.notes) === JSON.stringify(oldNotes)) card.notes = newNotes.slice();
+          if (oldPaces.indexOf(card.pace) >= 0) { card.pace = newPace; changed = true; }
+          var notesKey = JSON.stringify(card.notes || []);
+          if (!card.notes || !card.notes.length || notesKey === JSON.stringify(oldNotes) || notesKey === JSON.stringify(prevNotes)) {
+            card.notes = newNotes.slice();
+            changed = true;
+          } else if (card.notes[1] === prevNotes[1]) {
+            card.notes[1] = newNotes[1];
+            changed = true;
+          }
         });
         (saved.yaksu.programs || []).forEach(function (p) {
           if (p.title === '70분 · 1:1 리얼 컨디셔닝') p.title = '70분 · 1:1 리얼무브먼트 + 컨디셔닝';
@@ -8283,7 +8311,18 @@
           if (p.title === '70분 · 1:1 리얼무브먼트 + 컨디셔닝' && (!p.sub || p.sub === '50분에 기능 운동을 더합니다. 버티는 힘을 같이 봅니다.')) {
             p.sub = '레슨 40분 + 두타 마사지 10분 + 컨디셔닝 20분';
           }
+          if (p.title === '70분 · 1:1 리얼무브먼트 + 컨디셔닝') {
+            (p.rows || []).forEach(function (row) {
+              if (row.name === '24회권' && row.recommend && !String(row.save || '').trim()) {
+                row.save = '1회보다 회당 35,000원 적습니다';
+                changed = true;
+              }
+            });
+          }
         });
+        if (changed) {
+          try { localStorage.setItem(PRICE_CARD_KEY, JSON.stringify(saved)); } catch (eSave) {}
+        }
         (saved.incheon.programs || []).forEach(function (p) {
           if (p.title === '50분 · 1:1') p.title = '50분 · 1:1 리얼무브먼트 / 리얼페이스';
           if (p.title === '80분 · 1:1') p.title = '80분 · 1:1 리얼무브먼트 / 리얼페이스';
@@ -8874,31 +8913,32 @@
         kicker: '리얼무브먼트',
         program: '힐스테이트 자이 계양',
         hook: '커뮤니티 프로그램 제안',
-        lead: '오래 앉으면 허리와 어깨가 뭉칩니다. 폼롤러와 공으로 그곳을 풀고, 스트레칭과 바른 자세까지 스스로 하는 법을 배웁니다. 4주가 끝나면 집에서도 같은 순서로 아픈 곳을 돌볼 수 있습니다.',
+        lead: '한 자세로 지속하면, 어깨나 허리 근육이 뭉칩니다. 폼롤러와 소도구로 뭉친 근육을 풀고, 스트레칭과 바른 자세까지 스스로 잡는 법을 배웁니다.\n4주 과정으로, 집에서도 같은 순서로 진행하시면 셀프 통증 케어에 많은 도움이 됩니다.',
         facts: [
-          { b: '주 2회 · 4주', s: '총 8회, 커뮤니티실' },
+          { b: '주 2회 · 4주', s: '총 8회, 커뮤니티 그룹운동실' },
           { b: '한 회 50분', s: '자극 · 스트레칭 · 바른 자세' },
-          { b: '6~8명', s: '근골격계 전문가 강사가 진행합니다' }
+          { b: '6~8명', s: '근골격계 전문강사가 진행합니다' }
         ],
         photoCap: '',
+        meritTitle: '이 수업을 통해서',
         merits: [
-          { h: '집에서도 스스로 풉니다', p: '배운 순서를 집에 가져갑니다. 뭉친 허리와 어깨를 같은 방법으로 돌봅니다.' },
-          { h: '소도구로 순서가 있습니다', p: '폼롤러와 공으로 풀고, 스트레칭으로 늘린 뒤, 바른 자세를 잡습니다.' },
-          { h: '전문가가 옆에서 봐 줍니다', p: '근골격계 전문가가 동작을 고칩니다. 아프면 멈추는 곳도 알려 줍니다.' }
+          { h: '집에서도 할 수 있는 셀프케어를 배웁니다', p: '배운 순서를 홈트해보세요. 뭉친 허리와 어깨를 같은 방법으로 풀어갑니다.' },
+          { h: '셀프케어에도 순서가 있습니다', p: '폼롤러와 소도구로 풀고, 스트레칭 다음 바른 자세를 잡습니다.' },
+          { h: '근골격계 전문가가 동작을 바로잡아줍니다', p: '아프면 멈춰야 하는 곳도 알려 줍니다.' }
         ],
-        meritFoot: '8회가 끝나면, 집에서도 같은 순서로 합니다.',
+        meritFoot: '8회가 끝나도, 집에서 계속 하면 가벼운 근골격계 통증을 케어하는 데 큰 도움이 됩니다.',
         weeks: [
-          { d: '1주', h: '누워서', why: '누우면 허리 힘이 빠져, 처음에도 따라갑니다.', gain: '아픈 범위는 피하고, 오늘 풀 곳만 알게 됩니다.' },
-          { d: '2주', h: '앉아서', why: '평소 앉는 의자에서 같은 동작을 합니다.', gain: '집에 앉아서도 허리와 골반을 풀 수 있습니다.' },
-          { d: '3주', h: '바르게 서서', why: '선 자세에도 남아야 걷고 설 때 힘이 됩니다.', gain: '벽이나 의자를 잡고 바르게 서는 연습입니다.' },
-          { d: '4주', h: '전신', why: '한 곳만 풀면 금방 돌아옵니다.', gain: '집에서도 전신을 한 순서로 반복합니다.' }
+          { d: '1주', h: '누워서', why: '가장 안전하게 시작할 수 있는 자세입니다.', gain: '부상 위험을 최대한 줄여, 누구나 쉽게 시작합니다.' },
+          { d: '2주', h: '앉아서', why: '바르게 앉는 자세와 스트레칭을 배웁니다.', gain: '앉아 있는 시간이 많은 분도, 그날 바로 쓸 수 있습니다.' },
+          { d: '3주', h: '바르게 서서', why: '설 때와 걸을 때도 같은 자세를 유지합니다.', gain: '오래 서 있는 분도, 그 자리에서 바로 쓸 수 있습니다.' },
+          { d: '4주', h: '전신', why: '풀었던 곳을 전신 한 순서로 잇습니다.', gain: '4주가 끝나면 집에서도 혼자 같은 순서로 합니다.' }
         ],
         beatTitle: '한 회 50분',
         beats: [
-          { t: '셀프 자극', h: '폼롤러와 공으로 뭉친 곳을 엽니다' },
-          { t: '스트레칭', h: '그 부위를 아프지 않은 만큼 늘립니다' },
-          { t: '바른 자세', h: '앉고 설 때 같은 정렬을 잡습니다' },
-          { t: '기능 운동', h: '그 자세로 걷고 서는 동작까지 잇습니다' }
+          { t: '셀프 자극', h: '폼롤러와 공으로 뭉친 부위를 자극합니다' },
+          { t: '스트레칭', h: '자극한 부위를 아프지 않은 범위만큼 늘립니다' },
+          { t: '바른 자세', h: '앉고 설 때 바른 정렬을 잡습니다' },
+          { t: '기능 운동', h: '몸의 기능을 연결하고 강화합니다' }
         ],
         whoTitle: '이런 분께 도움이 됩니다',
         who: [
@@ -8910,8 +8950,8 @@
         teacherLine: '물리치료사 · 카이로프랙터',
         teacherBody: '서울아산병원 도수치료과장, 연세척추재활 도수운동치료센터장을 지냈습니다. 폼롤러와 공으로, 집에서도 따라 하는 순서를 알려 드립니다.',
         space: '준비: 매트, 폼롤러, 12cm 볼 등',
-        cta: '가능하신 요일과 인원을 회신해 주시면, 그 일정으로 시작합니다.',
-        foot: '수강료는 인원과 일정이 정해진 뒤 정합니다. 찌릿함, 저림, 최근 다친 부위가 있으면 병원 진료를 먼저 합니다.'
+        cta: '',
+        foot: ''
       }
     },
     face: {
@@ -8989,6 +9029,130 @@
   function planLetter() {
     return PLAN_LETTERS[planPosterBrand] || PLAN_LETTERS.movement;
   }
+  var PLAN_SHEET_EDIT_KEY = 'rm-plan-sheet-edits-v1';
+  var planHitRegions = [];
+  function planSheetEdits_() {
+    try { return JSON.parse(localStorage.getItem(PLAN_SHEET_EDIT_KEY) || '{}'); } catch (e) { return {}; }
+  }
+  function planSheetDefault_(key) {
+    var S = (planLetter().sheet) || {};
+    var m = /^fact\.(\d+)\.(b|s)$/.exec(key);
+    if (m) return ((S.facts || [])[+m[1]] || {})[m[2]] || '';
+    m = /^merit\.(\d+)\.(h|p)$/.exec(key);
+    if (m) return ((S.merits || [])[+m[1]] || {})[m[2]] || '';
+    m = /^week\.(\d+)\.(d|h|why|gain|p)$/.exec(key);
+    if (m) return ((S.weeks || [])[+m[1]] || {})[m[2]] || '';
+    m = /^beat\.(\d+)\.(t|h)$/.exec(key);
+    if (m) return ((S.beats || [])[+m[1]] || {})[m[2]] || '';
+    m = /^who\.(\d+)$/.exec(key);
+    if (m) return (S.who || [])[+m[1]] || '';
+    if (key === 'meritTitle') return S.meritTitle || '이 수업을 하면';
+    if (key === 'weekTitle') return S.weekTitle || '4주가 이렇게 이어집니다';
+    return S[key] == null ? '' : String(S[key]);
+  }
+  function planApplySheetEdits_(sheet) {
+    var bag = planSheetEdits_()[planPosterBrand] || {};
+    var next = JSON.parse(JSON.stringify(sheet || {}));
+    function put(key, apply) {
+      if (Object.prototype.hasOwnProperty.call(bag, key)) apply(bag[key]);
+    }
+    ['kicker', 'program', 'hook', 'lead', 'meritTitle', 'meritFoot', 'weekTitle', 'beatTitle', 'whoTitle', 'teacher', 'teacherLine', 'teacherBody', 'space', 'cta', 'foot', 'photoCap'].forEach(function (k) {
+      put(k, function (v) { next[k] = v; });
+    });
+    (next.facts || []).forEach(function (f, i) {
+      put('fact.' + i + '.b', function (v) { f.b = v; });
+      put('fact.' + i + '.s', function (v) { f.s = v; });
+    });
+    (next.merits || []).forEach(function (f, i) {
+      put('merit.' + i + '.h', function (v) { f.h = v; });
+      put('merit.' + i + '.p', function (v) { f.p = v; });
+    });
+    (next.weeks || []).forEach(function (f, i) {
+      ['d', 'h', 'why', 'gain', 'p'].forEach(function (part) {
+        put('week.' + i + '.' + part, function (v) { f[part] = v; });
+      });
+    });
+    (next.beats || []).forEach(function (f, i) {
+      put('beat.' + i + '.t', function (v) { f.t = v; });
+      put('beat.' + i + '.h', function (v) { f.h = v; });
+    });
+    (next.who || []).forEach(function (line, i) {
+      put('who.' + i, function (v) { next.who[i] = v; });
+    });
+    return next;
+  }
+  function planSheetSave_(key, value) {
+    var all = planSheetEdits_();
+    var bag = all[planPosterBrand] || {};
+    var text = String(value == null ? '' : value).replace(/\s+$/g, '');
+    if (text === String(planSheetDefault_(key) || '').replace(/\s+$/g, '')) delete bag[key];
+    else bag[key] = text;
+    if (Object.keys(bag).length) all[planPosterBrand] = bag;
+    else delete all[planPosterBrand];
+    try { localStorage.setItem(PLAN_SHEET_EDIT_KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  function mountPlanHits_() {
+    var stage = $('planProposalStage');
+    var canvas = $('planProposalCanvas');
+    if (!stage || !canvas) return;
+    var old = $('planProposalHits');
+    if (old) old.remove();
+    var editing = stage.querySelector('.plan-hit-edit');
+    if (editing) editing.remove();
+    var layer = document.createElement('div');
+    layer.id = 'planProposalHits';
+    layer.className = 'no-print';
+    var scale = canvas.clientWidth / PLAN_A3_W;
+    planHitRegions.forEach(function (r) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'plan-hit';
+      b.title = '눌러서 고치기';
+      b.style.left = (r.x * scale) + 'px';
+      b.style.top = (r.y * scale) + 'px';
+      b.style.width = Math.max(r.w * scale, 28) + 'px';
+      b.style.height = Math.max(r.h * scale, 18) + 'px';
+      b.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        openPlanHitEdit_(r, scale);
+      });
+      layer.appendChild(b);
+    });
+    stage.appendChild(layer);
+  }
+  function openPlanHitEdit_(r, scale) {
+    var stage = $('planProposalStage');
+    if (!stage) return;
+    var prev = stage.querySelector('.plan-hit-edit');
+    if (prev) prev.remove();
+    var ta = document.createElement('textarea');
+    ta.className = 'plan-hit-edit no-print';
+    ta.value = r.text || '';
+    ta.style.left = (r.x * scale) + 'px';
+    ta.style.top = (r.y * scale) + 'px';
+    ta.style.width = Math.max(r.w * scale, 180) + 'px';
+    ta.style.height = Math.max(r.h * scale + 8, 52) + 'px';
+    var done = false;
+    function commit(save) {
+      if (done) return;
+      done = true;
+      var next = ta.value;
+      ta.remove();
+      if (save && next !== (r.text || '')) {
+        planSheetSave_(r.key, next);
+        renderPlanLetter();
+      }
+    }
+    ta.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.preventDefault(); commit(false); }
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); commit(true); }
+    });
+    ta.addEventListener('blur', function () { commit(true); });
+    stage.appendChild(ta);
+    ta.focus();
+    ta.select();
+  }
   var planLetterPaint = 0;
   function renderPlanLetter() {
     var canvas = $('planProposalCanvas');
@@ -9003,6 +9167,7 @@
       canvas.width = page.width;
       canvas.height = page.height;
       canvas.getContext('2d').drawImage(page, 0, 0);
+      mountPlanHits_();
     });
   }
   function planImagePool() {
@@ -9411,9 +9576,9 @@
     if (note) {
       if (showPoster) note.textContent = '추천 사진에서 고르거나 사진을 첨부합니다. 세 장까지, A3 한 장입니다.';
       else if (item.example && showProgram) note.textContent = item.title + ' 프로그램을 바탕으로 한 예시입니다.';
-      else if (item.example) note.textContent = item.title + ' 제안서 예시입니다. 소개, 대상, 강의안, 강사 순서입니다.';
+      else if (item.example) note.textContent = item.title + ' 제안서 예시입니다. 글 위를 누르면 그 칸을 고칩니다.';
       else if (showProgram) note.textContent = '지금 준비 중인 수업입니다. 개요는 전체 흐름이고, 주차는 그 주의 두 회차입니다.';
-      else note.textContent = 'A4 한 장입니다. 위 칸을 고치면 장 아래 일정에 들어갑니다.';
+      else note.textContent = 'A4 한 장입니다. 글 위를 누르면 그 칸을 고치고, 위 칸은 일정에 들어갑니다.';
     }
     if ($('planDownload')) $('planDownload').textContent = planPart === 'proposal' ? 'PDF로 받기' : '파일로 받기';
     if (showPoster) {
@@ -9481,7 +9646,8 @@
     var H = PLAN_A3_H;
     var pad = 36;
     var inner = W - pad * 2;
-    var S = L.sheet || {};
+    var S = planApplySheetEdits_(L.sheet || {});
+    planHitRegions = [];
     var canvas = document.createElement('canvas');
     var ctx = planSurface(canvas, W, H, 2);
     ctx.textBaseline = 'top';
@@ -9497,6 +9663,10 @@
       ctx.fillStyle = color;
       ctx.textAlign = 'left';
       return posterFillLines(ctx, lines, x, y, lh);
+    }
+    function hit(key, text, x, y, w, h) {
+      if (!key) return;
+      planHitRegions.push({ key: key, text: text == null ? '' : String(text), x: x, y: y, w: w, h: Math.max(h, 18) });
     }
     function rrect(x, y, w, h, r, fill) {
       var rr = Math.min(r, w / 2, h / 2);
@@ -9522,7 +9692,7 @@
       ctx.clip();
     }
     var leadFont = '500 24px Pretendard, sans-serif';
-    var leadLines = fontWrap(S.lead || '', leadFont, inner).slice(0, 4);
+    var leadLines = fontWrap(S.lead || '', leadFont, inner).slice(0, 5);
     var programFont = '800 48px Pretendard, sans-serif';
     var programLines = fontWrap(S.program || '', programFont, inner).slice(0, 2);
     var hookFont = '700 30px Pretendard, sans-serif';
@@ -9534,14 +9704,22 @@
     ctx.fillRect(0, headerH - 6, W, 6);
     var y = 28;
     ctx.letterSpacing = '1.4px';
+    var kickerY = y;
     paint([S.kicker || ''], pad, y, 22, '#E4C98A', '700 16px Pretendard, sans-serif');
+    hit('kicker', S.kicker, pad, kickerY, inner, 22);
     ctx.letterSpacing = '0px';
     y += 26;
+    var programY = y;
     paint(programLines, pad, y, 56, '#FFFFFF', programFont);
+    hit('program', S.program, pad, programY, inner, programLines.length * 56);
     y += programLines.length * 56 + 4;
+    var hookY = y;
     paint(hookLines, pad, y, 36, '#F3D48A', hookFont);
+    hit('hook', S.hook, pad, hookY, inner, hookLines.length * 36);
     y += hookLines.length * 36 + 8;
+    var leadY = y;
     paint(leadLines, pad, y, 32, '#F4E6D4', leadFont);
+    hit('lead', S.lead, pad, leadY, inner, Math.max(leadLines.length, 1) * 32);
     y = headerH + 16;
     var facts = S.facts || [];
     var gap = 12;
@@ -9552,32 +9730,40 @@
       rrect(x, y, fw, factH, 12, '#FFFCF8');
       ctx.fillStyle = '#C4A056';
       ctx.fillRect(x, y + 16, 5, factH - 32);
-      paint(fontWrap(f.b, '800 22px Pretendard, sans-serif', fw - 36).slice(0, 1), x + 20, y + 14, 26, '#1B2A4A', '800 22px Pretendard, sans-serif');
-      paint(fontWrap(f.s, '600 18px Pretendard, sans-serif', fw - 36).slice(0, 2), x + 20, y + 46, 22, '#5C4A38', '600 18px Pretendard, sans-serif');
+      var bLines = fontWrap(f.b, '800 22px Pretendard, sans-serif', fw - 36).slice(0, 1);
+      var sLines = fontWrap(f.s, '600 18px Pretendard, sans-serif', fw - 36).slice(0, 2);
+      paint(bLines, x + 20, y + 14, 26, '#1B2A4A', '800 22px Pretendard, sans-serif');
+      paint(sLines, x + 20, y + 46, 22, '#5C4A38', '600 18px Pretendard, sans-serif');
+      hit('fact.' + i + '.b', f.b, x + 16, y + 12, fw - 28, 28);
+      hit('fact.' + i + '.s', f.s, x + 16, y + 44, fw - 28, 40);
     });
     y += factH + 14;
     var bottom = 28;
     var sectionGap = 14;
     var weekHead = 36;
-    var scheduleH = 208;
+    var scheduleH = (S.cta || S.foot) ? 208 : 156;
     var avail = H - bottom - y - scheduleH - sectionGap * 4 - weekHead;
     var photoH = Math.round(avail * 0.36);
     var weekH = Math.round(avail * 0.27);
     var beatH = Math.round(avail * 0.14);
     if (photoH > 400) photoH = 400;
     if (photoH < 348) photoH = 348;
-    if (weekH < 232) weekH = 232;
-    if (weekH > 246) weekH = 246;
+    if (weekH < 268) weekH = 268;
+    if (weekH > 292) weekH = 292;
     if (beatH < 136) beatH = 136;
     if (beatH > 158) beatH = 158;
     var whoH = avail - photoH - weekH - beatH;
-    if (whoH < 250) {
-      weekH -= 250 - whoH;
-      whoH = 250;
+    if (whoH < 228) {
+      var lack = 228 - whoH;
+      var photoGive = Math.max(0, photoH - 320);
+      var take = Math.min(lack, photoGive);
+      photoH -= take;
+      weekH -= lack - take;
+      whoH = 228;
     }
-    if (whoH > 272) {
-      var extraWho = whoH - 272;
-      whoH = 272;
+    if (whoH > 208) {
+      var extraWho = whoH - 208;
+      whoH = 208;
       if (photoH + extraWho < 430) photoH += extraWho;
     }
     var photoW = Math.round(inner * 0.36);
@@ -9598,10 +9784,12 @@
     }
     ctx.restore();
     rrect(meritX, y, meritW, photoH, 14, '#FFFCF8');
-    paint(['이 수업을 하면'], meritX + 22, y + 16, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
+    var meritTitle = S.meritTitle || '이 수업을 하면';
+    paint([meritTitle], meritX + 22, y + 16, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
+    hit('meritTitle', meritTitle, meritX + 18, y + 12, meritW - 36, 30);
     var merits = S.merits || [];
     var meritTop = y + 54;
-    var meritFootH = S.meritFoot ? 48 : 16;
+    var meritFootH = S.meritFoot ? 70 : 16;
     var meritRoom = photoH - 54 - meritFootH - 8;
     var slot = meritRoom / Math.max(merits.length, 1);
     merits.forEach(function (m, i) {
@@ -9618,17 +9806,25 @@
       ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
       paint([m.h], meritX + 60, rowY, 26, '#1B2A4A', '800 22px Pretendard, sans-serif');
+      hit('merit.' + i + '.h', m.h, meritX + 56, rowY, meritW - 74, 26);
       var body = fontWrap(m.p, '500 20px Pretendard, sans-serif', meritW - 84);
       var maxBody = Math.max(2, Math.floor((slot - 30) / 26));
-      paint(body.slice(0, maxBody), meritX + 60, rowY + 30, 26, '#243044', '500 20px Pretendard, sans-serif');
+      var shown = body.slice(0, maxBody);
+      paint(shown, meritX + 60, rowY + 30, 26, '#243044', '500 20px Pretendard, sans-serif');
+      hit('merit.' + i + '.p', m.p, meritX + 56, rowY + 28, meritW - 74, Math.max(shown.length, 1) * 26);
     });
     if (S.meritFoot) {
+      var footLines = fontWrap(S.meritFoot, '700 18px Pretendard, sans-serif', meritW - 56).slice(0, 2);
+      var footH = 10 + footLines.length * 22;
       ctx.fillStyle = '#F6E7C8';
-      ctx.fillRect(meritX + 18, y + photoH - 48, meritW - 36, 32);
-      paint(fontWrap(S.meritFoot, '700 18px Pretendard, sans-serif', meritW - 56).slice(0, 1), meritX + 28, y + photoH - 40, 22, '#1B2A4A', '700 18px Pretendard, sans-serif');
+      ctx.fillRect(meritX + 18, y + photoH - footH - 10, meritW - 36, footH);
+      paint(footLines, meritX + 28, y + photoH - footH - 4, 22, '#1B2A4A', '700 18px Pretendard, sans-serif');
+      hit('meritFoot', S.meritFoot, meritX + 18, y + photoH - footH - 10, meritW - 36, footH);
     }
     y += photoH + sectionGap;
-    paint(['4주가 이렇게 이어집니다'], pad, y, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
+    var weekTitle = S.weekTitle || '4주가 이렇게 이어집니다';
+    paint([weekTitle], pad, y, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
+    hit('weekTitle', weekTitle, pad, y, inner, 28);
     y += weekHead;
     var weeks = S.weeks || [];
     var wg = 12;
@@ -9640,55 +9836,73 @@
       ctx.fillStyle = '#C4A056';
       ctx.fillRect(x, y, ww, 6);
       paint([w.d], x + 16, y + 16, 18, '#A6844A', '800 15px Pretendard, sans-serif');
+      hit('week.' + i + '.d', w.d, x + 12, y + 14, ww - 24, 18);
       var titleLines = fontWrap(w.h, '800 24px Pretendard, sans-serif', ww - 32).slice(0, 2);
       paint(titleLines, x + 16, y + 36, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
+      hit('week.' + i + '.h', w.h, x + 12, y + 34, ww - 24, titleLines.length * 28);
       if (w.gain) {
         var whyLines = fontWrap(w.why || '', weekBody, ww - 32).slice(0, 3);
         var gainLines = fontWrap(w.gain || '', weekBody, ww - 32).slice(0, 3);
         var whyY = y + 36 + titleLines.length * 28 + 10;
         paint(['이유'], x + 16, whyY, 18, '#A6844A', '800 14px Pretendard, sans-serif');
         paint(whyLines, x + 16, whyY + 18, 22, '#243044', weekBody);
+        hit('week.' + i + '.why', w.why, x + 12, whyY + 16, ww - 24, Math.max(whyLines.length, 1) * 22);
         var gainTop = whyY + 18 + whyLines.length * 22 + 12;
         paint(['이점'], x + 16, gainTop, 18, '#A6844A', '800 14px Pretendard, sans-serif');
         paint(gainLines, x + 16, gainTop + 20, 22, '#243044', weekBody);
+        hit('week.' + i + '.gain', w.gain, x + 12, gainTop + 18, ww - 24, Math.max(gainLines.length, 1) * 22);
       } else {
-        var pl = fontWrap(w.p || w.why || '', weekBody, ww - 32);
-        paint(pl.slice(0, 6), x + 16, y + 100, 24, '#243044', weekBody);
+        var pl = fontWrap(w.p || w.why || '', weekBody, ww - 32).slice(0, 6);
+        paint(pl, x + 16, y + 100, 24, '#243044', weekBody);
+        hit('week.' + i + '.p', w.p || w.why, x + 12, y + 98, ww - 24, Math.max(pl.length, 1) * 24);
       }
     });
     y += weekH + sectionGap;
     rrect(pad, y, inner, beatH, 14, '#1B2A4A');
     paint([S.beatTitle || '한 회'], pad + 22, y + 14, 22, '#E4C98A', '800 16px Pretendard, sans-serif');
+    hit('beatTitle', S.beatTitle, pad + 18, y + 12, 160, 22);
     var beats = S.beats || [];
     var bw = (inner - 36) / Math.max(beats.length, 1);
     beats.forEach(function (b, i) {
       var x = pad + 22 + i * bw;
-      paint(fontWrap(b.t, '800 22px Pretendard, sans-serif', bw - 16).slice(0, 1), x, y + 42, 26, '#FFFFFF', '800 22px Pretendard, sans-serif');
-      paint(fontWrap(b.h, '500 16px Pretendard, sans-serif', bw - 16).slice(0, 2), x, y + 74, 20, '#F0E0CC', '500 16px Pretendard, sans-serif');
+      var tLines = fontWrap(b.t, '800 22px Pretendard, sans-serif', bw - 16).slice(0, 1);
+      var hLines = fontWrap(b.h, '500 16px Pretendard, sans-serif', bw - 16).slice(0, 2);
+      paint(tLines, x, y + 42, 26, '#FFFFFF', '800 22px Pretendard, sans-serif');
+      paint(hLines, x, y + 74, 20, '#F0E0CC', '500 16px Pretendard, sans-serif');
+      hit('beat.' + i + '.t', b.t, x, y + 40, bw - 12, 26);
+      hit('beat.' + i + '.h', b.h, x, y + 72, bw - 12, Math.max(hLines.length, 1) * 20);
     });
     y += beatH + sectionGap;
     var colW = (inner - 14) / 2;
     rrect(pad, y, colW, whoH, 14, '#FFFCF8');
     rrect(pad + colW + 14, y, colW, whoH, 14, '#FFFCF8');
-    paint([S.whoTitle || '이런 분께'], pad + 20, y + 16, 26, '#1B2A4A', '800 22px Pretendard, sans-serif');
+    paint([S.whoTitle || '이런 분께'], pad + 18, y + 12, 30, '#1B2A4A', '800 26px Pretendard, sans-serif');
+    hit('whoTitle', S.whoTitle || '이런 분께', pad + 14, y + 10, colW - 28, 30);
     var whoList = S.who || [];
+    var whoY = y + 48;
     whoList.forEach(function (line, i) {
-      var ly = y + 54 + i * 58;
       ctx.fillStyle = '#C4A056';
       ctx.beginPath();
-      ctx.arc(pad + 32, ly + 12, 6, 0, Math.PI * 2);
+      ctx.arc(pad + 30, whoY + 14, 7, 0, Math.PI * 2);
       ctx.fill();
-      var wl = fontWrap(line, '500 20px Pretendard, sans-serif', colW - 64);
-      paint(wl.slice(0, 2), pad + 48, ly, 26, '#1B2A4A', '500 20px Pretendard, sans-serif');
+      var wl = fontWrap(line, '600 24px Pretendard, sans-serif', colW - 62).slice(0, 2);
+      paint(wl, pad + 46, whoY, 32, '#1B2A4A', '600 24px Pretendard, sans-serif');
+      hit('who.' + i, line, pad + 42, whoY, colW - 56, Math.max(wl.length, 1) * 32);
+      whoY += Math.max(wl.length, 1) * 32 + 8;
     });
     var tx = pad + colW + 14;
-    paint(['진행'], tx + 20, y + 16, 26, '#1B2A4A', '800 22px Pretendard, sans-serif');
-    paint([S.teacher || ''], tx + 20, y + 50, 32, '#1B2A4A', '800 28px Pretendard, sans-serif');
-    paint([S.teacherLine || ''], tx + 20, y + 88, 22, '#8A5A32', '700 18px Pretendard, sans-serif');
-    var tb = fontWrap(S.teacherBody || '', '500 18px Pretendard, sans-serif', colW - 40);
-    paint(tb.slice(0, 4), tx + 20, y + 118, 24, '#243044', '500 18px Pretendard, sans-serif');
-    var sp = fontWrap(S.space || '', '600 18px Pretendard, sans-serif', colW - 40);
-    paint(sp.slice(0, 2), tx + 20, y + 118 + Math.min(tb.length, 4) * 24 + 10, 24, '#5C4A38', '600 18px Pretendard, sans-serif');
+    paint(['진행'], tx + 18, y + 12, 28, '#1B2A4A', '800 24px Pretendard, sans-serif');
+    paint([S.teacher || ''], tx + 18, y + 42, 32, '#1B2A4A', '800 28px Pretendard, sans-serif');
+    hit('teacher', S.teacher, tx + 14, y + 40, colW - 28, 32);
+    paint([S.teacherLine || ''], tx + 18, y + 76, 22, '#8A5A32', '700 18px Pretendard, sans-serif');
+    hit('teacherLine', S.teacherLine, tx + 14, y + 74, colW - 28, 22);
+    var tb = fontWrap(S.teacherBody || '', '500 18px Pretendard, sans-serif', colW - 36).slice(0, 3);
+    paint(tb, tx + 18, y + 102, 24, '#243044', '500 18px Pretendard, sans-serif');
+    hit('teacherBody', S.teacherBody, tx + 14, y + 100, colW - 28, Math.max(tb.length, 1) * 24);
+    var sp = fontWrap(S.space || '', '600 18px Pretendard, sans-serif', colW - 36).slice(0, 2);
+    var spY = y + 102 + tb.length * 24 + 6;
+    paint(sp, tx + 18, spY, 22, '#5C4A38', '600 18px Pretendard, sans-serif');
+    hit('space', S.space, tx + 14, spY, colW - 28, Math.max(sp.length, 1) * 22);
     y += whoH + sectionGap;
     var sh = Math.min(scheduleH, H - y - bottom);
     if (sh < 180) sh = H - y - bottom;
@@ -9714,10 +9928,16 @@
       paint(vl.slice(0, 1), cx, cy + 16, 22, row[1] ? '#1B2A4A' : '#8A8175', '700 18px Pretendard, sans-serif');
     });
     var ctaY = y + 46 + 48 * 2 + 6;
-    var cta = fontWrap(S.cta || '', '800 18px Pretendard, sans-serif', inner - 44);
-    paint(cta.slice(0, 1), pad + 22, ctaY, 22, '#1B2A4A', '800 18px Pretendard, sans-serif');
-    var foot = fontWrap(S.foot || '', '500 15px Pretendard, sans-serif', inner - 44);
-    paint(foot.slice(0, 2), pad + 22, ctaY + 26, 18, '#5C4A38', '500 15px Pretendard, sans-serif');
+    if (S.cta) {
+      var cta = fontWrap(S.cta, '800 18px Pretendard, sans-serif', inner - 44).slice(0, 1);
+      paint(cta, pad + 22, ctaY, 22, '#1B2A4A', '800 18px Pretendard, sans-serif');
+      hit('cta', S.cta, pad + 18, ctaY, inner - 36, 22);
+    }
+    if (S.foot) {
+      var foot = fontWrap(S.foot, '500 15px Pretendard, sans-serif', inner - 44).slice(0, 2);
+      paint(foot, pad + 22, ctaY + (S.cta ? 26 : 0), 18, '#5C4A38', '500 15px Pretendard, sans-serif');
+      hit('foot', S.foot, pad + 18, ctaY + (S.cta ? 24 : 0), inner - 36, Math.max(foot.length, 1) * 18);
+    }
     return [canvas];
   }
   function drawTextPdfPages(title, text) {
@@ -10046,6 +10266,7 @@
     fitFaqBox();
     if (document.body.classList.contains('mode-receipt')) fitPreview();
     if (document.body.classList.contains('mode-price')) fitPriceSheet_();
+    if (document.body.classList.contains('mode-plan') && planPart === 'proposal') mountPlanHits_();
   });
   var pageTitle = document.title;
   function receiptPdfName() {
