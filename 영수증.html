@@ -8867,16 +8867,17 @@
       });
     }).then(function (canvas) {
       restoreSheet();
+      var sheet = bizhowsFitCanvas(canvas, 'a4');
       var base = priceBranch === 'incheon' ? '가격표-인천' : '가격표-약수';
       if (asPdf) {
-        var bytes = planJpegBytesSync(canvas);
-        var blob = planBuildPdf([{ bytes: bytes, w: canvas.width, h: canvas.height }], PLAN_A4_PT[0], PLAN_A4_PT[1]);
-        planDownloadBlob(blob, base + '.pdf');
-        if (status) status.textContent = base + '.pdf 를 저장했습니다.';
-        return;
+        return canvasCmykFlate(sheet).then(function (cmyk) {
+          var blob = planBuildPdf([{ cmyk: cmyk, w: sheet.width, h: sheet.height }], bizhowsPt(21.3), bizhowsPt(30));
+          planDownloadBlob(blob, base + '.pdf');
+          if (status) status.textContent = base + '.pdf 를 저장했습니다. 21.3×30.0cm, 300dpi, CMYK입니다.';
+        });
       }
-      triggerImageDownload(canvas.toDataURL('image/png'), base + '.png');
-      if (status) status.textContent = base + '.png 이미지를 저장했습니다.';
+      triggerImageDownload(sheet.toDataURL('image/png'), base + '.png');
+      if (status) status.textContent = base + '.png 이미지를 저장했습니다. 21.3×30.0cm, 300dpi입니다.';
     }).catch(function () {
       restoreSheet();
       if (status) status.textContent = '파일을 만들지 못했습니다. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.';
@@ -9758,8 +9759,13 @@
       startObj(contentN);
       add(contentN + ' 0 obj\n<< /Length ' + content.length + ' >>\nstream\n' + content + 'endstream\nendobj\n');
       startObj(imageN);
-      add(imageN + ' 0 obj\n<< /Type /XObject /Subtype /Image /Width ' + im.w + ' /Height ' + im.h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + im.bytes.length + ' >>\nstream\n');
-      add(im.bytes);
+      if (im.cmyk) {
+        add(imageN + ' 0 obj\n<< /Type /XObject /Subtype /Image /Width ' + im.w + ' /Height ' + im.h + ' /ColorSpace /DeviceCMYK /BitsPerComponent 8 /Filter /FlateDecode /Length ' + im.cmyk.length + ' >>\nstream\n');
+        add(im.cmyk);
+      } else {
+        add(imageN + ' 0 obj\n<< /Type /XObject /Subtype /Image /Width ' + im.w + ' /Height ' + im.h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + im.bytes.length + ' >>\nstream\n');
+        add(im.bytes);
+      }
       add('\nendstream\nendobj\n');
     });
     var xrefPos = pos;
@@ -9774,6 +9780,45 @@
     var o = 0;
     parts.forEach(function (p) { out.set(p, o); o += p.length; });
     return new Blob([out], { type: 'application/pdf' });
+  }
+  function bizhowsPx(cm) { return Math.round(cm / 2.54 * 300); }
+  function bizhowsPt(cm) { return cm / 2.54 * 72; }
+  function bizhowsFitCanvas(source, which) {
+    var spec = which === 'a4' ? [21.3, 30.0] : [30.0, 42.6];
+    var bleed = bizhowsPx(0.15);
+    var W = bizhowsPx(spec[0]);
+    var H = bizhowsPx(spec[1]);
+    var c = document.createElement('canvas');
+    c.width = W;
+    c.height = H;
+    var g = c.getContext('2d');
+    var paper = which === 'a4' ? '#3c342f' : '#FBF8F2';
+    try {
+      var px = source.getContext('2d').getImageData(2, 2, 1, 1).data;
+      paper = 'rgb(' + px[0] + ',' + px[1] + ',' + px[2] + ')';
+    } catch (e) {}
+    g.fillStyle = paper;
+    g.fillRect(0, 0, W, H);
+    g.imageSmoothingEnabled = true;
+    g.imageSmoothingQuality = 'high';
+    g.drawImage(source, bleed, bleed, W - bleed * 2, H - bleed * 2);
+    return c;
+  }
+  function canvasCmykFlate(canvas) {
+    var im = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+    var src = im.data;
+    var out = new Uint8Array((src.length / 4) * 4);
+    for (var i = 0, j = 0; i < src.length; i += 4, j += 4) {
+      var r = src[i] / 255, g = src[i + 1] / 255, b = src[i + 2] / 255;
+      var k = 1 - Math.max(r, g, b);
+      var div = 1 - k || 1;
+      out[j] = Math.round((1 - r - k) / div * 255);
+      out[j + 1] = Math.round((1 - g - k) / div * 255);
+      out[j + 2] = Math.round((1 - b - k) / div * 255);
+      out[j + 3] = Math.round(k * 255);
+    }
+    var stream = new Blob([out]).stream().pipeThrough(new CompressionStream('deflate'));
+    return new Response(stream).arrayBuffer().then(function (buf) { return new Uint8Array(buf); });
   }
   function planDownloadBlob(blob, name) {
     var a = document.createElement('a');
@@ -10325,17 +10370,29 @@
     if (!canvas || !canvas.width) return;
     var place = PLAN_POSTER_TPL[planPosterTemplate] || '포스터';
     var name = place + ' 포스터-A3';
-    try {
-      if (kind === 'pdf') {
-        var bytes = planJpegBytesSync(canvas);
-        var blob = planBuildPdf([{ bytes: bytes, w: canvas.width, h: canvas.height }], PLAN_A3_PT[0], PLAN_A3_PT[1]);
+    var sheet;
+    try { sheet = bizhowsFitCanvas(canvas, 'a3'); }
+    catch (e) {
+      if (status) status.textContent = location.protocol === 'file:'
+        ? '파일을 직접 열면 브라우저가 저장을 막습니다. HTML 미리보기로 연 다음 다시 눌러 주세요.'
+        : '저장에 실패했습니다. 페이지를 새로고침한 뒤 다시 눌러 주세요.';
+      return;
+    }
+    if (kind === 'pdf') {
+      if (status) status.textContent = 'A3 PDF를 만드는 중…';
+      canvasCmykFlate(sheet).then(function (cmyk) {
+        var blob = planBuildPdf([{ cmyk: cmyk, w: sheet.width, h: sheet.height }], bizhowsPt(30), bizhowsPt(42.6));
         planDownloadBlob(blob, name + '.pdf');
-        if (status) status.textContent = 'A3 PDF를 저장했습니다.';
-        return;
-      }
-      triggerImageDownload(canvas.toDataURL('image/png'), name + '.png');
-      if (status) status.textContent = 'A3 PNG를 저장했습니다.';
-    } catch (e) {
+        if (status) status.textContent = 'A3 PDF를 저장했습니다. 30.0×42.6cm, 300dpi, CMYK입니다.';
+      }).catch(function () {
+        if (status) status.textContent = '저장에 실패했습니다. 페이지를 새로고침한 뒤 다시 눌러 주세요.';
+      });
+      return;
+    }
+    try {
+      triggerImageDownload(sheet.toDataURL('image/png'), name + '.png');
+      if (status) status.textContent = 'A3 PNG를 저장했습니다. 30.0×42.6cm, 300dpi입니다.';
+    } catch (e2) {
       if (status) status.textContent = location.protocol === 'file:'
         ? '파일을 직접 열면 브라우저가 저장을 막습니다. HTML 미리보기로 연 다음 다시 눌러 주세요.'
         : '저장에 실패했습니다. 페이지를 새로고침한 뒤 다시 눌러 주세요.';
