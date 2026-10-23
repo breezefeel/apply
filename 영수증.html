@@ -8422,7 +8422,7 @@
             ]
           },
           {
-            title: '70분 · 1:1 리얼무브먼트 + 컨디셔닝',
+            title: '70분 · 1:1 리얼 무브먼트 + 컨디셔닝',
             sub: '레슨 40분 + 두타 10분 + 컨디셔닝 20분',
             note: '프리미엄 근막 컨디셔닝을 병행합니다.',
             rows: [
@@ -8443,7 +8443,7 @@
         foot: '움직임이 편해지는 시간 | REAL MOVEMENT',
         programs: [
           {
-            title: '50분 · 1:1 리얼무브먼트 / 리얼페이스',
+            title: '50분 · 1:1 리얼 무브먼트 / 리얼 페이스',
             sub: '레슨 25분, 온열 돔 25분',
             note: '다치지 않게 움직임을 익히고, 따뜻하게 마무리합니다.',
             rows: [
@@ -8453,7 +8453,7 @@
             ]
           },
           {
-            title: '80분 · 1:1 리얼무브먼트 / 리얼페이스',
+            title: '80분 · 1:1 리얼 무브먼트 / 리얼 페이스',
             sub: '레슨 55분, 온열 돔 25분',
             note: '프리미엄 집중 레슨으로 진행합니다.',
             rows: [
@@ -8493,12 +8493,14 @@
           }
         });
         (saved.yaksu.programs || []).forEach(function (p) {
-          if (p.title === '70분 · 1:1 리얼 컨디셔닝') p.title = '70분 · 1:1 리얼무브먼트 + 컨디셔닝';
+          var spaced = String(p.title || '').replace(/리얼무브먼트/g, '리얼 무브먼트').replace(/리얼페이스/g, '리얼 페이스');
+          if (spaced !== p.title) { p.title = spaced; changed = true; }
+          if (p.title === '70분 · 1:1 리얼 컨디셔닝') p.title = '70분 · 1:1 리얼 무브먼트 + 컨디셔닝';
           if (p.title === '50분 · 1:1 리얼 무브먼트' && (!p.sub || p.sub === '1:1로 오늘 움직임을 보고, 집에서 할 동작 하나를 정합니다.')) {
             p.sub = '레슨 40분 + 두타 10분';
             changed = true;
           }
-          if (p.title === '70분 · 1:1 리얼무브먼트 + 컨디셔닝' && (!p.sub || p.sub === '50분에 기능 운동을 더합니다. 버티는 힘을 같이 봅니다.')) {
+          if ((p.title === '70분 · 1:1 리얼무브먼트 + 컨디셔닝' || p.title === '70분 · 1:1 리얼 무브먼트 + 컨디셔닝') && (!p.sub || p.sub === '50분에 기능 운동을 더합니다. 버티는 힘을 같이 봅니다.')) {
             p.sub = '레슨 40분 + 두타 10분 + 컨디셔닝 20분';
             changed = true;
           }
@@ -8523,8 +8525,10 @@
           });
         });
         (saved.incheon.programs || []).forEach(function (p) {
-          if (p.title === '50분 · 1:1') { p.title = '50분 · 1:1 리얼무브먼트 / 리얼페이스'; changed = true; }
-          if (p.title === '80분 · 1:1') { p.title = '80분 · 1:1 리얼무브먼트 / 리얼페이스'; changed = true; }
+          var spacedIn = String(p.title || '').replace(/리얼무브먼트/g, '리얼 무브먼트').replace(/리얼페이스/g, '리얼 페이스');
+          if (spacedIn !== p.title) { p.title = spacedIn; changed = true; }
+          if (p.title === '50분 · 1:1') { p.title = '50분 · 1:1 리얼 무브먼트 / 리얼 페이스'; changed = true; }
+          if (p.title === '80분 · 1:1') { p.title = '80분 · 1:1 리얼 무브먼트 / 리얼 페이스'; changed = true; }
           var old50 = ['레슨 25분 뒤 돔 25분', '1:1 레슨 25분, 온열 돔 25분. 움직인 뒤를 따뜻하게 마무리합니다.'];
           var old80 = ['레슨 55분 뒤 돔 25분', '1:1 레슨 55분, 온열 돔 25분. 맞추는 시간이 더 길고, 마무리는 같습니다.'];
           if (p.title.indexOf('50분') === 0) {
@@ -10077,7 +10081,8 @@
     var canvas = $('planPosterCanvas');
     var status = $('planPosterStatus');
     if (!canvas || !canvas.width) return;
-    var name = planActiveTitle().replace(/[\\/:*?"<>|]/g, '') + '-포스터-A3';
+    var place = PLAN_POSTER_TPL[planPosterTemplate] || '포스터';
+    var name = place + ' 포스터-A3';
     try {
       if (kind === 'pdf') {
         var bytes = planJpegBytesSync(canvas);
