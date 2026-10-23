@@ -799,11 +799,11 @@
     .doc-payer-info .span2 { grid-column: span 1; }
   }
 
-  #certPanel, #smsPanel { display: none; }
+  #certPanel, #smsPanel, #posterCard { display: none; }
   body.academy-mode #consultChatBlocks { display: none !important; }
-  body.academy-mode #certPanel, body.academy-mode #smsPanel { display: block; }
+  body.academy-mode #smsPanel { display: block; }
   #consultChatBlocks[hidden] { display: none !important; }
-  #certPanel:not([hidden]), #smsPanel:not([hidden]) { display: block; }
+  #certPanel:not([hidden]), #smsPanel:not([hidden]), #posterCard:not([hidden]) { display: block; }
   .sms-text {
     width: 100%; min-height: 168px; resize: vertical;
     border: 1px solid #e2ddd3; background: #faf9f6;
@@ -824,6 +824,29 @@
   .sms-person input { margin-top: 3px; }
   .sms-person b { display: block; font-size: 14px; }
   .sms-person small { display: block; color: var(--mute); font-weight: 650; font-size: 11.5px; line-height: 1.4; }
+  .sms-history { margin-top: 16px; padding-top: 12px; border-top: 1px solid #e2ddd3; }
+  .sms-history-login { display: flex; flex-direction: column; gap: 8px; }
+  .sms-history-login input {
+    width: 100%; border: 1px solid #e2ddd3; background: #fff; border-radius: 10px;
+    padding: 10px 11px; font: inherit; color: var(--ink);
+  }
+  .sms-history-tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .sms-history-chip {
+    border: 1px solid #e2ddd3; background: #fff; color: var(--ink);
+    border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 12px; font-weight: 700;
+  }
+  .sms-history-chip.is-on { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .sms-history-item { border: 1px solid #e2ddd3; border-radius: 12px; background: #fff; margin-top: 6px; }
+  .sms-history-sum {
+    display: block; width: 100%; text-align: left; border: 0; background: transparent;
+    padding: 8px 10px; cursor: pointer; color: var(--ink);
+  }
+  .sms-history-sum b { display: block; font-size: 14px; }
+  .sms-history-sum small { display: block; color: var(--mute); font-weight: 650; font-size: 11.5px; line-height: 1.4; }
+  .sms-history-body {
+    margin: 0; padding: 0 10px 10px; white-space: pre-wrap; font: inherit;
+    font-size: 13px; line-height: 1.55; color: var(--ink);
+  }
   .cert-lead {
     font-size: 12.5px; color: var(--mute); font-weight: 650;
     line-height: 1.55; margin: 0 0 10px;
@@ -1665,54 +1688,10 @@
           <button type="button" class="btn btn-print" id="btnSmsSend">보내기</button>
         </div>
         <p class="ocr-status" id="smsStatus"></p>
-      </section>
-      <section class="card no-print" id="posterCard" hidden>
-        <div class="reply-label"><span>포스터 만들기</span></div>
-        <p class="cert-lead">일정과 수강료를 입력하면, 선택한 과정 색으로 두 장 포스터가 만들어집니다.</p>
-        <div class="chips poster-tracks" id="posterTracks"></div>
-        <div class="cert-fields" id="posterFields">
-          <label class="span2"><span>일정 한 줄</span><input data-k="ribbon" autocomplete="off"></label>
-          <label class="span2"><span>날짜</span><input data-k="date" autocomplete="off"></label>
-          <label><span>시간</span><input data-k="time" autocomplete="off"></label>
-          <label><span>장소</span><input data-k="place" autocomplete="off"></label>
-          <label><span>정가</span><input data-k="price" autocomplete="off"></label>
-          <label><span>얼리버드</span><input data-k="early" autocomplete="off"></label>
-          <label><span>추가 할인 이름</span><input data-k="extraLabel" autocomplete="off" placeholder="없으면 비움"></label>
-          <label><span>추가 할인 금액</span><input data-k="extraPrice" autocomplete="off" placeholder="없으면 비움"></label>
-          <label class="span2"><span>수강료 안내</span><input data-k="note" autocomplete="off"></label>
-        </div>
-        <div class="poster-actions">
-          <button type="button" class="btn btn-print" id="btnPosterSaveAll">이미지 저장</button>
-        </div>
-        <div class="poster-actions">
-          <button type="button" class="btn btn-ghost" id="btnPosterSave1">1쪽 PNG</button>
-          <button type="button" class="btn btn-ghost" id="btnPosterSave2">2쪽 PNG</button>
-        </div>
-        <p class="cert-note" id="posterStatus">미리보기입니다. 이미지 저장을 누르면 PNG 파일로 받아집니다.</p>
-        <div class="poster-preview" id="posterPreview">
-          <canvas id="posterCanvas1" width="1080" height="1528"></canvas>
-          <canvas id="posterCanvas2" width="1080" height="1528"></canvas>
-        </div>
-      </section>
-      <section class="card no-print" id="certPanel" hidden>
-        <div class="reply-label"><span>수료증 발급</span></div>
-        <p class="cert-lead" id="certLead"></p>
-        <div class="chips" id="certTemplates"></div>
-        <p class="cert-note" id="certNote"></p>
-        <div class="cert-actions">
-          <button type="button" class="btn btn-ghost" id="btnCertLoad">불러오기</button>
-          <button type="button" class="btn btn-ghost" id="btnCertAddManual">직접 추가</button>
-          <button type="button" class="btn btn-print" id="btnCertMake">만들기</button>
-        </div>
-        <p class="ocr-status" id="certStatus"></p>
-        <div id="certEditor"></div>
-        <div class="cert-preview-wrap" id="certPreviewWrap">
-          <div class="preview-label">미리보기</div>
-          <div class="cert-preview"><canvas id="certCanvas"></canvas></div>
-          <div class="cert-actions">
-            <button type="button" class="btn btn-ghost" id="btnCertSaveOne" hidden>이 수료증 저장</button>
-            <button type="button" class="btn btn-print" id="btnCertSaveAll" hidden>모두 저장</button>
-          </div>
+        <div class="sms-history" id="smsHistory">
+          <div class="reply-label"><span>보낸 기록</span></div>
+          <p class="cert-lead">수강생 문자와 회원 문자·알림톡이 여기에 쌓입니다. 줄을 누르면 보낸 내용이 열립니다.</p>
+          <div id="smsHistoryBody"></div>
         </div>
       </section>
     </div>
@@ -1906,6 +1885,57 @@
     <div id="panelPlan" class="panel">
       <section class="card" id="planAcademyEmpty" hidden>
         <p class="cert-lead" id="planAcademyEmptyText">아직 만든 제안서가 없습니다.</p>
+      </section>
+      <section class="card no-print" id="posterCard" hidden>
+        <div class="reply-label"><span>포스터 만들기</span></div>
+        <p class="cert-lead">첫 장은 수업 사진입니다. 일정·대상·수강료는 둘째 장부터 나옵니다.</p>
+        <div class="chips poster-tracks" id="posterTracks"></div>
+        <div class="cert-fields" id="posterFields">
+          <label class="span2"><span>일정 한 줄</span><input data-k="ribbon" autocomplete="off"></label>
+          <label class="span2"><span>날짜</span><input data-k="date" autocomplete="off"></label>
+          <label><span>시간</span><input data-k="time" autocomplete="off"></label>
+          <label><span>장소</span><input data-k="place" autocomplete="off"></label>
+          <label><span>정가</span><input data-k="price" autocomplete="off"></label>
+          <label><span>얼리버드</span><input data-k="early" autocomplete="off"></label>
+          <label><span>추가 할인 이름</span><input data-k="extraLabel" autocomplete="off" placeholder="없으면 비움"></label>
+          <label><span>추가 할인 금액</span><input data-k="extraPrice" autocomplete="off" placeholder="없으면 비움"></label>
+          <label class="span2"><span>수강료 안내</span><input data-k="note" autocomplete="off"></label>
+        </div>
+        <div class="poster-actions">
+          <button type="button" class="btn btn-print" id="btnPosterSaveAll">이미지 저장</button>
+        </div>
+        <div class="poster-actions">
+          <button type="button" class="btn btn-ghost" id="btnPosterSave1">1쪽 PNG</button>
+          <button type="button" class="btn btn-ghost" id="btnPosterSave2">2쪽 PNG</button>
+          <button type="button" class="btn btn-ghost" id="btnPosterSave3">3쪽 PNG</button>
+        </div>
+        <p class="cert-note" id="posterStatus">미리보기입니다. 이미지 저장을 누르면 PNG 파일로 받아집니다.</p>
+        <div class="poster-preview" id="posterPreview">
+          <canvas id="posterCanvas1" width="1080" height="1528"></canvas>
+          <canvas id="posterCanvas2" width="1080" height="1528"></canvas>
+          <canvas id="posterCanvas3" width="1080" height="1528"></canvas>
+        </div>
+      </section>
+      <section class="card no-print" id="certPanel" hidden>
+        <div class="reply-label"><span>수료증 만들기</span></div>
+        <p class="cert-lead" id="certLead"></p>
+        <div class="chips" id="certTemplates"></div>
+        <p class="cert-note" id="certNote"></p>
+        <div class="cert-actions">
+          <button type="button" class="btn btn-ghost" id="btnCertLoad">불러오기</button>
+          <button type="button" class="btn btn-ghost" id="btnCertAddManual">직접 추가</button>
+          <button type="button" class="btn btn-print" id="btnCertMake">만들기</button>
+        </div>
+        <p class="ocr-status" id="certStatus"></p>
+        <div id="certEditor"></div>
+        <div class="cert-preview-wrap" id="certPreviewWrap">
+          <div class="preview-label">미리보기</div>
+          <div class="cert-preview"><canvas id="certCanvas"></canvas></div>
+          <div class="cert-actions">
+            <button type="button" class="btn btn-ghost" id="btnCertSaveOne" hidden>이 수료증 저장</button>
+            <button type="button" class="btn btn-print" id="btnCertSaveAll" hidden>모두 저장</button>
+          </div>
+        </div>
       </section>
       <div class="plan-tools no-print">
         <div class="plan-items" id="planItems" hidden></div>
@@ -2536,6 +2566,7 @@
     </div>
   </div>
 
+<script src="sms-history.js?v=1"></script>
 <script>
 (function () {
   var DESC = '1:1 personalized functional rehabilitation training (passive stretching, postural correction, and functional exercise).';
@@ -5489,6 +5520,7 @@
     if (consultBranch === 'cmt') {
       return Object.assign(common, {
         file: 'CMT', kicker: 'CMT 임상도수치료 · 2026', title: 'CMT 도수치료 과정', brand: '평가 → 손',
+        cover: '평가로 원인을 가른 뒤, 손으로 다룹니다',
         lead: '평가로 원인을 가른 뒤, 연부조직과 관절을 손으로 다룹니다. 평가 → 손 → 움직임 흐름에서 CMT는 손(도구) 축입니다.',
         overviewH: '이 과정은',
         overview: '의료인·의료기사가 평가와 함께 도수 테크닉을 부위별로 익히는 과정입니다. 골반부터 경추까지, 연부조직 다음 관절로 들어가는 같은 순서를 내일 베드에서 바로 꺼내 쓰게 됩니다.',
@@ -5525,6 +5557,7 @@
     if (consultBranch === 'ifc') {
       return Object.assign(common, {
         file: 'IFC', kicker: '국제얼굴교정학회 · 2026', title: 'IFC 얼굴 교정 과정', brand: 'Re:Al FACE',
+        cover: '촉진으로 포인트를 찾고, 수기와 기기로 이어갑니다',
         lead: '얼굴 해부학과 촉진으로 핵심 포인트를 찾고, 수기·괄사·고주파로 변화를 만듭니다. 평가 → 손 → 움직임 흐름에서 IFC는 얼굴의 손(도구/기기) 축입니다.',
         overviewH: '이 과정은',
         overview: '비수술 얼굴 윤곽·비대칭을 해부 → 촉진 → 수기·괄사·고주파 순으로 익힙니다. 손으로 원인을 읽은 뒤, 수기와 기기를 같은 시퀀스로 연결하는 감각을 가져갑니다.',
@@ -5562,6 +5595,8 @@
     var oneday = posterTrackDef().id === 'oneday';
     return Object.assign(common, {
       file: 'ReAl', kicker: 'Re:Alignment · 2026', title: 'Re:Al 움직임 과정', brand: oneday ? '패시브 스트레칭' : 'PAR 전체',
+      cover: oneday ? '강사가 이끄는 패시브 스트레칭을 하루 만에' : '누워서, 네 발로, 서서 같은 순서를 올립니다',
+      coverWhen: oneday ? [v.date, v.time, posterPriceLine(v)].filter(Boolean).join('  ·  ') : '',
       lead: oneday
         ? '강사가 움직임을 유도하는 패시브 스트레칭을 하루 만에 익힙니다. 말단에서 근위로 잇는 플로우를, 매트와 베드 모두에서 쓸 수 있게 됩니다.'
         : '푼 몸을 움직임으로 지킵니다. 누워서 → 네발·앉기 → 서서, 각 자세에서 P · AA · A · R을 익힙니다.',
@@ -5650,6 +5685,117 @@
     ctx.fillRect(x, y, w, h);
     ctx.fillStyle = th.accent;
     ctx.fillRect(x, y, 8, h);
+  }
+  var posterPhotoCache = {};
+  function posterPhotoShots() {
+    if (consultBranch === 'cmt') return [
+      { src: 'poster-photos/cmt-hands.jpg', fx: 0.48, fy: 0.46 },
+      { src: 'poster-photos/cmt-pelvis.jpg', fx: 0.62, fy: 0.48 },
+      { src: 'poster-photos/cmt-neck.jpg', fx: 0.4, fy: 0.55 }
+    ];
+    if (consultBranch === 'ifc') return [
+      { src: 'poster-photos/ifc-tables.jpg', fx: 0.36, fy: 0.62 },
+      { src: 'poster-photos/ifc-lecture.jpg', fx: 0.5, fy: 0.42 }
+    ];
+    if (posterTrackDef().id === 'oneday') return [
+      { src: 'poster-photos/real-spine.jpg', fx: 0.55, fy: 0.5 },
+      { src: 'poster-photos/real-birddog.jpg', fx: 0.5, fy: 0.46 },
+      { src: 'poster-photos/real-stand.jpg', fx: 0.55, fy: 0.42 }
+    ];
+    return [
+      { src: 'poster-photos/real-birddog.jpg', fx: 0.5, fy: 0.46 },
+      { src: 'poster-photos/real-spine.jpg', fx: 0.55, fy: 0.48 },
+      { src: 'poster-photos/real-stand.jpg', fx: 0.55, fy: 0.42 }
+    ];
+  }
+  function posterPhoto(src) {
+    var hit = posterPhotoCache[src];
+    if (hit) return hit;
+    var img = new Image();
+    posterPhotoCache[src] = img;
+    img.onload = function () { schedulePosterPaint(); };
+    img.src = src;
+    return img;
+  }
+  function drawPosterPhoto(ctx, img, x, y, w, h, fx, fy) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, w, h);
+    ctx.clip();
+    ctx.fillStyle = '#C8C2BA';
+    ctx.fillRect(x, y, w, h);
+    if (img && img.complete && img.naturalWidth) {
+      var scale = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+      var dw = img.naturalWidth * scale;
+      var dh = img.naturalHeight * scale;
+      var dx = x + w / 2 - (fx == null ? 0.5 : fx) * dw;
+      var dy = y + h / 2 - (fy == null ? 0.5 : fy) * dh;
+      if (dx > x) dx = x;
+      if (dy > y) dy = y;
+      if (dx + dw < x + w) dx = x + w - dw;
+      if (dy + dh < y + h) dy = y + h - dh;
+      ctx.drawImage(img, dx, dy, dw, dh);
+    }
+    ctx.restore();
+  }
+  function drawPosterCover(ctx, W, H, m, th) {
+    var pad = 48;
+    var inner = W - pad * 2;
+    var shots = posterPhotoShots();
+    ctx.fillStyle = th.paper;
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = th.accent;
+    ctx.fillRect(0, 0, W, 10);
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = th.accent;
+    ctx.font = '700 22px Pretendard, sans-serif';
+    ctx.fillText(m.kicker, pad, 28);
+    ctx.fillStyle = th.ink;
+    ctx.font = '800 60px Pretendard, sans-serif';
+    ctx.fillText(m.title, pad, 60);
+    ctx.fillStyle = th.mute;
+    ctx.font = '600 28px Pretendard, sans-serif';
+    var coverLines = posterWrap(ctx, m.cover || m.brand, inner);
+    var textBottom = 136 + posterFillLines(ctx, coverLines.slice(0, 2), pad, 136, 38);
+    if (m.coverWhen) {
+      textBottom += 16;
+      ctx.font = '800 24px Pretendard, sans-serif';
+      var when = posterWrap(ctx, m.coverWhen, inner - 36).slice(0, 2);
+      var whenH = 20 + when.length * 32;
+      ctx.fillStyle = th.card;
+      ctx.fillRect(pad, textBottom, inner, whenH);
+      ctx.fillStyle = th.ink;
+      posterFillLines(ctx, when, pad + 18, textBottom + 12, 32);
+      textBottom += whenH;
+    }
+    var foot = 72;
+    var gap = 14;
+    var top = textBottom + 22;
+    var area = H - foot - 16 - top;
+    var heroH = shots.length > 2 ? Math.round(area * 0.62) : Math.round(area * 0.7);
+    var rest = area - heroH - gap;
+    drawPosterPhoto(ctx, posterPhoto(shots[0].src), pad, top, inner, heroH, shots[0].fx, shots[0].fy);
+    ctx.strokeStyle = th.accent;
+    ctx.lineWidth = 6;
+    ctx.strokeRect(pad + 3, top + 3, inner - 6, heroH - 6);
+    var rowY = top + heroH + gap;
+    if (shots.length > 2) {
+      var colW = (inner - gap) / 2;
+      drawPosterPhoto(ctx, posterPhoto(shots[1].src), pad, rowY, colW, rest, shots[1].fx, shots[1].fy);
+      drawPosterPhoto(ctx, posterPhoto(shots[2].src), pad + colW + gap, rowY, colW, rest, shots[2].fx, shots[2].fy);
+    } else if (shots[1]) {
+      drawPosterPhoto(ctx, posterPhoto(shots[1].src), pad, rowY, inner, rest, shots[1].fx, shots[1].fy);
+    }
+    ctx.fillStyle = th.header;
+    ctx.fillRect(0, H - foot, W, foot);
+    ctx.fillStyle = th.cream;
+    ctx.font = '700 22px Pretendard, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(m.brand, pad, H - foot + 24);
+    ctx.textAlign = 'right';
+    ctx.fillText('1 / 3', W - pad, H - foot + 24);
+    ctx.textAlign = 'left';
   }
   function drawPosterFront(ctx, W, H, m, th) {
     var pad = 56;
@@ -5771,7 +5917,7 @@
     ctx.textAlign = 'left';
     ctx.fillText(m.footLeft, pad, H - 44);
     ctx.textAlign = 'right';
-    ctx.fillText('1 / 2', W - pad, H - 44);
+    ctx.fillText('2 / 3', W - pad, H - 44);
     ctx.textAlign = 'left';
   }
   function drawPosterBack(ctx, W, H, m, th) {
@@ -5931,7 +6077,7 @@
     ctx.textAlign = 'left';
     ctx.fillText(m.barSub + ' · 2026', pad, H - 44);
     ctx.textAlign = 'right';
-    ctx.fillText('2 / 2', W - pad, H - 44);
+    ctx.fillText('3 / 3', W - pad, H - 44);
     ctx.textAlign = 'left';
   }
   var POSTER_W = 1080;
@@ -5953,11 +6099,13 @@
   function paintPosterNow() {
     var c1 = $('posterCanvas1');
     var c2 = $('posterCanvas2');
-    if (!c1 || !c2 || !isAcademyBranch()) return;
+    var c3 = $('posterCanvas3');
+    if (!c1 || !c2 || !c3 || !isAcademyBranch()) return;
     var m = posterModel();
     var th = POSTER_THEMES[consultBranch] || POSTER_THEMES.cmt;
-    drawPosterFront(posterSurface(c1), POSTER_W, POSTER_H, m, th);
-    drawPosterBack(posterSurface(c2), POSTER_W, POSTER_H, m, th);
+    drawPosterCover(posterSurface(c1), POSTER_W, POSTER_H, m, th);
+    drawPosterFront(posterSurface(c2), POSTER_W, POSTER_H, m, th);
+    drawPosterBack(posterSurface(c3), POSTER_W, POSTER_H, m, th);
   }
   function ensurePosterFonts() {
     if (posterFontsReady || !document.fonts || !document.fonts.load) {
@@ -5996,7 +6144,7 @@
     if (status) status.textContent = missing
       ? '일정 한 줄, 날짜, 시간, 장소, 정가를 넣으면 미리보기와 이미지 저장이 됩니다.'
       : '미리보기입니다. 이미지 저장을 누르면 PNG 파일로 받아집니다.';
-    ['btnPosterSaveAll', 'btnPosterSave1', 'btnPosterSave2'].forEach(function (id) {
+    ['btnPosterSaveAll', 'btnPosterSave1', 'btnPosterSave2', 'btnPosterSave3'].forEach(function (id) {
       var btn = $(id);
       if (btn) btn.disabled = missing;
     });
@@ -6027,7 +6175,7 @@
   function savePosterPng(page) {
     if (!readPosterInputs()) return;
     paintPosterNow();
-    var canvas = $(page === 2 ? 'posterCanvas2' : 'posterCanvas1');
+    var canvas = $(page === 3 ? 'posterCanvas3' : page === 2 ? 'posterCanvas2' : 'posterCanvas1');
     var name = posterFileName(page);
     triggerImageDownload(canvas.toDataURL('image/png'), name);
     var status = $('posterStatus');
@@ -6038,15 +6186,17 @@
     paintPosterNow();
     var c1 = $('posterCanvas1');
     var c2 = $('posterCanvas2');
+    var c3 = $('posterCanvas3');
     var gap = 28 * POSTER_SCALE;
     var out = document.createElement('canvas');
     out.width = c1.width;
-    out.height = c1.height + gap + c2.height;
+    out.height = c1.height + gap + c2.height + gap + c3.height;
     var g = out.getContext('2d');
     g.fillStyle = '#E7E0D8';
     g.fillRect(0, 0, out.width, out.height);
     g.drawImage(c1, 0, 0);
     g.drawImage(c2, 0, c1.height + gap);
+    g.drawImage(c3, 0, c1.height + gap + c2.height + gap);
     var name = posterFileName();
     triggerImageDownload(out.toDataURL('image/png'), name);
     var status = $('posterStatus');
@@ -6073,12 +6223,13 @@
       if (e.target.closest('#btnPosterSaveAll')) savePosterImage();
       if (e.target.closest('#btnPosterSave1')) savePosterPng(1);
       if (e.target.closest('#btnPosterSave2')) savePosterPng(2);
+      if (e.target.closest('#btnPosterSave3')) savePosterPng(3);
     });
   }
   function syncPoster() {
     var card = $('posterCard');
     if (!card) return;
-    var on = isAcademyBranch();
+    var on = isAcademyBranch() && appWhich === 'plan' && offerView === 'poster';
     card.hidden = !on;
     if (!on) return;
     bindPoster();
@@ -6088,6 +6239,13 @@
     fillPosterInputs();
     readPosterInputs();
     schedulePosterPaint();
+  }
+  function syncCertPanel() {
+    var panel = $('certPanel');
+    if (!panel) return;
+    var on = isAcademyBranch() && appWhich === 'plan' && offerView === 'cert';
+    panel.hidden = !on;
+    if (on) renderCertChrome();
   }
   var SMS_WAY = 'https://blog.naver.com/allenjoy/224307689748';
   var smsTemplateId = {};
@@ -6337,22 +6495,27 @@
         '<span><b>' + (p.name || '이름 없음') + '</b><small>' + meta + '</small></span></label>';
     }).join('');
   }
-  function collectSmsPhones() {
+  function collectSmsTargets() {
     var out = [];
     var seen = {};
     smsPeople.forEach(function (p) {
       if (!smsChecked[p.phone]) return;
       if (seen[p.phone]) return;
       seen[p.phone] = true;
-      out.push(p.phone);
+      out.push({ name: p.name || '', phone: p.phone });
     });
     String(($('smsExtra') && $('smsExtra').value) || '').split(/[\s,，]+/).forEach(function (raw) {
       var d = smsDigits(raw);
       if (!d || seen[d]) return;
       seen[d] = true;
-      out.push(d);
+      out.push({ name: '', phone: d });
     });
     return out;
+  }
+  function smsCurrentLabel() {
+    var id = smsCurrentId();
+    var hit = smsTemplates().filter(function (t) { return t.id === id; })[0];
+    return hit ? hit.label : '';
   }
   function loadSmsPeople() {
     var branch = consultBranch;
@@ -6388,7 +6551,8 @@
     if (smsSending) return;
     var text = ($('smsText') && $('smsText').value || '').trim();
     if (!text) { setSmsStatus('문자 내용을 적어 주세요.'); return; }
-    var phones = collectSmsPhones();
+    var targets = collectSmsTargets();
+    var phones = targets.map(function (p) { return p.phone; });
     if (!phones.length) { setSmsStatus('보낼 연락처를 선택하거나 직접 적어 주세요.'); return; }
     if (phones.length > 30) { setSmsStatus('한 번에 30명까지 보낼 수 있습니다. 나눠 보내 주세요.'); return; }
     if (!window.confirm(phones.length + '명에게 솔라피 문자를 보냅니다.')) return;
@@ -6414,6 +6578,18 @@
       var failed = data.failed || [];
       if (!failed.length) setSmsStatus(data.sent + '명에게 문자를 보냈습니다.');
       else setSmsStatus(data.sent + '명 발송, ' + failed.length + '명 실패. ' + failed.map(function (f) { return f.phoneTail || ''; }).filter(Boolean).join(', '));
+      if (window.SmsHistory && data.sent) {
+        SmsHistory.record({
+          audience: 'student',
+          course: consultBranch,
+          label: smsCurrentLabel(),
+          channel: 'sms',
+          body: text,
+          recipients: targets,
+          sentCount: data.sent,
+          failed: failed
+        });
+      }
     }).catch(function () {
       smsSending = false;
       if (btn) btn.disabled = false;
@@ -6423,6 +6599,7 @@
   function bindSms() {
     if (smsBound || !$('smsPanel')) return;
     smsBound = true;
+    if (window.SmsHistory) SmsHistory.mount('smsHistory', { course: function () { return consultBranch; } });
     $('smsPanel').addEventListener('input', function (e) {
       if (e.target.id === 'smsText') {
         smsEdits[consultBranch + ':' + smsCurrentId()] = e.target.value;
@@ -6466,6 +6643,7 @@
     paintSmsTemplates();
     paintSmsPeople();
     setSmsStatus('');
+    if (window.SmsHistory) SmsHistory.refresh();
   }
   function renderConsultBranch() {
     document.querySelectorAll('#consultBranchChips .chip').forEach(function (c) {
@@ -6474,10 +6652,8 @@
     var academy = isAcademyBranch();
     document.body.classList.toggle('academy-mode', academy);
     var chatBlocks = $('consultChatBlocks');
-    var certPanel = $('certPanel');
     var smsPanel = $('smsPanel');
     if (chatBlocks) chatBlocks.hidden = academy;
-    if (certPanel) certPanel.hidden = !academy;
     if (smsPanel) smsPanel.hidden = !academy;
     var q1 = $('chatQ');
     var q2 = $('chatQ2');
@@ -6485,9 +6661,9 @@
     if (q2 && !academy) q2.placeholder = '다음 메시지를 붙여 넣거나, 캡처를 넣으세요';
     syncPriceSheet();
     syncPoster();
+    syncCertPanel();
     syncSms();
     renderFaq();
-    renderCertChrome();
     syncShell();
     if (!academy) {
       if (q1 && q1.value.trim()) startGreeting('silent');
@@ -8976,7 +9152,7 @@
     if (linkBtn) linkBtn.classList.toggle('active', which === 'links');
     if (docsBtn) docsBtn.classList.toggle('active', which === 'docs');
     $('pageTitle').textContent = which === 'consult' ? '상담 메뉴얼' : which === 'links' ? '링크 모음' : which === 'unbooked' ? '미예약 확인' : which === 'plan' ? '포스터·제안서' : which === 'receipt' ? '영문 영수증' : '세금 서류';
-    $('pageSub').textContent = which === 'plan' ? '약수·인천은 가격표와 리얼무브먼트·리얼페이스입니다. 과정은 포스터와 제안서입니다.' : which === 'receipt' ? '발급 기관을 고른 뒤 항목을 입력하세요' : '프리랜서를 고른 뒤 지급액을 입력하세요';
+    $('pageSub').textContent = which === 'plan' ? '약수·인천은 가격표와 리얼무브먼트·리얼페이스입니다. 과정은 포스터, 수료증, 제안서입니다.' : which === 'receipt' ? '발급 기관을 고른 뒤 항목을 입력하세요' : '프리랜서를 고른 뒤 지급액을 입력하세요';
     syncShell();
     if (which === 'receipt') {
       if (receiptPrefillFromQuery && !receiptPrefillApplied) {
@@ -9001,7 +9177,7 @@
     if (!show) return;
     var academy = isAcademyBranch();
     var items = academy
-      ? [{ id: 'poster', label: '포스터' }, { id: 'proposal', label: '제안서' }]
+      ? [{ id: 'poster', label: '포스터' }, { id: 'cert', label: '수료증' }, { id: 'proposal', label: '제안서' }]
       : [{ id: 'price', label: '가격표' }, { id: 'movement', label: '리얼무브먼트' }, { id: 'face', label: '리얼페이스' }];
     var allowed = items.some(function (item) { return item.id === offerView; });
     if (!allowed) offerView = items[0].id;
@@ -9026,7 +9202,7 @@
       $('pageSub').textContent = showPrice
         ? '금액을 고친 뒤 PNG로 받으세요. 고친 내용은 이 브라우저에 남습니다.'
         : (academy
-          ? '과정용 포스터와 제안서는 아직 비어 있습니다.'
+          ? '과정은 포스터, 수료증, 제안서입니다.'
           : '리얼무브먼트와 리얼페이스는 포스터, 제안서, 프로그램입니다.');
     }
     document.body.classList.toggle('offer-price', showPrice);
@@ -9039,12 +9215,16 @@
       if (tools) tools.hidden = true;
       if (seed) seed.hidden = true;
       if (empty) {
-        empty.hidden = false;
+        empty.hidden = offerView !== 'proposal';
         var text = $('planAcademyEmptyText');
-        if (text) text.textContent = offerView === 'poster' ? '아직 만든 포스터가 없습니다.' : '아직 만든 제안서가 없습니다.';
+        if (text) text.textContent = '아직 만든 제안서가 없습니다.';
       }
+      syncPoster();
+      syncCertPanel();
       return;
     }
+    if ($('posterCard')) $('posterCard').hidden = true;
+    if ($('certPanel')) $('certPanel').hidden = true;
     if (empty) empty.hidden = true;
     if (tools) tools.hidden = false;
     if (seed) seed.hidden = false;
