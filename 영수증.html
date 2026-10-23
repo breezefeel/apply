@@ -8790,7 +8790,7 @@
     sheet.style.top = '0';
     Promise.resolve(ready).then(function () { return loadHtml2Canvas_(); }).then(function (h2c) {
       return h2c(sheet, {
-        scale: 2,
+        scale: 3,
         backgroundColor: '#3c342f',
         useCORS: true,
         width: sheet.offsetWidth,
@@ -9195,7 +9195,7 @@
   var PLAN_PICK_KEY = 'rm-plan-poster-pick-v2';
   var PLAN_A3_W = 1240;
   var PLAN_A3_H = 1754;
-  var PLAN_A3_SCALE = 2;
+  var PLAN_A3_SCALE = 3;
   var PLAN_A4_PT = [595.28, 841.89];
   var PLAN_A3_PT = [841.89, 1190.55];
   var planPosterBrand = 'movement';
@@ -10067,7 +10067,7 @@
     }).catch(function () {});
   }
   function planJpegBytesSync(canvas) {
-    var url = canvas.toDataURL('image/jpeg', 0.92);
+    var url = canvas.toDataURL('image/jpeg', 0.95);
     var bin = atob(url.split(',')[1]);
     var bytes = new Uint8Array(bin.length);
     for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
