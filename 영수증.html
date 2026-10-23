@@ -114,8 +114,52 @@
     cursor: pointer;
     line-height: 1.25;
     white-space: nowrap;
+    text-align: center;
+    text-decoration: none;
   }
-  .app-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .app-tab.bizhows-link {
+    flex: 0 0 auto;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 10px;
+    color: var(--mute);
+  }
+  .print-guide {
+    position: fixed; inset: 0; z-index: 80;
+    background: rgba(18, 20, 26, .45);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .print-guide[hidden] { display: none; }
+  .print-guide-card {
+    width: min(520px, 100%);
+    background: #fffefb;
+    border-radius: 18px;
+    padding: 22px 22px 18px;
+    color: var(--ink);
+  }
+  .print-guide-card h2 { margin: 0 0 12px; font-size: 20px; }
+  .print-guide-card p { margin: 0 0 10px; font-size: 14px; line-height: 1.55; }
+  .print-guide-card strong { font-weight: 800; }
+  .print-guide-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .print-guide-actions a, .print-guide-actions button {
+    flex: 1;
+    border: 1.5px solid var(--ink);
+    background: var(--ink);
+    color: #fff;
+    border-radius: 12px;
+    padding: 12px 10px;
+    font-weight: 800;
+    font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .print-guide-actions button {
+    flex: 0 0 auto;
+    background: #fff;
+    color: var(--ink);
+  }
   .app-tab.lock { font-size: 16px; padding: 12px 0; color: var(--mute); }
   @media (max-width: 420px) {
     .app-tabs { gap: 5px; }
@@ -1487,8 +1531,8 @@
             <button type="button" class="chip active" data-branch="yaksu">약수</button>
             <button type="button" class="chip" data-branch="incheon">인천</button>
             <span class="chip-sep" aria-hidden="true">｜</span>
-            <button type="button" class="chip" id="headLinkBtn">링크 모음</button>
-            <button type="button" class="chip" id="headDocsBtn">세금 서류</button>
+            <button type="button" class="chip" id="headLinkBtn">링크</button>
+            <button type="button" class="chip" id="headDocsBtn">세금</button>
           </div>
         </div>
         <div class="chip-row" id="courseChipRow">
@@ -1509,6 +1553,18 @@
       <button type="button" class="app-tab" data-app="receipt" id="appTabReceipt">영수증</button>
     </nav>
     <div class="app-tabs offer-nav no-print" id="offerNav" hidden></div>
+    <div class="print-guide no-print" id="printGuide" hidden>
+      <div class="print-guide-card" role="dialog" aria-labelledby="printGuideTitle">
+        <h2 id="printGuideTitle">출력할 상품</h2>
+        <p><strong>포스터</strong>는 <a href="https://www.bizhows.com/ko/v/option?mock=4000_200_4001" target="_blank" rel="noopener noreferrer">비즈하우스 종이 포스터(단면)</a>에서 A3, 스노우지 200g, 무광코팅을 고르면 됩니다. 벽에 붙이는 용도라 광택은 조명에 번쩍입니다. 200g은 일반 복사지보다 두꺼워서 잘 구겨지지 않습니다. 대형 고급 포스터나 부착형 실사 출력은 이 크기에 맞지 않습니다.</p>
+        <p><strong>가격표</strong>는 <a href="https://www.bizhows.com/ko/v/option?mock=8100_200_8001" target="_blank" rel="noopener noreferrer">소량 고급 전단지(단면)</a>에서 A4, 스노우지 150g이면 됩니다. 가까이서 금액을 읽는 종이라 무광이 맞습니다. 한두 장만 뽑는다면 종이 포스터에서 사이즈만 A4로 해도 됩니다.</p>
+        <div class="print-guide-actions">
+          <a href="https://www.bizhows.com/ko/v/option?mock=4000_200_4001" target="_blank" rel="noopener noreferrer">포스터 A3</a>
+          <a href="https://www.bizhows.com/ko/v/option?mock=8100_200_8001" target="_blank" rel="noopener noreferrer">가격표 A4</a>
+          <button type="button" id="printGuideClose">닫기</button>
+        </div>
+      </div>
+    </div>
 
     <div id="panelConsult" class="panel active">
       <section class="card no-print" id="faqCard">
@@ -2031,14 +2087,14 @@
         </article>
         <section class="card no-print" id="planPoster" hidden>
           <div class="reply-label"><span>포스터 · A3 한 장</span></div>
-          <p class="cert-lead">추천 사진에서 고르거나, 사진을 첨부합니다. 세 장까지입니다. 틀은 콘텐츠_기준.md 포스터 항목의 세 가지입니다.</p>
+          <p class="cert-lead">인천 커뮤니티에 붙이는 A3입니다. 헬스장, 사우나, 카페마다 문장이 다릅니다.</p>
           <div class="plan-switch" id="planPosterTemplates">
-            <button type="button" data-tpl="overlay">한 문장</button>
-            <button type="button" data-tpl="split">두 칸</button>
-            <button type="button" data-tpl="card">시리즈 카드</button>
+            <button type="button" data-tpl="gym" class="active">헬스장</button>
+            <button type="button" data-tpl="sauna">사우나</button>
+            <button type="button" data-tpl="cafe">카페</button>
           </div>
-          <div class="plan-items" id="planPosterImages"></div>
-          <label class="plan-file">사진 첨부
+          <div class="plan-items" id="planPosterImages" hidden></div>
+          <label class="plan-file" id="planPosterFileLabel" hidden>사진 첨부
             <input id="planPosterFile" type="file" accept="image/*" multiple>
           </label>
           <div class="poster-actions">
@@ -8868,7 +8924,7 @@
     if (!allowed) offerView = items[0].id;
     nav.innerHTML = items.map(function (item) {
       return '<button type="button" class="app-tab' + (item.id === offerView ? ' active' : '') + '" data-offer="' + item.id + '">' + item.label + '</button>';
-    }).join('');
+    }).join('') + '<button type="button" class="app-tab' + (academy ? ' bizhows-link' : '') + '" data-print-guide>출력</button>';
   }
   function syncPriceBranchFromConsult() {
     if (consultBranch !== 'yaksu' && consultBranch !== 'incheon') return;
@@ -9124,8 +9180,8 @@
   var PLAN_A3_PT = [841.89, 1190.55];
   var planPosterBrand = 'movement';
   var planPosterImageIds = ['bird', 'quad'];
-  var planPosterTemplate = 'overlay';
-  var PLAN_POSTER_TPL = { overlay: '한 문장', split: '두 칸', card: '시리즈 카드' };
+  var planPosterTemplate = 'gym';
+  var PLAN_POSTER_TPL = { gym: '헬스장', sauna: '사우나', cafe: '카페' };
   var PLAN_BRANDS = {
     movement: {
       label: '리얼무브먼트',
@@ -9506,6 +9562,7 @@
       if (Array.isArray(v.images)) planPosterImageIds = v.images;
       else planPosterImageIds = planDefaultImages();
       if (v.template && PLAN_POSTER_TPL[v.template]) planPosterTemplate = v.template;
+      else planPosterTemplate = 'gym';
     } catch (e) { planPosterImageIds = planDefaultImages(); }
     var known = planBrand().images.map(function (x) { return x.id; });
     var uploads = (planUploads[planPosterBrand] || []).map(function (x) { return x.id; });
@@ -9798,7 +9855,144 @@
     ctx.fillRect(0, H - 96, W, 96);
     planPosterPin(ctx, W, pad, H, th);
   }
+  function incheonPlacePoster() {
+    var tiles = [
+      ['패시브 스트레칭', '뭉쳐 있는 근육과 관절부터\n부드럽게 풀어갑니다.', 'poster-photos/incheon-passive.jpg'],
+      ['자세·생활습관', '오래 긴장하는 자세가 원인입니다.\n그 자세부터 함께 바꿉니다.', 'poster-photos/incheon-posture.jpg'],
+      ['기능 운동', '근막경선을 따라 연결하며\n다치지 않는 몸을 만들어갑니다.', 'poster-photos/incheon-function.jpg']
+    ];
+    var lines = ['참으면서 운동하고 계시다면,', '아픈 운동을 내려놓아도 되는 시간'];
+    var foot = ['커뮤니티 도서관 옆', '0507-1312-4596', '8회 패키지 시', '4만원', '첫 방문은 평가로 시작합니다.'];
+    var photo = 'poster-photos/window-bird.jpg';
+    if (planPosterTemplate === 'sauna') {
+      photo = 'poster-photos/incheon-sauna.jpg';
+      lines = ['사우나를 나와도, 뻐근함이 남는다면,', "필요한 것은 '움직임' 입니다."];
+    }
+    if (planPosterTemplate === 'cafe') {
+      photo = 'poster-photos/incheon-cafe.jpg';
+      lines = ['바르지 못한 자세가,', '같은 곳을 또 불편하게 합니다.'];
+    }
+    return { photo: photo, lines: lines, tiles: tiles, foot: foot };
+  }
+  function drawIncheonPlacePoster(ctx, W, H, logo, photos) {
+    var copy = incheonPlacePoster();
+    var paper = '#FBF8F2';
+    var ink = '#0B2048';
+    var mute = '#5a6578';
+    var gold = '#C4A056';
+    var card = '#FFFEFB';
+    var pad = 56;
+    var inner = W - pad * 2;
+    var hero = photos[0];
+    var tilePhotos = photos.slice(1, 4);
+    function roundPath(x, y, w, h, r) {
+      var rr = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    }
+    function rrect(x, y, w, h, r, fill) {
+      roundPath(x, y, w, h, r);
+      ctx.fillStyle = fill;
+      ctx.fill();
+    }
+    ctx.fillStyle = paper;
+    ctx.fillRect(0, 0, W, H);
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    if (logo) {
+      var logoH = 64;
+      var logoW = logoH * (logo.width / logo.height);
+      ctx.drawImage(logo, pad, 40, logoW, logoH);
+      ctx.fillStyle = gold;
+      ctx.font = '800 22px Pretendard, sans-serif';
+      ctx.fillText('REAL MOVEMENT', pad + logoW + 16, 58);
+    }
+    ctx.fillStyle = ink;
+    var y = 128;
+    copy.lines.forEach(function (line, i) {
+      var size = i === 0 ? 44 : 58;
+      ctx.font = '800 ' + size + 'px Pretendard, sans-serif';
+      ctx.fillText(line, pad, y);
+      y += i === 0 ? 58 : 70;
+    });
+    y += 16;
+    var footH = 210;
+    var gapAfterHero = 22;
+    var photoH = Math.max(300, Math.round((H - y - footH - gapAfterHero) * 0.46));
+    rrect(pad, y, inner, photoH, 28, '#E7E0D4');
+    if (hero) {
+      ctx.save();
+      roundPath(pad, y, inner, photoH, 28);
+      ctx.clip();
+      planDrawCover(ctx, hero, pad, y, inner, photoH);
+      ctx.restore();
+    }
+    y += photoH + gapAfterHero;
+    var gap = 14;
+    var tw = (inner - gap * 2) / 3;
+    var th = H - y - footH;
+    copy.tiles.forEach(function (tile, i) {
+      var x = pad + i * (tw + gap);
+      rrect(x, y, tw, th, 22, card);
+      ctx.fillStyle = gold;
+      ctx.fillRect(x + 18, y + 18, 36, 4);
+      ctx.fillStyle = ink;
+      ctx.font = '800 26px Pretendard, sans-serif';
+      posterFillLines(ctx, posterWrap(ctx, tile[0], tw - 36).slice(0, 2), x + 18, y + 32, 32);
+      ctx.fillStyle = mute;
+      ctx.font = '600 20px Pretendard, sans-serif';
+      posterFillLines(ctx, posterWrap(ctx, tile[1], tw - 28).slice(0, 3), x + 14, y + 96, 28);
+      var img = tilePhotos[i];
+      var iy = y + 188;
+      var ih = th - 206;
+      if (img && ih > 40) {
+        ctx.save();
+        roundPath(x + 14, iy, tw - 28, ih, 16);
+        ctx.clip();
+        planDrawCover(ctx, img, x + 14, iy, tw - 28, ih);
+        ctx.restore();
+      }
+    });
+    var fy = H - footH + 18;
+    ctx.fillStyle = ink;
+    ctx.font = '700 26px Pretendard, sans-serif';
+    ctx.fillText(copy.foot[0] + '   ·   ' + copy.foot[1], pad, fy);
+    ctx.fillStyle = mute;
+    ctx.font = '700 22px Pretendard, sans-serif';
+    ctx.fillText(copy.foot[2], pad, fy + 42);
+    ctx.font = '700 26px Pretendard, sans-serif';
+    ctx.fillText('회당', pad, fy + 88);
+    var perW = ctx.measureText('회당').width;
+    ctx.fillStyle = ink;
+    ctx.font = '800 52px Pretendard, sans-serif';
+    ctx.fillText(copy.foot[3], pad + perW + 12, fy + 70);
+    ctx.fillStyle = mute;
+    ctx.font = '600 22px Pretendard, sans-serif';
+    ctx.fillText(copy.foot[4], pad, fy + 132);
+    var qr = photos[4];
+    var qSize = 118;
+    var cap = '온라인 평가 해보기';
+    ctx.font = '700 18px Pretendard, sans-serif';
+    var capW = ctx.measureText(cap).width;
+    var blockW = Math.max(qSize, capW);
+    var qx = W - pad - blockW + (blockW - qSize) / 2;
+    var qy = fy + 8;
+    if (qr) ctx.drawImage(qr, qx, qy, qSize, qSize);
+    ctx.fillStyle = ink;
+    ctx.textAlign = 'center';
+    ctx.fillText(cap, W - pad - blockW / 2, qy + qSize + 8);
+    ctx.textAlign = 'left';
+  }
   function drawGroupPosterA3(ctx, W, H, brand, th, logo, photos) {
+    if (planPosterBrand === 'movement') {
+      drawIncheonPlacePoster(ctx, W, H, logo, photos);
+      return;
+    }
     if (planPosterTemplate === 'split') drawGroupSplit(ctx, W, H, brand, th, logo, photos);
     else if (planPosterTemplate === 'card') drawGroupCard(ctx, W, H, brand, th, logo, photos);
     else drawGroupOverlay(ctx, W, H, brand, th, logo, photos);
@@ -9808,6 +10002,10 @@
     if (!canvas) return Promise.resolve();
     var brand = planBrand();
     var shots = planPosterImageDefs();
+    if (planPosterBrand === 'movement') {
+      var place = incheonPlacePoster();
+      shots = [{ src: place.photo }].concat(place.tiles.map(function (tile) { return { src: tile[2] }; })).concat([{ src: 'poster-photos/consult-qr.png' }]);
+    }
     return ensurePosterFonts().then(function () {
       return Promise.all([loadPlanImg(brand.logo)].concat(shots.map(function (s) { return loadPlanImg(s.src); })));
     }).then(function (loaded) {
@@ -9847,27 +10045,36 @@
     }).then(function (text) {
       if (!text || text.indexOf('## 6. 포스터') < 0) return;
       var status = $('planPosterStatus');
-      if (status) status.textContent = (PLAN_POSTER_TPL[planPosterTemplate] || '한 문장') + ' 틀입니다. 기준은 콘텐츠_기준.md 포스터 항목입니다.';
+      if (status) status.textContent = (PLAN_POSTER_TPL[planPosterTemplate] || '헬스장') + '에 붙이는 A3입니다.';
     }).catch(function () {});
   }
+  function planJpegBytesSync(canvas) {
+    var url = canvas.toDataURL('image/jpeg', 0.92);
+    var bin = atob(url.split(',')[1]);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
   function saveGroupPoster(kind) {
-    paintGroupPoster().then(function () {
-      var canvas = $('planPosterCanvas');
-      var brand = planBrand().label;
+    var canvas = $('planPosterCanvas');
+    var status = $('planPosterStatus');
+    if (!canvas || !canvas.width) return;
+    var name = planActiveTitle().replace(/[\\/:*?"<>|]/g, '') + '-포스터-A3';
+    try {
       if (kind === 'pdf') {
-        return planJpegBytes(canvas).then(function (bytes) {
-          var blob = planBuildPdf([{ bytes: bytes, w: canvas.width, h: canvas.height }], PLAN_A3_PT[0], PLAN_A3_PT[1]);
-          var name = planActiveTitle().replace(/[\\/:*?"<>|]/g, '') + '-포스터-A3.pdf';
-          planDownloadBlob(blob, name);
-          var status = $('planPosterStatus');
-          if (status) status.textContent = brand + ' A3 PDF를 저장했습니다.';
-        });
+        var bytes = planJpegBytesSync(canvas);
+        var blob = planBuildPdf([{ bytes: bytes, w: canvas.width, h: canvas.height }], PLAN_A3_PT[0], PLAN_A3_PT[1]);
+        planDownloadBlob(blob, name + '.pdf');
+        if (status) status.textContent = 'A3 PDF를 저장했습니다.';
+        return;
       }
-      var name = planActiveTitle().replace(/[\\/:*?"<>|]/g, '') + '-포스터-A3.png';
-      triggerImageDownload(canvas.toDataURL('image/png'), name);
-      var status = $('planPosterStatus');
-      if (status) status.textContent = brand + ' A3 PNG를 저장했습니다.';
-    });
+      triggerImageDownload(canvas.toDataURL('image/png'), name + '.png');
+      if (status) status.textContent = 'A3 PNG를 저장했습니다.';
+    } catch (e) {
+      if (status) status.textContent = location.protocol === 'file:'
+        ? '파일을 직접 열면 브라우저가 저장을 막습니다. HTML 미리보기로 연 다음 다시 눌러 주세요.'
+        : '저장에 실패했습니다. 페이지를 새로고침한 뒤 다시 눌러 주세요.';
+    }
   }
   function syncPlanPart() {
     var item = planItem();
@@ -9893,7 +10100,7 @@
     });
     var note = $('planToolNote');
     if (note) {
-      if (showPoster) note.textContent = '추천 사진에서 고르거나 사진을 첨부합니다. 세 장까지, A3 한 장입니다.';
+      if (showPoster) note.textContent = '인천 커뮤니티 A3입니다. 헬스장, 사우나, 카페를 고릅니다.';
       else if (item.example && showProgram) note.textContent = item.title + ' 프로그램을 바탕으로 한 예시입니다.';
       else if (item.example) note.textContent = item.title + ' 제안서 예시입니다. 글 위를 누르면 그 칸을 고칩니다.';
       else if (showProgram) note.textContent = '지금 준비 중인 수업입니다. 개요는 전체 흐름이고, 주차는 그 주의 두 회차입니다.';
@@ -9902,7 +10109,7 @@
     if ($('planDownload')) $('planDownload').textContent = planPart === 'proposal' ? 'PDF로 받기' : '파일로 받기';
     if (showPoster) {
       var status = $('planPosterStatus');
-      if (status) status.textContent = (PLAN_POSTER_TPL[planPosterTemplate] || '한 문장') + ' 틀입니다. 기준은 콘텐츠_기준.md 포스터 항목입니다.';
+      if (status) status.textContent = (PLAN_POSTER_TPL[planPosterTemplate] || '헬스장') + '에 붙이는 A3입니다.';
     }
     syncPlanWeek();
     renderPlanLetter();
@@ -10421,7 +10628,7 @@
         renderPlanPosterImages();
         paintGroupPoster();
         var status = $('planPosterStatus');
-        if (status) status.textContent = PLAN_POSTER_TPL[planPosterTemplate] + ' 틀입니다. 기준은 콘텐츠_기준.md 포스터 항목입니다.';
+        if (status) status.textContent = PLAN_POSTER_TPL[planPosterTemplate] + '에 붙이는 A3입니다.';
       });
     }
     if ($('planPosterFile')) {
@@ -10463,11 +10670,19 @@
   document.getElementById('appTabPlan').addEventListener('click', function () { setAppTab('plan'); });
   document.getElementById('appTabReceipt').addEventListener('click', function () { setAppTab('receipt'); });
   document.getElementById('offerNav').addEventListener('click', function (e) {
+    if (e.target.closest('[data-print-guide]')) {
+      $('printGuide').hidden = false;
+      return;
+    }
     var b = e.target.closest('[data-offer]');
     if (!b) return;
     offerView = b.getAttribute('data-offer');
     renderOfferNav();
     applyOfferView();
+  });
+  $('printGuideClose').addEventListener('click', function () { $('printGuide').hidden = true; });
+  $('printGuide').addEventListener('click', function (e) {
+    if (e.target.id === 'printGuide') $('printGuide').hidden = true;
   });
   document.getElementById('btnUnbookedRefresh').addEventListener('click', startUnbookedCheck_);
   document.getElementById('unbookedBody').addEventListener('click', onUnbookedBodyClick_);
