@@ -1305,7 +1305,8 @@
   .plan-doc table.plan-time td:first-child,
   .plan-doc table.plan-time th:first-child { width: 64px; white-space: nowrap; }
   #planPoster { margin-top: 0; }
-  #planPoster .poster-preview { max-height: none; }
+  .poster-preview { position: relative; }
+  .plan-hit.is-photo { cursor: pointer; }
   @media (max-width: 640px) {
     .plan-facts, .plan-flow { grid-template-columns: 1fr; }
     .plan-photos { grid-template-columns: 1fr; }
@@ -1388,6 +1389,12 @@
     padding: 11mm;
     display: flex;
     transform-origin: top left;
+  }
+  .pcard-edit { cursor: text; }
+  .pcard-edit:hover, .pcard-edit:focus {
+    outline: 2px solid rgba(196, 160, 86, .95);
+    border-radius: 4px;
+    background: rgba(255, 252, 248, .45);
   }
   .pcard {
     width: 100%;
@@ -1566,8 +1573,16 @@
     <div class="print-guide no-print" id="printGuide" hidden>
       <div class="print-guide-card" role="dialog" aria-labelledby="printGuideTitle">
         <h2 id="printGuideTitle">출력할 상품</h2>
-        <p><strong>포스터</strong>는 <a href="https://www.bizhows.com/ko/v/option?mock=4000_200_4001" target="_blank" rel="noopener noreferrer">비즈하우스 종이 포스터(단면)</a>에서 A3, 스노우지 200g, 무광코팅을 고르면 됩니다. 벽에 붙이는 용도라 광택은 조명에 번쩍입니다. 200g은 일반 복사지보다 두꺼워서 잘 구겨지지 않습니다. 대형 고급 포스터나 부착형 실사 출력은 이 크기에 맞지 않습니다.</p>
-        <p><strong>가격표</strong>는 <a href="https://www.bizhows.com/ko/v/option?mock=8100_200_8001" target="_blank" rel="noopener noreferrer">소량 고급 전단지(단면)</a>에서 A4, 스노우지 150g이면 됩니다. 가까이서 금액을 읽는 종이라 무광이 맞습니다. 한두 장만 뽑는다면 종이 포스터에서 사이즈만 A4로 해도 됩니다.</p>
+        <p><strong>포스터</strong>는 <a href="https://www.bizhows.com/ko/v/option?mock=4000_200_4001" target="_blank" rel="noopener noreferrer">비즈하우스 종이 포스터(단면)</a>입니다. 아크릴 액자에 넣습니다.<br>
+        용지 <strong>스노우지 150g</strong><br>
+        방향 <strong>세로</strong><br>
+        사이즈 <strong>A3</strong><br>
+        코팅 <strong>코팅 없음</strong></p>
+        <p><strong>가격표</strong>는 <a href="https://www.bizhows.com/ko/v/option?mock=8100_200_8001" target="_blank" rel="noopener noreferrer">소량 고급 전단지(단면)</a>입니다. 가까이서 금액을 읽는 종이입니다.<br>
+        용지 <strong>스노우지 150g</strong><br>
+        사이즈 <strong>A4</strong><br>
+        코팅 <strong>무광</strong><br>
+        한두 장만 뽑는다면 종이 포스터에서 사이즈만 <strong>A4</strong>로 해도 됩니다.</p>
         <div class="print-guide-actions">
           <a href="https://www.bizhows.com/ko/v/option?mock=4000_200_4001" target="_blank" rel="noopener noreferrer">포스터 A3</a>
           <a href="https://www.bizhows.com/ko/v/option?mock=8100_200_8001" target="_blank" rel="noopener noreferrer">가격표 A4</a>
@@ -2110,10 +2125,12 @@
           <div class="poster-actions">
             <button type="button" class="btn btn-print" id="planPosterSavePng">A3 PNG</button>
             <button type="button" class="btn btn-ghost" id="planPosterSavePdf">A3 PDF</button>
+            <button type="button" class="btn btn-ghost" id="planPosterUpscale">사진 화질</button>
           </div>
           <p class="cert-note" id="planPosterStatus">미리보기입니다. A3 한 장으로 받아집니다.</p>
           <div class="poster-preview">
             <canvas id="planPosterCanvas" width="1240" height="1754"></canvas>
+            <input id="planPosterPhotoPick" type="file" accept="image/*" hidden>
           </div>
         </section>
       </div>
@@ -2122,18 +2139,20 @@
     <div id="panelPrice" class="panel">
       <div class="price-wrap">
         <section class="card no-print price-tools">
-          <div class="card-title">가격표 고치기</div>
-          <p class="cert-lead">글자와 금액을 고치면 미리보기 카드가 바로 바뀝니다. PNG 저장으로 받아 인쇄합니다.</p>
+          <p class="cert-lead">글자와 금액을 카드에서 누르면 바로 고칩니다. 사진은 누르면 바뀝니다.</p>
+          <div class="poster-actions">
+            <button type="button" class="btn btn-print" id="btnPricePng">PNG 저장</button>
+            <button type="button" class="btn btn-ghost" id="btnPricePdf">PDF 저장</button>
+          </div>
+          <p class="cert-note" id="priceStatus">고친 내용은 이 브라우저에 남습니다. 다른 컴퓨터에는 받은 파일을 가져가면 됩니다.</p>
           <div class="chips price-branch" id="priceBranchChips">
             <button type="button" class="chip active" data-price-branch="yaksu">약수</button>
             <button type="button" class="chip" data-price-branch="incheon">인천</button>
           </div>
           <div id="priceEditor"></div>
           <div class="price-actions">
-            <button type="button" class="btn btn-print" id="btnPricePng">PNG 저장</button>
             <button type="button" class="btn btn-ghost" id="btnPriceReset">이 지점 처음 금액</button>
           </div>
-          <p class="cert-note" id="priceStatus">고친 내용은 이 브라우저에 남습니다. 다른 컴퓨터에는 받은 PNG를 가져가면 됩니다.</p>
         </section>
         <div class="price-fit" id="priceFit">
           <div class="price-sheet" id="priceSheet">
@@ -8667,13 +8686,17 @@
       '<path d="M36 40c-1 8 0 14 0 20 0-6 1-12 0-20z" />' +
       '<circle cx="36" cy="40" r="1.6" fill="#2f2a26" stroke="none" /></svg></div>';
   }
-  function priceRowHtml_(row) {
-    var money = '<div class="pcard-money"><span class="pcard-total">' + escPrice_(row.total) + '</span>' +
-      (row.unit ? '<span class="pcard-unit">' + escPrice_(row.unit) + '</span>' : '') + '</div>';
-    var name = escPrice_(row.name);
+  function priceEdit_(tag, cls, pk, text) {
+    return '<' + tag + ' class="' + cls + ' pcard-edit" contenteditable="true" spellcheck="false" data-pk="' + pk + '">' + escPrice_(text || '') + '</' + tag + '>';
+  }
+  function priceRowHtml_(row, pi, ri) {
+    var pk = 'p' + pi + 'r' + ri;
+    var money = '<div class="pcard-money">' + priceEdit_('span', 'pcard-total', pk + '.total', row.total) +
+      (row.unit ? priceEdit_('span', 'pcard-unit', pk + '.unit', row.unit) : '') + '</div>';
+    var name = priceEdit_('span', '', pk + '.name', row.name);
+    var save = row.save ? priceEdit_('span', 'pcard-save', pk + '.save', row.save) : '';
     if (row.recommend) {
-      return '<div class="pcard-rec"><div class="pcard-line" style="padding:0"><div class="pcard-name"><span class="pcard-badge">추천</span><span>' + name + '</span>' +
-        (row.save ? '<span class="pcard-save">' + escPrice_(row.save) + '</span>' : '') +
+      return '<div class="pcard-rec"><div class="pcard-line" style="padding:0"><div class="pcard-name"><span class="pcard-badge">추천</span>' + name + save +
         '</div>' + money + '</div></div>';
     }
     return '<div class="pcard-line"><div class="pcard-name">' + name + '</div>' + money + '</div>';
@@ -8683,38 +8706,70 @@
     if (!box) return;
     if (!priceCards) priceCards = loadPriceCards_();
     var card = priceCards[priceBranch];
-    var footBits = String(card.foot || '').split('|');
-    var foot = escPrice_(footBits[0].trim()) + (footBits.length > 1 ? ' <span>| ' + escPrice_(footBits.slice(1).join('|').trim()) + '</span>' : '');
-    var pace = escPrice_(card.pace || '').replace(/\n/g, '<br>');
+    var foot = priceEdit_('span', '', 'foot', card.foot);
     var html = '<div class="pcard-logo-block">' + priceLogoSvg_() +
       '<p class="pcard-script">Re &amp; Alignment</p><div class="pcard-rule"></div></div>' +
       '<div class="pcard-sig-slot"><div class="pcard-anchor"><p class="pcard-kicker">SIGNATURE CARE</p>' +
-      '<div class="pcard-sig"><div class="pcard-sig-name">' + escPrice_(card.sigName) + '</div><div class="pcard-sig-note">' + escPrice_(card.sigNote) + '</div></div>' +
-      '<div class="pcard-line"><div class="pcard-name">' + escPrice_(card.sigItem) + '</div><div class="pcard-money"><span class="pcard-total">' + escPrice_(card.sigPrice) + '</span></div></div></div></div>';
+      '<div class="pcard-sig">' + priceEdit_('div', 'pcard-sig-name', 'sigName', card.sigName) + priceEdit_('div', 'pcard-sig-note', 'sigNote', card.sigNote) + '</div>' +
+      '<div class="pcard-line"><div class="pcard-name">' + priceEdit_('span', '', 'sigItem', card.sigItem) + '</div><div class="pcard-money">' + priceEdit_('span', 'pcard-total', 'sigPrice', card.sigPrice) + '</div></div></div></div>';
     html += '<div class="pcard-progs">';
-    (card.programs || []).forEach(function (prog) {
-      var titleLine = '<div class="pcard-titleline"><h2>' + escPrice_(prog.title) + '</h2>' +
-        (prog.sub ? '<span class="pcard-aside">' + escPrice_(prog.sub) + '</span>' : '') + '</div>';
-      var head = prog.sub ? titleLine : ('<h2>' + escPrice_(prog.title) + '</h2>');
-      if (prog.note) head = '<p class="pcard-lead">' + escPrice_(prog.note) + '</p>' + titleLine;
+    (card.programs || []).forEach(function (prog, pi) {
+      var titleLine = '<div class="pcard-titleline">' + priceEdit_('h2', '', 'p' + pi + '.title', prog.title) +
+        (prog.sub ? priceEdit_('span', 'pcard-aside', 'p' + pi + '.sub', prog.sub) : '') + '</div>';
+      var head = titleLine;
+      if (prog.note) head = priceEdit_('p', 'pcard-lead', 'p' + pi + '.note', prog.note) + titleLine;
       html += '<section class="pcard-prog">' + head;
-      (prog.rows || []).forEach(function (row) { html += priceRowHtml_(row); });
+      (prog.rows || []).forEach(function (row, ri) { html += priceRowHtml_(row, pi, ri); });
       html += '</section>';
     });
     html += '</div>';
     html += '<div class="pcard-mid">';
-    if (pace) html += '<p class="pcard-pace">' + pace + '</p>';
+    html += '<p class="pcard-pace pcard-edit" contenteditable="true" spellcheck="false" data-pk="pace">' + escPrice_(card.pace || '').replace(/\n/g, '<br>') + '</p>';
     html += '</div>';
     html += '<div class="pcard-bottom">';
-    if (card.notes && card.notes.length) {
-      html += '<ul class="pcard-merits">' + card.notes.map(function (line) {
-        return '<li>' + escPrice_(line) + '</li>';
-      }).join('') + '</ul>';
-    }
-    if (foot) html += '<div class="pcard-foot">' + foot + '</div>';
+    html += '<ul class="pcard-merits">' + (card.notes || []).map(function (line, ni) {
+      return '<li class="pcard-edit" contenteditable="true" spellcheck="false" data-pk="note.' + ni + '">' + escPrice_(line) + '</li>';
+    }).join('') + '</ul>';
+    html += '<div class="pcard-foot">' + foot + '</div>';
     html += '</div>';
     box.innerHTML = html;
     fitPriceSheet_();
+    bindPriceLiveEdit_();
+  }
+  function bindPriceLiveEdit_() {
+    var box = $('priceCard');
+    if (!box || box._liveEdit) return;
+    box._liveEdit = true;
+    box.addEventListener('focusout', function (e) {
+      var el = e.target.closest ? e.target.closest('[data-pk]') : null;
+      if (!el || !box.contains(el)) return;
+      applyPriceLive_(el);
+    });
+  }
+  function applyPriceLive_(el) {
+    if (!priceCards) return;
+    var card = priceCards[priceBranch];
+    var pk = el.getAttribute('data-pk');
+    var text = (el.innerText || '').replace(/\u00a0/g, ' ').replace(/\s+$/g, '').replace(/^\s+/g, '');
+    if (pk === 'pace') card.pace = el.innerText.replace(/\u00a0/g, ' ').replace(/\s+$/g, '');
+    else if (pk === 'foot') card.foot = text;
+    else if (pk.indexOf('note.') === 0) {
+      var ni = parseInt(pk.split('.')[1], 10);
+      if (card.notes && card.notes[ni] != null) card.notes[ni] = text;
+    } else if (pk.indexOf('sig') === 0) card[pk] = text;
+    else if (/^p\d+\./.test(pk)) {
+      var bits = pk.split('.');
+      var prog = card.programs[parseInt(bits[0].slice(1), 10)];
+      if (prog) prog[bits[1]] = text;
+    } else if (/^p\d+r\d+\./.test(pk)) {
+      var m = pk.match(/^p(\d+)r(\d+)\.(.+)$/);
+      if (m) {
+        var row = card.programs[parseInt(m[1], 10)].rows[parseInt(m[2], 10)];
+        if (row) row[m[3]] = text;
+      }
+    }
+    savePriceCards_();
+    renderPriceEditor_();
   }
   function placePriceRegions_() {
     var card = $('priceCard');
@@ -8779,12 +8834,13 @@
       document.head.appendChild(s);
     });
   }
-  function savePricePng_() {
+  function savePricePng_(kind) {
     readPriceEditor_();
     savePriceCards_();
     renderPricePreview_();
     var status = $('priceStatus');
-    if (status) status.textContent = '이미지를 만드는 중…';
+    var asPdf = kind === 'pdf';
+    if (status) status.textContent = asPdf ? 'PDF를 만드는 중…' : '이미지를 만드는 중…';
     var ready = (document.fonts && document.fonts.load) ? document.fonts.load('78px Italianno').catch(function () {}) : Promise.resolve();
     var sheet = $('priceSheet');
     var prev = sheet.style.transform;
@@ -8792,9 +8848,16 @@
     sheet.style.position = 'fixed';
     sheet.style.left = '-12000px';
     sheet.style.top = '0';
+    function restoreSheet() {
+      sheet.style.transform = prev;
+      sheet.style.position = '';
+      sheet.style.left = '';
+      sheet.style.top = '';
+      fitPriceSheet_();
+    }
     Promise.resolve(ready).then(function () { return loadHtml2Canvas_(); }).then(function (h2c) {
       return h2c(sheet, {
-        scale: 3,
+        scale: 4,
         backgroundColor: '#3c342f',
         useCORS: true,
         width: sheet.offsetWidth,
@@ -8803,21 +8866,20 @@
         windowHeight: sheet.offsetHeight
       });
     }).then(function (canvas) {
-      sheet.style.transform = prev;
-      sheet.style.position = '';
-      sheet.style.left = '';
-      sheet.style.top = '';
-      fitPriceSheet_();
-      var name = (priceBranch === 'incheon' ? '가격표-인천' : '가격표-약수') + '.png';
-      triggerImageDownload(canvas.toDataURL('image/png'), name);
-      if (status) status.textContent = name + ' 이미지를 저장했습니다.';
+      restoreSheet();
+      var base = priceBranch === 'incheon' ? '가격표-인천' : '가격표-약수';
+      if (asPdf) {
+        var bytes = planJpegBytesSync(canvas);
+        var blob = planBuildPdf([{ bytes: bytes, w: canvas.width, h: canvas.height }], PLAN_A4_PT[0], PLAN_A4_PT[1]);
+        planDownloadBlob(blob, base + '.pdf');
+        if (status) status.textContent = base + '.pdf 를 저장했습니다.';
+        return;
+      }
+      triggerImageDownload(canvas.toDataURL('image/png'), base + '.png');
+      if (status) status.textContent = base + '.png 이미지를 저장했습니다.';
     }).catch(function () {
-      sheet.style.transform = prev;
-      sheet.style.position = '';
-      sheet.style.left = '';
-      sheet.style.top = '';
-      fitPriceSheet_();
-      if (status) status.textContent = '이미지를 만들지 못했습니다. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.';
+      restoreSheet();
+      if (status) status.textContent = '파일을 만들지 못했습니다. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.';
     });
   }
   var priceCardBound = false;
@@ -8865,7 +8927,8 @@
       renderPriceEditor_();
       renderPricePreview_();
     });
-    $('btnPricePng').addEventListener('click', savePricePng_);
+    $('btnPricePng').addEventListener('click', function () { savePricePng_('png'); });
+    $('btnPricePdf').addEventListener('click', function () { savePricePng_('pdf'); });
     $('btnPriceReset').addEventListener('click', function () {
       priceCards[priceBranch] = priceCardDefaults_()[priceBranch];
       savePriceCards_();
@@ -9501,8 +9564,8 @@
     planHitRegions.forEach(function (r) {
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'plan-hit';
-      b.title = '눌러서 고치기';
+      b.className = 'plan-hit' + (r.kind === 'photo' ? ' is-photo' : '');
+      b.title = r.kind === 'photo' ? '눌러서 사진 바꾸기' : '눌러서 고치기';
       b.style.left = (r.x * scale) + 'px';
       b.style.top = (r.y * scale) + 'px';
       b.style.width = Math.max(r.w * scale, 28) + 'px';
@@ -9517,6 +9580,12 @@
     stage.appendChild(layer);
   }
   function openPlanHitEdit_(r, scale) {
+    if (r.kind === 'photo') {
+      posterPhotoTarget = r;
+      var input = $('planPosterPhotoPick');
+      if (input) input.click();
+      return;
+    }
     var stage = $('planProposalStage');
     if (!stage) return;
     var prev = stage.querySelector('.plan-hit-edit');
@@ -9554,6 +9623,7 @@
     if (!canvas) return;
     var token = ++planLetterPaint;
     var L = planLetter();
+    if (planProposalPhoto) L.photos[0] = Object.assign({}, L.photos[0], { src: planProposalPhoto });
     ensurePosterFonts().then(function () {
       return Promise.all(L.photos.map(function (p) { return loadPlanImg(p.src); }));
     }).then(function (photos) {
@@ -9879,6 +9949,16 @@
     ctx.fillRect(0, H - 96, W, 96);
     planPosterPin(ctx, W, pad, H, th);
   }
+  var posterHitRegions = [];
+  var posterPhotoOverride = {};
+  var posterPhotoTarget = null;
+  var planProposalPhoto = '';
+  function posterCopyBag() {
+    try { return JSON.parse(localStorage.getItem('rm-place-poster-copy') || '{}'); } catch (e) { return {}; }
+  }
+  function posterCopySave(bag) {
+    try { localStorage.setItem('rm-place-poster-copy', JSON.stringify(bag)); } catch (e) {}
+  }
   function incheonPlacePoster() {
     var tiles = [
       ['패시브 스트레칭', '뭉쳐 있는 근육과 관절부터\n부드럽게 풀어갑니다.', 'poster-photos/incheon-passive.jpg'],
@@ -9896,6 +9976,24 @@
       photo = 'poster-photos/incheon-cafe.jpg';
       lines = ['바르지 못한 자세가,', '같은 곳을 또 불편하게 합니다.'];
     }
+    var bag = posterCopyBag();
+    var own = bag[planPosterTemplate] || {};
+    if (own.lines && own.lines.length) lines = own.lines.slice();
+    if (own.photo) photo = own.photo;
+    if (Array.isArray(bag.tiles)) {
+      bag.tiles.forEach(function (tile, i) {
+        if (!tile || !tiles[i]) return;
+        if (tile[0]) tiles[i][0] = tile[0];
+        if (tile[1]) tiles[i][1] = tile[1];
+        if (tile[2]) tiles[i][2] = tile[2];
+      });
+    }
+    if (own.foot && own.foot.length) foot = own.foot.slice();
+    var shots = posterPhotoOverride[planPosterTemplate] || {};
+    if (shots.hero) photo = shots.hero;
+    [0, 1, 2].forEach(function (i) {
+      if (shots['tile.' + i]) tiles[i][2] = shots['tile.' + i];
+    });
     return { photo: photo, lines: lines, tiles: tiles, foot: foot };
   }
   function drawIncheonPlacePoster(ctx, W, H, logo, photos) {
@@ -9926,6 +10024,7 @@
     }
     ctx.fillStyle = paper;
     ctx.fillRect(0, 0, W, H);
+    posterHitRegions = [];
     ctx.textBaseline = 'top';
     ctx.textAlign = 'left';
     var logoH = 64;
@@ -9940,6 +10039,7 @@
       var size = i === 0 ? 44 : 58;
       ctx.font = '800 ' + size + 'px Pretendard, sans-serif';
       ctx.fillText(line, pad, y);
+      posterHitRegions.push({ kind: 'text', key: 'line.' + i, text: line, x: pad, y: y, w: inner, h: size + 8 });
       y += i === 0 ? 58 : 70;
     });
     y += 16;
@@ -9954,6 +10054,7 @@
       planDrawCover(ctx, hero, pad, y, inner, photoH);
       ctx.restore();
     }
+    posterHitRegions.push({ kind: 'photo', key: 'hero', x: pad, y: y, w: inner, h: photoH });
     y += photoH + gapAfterHero;
     var gap = 14;
     var tw = (inner - gap * 2) / 3;
@@ -9966,9 +10067,11 @@
       ctx.fillStyle = ink;
       ctx.font = '800 26px Pretendard, sans-serif';
       posterFillLines(ctx, posterWrap(ctx, tile[0], tw - 36).slice(0, 2), x + 18, y + 32, 32);
+      posterHitRegions.push({ kind: 'text', key: 'tile.' + i + '.0', text: tile[0], x: x + 14, y: y + 28, w: tw - 28, h: 64 });
       ctx.fillStyle = mute;
       ctx.font = '600 20px Pretendard, sans-serif';
       posterFillLines(ctx, posterWrap(ctx, tile[1], tw - 28).slice(0, 3), x + 14, y + 96, 28);
+      posterHitRegions.push({ kind: 'text', key: 'tile.' + i + '.1', text: tile[1], x: x + 14, y: y + 92, w: tw - 28, h: 88 });
       var img = tilePhotos[i];
       var iy = y + 188;
       var ih = th - 206;
@@ -9979,6 +10082,7 @@
         planDrawCover(ctx, img, x + 14, iy, tw - 28, ih);
         ctx.restore();
       }
+      if (ih > 40) posterHitRegions.push({ kind: 'photo', key: 'tile.' + i, x: x + 14, y: iy, w: tw - 28, h: ih });
     });
     var fy = H - footH + 18;
     ctx.fillStyle = ink;
@@ -9996,6 +10100,11 @@
     ctx.fillStyle = mute;
     ctx.font = '600 22px Pretendard, sans-serif';
     ctx.fillText(copy.foot[4], pad, fy + 132);
+    posterHitRegions.push({ kind: 'text', key: 'foot.0', text: copy.foot[0], x: pad, y: fy, w: inner * 0.6, h: 32 });
+    posterHitRegions.push({ kind: 'text', key: 'foot.1', text: copy.foot[1], x: pad + 280, y: fy, w: 280, h: 32 });
+    posterHitRegions.push({ kind: 'text', key: 'foot.2', text: copy.foot[2], x: pad, y: fy + 40, w: 280, h: 28 });
+    posterHitRegions.push({ kind: 'text', key: 'foot.3', text: copy.foot[3], x: pad + 70, y: fy + 68, w: 220, h: 58 });
+    posterHitRegions.push({ kind: 'text', key: 'foot.4', text: copy.foot[4], x: pad, y: fy + 128, w: inner * 0.7, h: 28 });
     var qr = photos[4];
     var qSize = 118;
     var cap = '온라인 평가 해보기';
@@ -10019,6 +10128,138 @@
     else if (planPosterTemplate === 'card') drawGroupCard(ctx, W, H, brand, th, logo, photos);
     else drawGroupOverlay(ctx, W, H, brand, th, logo, photos);
   }
+  function mountPosterHits_() {
+    var preview = document.querySelector('#planPoster .poster-preview');
+    var canvas = $('planPosterCanvas');
+    if (!preview || !canvas || planPosterBrand !== 'movement') return;
+    var old = $('planPosterHits');
+    if (old) old.remove();
+    var layer = document.createElement('div');
+    layer.id = 'planPosterHits';
+    layer.className = 'no-print';
+    layer.style.cssText = 'position:absolute;inset:0;pointer-events:none;';
+    var scale = canvas.clientWidth / PLAN_A3_W;
+    posterHitRegions.forEach(function (r) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'plan-hit' + (r.kind === 'photo' ? ' is-photo' : '');
+      b.title = r.kind === 'photo' ? '눌러서 사진 바꾸기' : '눌러서 고치기';
+      b.style.left = (r.x * scale) + 'px';
+      b.style.top = (r.y * scale) + 'px';
+      b.style.width = Math.max(r.w * scale, 24) + 'px';
+      b.style.height = Math.max(r.h * scale, 16) + 'px';
+      b.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (r.kind === 'photo') openPosterPhoto_(r);
+        else openPosterText_(r, scale);
+      });
+      layer.appendChild(b);
+    });
+    preview.appendChild(layer);
+  }
+  function openPosterText_(r, scale) {
+    var preview = document.querySelector('#planPoster .poster-preview');
+    if (!preview) return;
+    var prev = preview.querySelector('.plan-hit-edit');
+    if (prev) prev.remove();
+    var ta = document.createElement('textarea');
+    ta.className = 'plan-hit-edit no-print';
+    ta.value = r.text || '';
+    ta.style.left = (r.x * scale) + 'px';
+    ta.style.top = (r.y * scale) + 'px';
+    ta.style.width = Math.max(r.w * scale, 160) + 'px';
+    ta.style.height = Math.max(r.h * scale + 8, 48) + 'px';
+    var done = false;
+    function commit(save) {
+      if (done) return;
+      done = true;
+      var next = ta.value;
+      ta.remove();
+      if (!save || next === (r.text || '')) return;
+      var bag = posterCopyBag();
+      var own = bag[planPosterTemplate] || {};
+      var copy = incheonPlacePoster();
+      if (r.key.indexOf('line.') === 0) {
+        var lines = copy.lines.slice();
+        lines[parseInt(r.key.split('.')[1], 10)] = next;
+        own.lines = lines;
+      } else if (r.key.indexOf('foot.') === 0) {
+        var foot = copy.foot.slice();
+        foot[parseInt(r.key.split('.')[1], 10)] = next;
+        own.foot = foot;
+      } else if (r.key.indexOf('tile.') === 0) {
+        var parts = r.key.split('.');
+        var tiles = bag.tiles || copy.tiles.map(function (t) { return [t[0], t[1]]; });
+        var ti = parseInt(parts[1], 10);
+        tiles[ti] = tiles[ti] || ['', ''];
+        tiles[ti][parseInt(parts[2], 10)] = next;
+        bag.tiles = tiles;
+      }
+      bag[planPosterTemplate] = own;
+      posterCopySave(bag);
+      paintGroupPoster();
+    }
+    ta.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.preventDefault(); commit(false); }
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); commit(true); }
+    });
+    ta.addEventListener('blur', function () { commit(true); });
+    preview.appendChild(ta);
+    ta.focus();
+  }
+  function upscalePosterHero_() {
+    var status = $('planPosterStatus');
+    var place = incheonPlacePoster();
+    if (status) status.textContent = '메인 사진 화질을 올리는 중…';
+    loadPlanImg(place.photo).then(function (img) {
+      if (!img) throw new Error('사진이 없습니다.');
+      var c = document.createElement('canvas');
+      var sc = Math.min(1, 1400 / img.width);
+      c.width = Math.max(1, Math.round(img.width * sc));
+      c.height = Math.max(1, Math.round(img.height * sc));
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      var dataUrl = c.toDataURL('image/jpeg', 0.85);
+      return fetch('https://script.google.com/macros/s/AKfycbwVJSc6rY5tcBSB1VaRi4DBEXGyUBr1ADFfs6QEA9Z9bu0G-0mdMAv374-MdPVYMnSaeQ/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'plannerUpscaleImage',
+          mediaType: 'image/jpeg',
+          imageBase64: dataUrl.split(',')[1],
+          scale: 2,
+          faceEnhance: false
+        })
+      });
+    }).then(function (res) { return res.json(); }).then(function (data) {
+      if (!data || data.result !== 'success' || !data.imageBase64) throw new Error((data && data.message) || '사진 화질을 올리지 못했습니다.');
+      if (!posterPhotoOverride[planPosterTemplate]) posterPhotoOverride[planPosterTemplate] = {};
+      posterPhotoOverride[planPosterTemplate].hero = 'data:' + (data.mediaType || 'image/jpeg') + ';base64,' + data.imageBase64;
+      if (status) status.textContent = '메인 사진 화질을 올렸습니다.';
+      paintGroupPoster();
+    }).catch(function (err) {
+      if (status) status.textContent = (err && err.message) || '사진 화질을 올리지 못했습니다. 페이지를 HTML 미리보기로 연 뒤 다시 눌러 주세요.';
+    });
+  }
+  function coverPhotoDataUrl(file, aspect) {
+    return blobToData(file).then(function (url) {
+      return loadPlanImg(url);
+    }).then(function (img) {
+      if (!img) return '';
+      var w = 1600;
+      var h = Math.max(200, Math.round(w / aspect));
+      var c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      planDrawCover(c.getContext('2d'), img, 0, 0, w, h);
+      return c.toDataURL('image/jpeg', 0.92);
+    });
+  }
+  function openPosterPhoto_(r) {
+    posterPhotoTarget = r;
+    var input = $('planPosterPhotoPick');
+    if (input) input.click();
+  }
   function paintGroupPoster() {
     var canvas = $('planPosterCanvas');
     if (!canvas) return Promise.resolve();
@@ -10035,6 +10276,7 @@
       if (logo && brand.knock === 'white') logo = planKnockWhite(logo);
       var photos = loaded.slice(1).filter(Boolean);
       drawGroupPosterA3(planSurface(canvas, PLAN_A3_W, PLAN_A3_H, PLAN_A3_SCALE), PLAN_A3_W, PLAN_A3_H, brand, brand.theme, logo, photos);
+      mountPosterHits_();
     });
   }
   function renderPlanPosterImages() {
@@ -10352,6 +10594,7 @@
       ctx.fillStyle = '#E4D9C8';
       ctx.fillRect(pad, y, photoW, photoH);
     }
+    planHitRegions.push({ kind: 'photo', key: 'proposal', text: '', x: pad, y: y, w: photoW, h: Math.max(48, photoH - 44) });
     if (S.photoCap) {
       ctx.fillStyle = 'rgba(27,42,74,0.82)';
       ctx.fillRect(pad, y + photoH - 40, photoW, 40);
@@ -10573,6 +10816,7 @@
     await ensurePosterFonts();
     var pages = [];
     var L = planLetter();
+    if (planProposalPhoto) L.photos[0] = Object.assign({}, L.photos[0], { src: planProposalPhoto });
     var photos = await Promise.all(L.photos.map(function (p) { return loadPlanImg(p.src); }));
     pages = drawProposalPdfPages(L, photos.filter(Boolean));
     var images = [];
@@ -10674,6 +10918,25 @@
     loadPosterGuide();
     $('planPosterSavePng').addEventListener('click', function () { saveGroupPoster('png'); });
     $('planPosterSavePdf').addEventListener('click', function () { saveGroupPoster('pdf'); });
+    $('planPosterUpscale').addEventListener('click', upscalePosterHero_);
+    var photoPick = $('planPosterPhotoPick');
+    if (photoPick) photoPick.addEventListener('change', function () {
+      var file = photoPick.files && photoPick.files[0];
+      var target = posterPhotoTarget;
+      photoPick.value = '';
+      if (!file || !target || !target.w || !target.h) return;
+      coverPhotoDataUrl(file, target.w / target.h).then(function (url) {
+        if (!url) return;
+        if (target.key === 'proposal') {
+          planProposalPhoto = url;
+          renderPlanLetter();
+          return;
+        }
+        if (!posterPhotoOverride[planPosterTemplate]) posterPhotoOverride[planPosterTemplate] = {};
+        posterPhotoOverride[planPosterTemplate][target.key] = url;
+        paintGroupPoster();
+      });
+    });
     document.querySelectorAll('#planProposal input[data-k]').forEach(function (input) {
       input.addEventListener('input', function () {
         savePlanMeta();
