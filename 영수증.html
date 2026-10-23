@@ -1888,7 +1888,7 @@
       </section>
       <section class="card no-print" id="posterCard" hidden>
         <div class="reply-label"><span>포스터 만들기</span></div>
-        <p class="cert-lead">첫 장은 수업 사진입니다. 일정·대상·수강료는 둘째 장부터 나옵니다.</p>
+        <p class="cert-lead">첫 장은 수업 사진과 한 문장입니다. 설명과 수강료는 다음 장입니다.</p>
         <div class="chips poster-tracks" id="posterTracks"></div>
         <div class="cert-fields" id="posterFields">
           <label class="span2"><span>일정 한 줄</span><input data-k="ribbon" autocomplete="off"></label>
@@ -5520,7 +5520,8 @@
     if (consultBranch === 'cmt') {
       return Object.assign(common, {
         file: 'CMT', kicker: 'CMT 임상도수치료 · 2026', title: 'CMT 도수치료 과정', brand: '평가 → 손',
-        cover: '평가로 원인을 가른 뒤, 손으로 다룹니다',
+        coverSet: '제도가 바뀌어도',
+        cover: '손 기술은 남는다',
         lead: '평가로 원인을 가른 뒤, 연부조직과 관절을 손으로 다룹니다. 평가 → 손 → 움직임 흐름에서 CMT는 손(도구) 축입니다.',
         overviewH: '이 과정은',
         overview: '의료인·의료기사가 평가와 함께 도수 테크닉을 부위별로 익히는 과정입니다. 골반부터 경추까지, 연부조직 다음 관절로 들어가는 같은 순서를 내일 베드에서 바로 꺼내 쓰게 됩니다.',
@@ -5557,7 +5558,8 @@
     if (consultBranch === 'ifc') {
       return Object.assign(common, {
         file: 'IFC', kicker: '국제얼굴교정학회 · 2026', title: 'IFC 얼굴 교정 과정', brand: 'Re:Al FACE',
-        cover: '촉진으로 포인트를 찾고, 수기와 기기로 이어갑니다',
+        coverSet: '촉진은',
+        cover: '만져야 하는 것이 아니다',
         lead: '얼굴 해부학과 촉진으로 핵심 포인트를 찾고, 수기·괄사·고주파로 변화를 만듭니다. 평가 → 손 → 움직임 흐름에서 IFC는 얼굴의 손(도구/기기) 축입니다.',
         overviewH: '이 과정은',
         overview: '비수술 얼굴 윤곽·비대칭을 해부 → 촉진 → 수기·괄사·고주파 순으로 익힙니다. 손으로 원인을 읽은 뒤, 수기와 기기를 같은 시퀀스로 연결하는 감각을 가져갑니다.',
@@ -5595,8 +5597,9 @@
     var oneday = posterTrackDef().id === 'oneday';
     return Object.assign(common, {
       file: 'ReAl', kicker: 'Re:Alignment · 2026', title: 'Re:Al 움직임 과정', brand: oneday ? '패시브 스트레칭' : 'PAR 전체',
-      cover: oneday ? '강사가 이끄는 패시브 스트레칭을 하루 만에' : '누워서, 네 발로, 서서 같은 순서를 올립니다',
-      coverWhen: oneday ? [v.date, v.time, posterPriceLine(v)].filter(Boolean).join('  ·  ') : '',
+      oneday: oneday,
+      coverSet: oneday ? '강사가 힘들이지 않는 자세' : '패시브만으로는',
+      cover: oneday ? '하루 종일 반복합니다' : '유지가 안 됩니다',
       lead: oneday
         ? '강사가 움직임을 유도하는 패시브 스트레칭을 하루 만에 익힙니다. 말단에서 근위로 잇는 플로우를, 매트와 베드 모두에서 쓸 수 있게 됩니다.'
         : '푼 몸을 움직임으로 지킵니다. 누워서 → 네발·앉기 → 서서, 각 자세에서 P · AA · A · R을 익힙니다.',
@@ -5739,63 +5742,75 @@
     ctx.restore();
   }
   function drawPosterCover(ctx, W, H, m, th) {
-    var pad = 48;
+    var pad = 56;
     var inner = W - pad * 2;
-    var shots = posterPhotoShots();
+    var shot = posterPhotoShots()[0];
+    var photoH = Math.round(H * 0.56);
     ctx.fillStyle = th.paper;
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = th.accent;
-    ctx.fillRect(0, 0, W, 10);
     ctx.textBaseline = 'top';
     ctx.textAlign = 'left';
-    ctx.fillStyle = th.accent;
-    ctx.font = '700 22px Pretendard, sans-serif';
-    ctx.fillText(m.kicker, pad, 28);
-    ctx.fillStyle = th.ink;
-    ctx.font = '800 60px Pretendard, sans-serif';
-    ctx.fillText(m.title, pad, 60);
+    drawPosterPhoto(ctx, posterPhoto(shot.src), 0, 0, W, photoH, shot.fx, shot.fy);
+    var y = photoH + 40;
     ctx.fillStyle = th.mute;
-    ctx.font = '600 28px Pretendard, sans-serif';
-    var coverLines = posterWrap(ctx, m.cover || m.brand, inner);
-    var textBottom = 136 + posterFillLines(ctx, coverLines.slice(0, 2), pad, 136, 38);
-    if (m.coverWhen) {
-      textBottom += 16;
-      ctx.font = '800 24px Pretendard, sans-serif';
-      var when = posterWrap(ctx, m.coverWhen, inner - 36).slice(0, 2);
-      var whenH = 20 + when.length * 32;
-      ctx.fillStyle = th.card;
-      ctx.fillRect(pad, textBottom, inner, whenH);
+    ctx.font = '600 32px Pretendard, sans-serif';
+    if (m.coverSet) {
+      ctx.fillText(m.coverSet, pad, y);
+      y += 44;
+    }
+    var hook = m.cover || '';
+    var size = 84;
+    ctx.font = '800 ' + size + 'px Pretendard, sans-serif';
+    while (size > 52 && ctx.measureText(hook).width > inner) {
+      size -= 2;
+      ctx.font = '800 ' + size + 'px Pretendard, sans-serif';
+    }
+    ctx.fillStyle = th.ink;
+    ctx.fillText(hook, pad, y);
+    y += size + 28;
+    if (m.oneday) {
       ctx.fillStyle = th.ink;
-      posterFillLines(ctx, when, pad + 18, textBottom + 12, 32);
-      textBottom += whenH;
+      ctx.font = '800 34px Pretendard, sans-serif';
+      var when = [m.date, m.time].filter(Boolean).join('  ·  ');
+      if (when) { ctx.fillText(when, pad, y); y += 46; }
+      if (m.place) {
+        ctx.fillStyle = th.mute;
+        ctx.font = '600 26px Pretendard, sans-serif';
+        ctx.fillText(m.place, pad, y);
+        y += 40;
+      }
+      if (m.priceLine) {
+        ctx.font = '800 32px Pretendard, sans-serif';
+        var pw = ctx.measureText(m.priceLine).width;
+        ctx.fillStyle = th.hi;
+        ctx.fillRect(pad - 6, y - 2, Math.min(pw + 18, inner), 42);
+        ctx.fillStyle = th.ink;
+        ctx.fillText(m.priceLine, pad, y);
+        y += 56;
+      }
     }
-    var foot = 72;
-    var gap = 14;
-    var top = textBottom + 22;
-    var area = H - foot - 16 - top;
-    var heroH = shots.length > 2 ? Math.round(area * 0.62) : Math.round(area * 0.7);
-    var rest = area - heroH - gap;
-    drawPosterPhoto(ctx, posterPhoto(shots[0].src), pad, top, inner, heroH, shots[0].fx, shots[0].fy);
-    ctx.strokeStyle = th.accent;
-    ctx.lineWidth = 6;
-    ctx.strokeRect(pad + 3, top + 3, inner - 6, heroH - 6);
-    var rowY = top + heroH + gap;
-    if (shots.length > 2) {
-      var colW = (inner - gap) / 2;
-      drawPosterPhoto(ctx, posterPhoto(shots[1].src), pad, rowY, colW, rest, shots[1].fx, shots[1].fy);
-      drawPosterPhoto(ctx, posterPhoto(shots[2].src), pad + colW + gap, rowY, colW, rest, shots[2].fx, shots[2].fy);
-    } else if (shots[1]) {
-      drawPosterPhoto(ctx, posterPhoto(shots[1].src), pad, rowY, inner, rest, shots[1].fx, shots[1].fy);
+    ctx.fillStyle = th.ink;
+    ctx.font = '700 28px Pretendard, sans-serif';
+    ctx.fillText(m.title, pad, y);
+    y += 48;
+    if (!m.oneday && m.ribbon) {
+      ctx.fillStyle = th.mute;
+      ctx.font = '600 24px Pretendard, sans-serif';
+      y += posterFillLines(ctx, posterWrap(ctx, m.ribbon, inner).slice(0, 2), pad, y, 34) + 8;
     }
-    ctx.fillStyle = th.header;
-    ctx.fillRect(0, H - foot, W, foot);
-    ctx.fillStyle = th.cream;
-    ctx.font = '700 22px Pretendard, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText(m.brand, pad, H - foot + 24);
-    ctx.textAlign = 'right';
-    ctx.fillText('1 / 3', W - pad, H - foot + 24);
-    ctx.textAlign = 'left';
+    y += 20;
+    var btnH = 68;
+    var btnY = H - 64 - btnH;
+    if (btnY < y) btnY = y;
+    if (btnY + btnH < H - 28) {
+      ctx.fillStyle = th.accent;
+      ctx.fillRect(pad, btnY, inner, btnH);
+      ctx.fillStyle = '#fff';
+      ctx.font = '800 26px Pretendard, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(m.applyLabel || '수강 신청하기', W / 2, btnY + 18);
+      ctx.textAlign = 'left';
+    }
   }
   function drawPosterFront(ctx, W, H, m, th) {
     var pad = 56;
