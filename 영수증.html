@@ -90,6 +90,16 @@
   #headLinkBtn.active,
   #headDocsBtn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
   .offer-nav { margin-bottom: 12px; }
+  #offerNav .app-tab {
+    background: #e7eef8;
+    border-color: #c5d2e6;
+    color: #1c3f73;
+  }
+  #offerNav .app-tab.active {
+    background: #1c3f73;
+    border-color: #1c3f73;
+    color: #fff;
+  }
   body:not(.mode-plan) #offerNav { display: none; }
   #priceBranchChips { display: none; }
   body.mode-consult #pageSub,
@@ -1182,7 +1192,7 @@
     font-weight: 800; border-radius: 12px; padding: 10px 12px; cursor: pointer;
   }
   .plan-switch, .plan-dl { display: flex; gap: 6px; margin-bottom: 8px; }
-  .plan-switch button { flex: 1; }
+  .plan-switch button { flex: 1; background: #f4efe4; border-color: #e0d3b8; color: #6a5428; }
   .plan-switch button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
   .plan-dl button { flex: 1; }
   .plan-dl .is-solid { background: var(--ink); color: #fff; border-color: var(--ink); }
@@ -6739,6 +6749,7 @@
     return d;
   }
   function saveDocs(d) {
+    d.savedAt = Date.now();
     localStorage.setItem(DOCS_STORE, JSON.stringify(d));
     schedulePayrollSheetSave(d);
   }
@@ -6781,6 +6792,15 @@
       }
       var parsed = parseDocsPayload(res.docs);
       if (!parsed) return false;
+      var localAt = 0;
+      try {
+        var stored = JSON.parse(localStorage.getItem(DOCS_STORE) || 'null');
+        localAt = stored && stored.savedAt ? stored.savedAt : 0;
+      } catch (e2) {}
+      if (localAt && localAt >= (parsed.savedAt || 0)) {
+        pushPayrollToSheet(loadDocs());
+        return false;
+      }
       applyDocsData(parsed);
       setSheetStatus('load');
       return true;
@@ -8924,7 +8944,7 @@
     if (!allowed) offerView = items[0].id;
     nav.innerHTML = items.map(function (item) {
       return '<button type="button" class="app-tab' + (item.id === offerView ? ' active' : '') + '" data-offer="' + item.id + '">' + item.label + '</button>';
-    }).join('') + '<button type="button" class="app-tab' + (academy ? ' bizhows-link' : '') + '" data-print-guide>출력</button>';
+    }).join('') + '<button type="button" class="app-tab bizhows-link" data-print-guide>출력</button>';
   }
   function syncPriceBranchFromConsult() {
     if (consultBranch !== 'yaksu' && consultBranch !== 'incheon') return;
@@ -9186,7 +9206,7 @@
     movement: {
       label: '리얼무브먼트',
       word: 'REAL MOVEMENT',
-      logo: '리얼무브먼트_링크_로고_투명.png',
+      logo: 'poster-photos/rm-logo.png',
       knock: '',
       hook: '앉아 있는 하루가 길다면',
       sub: '바닥에서 같이 움직입니다',
@@ -9600,7 +9620,7 @@
       var img = new Image();
       img.onload = function () { resolve(img); };
       img.onerror = function () { resolve(null); };
-      img.src = src;
+      img.src = encodeURI(src);
     });
   }
   function planSurface(canvas, w, h, scale) {
@@ -9904,14 +9924,12 @@
     ctx.fillRect(0, 0, W, H);
     ctx.textBaseline = 'top';
     ctx.textAlign = 'left';
-    if (logo) {
-      var logoH = 64;
-      var logoW = logoH * (logo.width / logo.height);
-      ctx.drawImage(logo, pad, 40, logoW, logoH);
-      ctx.fillStyle = gold;
-      ctx.font = '800 22px Pretendard, sans-serif';
-      ctx.fillText('REAL MOVEMENT', pad + logoW + 16, 58);
-    }
+    var logoH = 64;
+    var logoW = logo && logo.width && logo.height ? logoH * (logo.width / logo.height) : 0;
+    if (logo && logoW) ctx.drawImage(logo, pad, 36, logoW, logoH);
+    ctx.fillStyle = gold;
+    ctx.font = '800 22px Pretendard, sans-serif';
+    ctx.fillText('REAL MOVEMENT', pad + (logoW ? logoW + 16 : 0), 58);
     ctx.fillStyle = ink;
     var y = 128;
     copy.lines.forEach(function (line, i) {
