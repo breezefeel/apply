@@ -8639,8 +8639,7 @@
     });
     html += '<div class="price-actions"><button type="button" class="btn-sm" data-act="add-prog">프로그램 추가</button></div>' +
       '<label class="span2" style="display:flex;flex-direction:column;gap:4px;margin-top:12px;font-size:11px;font-weight:800;color:var(--mute)">횟수 안내<textarea class="price-pace" data-k="pace">' + escPrice_(card.pace) + '</textarea></label>' +
-      '<label class="span2" style="display:flex;flex-direction:column;gap:4px;margin-top:8px;font-size:11px;font-weight:800;color:var(--mute)">아래 안내 · 한 줄에 하나<textarea class="price-pace" data-k="notes">' + escPrice_((card.notes || []).join('\n')) + '</textarea></label>' +
-      '<div class="price-grid" style="margin-top:8px">' + priceField_('foot', '맨 아래 줄', card.foot, true) + '</div>';
+      '<label class="span2" style="display:flex;flex-direction:column;gap:4px;margin-top:8px;font-size:11px;font-weight:800;color:var(--mute)">아래 안내 · 한 줄에 하나<textarea class="price-pace" data-k="notes">' + escPrice_((card.notes || []).join('\n')) + '</textarea></label>';
     root.innerHTML = html;
   }
   function readPriceEditor_() {
@@ -8706,7 +8705,6 @@
     if (!box) return;
     if (!priceCards) priceCards = loadPriceCards_();
     var card = priceCards[priceBranch];
-    var foot = priceEdit_('span', '', 'foot', card.foot);
     var html = '<div class="pcard-logo-block">' + priceLogoSvg_() +
       '<p class="pcard-script">Re &amp; Alignment</p><div class="pcard-rule"></div></div>' +
       '<div class="pcard-sig-slot"><div class="pcard-anchor"><p class="pcard-kicker">SIGNATURE CARE</p>' +
@@ -8730,7 +8728,6 @@
     html += '<ul class="pcard-merits">' + (card.notes || []).map(function (line, ni) {
       return '<li class="pcard-edit" contenteditable="true" spellcheck="false" data-pk="note.' + ni + '">' + escPrice_(line) + '</li>';
     }).join('') + '</ul>';
-    html += '<div class="pcard-foot">' + foot + '</div>';
     html += '</div>';
     box.innerHTML = html;
     fitPriceSheet_();
@@ -8779,9 +8776,9 @@
     var progs = card.querySelector('.pcard-progs');
     var mid = card.querySelector('.pcard-mid');
     var bottom = card.querySelector('.pcard-bottom');
-    var secs = card.querySelectorAll('.pcard-prog');
-    var prog2 = secs[1] || secs[0];
-    if (!logo || !sig || !progs || !mid || !bottom || !prog2) return;
+    var firstProg = card.querySelector('.pcard-prog');
+    var mark = firstProg ? (firstProg.querySelector('.pcard-rec') || firstProg) : null;
+    if (!logo || !sig || !progs || !mid || !bottom || !mark) return;
     sig.style.flex = '0 0 auto';
     sig.style.height = 'auto';
     mid.style.flex = '0 0 auto';
@@ -8790,14 +8787,12 @@
     var padT = parseFloat(cs.paddingTop) || 0;
     var padB = parseFloat(cs.paddingBottom) || 0;
     var inner = card.clientHeight - padT - padB;
-    var mark = prog2.querySelector('h2') || prog2;
-    var y = 0;
-    var node = mark;
-    while (node && node !== card) {
-      y += node.offsetTop;
-      node = node.offsetParent;
-    }
-    var delta = Math.round(card.clientHeight / 2 - (y + mark.offsetHeight / 2));
+    var sheet = card.parentElement;
+    var sheetRect = sheet ? sheet.getBoundingClientRect() : card.getBoundingClientRect();
+    var markRect = mark.getBoundingClientRect();
+    var pageMid = sheetRect.top + sheetRect.height / 2;
+    var markMid = markRect.top + markRect.height / 2;
+    var delta = Math.round(pageMid - markMid);
     var free = inner - logo.offsetHeight - sig.offsetHeight - progs.offsetHeight - mid.offsetHeight - bottom.offsetHeight;
     if (free < 0) free = 0;
     if (delta < 0) delta = 0;
