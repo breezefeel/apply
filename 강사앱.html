@@ -13804,7 +13804,12 @@
         html += buildScheduleSyncFootnotesHtml_(data);
       }
       if (data.showExtensionModal) {
-        html += '<p class="attend-result-extension">잔여 1회 — 회원에게 연장 안내가 필요합니다.</p>';
+        var passTotal = parseInt(data.payRounds, 10) || 0;
+        if (passTotal <= 1) {
+          html += '<p class="attend-result-extension">1회권 사용이 반영되었습니다.</p>';
+        } else {
+          html += '<p class="attend-result-extension">잔여 1회 — 회원에게 연장 안내가 필요합니다.</p>';
+        }
       }
       if (opts.skipAttendAlimtalk && data.saved && data.completed) {
         html += '<p class="attend-result-status ok">출석·진도 저장 완료 (알림 없음)</p>';
