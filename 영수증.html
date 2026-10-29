@@ -8618,12 +8618,12 @@
         sigItem: '시그니처 1회',
         sigPrice: '12.5만원',
         pace: '초기에는 주2회를 추천합니다.\n홈트가 가능해지면 주1회도 괜찮습니다.',
-        notes: ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'],
+        notes: ['한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'],
         foot: '움직임이 편해지는 시간 | REAL MOVEMENT',
         programs: [
           {
             title: '50분 · 1:1 리얼 무브먼트',
-            sub: '레슨 40분 + 두타 10분',
+            sub: '레슨 40분 + 두타 마사지 베드 10분',
             note: '다치지 않게 움직임을 익히고, 끝에 부드럽게 두드립니다.',
             rows: [
               { name: '1회', total: '8.5만원', unit: '', save: '', recommend: false },
@@ -8633,7 +8633,7 @@
           },
           {
             title: '70분 · 1:1 리얼 무브먼트 + 컨디셔닝',
-            sub: '레슨 40분 + 두타 10분 + 컨디셔닝 20분',
+            sub: '레슨 40분 + 두타 마사지 베드 10분 + 컨디셔닝 20분',
             note: '프리미엄 근막 컨디셔닝을 병행합니다.',
             rows: [
               { name: '1회', total: '12.5만원', unit: '', save: '', recommend: false },
@@ -8688,17 +8688,22 @@
         var newPace = '초기에는 주2회를 추천합니다.\n홈트가 가능해지면 주1회도 괜찮습니다.';
         var oldNotes = ['한 번에 한 분입니다. 오늘 컨디션에 맞춰 진행합니다.', '끝나면 집에서 할 동작 하나를 가져갑니다.'];
         var prevNotes = ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 끝난 뒤에도 스스로 유지할 수 있습니다.'];
-        var newNotes = ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'];
+        var newNotes = ['한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'];
+        var yaksuNoteWas = ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'];
         var changed = false;
         ['yaksu', 'incheon'].forEach(function (key) {
           var card = saved[key];
           if (oldPaces.indexOf(card.pace) >= 0) { card.pace = newPace; changed = true; }
           var notesKey = JSON.stringify(card.notes || []);
-          if (!card.notes || !card.notes.length || notesKey === JSON.stringify(oldNotes) || notesKey === JSON.stringify(prevNotes)) {
-            card.notes = newNotes.slice();
-            changed = true;
+          var noteTarget = key === 'yaksu' ? newNotes : yaksuNoteWas;
+          var yaksuPhrase = key === 'yaksu' && (notesKey === JSON.stringify(yaksuNoteWas) || (card.notes && card.notes[0] === yaksuNoteWas[0]));
+          if (!card.notes || !card.notes.length || notesKey === JSON.stringify(oldNotes) || notesKey === JSON.stringify(prevNotes) || yaksuPhrase) {
+            if (notesKey !== JSON.stringify(noteTarget)) {
+              card.notes = noteTarget.slice();
+              changed = true;
+            }
           } else if (card.notes[1] === prevNotes[1]) {
-            card.notes[1] = newNotes[1];
+            card.notes[1] = noteTarget[1];
             changed = true;
           }
         });
@@ -8706,16 +8711,12 @@
           var spaced = String(p.title || '').replace(/리얼무브먼트/g, '리얼 무브먼트').replace(/리얼페이스/g, '리얼 페이스');
           if (spaced !== p.title) { p.title = spaced; changed = true; }
           if (p.title === '70분 · 1:1 리얼 컨디셔닝') p.title = '70분 · 1:1 리얼 무브먼트 + 컨디셔닝';
-          if (p.title === '50분 · 1:1 리얼 무브먼트' && (!p.sub || p.sub === '1:1로 오늘 움직임을 보고, 집에서 할 동작 하나를 정합니다.')) {
-            p.sub = '레슨 40분 + 두타 10분';
+          if (p.title === '50분 · 1:1 리얼 무브먼트' && (!p.sub || p.sub === '1:1로 오늘 움직임을 보고, 집에서 할 동작 하나를 정합니다.' || p.sub === '레슨 40분 + 두타 10분' || p.sub === '레슨 40분 + 두타 마사지 10분')) {
+            p.sub = '레슨 40분 + 두타 마사지 베드 10분';
             changed = true;
           }
-          if ((p.title === '70분 · 1:1 리얼무브먼트 + 컨디셔닝' || p.title === '70분 · 1:1 리얼 무브먼트 + 컨디셔닝') && (!p.sub || p.sub === '50분에 기능 운동을 더합니다. 버티는 힘을 같이 봅니다.')) {
-            p.sub = '레슨 40분 + 두타 10분 + 컨디셔닝 20분';
-            changed = true;
-          }
-          if (p.sub && p.sub.indexOf('두타 마사지') >= 0) {
-            p.sub = p.sub.replace(/두타 마사지/g, '두타');
+          if ((p.title === '70분 · 1:1 리얼무브먼트 + 컨디셔닝' || p.title === '70분 · 1:1 리얼 무브먼트 + 컨디셔닝') && (!p.sub || p.sub === '50분에 기능 운동을 더합니다. 버티는 힘을 같이 봅니다.' || p.sub === '레슨 40분 + 두타 10분 + 컨디셔닝 20분' || p.sub === '레슨 40분 + 두타 마사지 10분 + 컨디셔닝 20분')) {
+            p.sub = '레슨 40분 + 두타 마사지 베드 10분 + 컨디셔닝 20분';
             changed = true;
           }
           if (p.title.indexOf('50분') === 0 && (!String(p.note || '').trim() || p.note === '움직인 뒤 부드럽게 두드려줍니다.')) {
