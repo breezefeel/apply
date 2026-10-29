@@ -8618,7 +8618,7 @@
         sigItem: '시그니처 1회',
         sigPrice: '12.5만원',
         pace: '초기에는 주2회를 추천합니다.\n홈트가 가능해지면 주1회도 괜찮습니다.',
-        notes: ['한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'],
+        notes: ['한 번에 한 분씩, 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'],
         foot: '움직임이 편해지는 시간 | REAL MOVEMENT',
         programs: [
           {
@@ -8649,7 +8649,7 @@
         sigItem: '시그니처 1회',
         sigPrice: '12.5만원',
         pace: '초기에는 주2회를 추천합니다.\n홈트가 가능해지면 주1회도 괜찮습니다.',
-        notes: ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'],
+        notes: ['한 번에 한 분씩, 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'],
         foot: '움직임이 편해지는 시간 | REAL MOVEMENT',
         programs: [
           {
@@ -8688,23 +8688,24 @@
         var newPace = '초기에는 주2회를 추천합니다.\n홈트가 가능해지면 주1회도 괜찮습니다.';
         var oldNotes = ['한 번에 한 분입니다. 오늘 컨디션에 맞춰 진행합니다.', '끝나면 집에서 할 동작 하나를 가져갑니다.'];
         var prevNotes = ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 끝난 뒤에도 스스로 유지할 수 있습니다.'];
-        var newNotes = ['한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'];
-        var yaksuNoteWas = ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'];
+        var shortNotes = ['한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'];
+        var longNotes = ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'];
+        var newNotes = ['한 번에 한 분씩, 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'];
+        var priorFirst = [oldNotes[0], prevNotes[0], shortNotes[0], longNotes[0]];
         var changed = false;
         ['yaksu', 'incheon'].forEach(function (key) {
           var card = saved[key];
           if (oldPaces.indexOf(card.pace) >= 0) { card.pace = newPace; changed = true; }
-          var notesKey = JSON.stringify(card.notes || []);
-          var noteTarget = key === 'yaksu' ? newNotes : yaksuNoteWas;
-          var yaksuPhrase = key === 'yaksu' && (notesKey === JSON.stringify(yaksuNoteWas) || (card.notes && card.notes[0] === yaksuNoteWas[0]));
-          if (!card.notes || !card.notes.length || notesKey === JSON.stringify(oldNotes) || notesKey === JSON.stringify(prevNotes) || yaksuPhrase) {
-            if (notesKey !== JSON.stringify(noteTarget)) {
-              card.notes = noteTarget.slice();
-              changed = true;
-            }
-          } else if (card.notes[1] === prevNotes[1]) {
-            card.notes[1] = noteTarget[1];
+          var notes = card.notes || [];
+          var notesKey = JSON.stringify(notes);
+          var knownPair = !notes.length || notesKey === JSON.stringify(oldNotes) || notesKey === JSON.stringify(prevNotes) || notesKey === JSON.stringify(shortNotes) || notesKey === JSON.stringify(longNotes);
+          if (knownPair && notesKey !== JSON.stringify(newNotes)) {
+            card.notes = newNotes.slice();
             changed = true;
+          } else if (priorFirst.indexOf(notes[0]) >= 0 && notes[0] !== newNotes[0]) {
+            card.notes[0] = newNotes[0];
+            changed = true;
+            if (card.notes[1] === prevNotes[1]) card.notes[1] = newNotes[1];
           }
         });
         (saved.yaksu.programs || []).forEach(function (p) {
