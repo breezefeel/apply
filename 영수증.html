@@ -8515,7 +8515,8 @@
       : '';
     body.innerHTML = filterBar + '<div class="unbooked-list">' + rows.map(function (row) {
       var unbooked = parseInt(row.unbooked, 10) || 0;
-      var cls = (unbooked > 0 ? ' is-gap' : (unbooked < 0 ? ' is-over' : '')) + unbookedBranchClass_(row.branch);
+      var overBooked = row.overBooked === true || unbooked < 0;
+      var cls = (overBooked ? ' is-over' : (unbooked > 0 ? ' is-gap' : '')) + unbookedBranchClass_(row.branch);
       var inst = String(row.instructor || '').trim();
       var instHtml = inst
         ? '<button type="button" class="unbooked-inst' + (unbookedInstFilter === inst ? ' is-on' : '') + '" data-inst="' + escHtml_(inst) + '">' + escHtml_(inst) + '</button>'
@@ -8527,7 +8528,9 @@
         '<dl class="unbooked-nums">' +
         '<div><dt>남은횟수</dt><dd>' + escHtml_(row.remain) + '</dd></div>' +
         '<div><dt>예약횟수</dt><dd>' + escHtml_(row.reserved) + '</dd></div>' +
-        '<div><dt>예약되지 않은 횟수</dt><dd>' + escHtml_(row.unbooked) + '</dd></div>' +
+        '<div><dt>예약되지 않은 횟수</dt>' + (overBooked
+          ? '<dd style="font-size:12px;color:#b91c1c;">초과예약 확인 필요</dd>'
+          : '<dd>' + escHtml_(typeof row.unbookedLabel === 'string' && row.unbookedLabel ? row.unbookedLabel : row.unbooked) + '</dd>') + '</div>' +
         '</dl>' + dates + '</article>';
     }).join('') + '</div>';
     resetUnbookedButton_();
