@@ -282,36 +282,6 @@
   .org-tab-x:hover { opacity: 1; background: rgba(0,0,0,.08); }
   .org-tab.active .org-tab-x:hover { background: rgba(255,255,255,.22); }
 
-  .chat-drop {
-    border: 1.5px dashed #cfc6b6;
-    border-radius: 14px;
-    background: #faf9f6;
-    padding: 6px;
-    min-height: 96px;
-  }
-  .chat-drop.drag { border-color: var(--gold); background: #fff8e8; }
-  .chat-drop textarea {
-    width: 100%; border: 0; background: transparent;
-    min-height: 84px; resize: vertical; font-size: 15px;
-    line-height: 1.5; padding: 8px 10px; color: var(--ink);
-  }
-  .chat-drop textarea:focus { outline: none; }
-  .chat-thumbs {
-    display: flex; gap: 8px; flex-wrap: wrap; padding: 0 8px 8px;
-  }
-  .chat-thumb {
-    position: relative;
-    width: 72px; height: 72px;
-  }
-  .chat-thumb img {
-    width: 72px; height: 72px; object-fit: cover; border-radius: 10px;
-    display: block; background: #eee;
-  }
-  .chat-thumb button {
-    position: absolute; top: -6px; right: -6px;
-    width: 22px; height: 22px; border: 0; border-radius: 50%;
-    background: var(--ink); color: #fff; font-size: 12px; cursor: pointer;
-  }
   .chat-actions {
     display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
   }
@@ -319,12 +289,6 @@
     flex: 1 1 auto; min-width: 0;
     padding: 11px 10px; font-size: 13px;
   }
-  .chat-file {
-    flex: 1 1 auto;
-    position: relative;
-    display: flex;
-  }
-  .chat-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
   .ocr-status {
     min-height: 18px; margin-top: 8px;
     font-size: 12px; font-weight: 700; color: var(--mute);
@@ -407,7 +371,6 @@
     .faq-tabs { gap: 5px; }
     .faq-tabs .chip { font-size: 10.5px; padding: 7px 2px; }
   }
-  .follow-reply { margin-top: 12px; }
   .reply-box:focus { outline: 2px solid var(--gold); background: #fff; }
   .hint {
     font-size: 12px; color: var(--mute); font-weight: 600;
@@ -800,15 +763,17 @@
   }
 
   #certPanel, #smsPanel, #posterCard { display: none; }
-  body.academy-mode #consultChatBlocks { display: none !important; }
-  body.academy-mode #smsPanel { display: block; }
-  #consultChatBlocks[hidden] { display: none !important; }
   #certPanel:not([hidden]), #smsPanel:not([hidden]), #posterCard:not([hidden]) { display: block; }
   .sms-text {
     width: 100%; min-height: 168px; resize: vertical;
     border: 1px solid #e2ddd3; background: #faf9f6;
     border-radius: 10px; padding: 10px 11px; font-size: 14px;
     color: var(--ink); line-height: 1.55; margin-top: 8px;
+  }
+  .sms-optout {
+    width: 100%; border: 1px solid #e2ddd3; background: #faf9f6;
+    border-radius: 10px; padding: 9px 11px; font-size: 14px;
+    color: var(--ink); margin-top: 6px;
   }
   .sms-people {
     max-height: 220px; overflow: auto;
@@ -1638,49 +1603,10 @@
         <a class="btn-sm faq-dl" id="btnSaveDiffFront">차별성 앞</a>
         <a class="btn-sm faq-dl" id="btnSaveDiffBack">차별성 뒤</a>
       </div>
-      <div id="consultChatBlocks">
-      <section class="card no-print">
-        <div class="field">
-          <label>회원 질문</label>
-          <div class="chat-drop" id="chatDrop">
-            <textarea id="chatQ" placeholder="질문을 붙여 넣거나, 캡처를 여기에 넣으세요"></textarea>
-            <div class="chat-thumbs" id="chatThumbs"></div>
-          </div>
-        </div>
-        <div class="chat-actions">
-          <button type="button" class="btn btn-ghost" id="btnPaste">붙여넣기</button>
-          <button type="button" class="btn btn-ghost" id="btnCapture">캡처 넣기</button>
-          <label class="btn btn-ghost chat-file">사진 선택<input id="chatFile" type="file" accept="image/*"></label>
-        </div>
-        <p class="ocr-status" id="ocrStatus"></p>
-        <div class="reply-label follow-reply">
-          <span>첫 인사</span>
-          <button type="button" class="btn-sm" id="btnNewConsult">새 상담</button>
-        </div>
-        <textarea class="reply-box is-copy" id="chatReply" readonly title="누르면 복사됩니다" placeholder="캡처나 질문을 넣으면 첫 인사가 생깁니다. 멘트를 누르면 복사됩니다."></textarea>
-      </section>
-      <section class="card no-print">
-        <div class="field">
-          <label>이어서</label>
-          <div class="chat-drop" id="chatDrop2">
-            <textarea id="chatQ2" placeholder="다음 메시지를 붙여 넣거나, 캡처를 넣으세요"></textarea>
-            <div class="chat-thumbs" id="chatThumbs2"></div>
-          </div>
-        </div>
-        <div class="chat-actions">
-          <button type="button" class="btn btn-ghost" id="btnPaste2">붙여넣기</button>
-          <button type="button" class="btn btn-ghost" id="btnCapture2">캡처 넣기</button>
-          <label class="btn btn-ghost chat-file">사진 선택<input id="chatFile2" type="file" accept="image/*"></label>
-        </div>
-        <div class="reply-label follow-reply">
-          <span>상담 멘트</span>
-        </div>
-        <textarea class="reply-box is-copy" id="chatFollow" readonly title="누르면 복사됩니다" placeholder="이어서 넣으면 다음 멘트가 생깁니다. 멘트를 누르면 복사됩니다."></textarea>
-      </section>
-      </div>
+      <p class="ocr-status no-print" id="ocrStatus"></p>
       <section class="card no-print" id="smsPanel" hidden>
-        <div class="reply-label"><span>수강생 문자</span></div>
-        <p class="cert-lead">신청서 알림톡과 별도입니다. 안내를 고른 뒤 내용을 고치고, 받을 사람을 정한 다음 보내면 솔라피 문자로 나갑니다.</p>
+        <div class="reply-label"><span id="smsTitle">수강생 문자</span></div>
+        <p class="cert-lead" id="smsLead">신청서 알림톡과 별도입니다. 안내를 고른 뒤 내용을 고치고, 받을 사람을 정한 다음 보내면 솔라피 문자로 나갑니다.</p>
         <div class="chips" id="smsTemplates"></div>
         <textarea class="sms-text" id="smsText"></textarea>
         <p class="cert-note" id="smsCount"></p>
@@ -1689,8 +1615,12 @@
           <button type="button" class="btn btn-ghost" id="btnSmsAll">전체 선택</button>
         </div>
         <div class="sms-people" id="smsPeople"></div>
-        <label class="cert-note" for="smsExtra" style="display:block;margin-top:10px">연락처 직접 입력 · 쉼표나 줄바꿈</label>
+        <label class="cert-note" id="smsExtraLabel" for="smsExtra" style="display:block;margin-top:10px">연락처 직접 입력 · 쉼표나 줄바꿈</label>
         <textarea class="sms-text" id="smsExtra" style="min-height:72px" placeholder="010-0000-0000"></textarea>
+        <div id="smsOptoutRow" hidden>
+          <label class="cert-note" for="smsOptout" style="display:block;margin-top:10px">무료수신거부 번호 · 광고 문자 끝의 #{수신거부번호}에 들어갑니다 (이 기기에만 저장)</label>
+          <input class="sms-optout" id="smsOptout" type="text" inputmode="tel" placeholder="080-000-0000" autocomplete="off">
+        </div>
         <div class="cert-actions">
           <button type="button" class="btn btn-print" id="btnSmsSend">보내기</button>
         </div>
@@ -2577,7 +2507,7 @@
     </div>
   </div>
 
-<script src="sms-history.js?v=1"></script>
+<script src="sms-history.js?v=2"></script>
 <script src="poster-carousel.js?v=1"></script>
 <script>
 (function () {
@@ -2873,6 +2803,10 @@
       parking: '주차는 리사르커피 옆 지상, 벤츠 옆 우측 2칸입니다.\n내비는 「리사르커피 약수」로 검색해 주세요.',
       map: 'https://naver.me/x2YstInq',
       phone: '0507-1359-4596',
+      smsName: '리얼무브먼트 약수점',
+      where: '약수역 5·6·7번 출구에서 도보 3분, 더약수빌딩 4층',
+      reviewNaver: 'https://naver.me/x2YstInq',
+      reviewKarrot: 'https://www.daangn.com/kr/local-profile/%EB%A6%AC%EC%96%BC%EB%AC%B4%EB%B8%8C%EB%A8%BC%ED%8A%B8-%EC%95%BD%EC%88%98%EC%A0%90-mun1jrp9hjt4/',
       priceImg: '가격표  리얼무브먼트 약수.png',
       priceDownload: '가격표-약수.png',
       brochure: [
@@ -2887,6 +2821,10 @@
       parking: '주차는 힐스테이트자이계양 단지 주차장이며, 입차 전 차량번호를 알려 주셔야 합니다.\n내비는 「힐스테이트자이 계양」 동문으로 검색해 주세요.',
       map: 'https://naver.me/xYNbHrY9',
       phone: '0507-1312-4596',
+      smsName: '리얼무브먼트 인천점',
+      where: '힐스테이트자이계양 1층, 도서관 옆',
+      reviewNaver: 'https://naver.me/xYNbHrY9',
+      reviewKarrot: 'https://www.daangn.com/kr/local-profile/9v37eoudnjkh/',
       priceImg: '가격표  리얼무브먼트 인천.png',
       priceDownload: '가격표-인천.png',
       brochure: [
@@ -3239,40 +3177,7 @@
   function academyFaqs() {
     return (ACADEMY[consultBranch] && ACADEMY[consultBranch].faqs) || [];
   }
-  function academyFaqText(id) {
-    var items = academyFaqs();
-    for (var i = 0; i < items.length; i++) {
-      if (items[i].id === id) return items[i].text;
-    }
-    return items[0] ? items[0].text : '';
-  }
-  function academyFollowup(q) {
-    q = String(q || '');
-    if (wantsPrice(q) || /수강료|얼리|동반|얼마|비용|정가/.test(q)) {
-      return academyFaqText('fall') || academyFaqText('oneday') || academyFaqText('spring');
-    }
-    if (wantsLocation(q) || /주차|오시는|약수역|삼육/.test(q)) {
-      return academyFaqText('fall') || academyFaqText('oneday') || academyFaqText('place') || academyFaqText('hello');
-    }
-    if (/입금|정원|등록|신청만|확정|계좌/.test(q) || wantsBooking(q)) return academyFaqText('deposit');
-    if (/준비|복장|가져|수건|화장/.test(q)) return academyFaqText('prep');
-    if (/1\s*주|일주일|사전\s*영상|실습\s*영상|안내\s*문자/.test(q)) return academyFaqText('week');
-    if (/대상|자격|누가|의료인|에스테|트레이너/.test(q)) return academyFaqText('who');
-    if (/통합|같이 들|CMT\s*\+|Re:?Al.*CMT/.test(q)) return academyFaqText('bundle') || academyFaqText('hello');
-    if (/원데이|10월\s*11|패시브/.test(q)) return academyFaqText('oneday') || academyFaqText('hello');
-    if (/정규|PAR|6월|12월/.test(q)) return academyFaqText('regular') || academyFaqText('hello');
-    if (/커리|수업 내용|뭘 배우|커리큘럼|해부|촉진/.test(q)) return academyFaqText('curric') || academyFaqText('regular') || academyFaqText('oneday') || academyFaqText('spring');
-    if (/하반기|11월|8.?15.?22/.test(q)) return academyFaqText('fall') || academyFaqText('hello');
-    if (/상반기|4월|3월/.test(q)) return academyFaqText('spring') || academyFaqText('hello');
-    if (/일정|며칠|몇 시|시작/.test(q)) return academyFaqText('fall') || academyFaqText('oneday') || academyFaqText('spring') || academyFaqText('hello');
-    return academyFaqText('deposit') || academyFaqText('hello');
-  }
-  var chatImages = [];
-  var chatImages2 = [];
   var faqId = 'consult';
-  var consultFollow = 0;
-  var ocrWorker = null;
-  var tesseractLoading = null;
   var receiptPrefillFromQuery = null;
   var receiptPrefillApplied = false;
   var toastTimer = 0;
@@ -3306,339 +3211,12 @@
       document.body.removeChild(ta);
     }
   }
-  var VS_LINE = '도수는 지금 불편한 부분을 풀어 주는 데 초점을 둡니다.\n리얼무브먼트는 같은 문제가 다시 생기지 않도록, 움직임과 자세를 다시 잡아 드리는 데 초점을 둡니다.\n풀어 주는 것에서 그치지 않고, 이후 기능을 강화하는 단계까지 이어집니다.';
-  var POSTURE_LINE = '자세 교정은 바로 세운 자세에서 시작하지 않습니다.\n가장 안전한 누운 자세에서 호흡부터 잡고, 앉기 → 서기 → 걸음걸이까지 같은 순서로 이어갑니다.';
-  var START_LINE = '운동을 처음 시작하시거나, 안전하게 몸을 만들고 싶으신 분께 맞는 프로그램입니다.\n누운 자세·호흡부터 시작해, 앉고 서서 실제로 쓰는 움직임까지 단계를 쌓아 갑니다.';
-  var FACE_LINE = '리얼 페이스는 얼굴 움직임과 균형을 보는 1:1 프로그램입니다.\n50분 동안 수기·인디바로 얼굴을 본 뒤, 얼굴 운동으로 이어갑니다.\n약수점·인천점 모두 박준규 원장이 직접 진행하며, 원장님이 계신 요일에 맞춰 예약해 드리고 있어요.';
-  function helloLine() {
-    return '안녕하세요.';
-  }
-  var consultRound = 0;
-  function painPart(q) {
-    var parts = ['고관절', '팔꿈치', '손목', '발목', '어깨', '무릎', '골반', '허리', '턱', '목', '등'];
-    for (var i = 0; i < parts.length; i++) {
-      var p = parts[i];
-      if (q.indexOf(p) < 0) continue;
-      if (p === '목') {
-        var neckQ = q
-          .replace(/거북목/g, '')
-          .replace(/목요일/g, '')
-          .replace(/목적/g, '')
-          .replace(/목록/g, '')
-          .replace(/제목/g, '')
-          .replace(/과목/g, '')
-          .replace(/항목/g, '')
-          .replace(/목격/g, '');
-        if (neckQ.indexOf('목') < 0) continue;
-      }
-      if (p === '등' && /등록|등원|등급/.test(q) && !/등이|등 아|등쪽/.test(q)) continue;
-      return p;
-    }
-    return '';
-  }
-  function eunNeun(word) {
-    var code = word.charCodeAt(word.length - 1);
-    if (code < 0xAC00 || code > 0xD7A3) return '는';
-    return ((code - 0xAC00) % 28) ? '은' : '는';
-  }
-  function pushLine(lines, text) {
-    text = String(text || '').trim();
-    if (!text) return;
-    for (var i = 0; i < lines.length; i++) {
-      if (lines[i] === text) return;
-    }
-    lines.push(text);
-  }
-  function isPainCase(q) {
-    if (/아프|통증|뻐근|결리|저림|디스크|찌릿|찢어/.test(q)) return true;
-    if ((isPostureCase(q) || isFaceCase(q)) && !/아프|통증|뻐근|저림|찌릿/.test(q)) return false;
-    if (/거북목/.test(q) && !/아프|통증|뻐근|저림/.test(q)) return false;
-    return !!painPart(q);
-  }
-  function isFaceCase(q) {
-    return /페이스|얼굴|비대칭|리얼 페이스/.test(q);
-  }
-  function isPostureCase(q) {
-    if (isFaceCase(q) && !/자세|체형|거북|라운드/.test(q)) return false;
-    return /자세|거북|틀어|교정|체형|라운드/.test(q);
-  }
-  function isStartCase(q) {
-    return /운동\s*시작|시작하련|시작해\s*보|입문|왕초보|운동을 못|운동 처음|운동.?해본/.test(q);
-  }
-  function isFunctionCase(q) {
-    return isStartCase(q) || /기능\s*운동|기능운동|재활|체력|근력|퍼포먼스/.test(q);
-  }
-  function needTracks(q) {
-    var tracks = [];
-    var pain = isPainCase(q) || /불편/.test(q);
-    var post = isPostureCase(q);
-    var fn = isFunctionCase(q);
-    var goalFirst = /교정|체형|기능\s*운동|기능운동|재활|체력|운동\s*시작|시작해/.test(q) && !/아프|통증|뻐근|저림/.test(q);
-    if (goalFirst) {
-      if (post) tracks.push('posture');
-      if (fn) tracks.push('function');
-      if (pain) tracks.push('pain');
-    } else {
-      if (pain) tracks.push('pain');
-      if (post) tracks.push('posture');
-      if (fn) tracks.push('function');
-    }
-    return tracks;
-  }
-  function timelineLine(track) {
-    if (track === 'pain') {
-      return '불편하신 부분은 주 2회 기준으로, 보통 2~3주 안에 변화가 느껴지는지를 봅니다. 그 안에 변화가 없으면 병원 진료를 함께 상의드려요.';
-    }
-    if (track === 'posture') {
-      return '자세 교정은 3개월 단위로 봅니다.';
-    }
-    if (track === 'function') {
-      return '기능을 키우는 운동은 6개월 단위로 진행합니다.';
-    }
-    return '';
-  }
-  function timelineBlock(q) {
-    var tracks = needTracks(q);
-    if (!tracks.length) return '';
-    return tracks.map(function (t) {
-      return timelineLine(t);
-    }).join('\n');
-  }
-  function hasVas(q) {
-    return /vas\s*\d|10\s*점|[1-9]\s*점|[1-9]\s*\/\s*10|10\s*\/\s*10|경증|중등도|중증/i.test(q);
-  }
-  function hasQuality(q) {
-    return /뻐근|묵직|당기|뻣뻣|찌릿|저림|저려|날카롭|한 점|찢어/.test(q);
-  }
-  function hasRadiate(q) {
-    return /뻗|방사|저림|저려|힘.?빠|마비/.test(q);
-  }
-  function hasDx(q) {
-    return /디스크|협착|진단|mri|초음파|엑스레이|수술/i.test(q);
-  }
-  function painAskLines(q) {
-    var qs = [];
-    if (!painPart(q)) qs.push('가장 불편하신 부위가 어디인가요?');
-    if (!hasVas(q)) qs.push('불편하신 정도는 1에서 10 사이라면 어느 정도일까요?');
-    if (!hasQuality(q)) qs.push('뻐근한지, 당기는지, 찌릿하거나 저린지 느낌이 어떠신가요?');
-    if (!hasRadiate(q)) qs.push('팔이나 다리로 뻗치거나, 힘이 빠지지는 않으신가요?');
-    if (!hasDx(q)) qs.push('병원에서 진단을 받아 보신 적 있으실까요?');
-    return qs;
-  }
-  function visitGuide(q) {
-    if (/저림|마비|날카롭|힘.?빠|찢어/.test(q)) {
-      return '저림·마비·날카로운 통증이 있거나 힘이 빠지신다면 병원 검사가 먼저일 수 있습니다. 해당되시면 꼭 말씀해 주세요.';
-    }
-    return '병원 치료와 병행이 나을 수도 있습니다. 방문해 주시면 평가에서 병원 단계인지, 움직임으로 진행할 단계인지를 가려 드립니다.';
-  }
-  function wantsPrice(q) {
-    return /가격|얼마|비용|수강료|패키지|회비|요금/.test(q);
-  }
-  function wantsIntro(q) {
-    return /뭐\s*하는|어떤\s*곳|무슨\s*곳|소개|프로그램이|무슨\s*프로그램|PT\s*(인가요|원|센터)|교정하는\s*곳|스트레칭\s*(하는|받)/.test(q);
-  }
-  function wantsVs(q) {
-    return /도수|마사지|카이로|근막/.test(q);
-  }
-  function wantsBooking(q) {
-    return /예약|운영시간|휴무|영업시간|가능한 날|방문\s*(가능|할 수|하고 싶)|상담\s*(가능|예약)/.test(q);
-  }
-  function wantsLocation(q) {
-    return /위치|주소|오시는 길|찾아가|약수역|계양|지도/.test(q) || (/어디\s*(예요|에요|인가요|인지)/.test(q) && !/아프|통증|뻐근/.test(q));
-  }
-  function wantsHospital(q) {
-    return /병원인가요|보험|실비|실손|의료보험|산재/.test(q);
-  }
-  function wantsOnce(q) {
-    return /한\s*번만|한번만|한 번에|한번에|바로 좋아|금방\s*(교정|좋아)|하루\s*만/.test(q);
-  }
-  function wantsGender(q) {
-    return /여자만|남성만|남자만|여자도|남자도|남녀/.test(q);
-  }
-  function hasWhen(q) {
-    return /부터|어제|그제|최근|오래|주\s*전|한달|한\s*달|\d+\s*달|몇\s*달|달\s*전|달째|\d+\s*년|몇\s*년|년\s*전|작년/.test(q);
-  }
-  function hasTrigger(q) {
-    return /앉아|걷|서 있|일어|잠들|아침에|저녁에|운전|운동할\s*때|운동\s*중|운동하면/.test(q);
-  }
-  function hasGoal(q) {
-    return /고치|교정|빼고|펴고|재활|관리|예방|좋아졌|개선/.test(q);
-  }
-  function hasNeedDetail(q) {
-    return q.length > 40 && /부터|앉아|걷|일어|아침|디스크|수술|병원|자세|아프|통증|뻐근/.test(q);
-  }
-  function needsAsk(q) {
-    var part = painPart(q);
-    if (part && !hasWhen(q)) return part + eunNeun(part) + ' 언제부터 불편하셨나요?';
-    if (isPainCase(q) && !hasTrigger(q)) return '앉기, 서기, 걷기 중에 언제 더 느껴지세요?';
-    if (!hasGoal(q)) return '이번에 가장 개선하고 싶은 걸 한 가지로 말씀해 주시면 맞춰 볼게요.';
-    return '추가로 보시면 좋을 지점이 있으면 알려 주세요.';
-  }
-  function needAskLines(q) {
-    var qs = [];
-    var part = painPart(q);
-    if (isFaceCase(q) && !isPainCase(q)) {
-      if (!hasWhen(q)) qs.push('어느 쪽이 더 신경 쓰이시는지, 언제부터인지 알려 주세요.');
-      return qs;
-    }
-    if ((isStartCase(q) || isFunctionCase(q)) && !isPainCase(q) && !isPostureCase(q)) {
-      qs.push('지금 가장 신경 쓰이는 부위가 있으실까요?');
-      return qs;
-    }
-    if (part && !hasWhen(q)) qs.push(part + eunNeun(part) + ' 언제부터 불편하셨나요?');
-    else if (!part && !hasWhen(q) && isPainCase(q)) qs.push('그 부분은 언제부터 신경 쓰이셨을까요?');
-    if (isPainCase(q) && !hasTrigger(q)) qs.push('앉기, 서기, 걷기 중에 언제 더 느껴지세요?');
-    if (!hasGoal(q)) qs.push('이번에 가장 개선하고 싶은 걸 한 가지로 말씀해 주시면 맞춰 볼게요.');
-    return qs;
-  }
-  function statedNeed(q) {
-    return !!(painPart(q) || isPostureCase(q) || isFaceCase(q) || isStartCase(q) || isFunctionCase(q) || /불편|아프|통증/.test(q));
-  }
-  function appealLine(q) {
-    if (isFaceCase(q)) return FACE_LINE;
-    if (isPostureCase(q)) return '자세가 신경 쓰이신다면, 누운 자세에서 호흡부터 잡아 앉기·서기까지 이어가는 자세 교정으로 맞춰 볼 수 있습니다.';
-    if (isStartCase(q) || isFunctionCase(q)) return START_LINE;
-    if (isPainCase(q)) {
-      var p = painPart(q);
-      return (p ? p + ' 쪽이 불편하시다면, ' : '불편하신 부분이 있다면, ') + '오늘의 몸을 먼저 보고 안전한 범위부터 진행합니다.';
-    }
-    return '';
-  }
-  function offerBlock(q) {
-    if (isAcademyBranch()) return academyFollowup(q);
-    var b = BRANCH[consultBranch];
-    var lines = [];
-    var appeal = appealLine(q);
-    if (appeal) pushLine(lines, appeal);
-    else pushLine(lines, '말씀해 주신 내용을 기준으로, 오늘의 몸을 본 뒤에 필요한 단계부터 진행합니다.');
-    pushLine(lines, '리얼무브먼트는 누운 자세에서 이완부터 시작해, 앉기·서기까지 같은 순서로 갑니다. 바로 세운 자세에서 억지로 맞추지 않습니다.');
-    var time = timelineBlock(q);
-    if (time) pushLine(lines, time);
-    pushLine(lines, b.price);
-    pushLine(lines, '톡톡 아래 메뉴의 예약에서 남겨 주시거나, 가능하신 요일·시간을 알려 주시면 맞춰 볼게요.');
-    return lines.join('\n\n');
-  }
-  function detectIntent(q) {
-    if (wantsPrice(q)) return 'price';
-    if (wantsBooking(q)) return 'booking';
-    if (wantsHospital(q)) return 'hospital';
-    if (wantsIntro(q)) return 'intro';
-    if (wantsVs(q)) return 'vs';
-    if (wantsLocation(q)) return 'location';
-    if (wantsOnce(q)) return 'once';
-    if (wantsGender(q)) return 'gender';
-    return 'need';
-  }
   function mapBlurb() {
     var b = BRANCH[consultBranch];
     var where = consultBranch === 'incheon'
       ? '힐스테이트자이계양 1층, 도서관 옆입니다.'
       : '약수역 5·6·7번 출구에서 도보 3분입니다.';
     return where + '\n톡톡 아래 메뉴의 오시는 길에서도 확인하실 수 있습니다.\n\n' + b.map + '\n전화 ' + b.phone;
-  }
-  function makeGreeting(q) {
-    q = String(q || '').trim();
-    if (isAcademyBranch()) return academyFaqText('hello');
-    var intent = detectIntent(q);
-    var lines = [helloLine()];
-    var part = painPart(q);
-    var need = statedNeed(q);
-    var askNeed = '지금 개선되고 싶은 부분이 있으실까요?';
-    if (intent === 'price') {
-      pushLine(lines, '비용은 회원님 상태를 본 뒤에 프로그램이 정해지고, 그에 따라 달라집니다.');
-      if (need) {
-        if (part) pushLine(lines, part + ' 쪽이 불편하신 거죠.');
-        else {
-          var appeal = appealLine(q);
-          if (appeal) pushLine(lines, appeal);
-        }
-        pushLine(lines, needsAsk(q));
-      } else {
-        pushLine(lines, askNeed);
-      }
-      return lines.join('\n\n');
-    }
-    if (intent === 'booking') {
-      pushLine(lines, '원장님마다 전문 분야가 조금씩 달라서, 회원님 상태에 맞춰 예약을 잡아 드리고 있습니다.');
-      if (need) {
-        if (part) pushLine(lines, part + ' 쪽이 불편하신 거죠.');
-        else {
-          var appealB = appealLine(q);
-          if (appealB) pushLine(lines, appealB);
-        }
-        pushLine(lines, needsAsk(q));
-      } else {
-        pushLine(lines, '개선되고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.');
-      }
-      return lines.join('\n\n');
-    }
-    if (intent === 'intro') {
-      pushLine(lines, '리얼무브먼트는 안전하게 운동하고 싶은 분들을 위한 1:1 프로그램입니다.\n원장님이 오늘의 몸을 먼저 살펴보고, 필요한 단계부터 진행해요.');
-      if (need) {
-        var appealI = appealLine(q);
-        if (appealI) pushLine(lines, appealI);
-        pushLine(lines, '지금 가장 개선하고 싶은 부분을 조금 더 알려 주실 수 있을까요?');
-      } else {
-        pushLine(lines, '지금 개선하고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.');
-      }
-      return lines.join('\n\n');
-    }
-    if (intent === 'vs') {
-      pushLine(lines, VS_LINE);
-      pushLine(lines, need ? needsAsk(q) : '지금 개선하고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.');
-      return lines.join('\n\n');
-    }
-    if (intent === 'hospital') {
-      pushLine(lines, '병원이나 보험 적용 기관은 아닙니다.\n검사가 필요해 보이는 경우에는 운동보다 진료를 먼저 권해 드려요.');
-      pushLine(lines, need ? needsAsk(q) : '개선되고 싶은 부분이 있으시면 알려 주세요.');
-      return lines.join('\n\n');
-    }
-    if (intent === 'location') {
-      pushLine(lines, mapBlurb());
-      pushLine(lines, need ? needsAsk(q) : '개선되고 싶은 부분이 있으시면 알려 주세요.');
-      return lines.join('\n\n');
-    }
-    if (intent === 'once') {
-      pushLine(lines, '체형이나 불편함은 한 번에 바뀌지 않습니다.\n누운 자세에서 호흡부터 잡아, 앉기·서기까지 단계를 쌓아 갑니다.');
-      pushLine(lines, need ? needsAsk(q) : '지금 가장 개선하고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.');
-      return lines.join('\n\n');
-    }
-    if (intent === 'gender') {
-      pushLine(lines, '남녀 구분 없이, 지금 움직임 패턴을 기준으로 맞춰 진행합니다.');
-      pushLine(lines, need ? needsAsk(q) : '개선되고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.');
-      return lines.join('\n\n');
-    }
-    if (part) pushLine(lines, part + ' 쪽이 불편하신 거죠.');
-    else {
-      var appealN = appealLine(q);
-      if (appealN) pushLine(lines, appealN);
-    }
-    if (/저림|마비|날카롭|힘.?빠|수술/.test(q)) pushLine(lines, visitGuide(q));
-    pushLine(lines, need ? needsAsk(q) : '개선되고 싶은 부분을 알려 주시면 맞춰 안내해 드릴게요.');
-    return lines.join('\n\n');
-  }
-  function allQuestionText() {
-    var a = ($('chatQ').value || '').trim();
-    var b = ($('chatQ2').value || '').trim();
-    return b ? a + '\n\n' + b : a;
-  }
-  function makeFollowup() {
-    var q = allQuestionText();
-    var lines = [];
-    if (!q) return '';
-    if (isAcademyBranch()) return academyFollowup(q);
-    var remain = isPainCase(q) ? painAskLines(q) : [];
-    var needRemain = needAskLines(q);
-    var ask = needRemain.slice();
-    remain.forEach(function (line) {
-      if (ask.indexOf(line) < 0) ask.push(line);
-    });
-    if (consultFollow < 2 && ask.length && !hasNeedDetail(q)) {
-      pushLine(lines, ask.slice(0, 3).join('\n'));
-      if (/저림|마비|날카롭|힘.?빠|수술/.test(q)) pushLine(lines, visitGuide(q));
-      return lines.join('\n\n');
-    }
-    return offerBlock(q);
   }
   var APPLY_ASSET_BASE = 'https://breezefeel.github.io/apply/';
   function encodeAsset_(file) {
@@ -3791,168 +3369,6 @@
       if (String(a.getAttribute('href') || '').indexOf('blob:') === 0) return;
       e.preventDefault();
       downloadAssetFile(file.src, file.download);
-    });
-  }
-  function startGreeting(reason) {
-    var q = $('chatQ').value.trim();
-    if (!q) {
-      $('chatReply').value = '';
-      consultRound = 0;
-      return;
-    }
-    if ($('chatFollow').value.trim() && reason !== 'force') return;
-    consultRound = 1;
-    $('chatReply').value = makeGreeting(q);
-  }
-  function startFollow(reason) {
-    var q = ($('chatQ2').value || '').trim();
-    if (!q) {
-      $('chatFollow').value = '';
-      consultFollow = 0;
-      return;
-    }
-    if (reason === 'paste' || reason === 'ocr' || reason === 'click') consultFollow += 1;
-    else if (consultFollow < 1) consultFollow = 1;
-    $('chatFollow').value = makeFollowup();
-  }
-  function appendQuestion(text, zone) {
-    var add = String(text || '').trim();
-    if (!add) return;
-    var id = zone === 2 ? 'chatQ2' : 'chatQ';
-    var cur = $(id).value;
-    if (cur && cur.indexOf(add) >= 0) return;
-    $(id).value = cur && cur.trim() ? cur.replace(/\s+$/, '') + '\n\n' + add : add;
-  }
-  function afterQuestion(reason, zone) {
-    if (zone === 2) startFollow(reason);
-    else startGreeting(reason);
-  }
-  function tidyOcr(text) {
-    return String(text || '')
-      .replace(/\r/g, '')
-      .replace(/[ \t]+/g, ' ')
-      .replace(/([가-힣])\s+(?=[가-힣])/g, '$1')
-      .replace(/\n[ \t]+/g, '\n')
-      .replace(/\n{3,}/g, '\n\n')
-      .trim();
-  }
-  function imagesFor(zone) {
-    return zone === 2 ? chatImages2 : chatImages;
-  }
-  function renderThumbs(zone) {
-    var id = zone === 2 ? 'chatThumbs2' : 'chatThumbs';
-    var images = imagesFor(zone);
-    $(id).innerHTML = images.map(function (img, i) {
-      return '<div class="chat-thumb"><img src="' + img.url + '" alt="캡처"><button type="button" data-del="' + i + '" data-zone="' + (zone || 1) + '" aria-label="삭제">×</button></div>';
-    }).join('');
-  }
-  function loadTesseract() {
-    if (window.Tesseract) return Promise.resolve();
-    if (tesseractLoading) return tesseractLoading;
-    tesseractLoading = new Promise(function (resolve, reject) {
-      var s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
-      s.onload = resolve;
-      s.onerror = function () {
-        tesseractLoading = null;
-        reject(new Error('ocr-script'));
-      };
-      document.head.appendChild(s);
-    });
-    return tesseractLoading;
-  }
-  function ingestImage(file, zone) {
-    if (!file) return Promise.resolve();
-    var url = URL.createObjectURL(file);
-    imagesFor(zone).push({ url: url });
-    renderThumbs(zone);
-    setStatus('캡처에서 글자를 읽는 중…');
-    return loadTesseract().then(function () {
-      if (ocrWorker) return ocrWorker;
-      return window.Tesseract.createWorker('kor+eng', 1, {
-        logger: function (m) {
-          if (m.status === 'recognizing text') {
-            setStatus('캡처에서 글자 읽는 중 ' + Math.round((m.progress || 0) * 100) + '%');
-          }
-        }
-      }).then(function (w) {
-        ocrWorker = w;
-        return w;
-      });
-    }).then(function (worker) {
-      return worker.recognize(file);
-    }).then(function (result) {
-      var text = tidyOcr(result && result.data && result.data.text);
-      if (text) {
-        appendQuestion(text, zone);
-        afterQuestion('ocr', zone);
-      } else {
-        setStatus('글자를 읽지 못했습니다. 질문을 직접 붙여 넣어 주세요.');
-      }
-    }).catch(function () {
-      setStatus('캡처는 넣었습니다. 글자 인식이 안 되면 질문을 직접 붙여 넣어 주세요.');
-    });
-  }
-  function pasteClipboard(zone) {
-    var qid = zone === 2 ? 'chatQ2' : 'chatQ';
-    setStatus('클립보드를 읽는 중…');
-    var readItems = navigator.clipboard && navigator.clipboard.read
-      ? navigator.clipboard.read()
-      : Promise.reject();
-    return readItems.then(function (items) {
-      var chain = Promise.resolve(false);
-      items.forEach(function (item) {
-        chain = chain.then(function (got) {
-          if (got) return true;
-          var types = item.types || [];
-          var imgType = '';
-          for (var i = 0; i < types.length; i++) {
-            if (types[i].indexOf('image/') === 0) { imgType = types[i]; break; }
-          }
-          if (imgType) {
-            return item.getType(imgType).then(function (blob) {
-              return ingestImage(blob, zone).then(function () { return true; });
-            });
-          }
-          return false;
-        });
-      });
-      return chain.then(function (got) {
-        if (got) return true;
-        if (navigator.clipboard.readText) {
-          return navigator.clipboard.readText().then(function (text) {
-            if (text && text.trim()) {
-              appendQuestion(text, zone);
-              afterQuestion('paste', zone);
-              return true;
-            }
-            return false;
-          });
-        }
-        return false;
-      });
-    }).then(function (got) {
-      if (!got) {
-        $(qid).focus();
-        setStatus('캡처 후 이 칸에서 Ctrl+V, 또는 붙여넣기/캡처 넣기를 다시 눌러 주세요.');
-      }
-    }).catch(function () {
-      if (navigator.clipboard && navigator.clipboard.readText) {
-        return navigator.clipboard.readText().then(function (text) {
-          if (text && text.trim()) {
-            appendQuestion(text, zone);
-            afterQuestion('paste', zone);
-          } else {
-            $(qid).focus();
-            setStatus('이 칸을 누른 뒤 Ctrl+V로 글이나 캡처를 넣으세요.');
-          }
-        }).catch(function () {
-          $(qid).focus();
-          setStatus('이 칸을 누른 뒤 Ctrl+V로 글이나 캡처를 넣으세요.');
-        });
-      }
-      $(qid).focus();
-      setStatus('이 칸을 누른 뒤 Ctrl+V로 글이나 캡처를 넣으세요.');
     });
   }
   var CERT_TEMPLATES = {
@@ -6469,7 +5885,115 @@
     if (consultBranch === 'ifc') return 'https://cafe.naver.com/ifc/51';
     return 'https://cafe.naver.com/koreaposture/359';
   }
+  function isMemberBranch() {
+    return consultBranch === 'yaksu' || consultBranch === 'incheon';
+  }
+  var SMS_OPTOUT_KEY = 'rm_sms_optout_number';
+  var SMS_AD_TAIL = '무료수신거부 #{수신거부번호}';
+  /** 센터 회원에게 보내는 문자 문구. 지점명·링크·전화는 BRANCH에서만 가져오고, 모르는 값은 #{...}로 둡니다. */
+  function memberSmsTemplates() {
+    var b = BRANCH[consultBranch];
+    var head = '[' + b.smsName + ']';
+    var adHead = '(광고)' + head;
+    var priceLines = String(b.price || '').split('\n\n').slice(1).join('\n\n');
+    var items = [];
+    items.push({ id: 'trialBook', label: '체험 예약 확인', text: [
+      head,
+      '#{이름} 님, 체험 예약이 확정되었습니다.',
+      '',
+      '■ 일시: #{예약 일시}',
+      '■ 장소: ' + b.where,
+      '',
+      '첫 방문은 문진 → 평가 → 당일 안전한 범위만 진행합니다.',
+      '움직이기 편한 복장으로 오시면 됩니다.',
+      '',
+      '오시는 길: ' + b.map,
+      b.parking.replace('\n', ' '),
+      '',
+      '일정 변경이 필요하시면 전화 ' + b.phone + '로 알려 주세요.',
+      '감사합니다.'
+    ].join('\n') });
+    items.push({ id: 'trialReview', label: '체험 후기 안내(2회 체험 후)', text: [
+      head,
+      '#{이름} 님, 두 번의 체험 함께해 주셔서 감사합니다.',
+      '체험해 보신 느낌을 솔직하게 남겨 주시면 저희에게 큰 힘이 돼요.',
+      '',
+      '▶ 네이버 예약으로 오신 분: ' + b.reviewNaver,
+      '(링크를 열고 \'리뷰 쓰기\'를 눌러 주세요)',
+      '▶ 당근으로 오신 분: ' + b.reviewKarrot,
+      '(당근 앱에서 [후기] 탭 > [후기 작성하기])',
+      '',
+      '움직이시다 불편한 곳이 있으면 언제든 편하게 알려 주세요. 감사합니다.'
+    ].join('\n') });
+    items.push({ id: 'welcome', label: '등록 환영·첫 수업 안내', text: [
+      head,
+      '#{이름} 님, 등록해 주셔서 감사합니다.',
+      '',
+      '■ 첫 수업: #{첫 수업 일시}',
+      '■ 장소: ' + b.where,
+      '',
+      '1:1 예약제이고, 첫 수업에서 평가 후 프로그램이 정해집니다.',
+      '움직이기 편한 복장으로 오시고, 불편한 곳이나 바라시는 점을 미리 떠올려 오시면 도움이 됩니다.',
+      '',
+      '오시는 길: ' + b.map,
+      b.parking.replace('\n', ' '),
+      '',
+      '문의는 전화 ' + b.phone + '로 주세요.',
+      '감사합니다.'
+    ].join('\n') });
+    items.push({ id: 'change', label: '예약 변경 안내', text: [
+      head,
+      '#{이름} 님, 예약이 아래와 같이 변경되었습니다.',
+      '',
+      '■ 기존: #{기존 일시}',
+      '■ 변경: #{변경 일시}',
+      '',
+      '다른 요일이나 시간대가 편하시면 말씀해 주세요. 빈 자리가 있으면 당일 예약도 가능해요.',
+      '문의: 전화 ' + b.phone,
+      '감사합니다.'
+    ].join('\n') });
+    items.push({ id: 'cancel', label: '예약 취소 안내', text: [
+      head,
+      '#{이름} 님, #{취소 일시} 예약이 취소되었습니다.',
+      '',
+      '다시 예약하실 때는 원하시는 요일과 시간대를 알려 주세요. 빈 자리가 있으면 당일 예약도 가능해요.',
+      '문의: 전화 ' + b.phone,
+      '감사합니다.'
+    ].join('\n') });
+    items.push({ id: 'checkin', label: '오래 안 오신 분 안부', ad: true, text: [
+      adHead,
+      '#{이름} 님, 안녕하세요. 한동안 뵙지 못해 안부 여쭙니다.',
+      '요즘 몸은 어떠세요? 불편한 곳이 있으면 편하게 알려 주세요.',
+      '',
+      '원하시는 요일과 시간대를 알려 주시면 맞춰 예약해 드릴게요.',
+      '예약·문의: 전화 ' + b.phone,
+      '',
+      SMS_AD_TAIL
+    ].join('\n') });
+    items.push({ id: 'renew', label: '회차 마감 전 재등록 안내', ad: true, text: [
+      adHead,
+      '#{이름} 님, 지금 수강권이 #{남은 회차}회 남았습니다. 마감 예정일은 #{마감 예정일}입니다.',
+      '',
+      '계속 다니시려면 마감 전에 예약과 함께 알려 주세요. 수강 안내는 아래와 같습니다.',
+      priceLines,
+      '',
+      '예약·문의: 전화 ' + b.phone,
+      '',
+      SMS_AD_TAIL
+    ].join('\n') });
+    items.push({ id: 'where', label: '오시는 길·주차', text: [
+      head,
+      b.where + '입니다.',
+      '',
+      '네이버 지도: ' + b.map,
+      b.parking,
+      '',
+      '문의: 전화 ' + b.phone
+    ].join('\n') });
+    return items;
+  }
   function smsTemplates() {
+    if (isMemberBranch()) return memberSmsTemplates();
     var name = smsCourseName();
     var items = {};
     if (consultBranch === 'ifc') {
@@ -6668,10 +6192,54 @@
     var el = $('smsStatus');
     if (el) el.textContent = msg || '';
   }
+  function smsByteLen(text) {
+    var n = 0;
+    String(text || '').split('').forEach(function (ch) { n += ch.charCodeAt(0) > 127 ? 2 : 1; });
+    return n;
+  }
+  function smsOptoutValue() {
+    var el = $('smsOptout');
+    var v = el ? String(el.value || '').trim() : '';
+    if (v) return v;
+    try { return String(localStorage.getItem(SMS_OPTOUT_KEY) || '').trim(); } catch (e) { return ''; }
+  }
+  function paintSmsChrome() {
+    var member = isMemberBranch();
+    var set = function (id, fn) { var el = $(id); if (el) fn(el); };
+    set('smsTitle', function (el) { el.textContent = member ? '회원 문자' : '수강생 문자'; });
+    set('smsLead', function (el) {
+      el.textContent = member
+        ? '신청서 알림톡과 별도입니다. 안내를 고른 뒤 내용을 고치고, 받을 사람을 이름과 연락처로 적은 다음 보내면 솔라피 문자로 나갑니다. 보내기 전에 확인 창이 한 번 뜹니다. 재등록·안부 같은 광고 문자는 맨 앞 (광고)와 끝 수신거부 문구가 있어야 보내집니다.'
+        : '신청서 알림톡과 별도입니다. 안내를 고른 뒤 내용을 고치고, 받을 사람을 정한 다음 보내면 솔라피 문자로 나갑니다.';
+    });
+    set('btnSmsLoad', function (el) { el.hidden = member; });
+    set('btnSmsAll', function (el) { el.hidden = member; });
+    set('smsPeople', function (el) { el.hidden = member; });
+    set('smsOptoutRow', function (el) { el.hidden = !member; });
+    set('smsExtraLabel', function (el) {
+      el.textContent = member ? '받을 사람 · 한 줄에 한 명, 이름 연락처 순서로 적어 주세요' : '연락처 직접 입력 · 쉼표나 줄바꿈';
+    });
+    set('smsExtra', function (el) { el.placeholder = member ? '이름 010-0000-0000' : '010-0000-0000'; });
+    set('smsOptout', function (el) {
+      if (member && !el.value) {
+        try { el.value = localStorage.getItem(SMS_OPTOUT_KEY) || ''; } catch (e) {}
+      }
+    });
+  }
+  function fitSmsBox() {
+    var ta = $('smsText');
+    if (!ta) return;
+    ta.style.height = '0px';
+    ta.style.height = Math.max(168, ta.scrollHeight + 4) + 'px';
+  }
   function paintSmsCount() {
     var el = $('smsCount');
     var text = ($('smsText') && $('smsText').value) || '';
-    if (el) el.textContent = text.length ? (text.length + '자') : '';
+    fitSmsBox();
+    if (el) {
+      var long = smsByteLen(text) > 90;
+      el.textContent = text.length ? (text.length + '자' + (long ? ' · 90바이트가 넘어 장문(LMS)으로 나갑니다' : '')) : '';
+    }
   }
   function paintSmsTemplates() {
     var box = $('smsTemplates');
@@ -6708,8 +6276,21 @@
       seen[p.phone] = true;
       out.push({ name: p.name || '', phone: p.phone });
     });
-    String(($('smsExtra') && $('smsExtra').value) || '').split(/[\s,，]+/).forEach(function (raw) {
-      var d = smsDigits(raw);
+    var raw = String(($('smsExtra') && $('smsExtra').value) || '');
+    if (isMemberBranch()) {
+      // 회원 문자: 한 줄에 한 명, "이름 연락처"
+      raw.split(/\r?\n/).forEach(function (line) {
+        var m = line.match(/(0\d{1,2}[-\s.]?\d{3,4}[-\s.]?\d{4})/);
+        if (!m) return;
+        var d = smsDigits(m[1]);
+        if (!d || seen[d]) return;
+        seen[d] = true;
+        out.push({ name: line.replace(m[1], '').replace(/[,，\t]+/g, ' ').replace(/\s+/g, ' ').trim(), phone: d });
+      });
+      return out;
+    }
+    raw.split(/[\s,，]+/).forEach(function (raw1) {
+      var d = smsDigits(raw1);
       if (!d || seen[d]) return;
       seen[d] = true;
       out.push({ name: '', phone: d });
@@ -6751,47 +6332,107 @@
       setSmsStatus('시트에 연결하지 못했습니다.');
     });
   }
-  function sendSmsNow() {
-    if (smsSending) return;
-    var text = ($('smsText') && $('smsText').value || '').trim();
-    if (!text) { setSmsStatus('문자 내용을 적어 주세요.'); return; }
-    var targets = collectSmsTargets();
-    var phones = targets.map(function (p) { return p.phone; });
-    if (!phones.length) { setSmsStatus('보낼 연락처를 선택하거나 직접 적어 주세요.'); return; }
-    if (phones.length > 30) { setSmsStatus('한 번에 30명까지 보낼 수 있습니다. 나눠 보내 주세요.'); return; }
-    if (!window.confirm(phones.length + '명에게 솔라피 문자를 보냅니다.')) return;
-    smsSending = true;
-    var btn = $('btnSmsSend');
-    if (btn) btn.disabled = true;
-    setSmsStatus('보내는 중입니다.');
-    fetch(PAYROLL_API_URL, {
+  function smsPostGroup(text, phones) {
+    return fetch(PAYROLL_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: 'academySendNoticeSms', text: text, phones: phones, course: consultBranch })
     }).then(function (res) { return res.text(); }).then(function (raw) {
-      smsSending = false;
-      if (btn) btn.disabled = false;
       var data;
       try { data = JSON.parse(raw); } catch (eParse) { data = null; }
-      if (!data || data.ok === false || data.result === 'error') {
-        var msg = (data && (data.message || data.error)) || '';
-        if (/unknown action/i.test(msg)) setSmsStatus('Apps Script를 다시 배포하면 솔라피 발송이 연결됩니다.');
-        else setSmsStatus(msg || '문자를 보내지 못했습니다.');
-        return;
-      }
-      var failed = data.failed || [];
-      if (!failed.length) setSmsStatus(data.sent + '명에게 문자를 보냈습니다.');
-      else setSmsStatus(data.sent + '명 발송, ' + failed.length + '명 실패. ' + failed.map(function (f) { return f.phoneTail || ''; }).filter(Boolean).join(', '));
-      if (window.SmsHistory && data.sent) {
+      return data;
+    });
+  }
+  function smsNightNow() {
+    var h = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul', hour: 'numeric', hour12: false }), 10);
+    return h >= 21 || h < 8;
+  }
+  function sendSmsNow() {
+    if (smsSending) return;
+    var raw = ($('smsText') && $('smsText').value || '').trim();
+    if (!raw) { setSmsStatus('문자 내용을 적어 주세요.'); return; }
+    var targets = collectSmsTargets();
+    if (!targets.length) { setSmsStatus(isMemberBranch() ? '받을 사람을 이름과 연락처로 적어 주세요.' : '보낼 연락처를 선택하거나 직접 적어 주세요.'); return; }
+    if (targets.length > 30) { setSmsStatus('한 번에 30명까지 보낼 수 있습니다. 나눠 보내 주세요.'); return; }
+    var optout = isMemberBranch() ? smsOptoutValue() : '';
+    if (isMemberBranch() && optout) {
+      try { localStorage.setItem(SMS_OPTOUT_KEY, optout); } catch (eStore) {}
+    }
+    var base = optout ? raw.replace(/#\{수신거부번호\}/g, optout) : raw;
+    if (/#\{이름\}/.test(base) && targets.some(function (t) { return !t.name; })) {
+      setSmsStatus('문구에 #{이름}이 있어 받는 분 이름이 필요합니다. 한 줄에 "이름 연락처"로 적어 주세요.');
+      return;
+    }
+    var left = base.replace(/#\{이름\}/g, '').match(/#\{[^}]*\}/g);
+    if (left) {
+      var uniq = left.filter(function (v, i) { return left.indexOf(v) === i; });
+      setSmsStatus('아직 채우지 않은 자리표시가 있습니다. 내용을 고쳐 주세요: ' + uniq.join(' '));
+      return;
+    }
+    var tmpl = smsTemplates().filter(function (t) { return t.id === smsCurrentId(); })[0];
+    var isAd = !!(tmpl && tmpl.ad) || /^\s*\(광고\)/.test(base);
+    if (isAd && !/^\s*\(광고\)/.test(base)) { setSmsStatus('광고 문자는 맨 앞에 (광고)를 적어야 합니다.'); return; }
+    if (isAd && !/수신거부/.test(base)) { setSmsStatus('광고 문자는 끝에 무료 수신거부 문구가 있어야 합니다.'); return; }
+    var items = targets.map(function (t) {
+      return { target: t, text: base.replace(/#\{이름\}/g, t.name) };
+    });
+    if (items.some(function (it) { return it.text.length > 1000; })) { setSmsStatus('문자가 너무 깁니다. 1000자 안으로 줄여 주세요.'); return; }
+    var who = items.slice(0, 5).map(function (it) {
+      return (it.target.name || '이름 없음') + '(' + it.target.phone.slice(-4) + ')';
+    }).join(', ') + (items.length > 5 ? ' 외 ' + (items.length - 5) + '명' : '');
+    var ask = items.length + '명에게 솔라피 문자를 보냅니다.\n\n' +
+      '받는 분: ' + who + '\n' +
+      '안내: ' + smsCurrentLabel() + (isAd ? ' (광고 문자)' : '') + '\n\n' +
+      '내용 미리보기\n' + items[0].text.slice(0, 160) + (items[0].text.length > 160 ? '…' : '');
+    if (isAd && smsNightNow()) ask += '\n\n※ 지금은 광고 문자 야간 제한 시간(밤 9시~아침 8시)입니다. 별도 동의가 있는 분께만 보내세요.';
+    if (!window.confirm(ask)) return;
+    var groups = [];
+    items.forEach(function (it) {
+      var g = groups.filter(function (x) { return x.text === it.text; })[0];
+      if (!g) { g = { text: it.text, targets: [] }; groups.push(g); }
+      g.targets.push(it.target);
+    });
+    smsSending = true;
+    var btn = $('btnSmsSend');
+    if (btn) btn.disabled = true;
+    setSmsStatus('보내는 중입니다.');
+    var sentTotal = 0;
+    var failedAll = [];
+    var doneTargets = [];
+    var problem = '';
+    var chain = Promise.resolve();
+    groups.forEach(function (g) {
+      chain = chain.then(function () {
+        if (problem) return;
+        return smsPostGroup(g.text, g.targets.map(function (t) { return t.phone; })).then(function (data) {
+          if (!data || data.ok === false || data.result === 'error') {
+            var msg = (data && (data.message || data.error)) || '';
+            problem = /unknown action/i.test(msg) ? 'Apps Script를 다시 배포하면 솔라피 발송이 연결됩니다.' : (msg || '문자를 보내지 못했습니다.');
+            return;
+          }
+          sentTotal += data.sent || 0;
+          failedAll = failedAll.concat(data.failed || []);
+          doneTargets = doneTargets.concat(g.targets);
+        });
+      });
+    });
+    chain.then(function () {
+      smsSending = false;
+      if (btn) btn.disabled = false;
+      if (problem && !sentTotal) { setSmsStatus(problem); return; }
+      var tail = failedAll.length ? (failedAll.length + '명 실패. ' + failedAll.map(function (f) { return f.phoneTail || ''; }).filter(Boolean).join(', ')) : '';
+      if (problem) setSmsStatus(sentTotal + '명 발송 후 멈췄습니다. ' + problem);
+      else setSmsStatus(tail ? (sentTotal + '명 발송, ' + tail) : (sentTotal + '명에게 문자를 보냈습니다.'));
+      if (window.SmsHistory && sentTotal) {
         SmsHistory.record({
-          audience: 'student',
+          audience: isMemberBranch() ? 'member' : 'student',
           course: consultBranch,
           label: smsCurrentLabel(),
           channel: 'sms',
-          body: text,
-          recipients: targets,
-          sentCount: data.sent,
-          failed: failed
+          body: base,
+          recipients: doneTargets,
+          sentCount: sentTotal,
+          failed: failedAll
         });
       }
     }).catch(function () {
@@ -6808,6 +6449,9 @@
       if (e.target.id === 'smsText') {
         smsEdits[consultBranch + ':' + smsCurrentId()] = e.target.value;
         paintSmsCount();
+      }
+      if (e.target.id === 'smsOptout') {
+        try { localStorage.setItem(SMS_OPTOUT_KEY, String(e.target.value || '').trim()); } catch (eStore) {}
       }
     });
     $('smsPanel').addEventListener('change', function (e) {
@@ -6840,10 +6484,10 @@
   function syncSms() {
     var card = $('smsPanel');
     if (!card) return;
-    if (!isAcademyBranch()) return;
     bindSms();
     smsPeople = [];
     smsChecked = {};
+    paintSmsChrome();
     paintSmsTemplates();
     paintSmsPeople();
     setSmsStatus('');
@@ -6855,24 +6499,14 @@
     });
     var academy = isAcademyBranch();
     document.body.classList.toggle('academy-mode', academy);
-    var chatBlocks = $('consultChatBlocks');
     var smsPanel = $('smsPanel');
-    if (chatBlocks) chatBlocks.hidden = academy;
-    if (smsPanel) smsPanel.hidden = !academy;
-    var q1 = $('chatQ');
-    var q2 = $('chatQ2');
-    if (q1 && !academy) q1.placeholder = '질문을 붙여 넣거나, 캡처를 여기에 넣으세요';
-    if (q2 && !academy) q2.placeholder = '다음 메시지를 붙여 넣거나, 캡처를 넣으세요';
+    if (smsPanel) smsPanel.hidden = false;
     syncPriceSheet();
     syncPoster();
     syncCertPanel();
     syncSms();
     renderFaq();
     syncShell();
-    if (!academy) {
-      if (q1 && q1.value.trim()) startGreeting('silent');
-      if (q2 && q2.value.trim()) startFollow('silent');
-    }
   }
   function faqItems() {
     if (isAcademyBranch()) return academyFaqs();
@@ -11454,95 +11088,6 @@
     consultBranch = c.dataset.branch;
     renderConsultBranch();
   });
-  function bindZone(zone) {
-    var drop = $(zone === 2 ? 'chatDrop2' : 'chatDrop');
-    var ta = $(zone === 2 ? 'chatQ2' : 'chatQ');
-    var file = $(zone === 2 ? 'chatFile2' : 'chatFile');
-    var thumbs = $(zone === 2 ? 'chatThumbs2' : 'chatThumbs');
-    $(zone === 2 ? 'btnPaste2' : 'btnPaste').addEventListener('click', function () { pasteClipboard(zone); });
-    $(zone === 2 ? 'btnCapture2' : 'btnCapture').addEventListener('click', function () { pasteClipboard(zone); });
-    file.addEventListener('change', function () {
-      var f = this.files && this.files[0];
-      if (f) ingestImage(f, zone);
-      this.value = '';
-    });
-    thumbs.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-del]');
-      if (!btn) return;
-      var i = parseInt(btn.getAttribute('data-del'), 10);
-      var images = imagesFor(zone);
-      if (isNaN(i) || !images[i]) return;
-      URL.revokeObjectURL(images[i].url);
-      images.splice(i, 1);
-      renderThumbs(zone);
-    });
-    drop.addEventListener('dragover', function (e) {
-      e.preventDefault();
-      drop.classList.add('drag');
-    });
-    drop.addEventListener('dragleave', function () { drop.classList.remove('drag'); });
-    drop.addEventListener('drop', function (e) {
-      e.preventDefault();
-      drop.classList.remove('drag');
-      var files = e.dataTransfer.files || [];
-      var hadImg = false;
-      for (var i = 0; i < files.length; i++) {
-        if (files[i].type.indexOf('image/') === 0) {
-          ingestImage(files[i], zone);
-          hadImg = true;
-        }
-      }
-      var text = e.dataTransfer.getData('text/plain');
-      if (text && text.trim() && !hadImg) {
-        appendQuestion(text, zone);
-        afterQuestion('paste', zone);
-      }
-    });
-    ta.addEventListener('paste', function (e) {
-      var items = e.clipboardData && e.clipboardData.items;
-      if (items) {
-        for (var i = 0; i < items.length; i++) {
-          if (items[i].type.indexOf('image/') === 0) {
-            e.preventDefault();
-            ingestImage(items[i].getAsFile(), zone);
-            return;
-          }
-        }
-      }
-      setTimeout(function () { afterQuestion('paste', zone); }, 0);
-    });
-    ta.addEventListener('input', function () {
-      if (!this.value.trim()) {
-        if (zone === 2) {
-          consultFollow = 0;
-          $('chatFollow').value = '';
-        } else {
-          consultRound = 0;
-          $('chatReply').value = '';
-        }
-        return;
-      }
-      clearTimeout(ta._t);
-      ta._t = setTimeout(function () { afterQuestion('type', zone); }, 450);
-    });
-  }
-  bindZone(1);
-  bindZone(2);
-  $('btnNewConsult').addEventListener('click', function () {
-    consultRound = 0;
-    consultFollow = 0;
-    $('chatQ').value = '';
-    $('chatQ2').value = '';
-    $('chatReply').value = '';
-    $('chatFollow').value = '';
-    chatImages.forEach(function (img) { URL.revokeObjectURL(img.url); });
-    chatImages2.forEach(function (img) { URL.revokeObjectURL(img.url); });
-    chatImages = [];
-    chatImages2 = [];
-    renderThumbs(1);
-    renderThumbs(2);
-    setStatus('');
-  });
   function bindCopyBox_(id) {
     var el = $(id);
     if (!el) return;
@@ -11552,8 +11097,6 @@
     });
   }
   bindCopyBox_('faqText');
-  bindCopyBox_('chatReply');
-  bindCopyBox_('chatFollow');
   $('panelLinks').addEventListener('click', function (e) {
     var btn = e.target.closest('.link-copy');
     if (!btn) return;
