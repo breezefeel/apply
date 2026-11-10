@@ -53,6 +53,8 @@
     if (code === 'cmt') return 'CMT';
     if (code === 'ifc') return 'IFC';
     if (code === 'real') return 'Re:Al';
+    if (code === 'yaksu') return '약수';
+    if (code === 'incheon') return '인천';
     return '';
   }
   function outbox() {
@@ -140,7 +142,7 @@
     var course = courseOf() || '';
     return rows.filter(function (r) {
       if (filter === 'member') return r.audience === 'member';
-      if (filter === 'course') return r.audience === 'student' && r.course === course;
+      if (filter === 'course') return r.course === course;
       return true;
     });
   }
@@ -192,7 +194,7 @@
       var chips =
         '<div class="sms-history-tools">' +
           '<button type="button" class="sms-history-chip' + (filter === 'all' ? ' is-on' : '') + '" data-sms-filter="all">전체</button>' +
-          '<button type="button" class="sms-history-chip' + (filter === 'course' ? ' is-on' : '') + '" data-sms-filter="course">이 과정</button>' +
+          '<button type="button" class="sms-history-chip' + (filter === 'course' ? ' is-on' : '') + '" data-sms-filter="course">이 과정·센터</button>' +
           '<button type="button" class="sms-history-chip' + (filter === 'member' ? ' is-on' : '') + '" data-sms-filter="member">회원</button>' +
           '<button type="button" class="sms-history-chip" data-sms-logout>로그아웃</button>' +
         '</div>';
