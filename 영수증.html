@@ -1116,6 +1116,8 @@
     body:not(.printing-docs):not(.printing-plan) #panelUnbooked,
     body:not(.printing-docs):not(.printing-plan) #panelPrice,
     body:not(.printing-docs):not(.printing-plan) #panelBrochure,
+    body:not(.printing-docs):not(.printing-plan) #panelSign,
+    body:not(.printing-docs):not(.printing-plan) #panelPlaque,
     body:not(.printing-docs):not(.printing-plan) .app-tabs { display: none !important; }
     body:not(.printing-docs):not(.printing-plan) #panelReceipt { display: block !important; }
     body.printing-plan .head,
@@ -1126,6 +1128,8 @@
     body.printing-plan #panelUnbooked,
     body.printing-plan #panelPrice,
     body.printing-plan #panelBrochure,
+    body.printing-plan #panelSign,
+    body.printing-plan #panelPlaque,
     body.printing-plan #panelReceipt,
     body.printing-plan #panelDocs,
     body.printing-plan .receipt-dock { display: none !important; }
@@ -1147,6 +1151,8 @@
     body.printing-docs #panelLinks,
     body.printing-docs #panelPrice,
     body.printing-docs #panelBrochure,
+    body.printing-docs #panelSign,
+    body.printing-docs #panelPlaque,
     body.printing-docs #panelReceipt,
     body.printing-docs .receipt-dock,
     body.printing-docs .doc-screen { display: none !important; }
@@ -1760,6 +1766,245 @@
   .bcred li:before { content: "–"; position: absolute; left: 0; color: #8a7560; }
   @media (max-width: 860px) {
     #panelBrochure .brochure-wrap { grid-template-columns: 1fr; }
+  }
+
+  @font-face {
+    font-family: "SCDream";
+    src: url("https://cdn.jsdelivr.net/gh/moonspam/SCDream@master/SCDream5.otf") format("opentype");
+    font-weight: 500; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: "SCDream";
+    src: url("https://cdn.jsdelivr.net/gh/moonspam/SCDream@master/SCDream7.otf") format("opentype");
+    font-weight: 700; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: "SCDream";
+    src: url("https://cdn.jsdelivr.net/gh/moonspam/SCDream@master/SCDream9.otf") format("opentype");
+    font-weight: 800; font-style: normal; font-display: swap;
+  }
+  body.mode-plan.offer-sign .app,
+  body.mode-plan.offer-plaque .app { max-width: 1100px; }
+  #panelSign .sign-wrap,
+  #panelPlaque .plaque-wrap {
+    display: grid;
+    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+  #panelSign .sign-fit,
+  #panelPlaque .plaque-fit {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .sg-miss {
+    margin-top: 12px;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--mute);
+    font-weight: 650;
+  }
+  .sg-board {
+    width: 600mm;
+    height: 1800mm;
+    background: #F7F4EE;
+    color: #000;
+    position: relative;
+    overflow: hidden;
+    padding: 44mm 40mm 40mm;
+    display: flex;
+    flex-direction: column;
+    transform-origin: top left;
+    font-family: "SCDream", Pretendard, "Noto Sans KR", sans-serif;
+  }
+  .sg-kicker {
+    font-size: 12mm; font-weight: 800; letter-spacing: .28em;
+    color: #9A7230; text-align: center;
+  }
+  .sg-headline {
+    margin-top: 10mm;
+    font-size: 36mm; font-weight: 900; line-height: 1.22;
+    letter-spacing: -0.055em; text-align: center;
+  }
+  .sg-headline em { font-style: normal; color: #9A7230; }
+  .sg-sub {
+    margin-top: 10mm; text-align: center;
+    font-size: 14.5mm; font-weight: 800; letter-spacing: -0.04em;
+  }
+  .sg-logo {
+    margin: 26mm auto 28mm; width: 156mm; height: 82mm;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sg-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .sg-bar {
+    background: #000; color: #F3F0E8;
+    border-radius: 16mm; text-align: center;
+    padding: 10mm 10mm;
+    font-size: 20mm; font-weight: 800; letter-spacing: -0.04em; line-height: 1.25;
+  }
+  .sg-bar small, .sg-bar .sg-bar-sub {
+    display: block; margin-top: 2.5mm;
+    font-size: 12mm; font-weight: 700; color: #D9C28A; letter-spacing: 0;
+  }
+  .sg-ph {
+    margin-top: 18mm; height: 340mm; overflow: hidden; border-radius: 12mm;
+    background: #d5cfc4; position: relative; cursor: pointer;
+  }
+  .sg-ph img, .sg-doc-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .sg-missing {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 8mm;
+    color: #3f3a34; font-size: 14mm; font-weight: 800; line-height: 1.35;
+  }
+  .sg-docs-head {
+    margin: 22mm 0 10mm;
+    text-align: center; font-size: 13mm; font-weight: 800;
+    letter-spacing: .18em; color: #9A7230;
+  }
+  .sg-docs { display: flex; flex-direction: column; gap: 12mm; }
+  .sg-doc {
+    display: flex; gap: 20mm; align-items: stretch;
+    background: #EFEBE3; border-radius: 12mm; padding: 10mm 12mm;
+    border-left: 3mm solid #C4A056; height: 228mm;
+  }
+  .sg-doc-photo {
+    width: 42%; flex: none; overflow: hidden; border-radius: 8mm;
+    background: #d5cfc4; position: relative; cursor: pointer;
+  }
+  .sg-doc-text { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 2mm 4mm 2mm 10mm; }
+  .sg-name { font-size: 24mm; font-weight: 900; letter-spacing: -0.045em; line-height: 1.12; }
+  .sg-role { margin-top: 3.5mm; font-size: 13mm; font-weight: 800; color: #9A7230; line-height: 1.35; }
+  .sg-bio { margin-top: 7mm; list-style: none; }
+  .sg-bio li { font-size: 12mm; font-weight: 700; line-height: 1.42; letter-spacing: -0.04em; }
+  .sg-svc {
+    margin-top: 22mm; background: #000; color: #F3F0E8;
+    border-radius: 16mm; padding: 20mm 22mm 22mm;
+  }
+  .sg-svc-head { text-align: center; font-size: 17mm; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 22mm; }
+  .sg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12mm 20mm; }
+  .sg-tag {
+    display: flex; align-items: center; gap: 5.5mm;
+    font-size: 15mm; font-weight: 700; letter-spacing: -0.04em; line-height: 1.3; padding: 2.5mm 0;
+  }
+  .sg-petal { width: 7mm; height: 7mm; flex: none; border-radius: 50%; background: #C4A056; }
+  .sg-solo {
+    display: inline-block; margin-left: 2mm; padding: 1mm 2.6mm;
+    background: #C4A056; color: #000; font-size: 8mm; font-weight: 900; border-radius: 1mm;
+  }
+  .sg-cred {
+    margin-top: 18mm; background: #000; color: #F3F0E8;
+    border-radius: 16mm; padding: 16mm 22mm; list-style: none;
+  }
+  .sg-cred li {
+    display: flex; gap: 7mm; align-items: center;
+    font-size: 16mm; font-weight: 800; letter-spacing: -0.04em; line-height: 1.35; padding: 8mm 0;
+  }
+  .sg-cred li + li { border-top: 0.4mm solid rgba(217,194,138,.28); }
+  .sg-hl { color: #C4A056; }
+  .sg-hours {
+    margin-top: 18mm; text-align: center;
+    font-size: 14mm; font-weight: 800; line-height: 1.55; letter-spacing: -0.03em;
+  }
+  .sg-dot { color: #9A7230; }
+  .sg-contact {
+    margin-top: 16mm;
+    display: flex; align-items: center; justify-content: space-between; gap: 8mm;
+  }
+  .sg-tel { font-size: 26mm; font-weight: 900; letter-spacing: -0.04em; line-height: 1; }
+  .sg-tel-label { display: block; font-size: 11mm; font-weight: 800; color: #9A7230; letter-spacing: .12em; margin-bottom: 2.5mm; }
+  .sg-addr { margin-top: 3.5mm; font-size: 11.5mm; font-weight: 700; line-height: 1.35; }
+  .sg-qr { width: 68mm; height: 68mm; background: #fff; padding: 2.5mm; border: 0.55mm solid #000; }
+  .sg-qr img { width: 100%; height: 100%; display: block; }
+  .sg-qr-cap { display: block; text-align: center; margin-top: 5mm; font-size: 10mm; font-weight: 800; line-height: 1.28; }
+  .sg-edit:hover, .sg-edit:focus { outline: 2px solid #C4A056; outline-offset: 1px; }
+  #panelPlaque .pl-sizes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .pl-board {
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+    transform-origin: top left;
+    color: #1E2126;
+    font-family: Pretendard, "Noto Sans KR", sans-serif;
+    box-shadow: 0 18px 48px rgba(18,20,26,.18);
+  }
+  .pl-pin {
+    position: absolute; z-index: 5;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #E8D5A3 0%, #C4A056 42%, #8A6F2E 100%);
+    box-shadow: 0 2px 4px rgba(0,0,0,.28), inset 0 1px 1px rgba(255,255,255,.55);
+  }
+  .pl-layout {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 3; text-align: center;
+  }
+  .pl-layout.row { flex-direction: row; gap: 3.5%; padding: 4% 4.5%; }
+  .pl-layout.portrait, .pl-layout.stack { flex-direction: column; padding: 6% 5%; }
+  .pl-unit { display: flex; flex-direction: column; align-items: center; width: 100%; }
+  .pl-logo img { width: 100%; height: auto; display: block; }
+  .pl-en {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 700; letter-spacing: .12em; line-height: 1.15;
+    text-transform: uppercase; color: #2C3036;
+  }
+  .pl-en span { display: block; white-space: nowrap; }
+  .pl-rule { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 3% 0 2.4%; }
+  .pl-rule:before, .pl-rule:after { content: ""; width: 56px; height: 1px; background: #B25A4C; opacity: .7; }
+  .pl-rule i { width: 6px; height: 6px; background: #B25A4C; transform: rotate(45deg); }
+  .pl-ko { font-weight: 900; letter-spacing: -.02em; line-height: 1.15; white-space: nowrap; }
+  .pl-sub { margin-top: 2%; font-weight: 700; letter-spacing: .16em; color: #3A3F46; white-space: nowrap; }
+  .pl-shop {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #f3f1ee; color: #6a645c; font-weight: 800; text-align: center; line-height: 1.35;
+  }
+  .pl-a3 { width: 420mm; height: 297mm; }
+  .pl-a3 .pl-pin { width: 15px; height: 15px; }
+  .pl-a3 .pl-pin.tl { top: 11mm; left: 11mm; }
+  .pl-a3 .pl-pin.tr { top: 11mm; right: 11mm; }
+  .pl-a3 .pl-pin.bl { bottom: 11mm; left: 11mm; }
+  .pl-a3 .pl-pin.br { bottom: 11mm; right: 11mm; }
+  .pl-a3 .pl-logo { width: 32%; flex: none; }
+  .pl-a3 .pl-en { font-size: 68px; }
+  .pl-a3 .pl-ko { font-size: 96px; }
+  .pl-a3 .pl-sub { font-size: 52px; }
+  .pl-a4 { width: 210mm; height: 297mm; }
+  .pl-a4 .pl-pin { width: 12px; height: 12px; }
+  .pl-a4 .pl-pin.tl { top: 9.5mm; left: 9.5mm; }
+  .pl-a4 .pl-pin.tr { top: 9.5mm; right: 9.5mm; }
+  .pl-a4 .pl-pin.bl { bottom: 9.5mm; left: 9.5mm; }
+  .pl-a4 .pl-pin.br { bottom: 9.5mm; right: 9.5mm; }
+  .pl-a4 .pl-logo { width: 58%; margin-bottom: 4%; }
+  .pl-a4 .pl-en { font-size: 48px; }
+  .pl-a4 .pl-ko { font-size: 68px; }
+  .pl-a4 .pl-sub { font-size: 40px; }
+  .pl-sq { width: 300mm; height: 300mm; }
+  .pl-sq .pl-pin { width: 14px; height: 14px; }
+  .pl-sq .pl-pin.tl { top: 11mm; left: 11mm; }
+  .pl-sq .pl-pin.tr { top: 11mm; right: 11mm; }
+  .pl-sq .pl-pin.bl { bottom: 11mm; left: 11mm; }
+  .pl-sq .pl-pin.br { bottom: 11mm; right: 11mm; }
+  .pl-sq .pl-logo { width: 54%; margin-bottom: 3%; }
+  .pl-sq .pl-en { font-size: 52px; }
+  .pl-sq .pl-ko { font-size: 72px; }
+  .pl-sq .pl-sub { font-size: 42px; }
+  .pl-sq.shop-a .pl-logo { width: 34%; margin-bottom: 1.5%; }
+  .pl-sq.shop-a .pl-en { font-size: 42px; }
+  .pl-sq.shop-a .pl-ko { font-size: 56px; }
+  .pl-sq.shop-a .pl-sub { font-size: 32px; }
+  .pl-sq.shop-a .pl-shop { width: 52%; min-height: 28mm; margin-top: 4%; padding: 4mm; font-size: 14px; }
+  .pl-sq.shop-b .pl-shop { width: 56%; min-height: 28mm; margin-bottom: 3%; padding: 4mm; font-size: 14px; }
+  .pl-sq.shop-b .pl-logo { width: 32%; margin-top: 3%; }
+  .pl-sq.shop-c .pl-pair { display: flex; align-items: center; justify-content: center; gap: 4%; width: 88%; margin-bottom: 3%; }
+  .pl-sq.shop-c .pl-logo { width: 30%; margin: 0; }
+  .pl-sq.shop-c .pl-shop { width: 46%; min-height: 24mm; padding: 3mm; font-size: 13px; }
+  .pl-sq.shop-c .pl-div { width: 1px; align-self: stretch; background: rgba(196,160,86,.5); }
+  .pl-edit:hover, .pl-edit:focus { outline: 2px solid #C4A056; outline-offset: 2px; }
+  @media (max-width: 860px) {
+    #panelSign .sign-wrap,
+    #panelPlaque .plaque-wrap { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -2395,6 +2640,40 @@
         </div>
       </div>
       <input id="brochurePhotoPick" type="file" accept="image/*" hidden>
+    </div>
+
+    <div id="panelSign" class="panel">
+      <div class="sign-wrap">
+        <section class="card no-print">
+          <div class="poster-actions">
+            <button type="button" class="btn btn-print" id="btnSignPng">PNG 저장</button>
+            <button type="button" class="btn btn-ghost" id="btnSignPdf">PDF 저장</button>
+          </div>
+          <p class="cert-note" id="signStatus">60×180cm, 120dpi, CMYK</p>
+          <p class="sg-miss" id="signMissing"></p>
+          <div class="price-actions">
+            <button type="button" class="btn btn-ghost" id="btnSignReset">이 지점 처음 문구</button>
+          </div>
+        </section>
+        <div class="sign-fit" id="signFit"></div>
+      </div>
+      <input id="signPhotoPick" type="file" accept="image/*" hidden>
+    </div>
+
+    <div id="panelPlaque" class="panel">
+      <div class="plaque-wrap">
+        <section class="card no-print">
+          <p class="cert-lead">국제얼굴교정학회 공식인증점 현판입니다. 규격을 고른 뒤 받으세요.</p>
+          <div class="poster-actions">
+            <button type="button" class="btn btn-print" id="btnPlaquePng">PNG 저장</button>
+            <button type="button" class="btn btn-ghost" id="btnPlaquePdf">PDF 저장</button>
+          </div>
+          <p class="cert-note" id="plaqueStatus">규격을 고르면 그 크기로 저장합니다.</p>
+          <div class="pl-sizes" id="plaqueSizes"></div>
+          <p class="sg-miss">샵 로고 파일 NUON_WELL_BEAUTY_LAB_로고.png 은 저장소에 없습니다.</p>
+        </section>
+        <div class="plaque-fit" id="plaqueFit"></div>
+      </div>
     </div>
 
     <div id="panelReceipt" class="panel">
@@ -9948,6 +10227,563 @@
     });
   }
 
+
+  var SIGN_KEY = 'rm-sign-v1';
+  var SIGN_DPI = 120;
+  var signBranch = 'yaksu';
+  var signs = null;
+  var signBound = false;
+  var signPhotoTarget = null;
+  var signBlobUrls_ = {};
+  var SIGN_DEFAULT_PHOTOS = {
+    incheon: { 'person.0': 'brochure-photos/director-lee.jpg', 'person.1': 'brochure-photos/director-park.jpg' },
+    yaksu: { 'person.0': 'brochure-photos/director-choi.jpg', 'person.1': 'brochure-photos/director-park.jpg' }
+  };
+  var SIGN_LOGO = 'poster-photos/rm-logo.png';
+  var SIGN_MISSING = {
+    incheon: ['cover.jpg', 'lee-wide.jpg', 'activity.jpg', 'talk-qr.png', 'logo-rm.png', 'print-cmyk PDF/JPG'],
+    yaksu: ['cover.jpg', 'choi.jpg', 'park.png', 'talk-qr.png', 'logo-rm.png', 'print-cmyk PDF/JPG']
+  };
+
+  function signOne_(branch) {
+    var incheon = branch === 'incheon';
+    var place = incheon ? '인천점' : '약수점';
+    return {
+      kicker: incheon ? 'INCHEON · JAKJEON' : 'SEOUL · YAKSU',
+      headline1: incheon ? '편안한 움직임,' : '기능운동과 셀프 케어,',
+      headline2: incheon ? '스스로 이어 가도록' : '기초부터 시작합니다',
+      sub: '1:1 움직임 · 셀프 케어 스튜디오',
+      bar: '원장 직접 1:1 지도',
+      barSmall: '미국 카이로프랙틱 닥터 · 물리치료사',
+      docsHead: '원장 소개',
+      people: incheon ? [
+        {
+          name: '이상민 원장',
+          role: '인천점 원장 · D.C. / P.T.',
+          creds: [
+            '미국 카이로프랙틱 닥터 (D.C.)',
+            '대한민국 물리치료사 (P.T.)',
+            '前 서울아산재활의학과 도수치료과장',
+            '前 연세제일병원 도수운동치료실장',
+            '前 연세척추재활의학과 도수운동치료센터장'
+          ]
+        },
+        {
+          name: '박준규 원장',
+          role: '약수 · 인천 원장 · D.C. / P.T.',
+          creds: [
+            '미국 카이로프랙틱 닥터 (D.C.)',
+            '대한민국 물리치료사 (P.T.)',
+            '前 미국 LA 월턴 메디컬센터 부원장',
+            '前 잠실 롯데월드타워 정형외과 부원장',
+            '現 IFC 국제얼굴교정학회 학회장'
+          ]
+        }
+      ] : [
+        {
+          name: '최진옥 원장',
+          role: '약수점 원장 · D.C.',
+          creds: [
+            '카이로프랙틱 닥터 (D.C.)',
+            '前 한서대 건강관리학과 전임조교수',
+            '前 인천아시안게임 세팍타크로 팀닥터',
+            '前 대한카이로프랙틱협회(KAC) 재무이사·사무총장',
+            '한서대 카이로프랙틱학과 박사과정 수료'
+          ]
+        },
+        {
+          name: '박준규 원장',
+          role: '약수 · 인천 원장 · D.C. / P.T.',
+          creds: [
+            '미국 카이로프랙틱 닥터 (D.C.)',
+            '대한민국 물리치료사 (P.T.)',
+            '前 미국 LA 월턴 메디컬센터 부원장',
+            '前 잠실 롯데월드타워 정형외과 부원장',
+            '現 IFC 국제얼굴교정학회 학회장'
+          ]
+        }
+      ],
+      svcHead: '1:1 맞춤 움직임 ㅣ 셀프 케어',
+      tags: [
+        { text: '기능운동 1:1', badge: '' },
+        { text: '패시브 스트레칭', badge: '' },
+        { text: '실버 트레이닝', badge: '' },
+        { text: '선수 트레이닝', badge: '' },
+        { text: '바른 자세 습관', badge: '' },
+        { text: '리:얼 페이스 셀프 케어', badge: place + ' 클래스' }
+      ],
+      lines: [
+        { text: '원장 직접 1:1 · 4단계 움직임 평가 후 진행', hl: '' },
+        { text: '약력과 경력을 공개합니다', hl: '' },
+        { text: '리:얼 페이스 셀프 케어', hl: place + ' 클래스' }
+      ],
+      hours: ['평일 09:00 – 21:00', '토 09:00 – 16:00 · 일·공휴일 휴무'],
+      placeLine: incheon ? '힐스테이트자이계양 커뮤니티(도서관 옆)' : '약수역 5·6·7번 출구 도보 3분',
+      phoneLabel: '문의 · 예약',
+      phone: incheon ? '0507-1312-4596' : '0507-1359-4596',
+      addr: '네이버 톡톡으로 문의하세요',
+      qrUrl: incheon ? 'https://talk.naver.com/ct/w46xopt?frm=qr' : 'https://talk.naver.com/profile/c/real_movement_y',
+      qrCap1: '네이버 톡톡',
+      qrCap2: '문의 · 예약'
+    };
+  }
+  function signDefaults_() {
+    return { yaksu: signOne_('yaksu'), incheon: signOne_('incheon') };
+  }
+  function loadSigns_() {
+    var defaults = signDefaults_();
+    try {
+      var saved = JSON.parse(localStorage.getItem(SIGN_KEY) || 'null');
+      if (saved && typeof saved === 'object') {
+        return {
+          yaksu: mergeBrochure_(defaults.yaksu, saved.yaksu),
+          incheon: mergeBrochure_(defaults.incheon, saved.incheon)
+        };
+      }
+    } catch (e) {}
+    return defaults;
+  }
+  function saveSigns_() {
+    try { localStorage.setItem(SIGN_KEY, JSON.stringify(signs)); } catch (e) {}
+  }
+  function sgEdit_(tag, cls, path, text) {
+    return '<' + tag + ' class="' + cls + ' sg-edit" contenteditable="true" spellcheck="false" data-sg="' + path + '">' + escPrice_(text || '') + '</' + tag + '>';
+  }
+  function signPhotoBox_(slot, cls, missingName) {
+    return '<div class="' + cls + '" data-sign-slot="' + slot + '" role="button" tabindex="0">' +
+      '<img alt="" hidden>' +
+      '<span class="sg-missing">' + escPrice_(missingName) + '</span></div>';
+  }
+  function renderSignBoard_() {
+    var fit = $('signFit');
+    if (!fit) return;
+    if (!signs) signs = loadSigns_();
+    var card = signs[signBranch];
+    var people = (card.people || []).map(function (person, i) {
+      var creds = (person.creds || []).map(function (line, ci) {
+        return '<li class="sg-edit" contenteditable="true" spellcheck="false" data-sg="people.' + i + '.creds.' + ci + '">' + escPrice_(line) + '</li>';
+      }).join('');
+      var missing = signBranch === 'incheon' ? (i === 0 ? 'lee-wide.jpg 없음' : 'activity.jpg 없음') : (i === 0 ? 'choi.jpg 없음' : 'park.png 없음');
+      return '<div class="sg-doc"><div class="sg-doc-photo" data-sign-slot="person.' + i + '" role="button" tabindex="0"><img alt="" hidden><span class="sg-missing">' + missing + '</span></div><div class="sg-doc-text">' +
+        sgEdit_('div', 'sg-name', 'people.' + i + '.name', person.name) +
+        sgEdit_('div', 'sg-role', 'people.' + i + '.role', person.role) +
+        '<ul class="sg-bio">' + creds + '</ul></div></div>';
+    }).join('');
+    var tags = (card.tags || []).map(function (tag, i) {
+      var badge = tag.badge ? '<span class="sg-solo sg-edit" contenteditable="true" spellcheck="false" data-sg="tags.' + i + '.badge">' + escPrice_(tag.badge) + '</span>' : '';
+      return '<div class="sg-tag"><span class="sg-petal"></span>' + sgEdit_('span', '', 'tags.' + i + '.text', tag.text) + badge + '</div>';
+    }).join('');
+    var lines = (card.lines || []).map(function (line, i) {
+      var hl = line.hl ? ' <span class="sg-hl sg-edit" contenteditable="true" spellcheck="false" data-sg="lines.' + i + '.hl">' + escPrice_(line.hl) + '</span>' : '';
+      return '<li><span class="sg-petal"></span><span>' + sgEdit_('span', '', 'lines.' + i + '.text', line.text) + hl + '</span></li>';
+    }).join('');
+    var hours = (card.hours || []).map(function (line, i) {
+      return '<span class="sg-dot">●</span> ' + sgEdit_('span', '', 'hours.' + i, line);
+    }).join('<br>');
+    fit.innerHTML = '<article class="sg-board" aria-label="' + (signBranch === 'incheon' ? '인천' : '약수') + '점 입간판">' +
+      sgEdit_('div', 'sg-kicker', 'kicker', card.kicker) +
+      '<h1 class="sg-headline">' + sgEdit_('div', '', 'headline1', card.headline1) +
+        '<div>' + sgEdit_('span', '', 'headline2', card.headline2) + '<em>.</em></div></h1>' +
+      sgEdit_('p', 'sg-sub', 'sub', card.sub) +
+      '<div class="sg-logo"><img src="' + SIGN_LOGO + '" alt="REAL MOVEMENT"></div>' +
+      '<div class="sg-bar">' + sgEdit_('div', '', 'bar', card.bar) + sgEdit_('div', 'sg-bar-sub', 'barSmall', card.barSmall) + '</div>' +
+      signPhotoBox_('hero', 'sg-ph', 'cover.jpg 없음') +
+      sgEdit_('div', 'sg-docs-head', 'docsHead', card.docsHead) +
+      '<div class="sg-docs">' + people + '</div>' +
+      '<div class="sg-svc">' + sgEdit_('div', 'sg-svc-head', 'svcHead', card.svcHead) + '<div class="sg-grid">' + tags + '</div></div>' +
+      '<ul class="sg-cred">' + lines + '</ul>' +
+      '<p class="sg-hours">' + hours + '<br>' + sgEdit_('span', '', 'placeLine', card.placeLine) + '</p>' +
+      '<div class="sg-contact"><div>' +
+        '<div class="sg-tel">' + sgEdit_('span', 'sg-tel-label', 'phoneLabel', card.phoneLabel) + sgEdit_('div', '', 'phone', card.phone) + '</div>' +
+        sgEdit_('p', 'sg-addr', 'addr', card.addr) +
+      '</div><div><div class="sg-qr"><img alt=""></div>' +
+        sgEdit_('span', 'sg-qr-cap', 'qrCap1', card.qrCap1) + '<br>' + sgEdit_('span', 'sg-qr-cap', 'qrCap2', card.qrCap2) +
+      '</div></div></article>';
+    var note = $('signMissing');
+    if (note) note.textContent = '원본에만 있고 저장소에 없는 파일: ' + (SIGN_MISSING[signBranch] || []).join(', ') + '. 로고와 원장 얼굴은 저장소에 있는 파일을 씁니다. QR은 여기서 만듭니다.';
+    hydrateSignPhotos_();
+    paintSignQr_();
+    fitSignSheet_();
+    requestAnimationFrame(fitSignSheet_);
+  }
+  function fitSignSheet_() {
+    var fit = $('signFit');
+    var board = fit && fit.querySelector('.sg-board');
+    if (!fit || !board || !fit.clientWidth) return;
+    board.style.transform = 'none';
+    var scale = fit.clientWidth / (board.offsetWidth || 1);
+    if (!scale || scale > 1) scale = 1;
+    board.style.transform = 'scale(' + scale + ')';
+    fit.style.height = Math.ceil(board.offsetHeight * scale) + 'px';
+  }
+  function signDb_() {
+    return new Promise(function (resolve, reject) {
+      var req = indexedDB.open('rm-sign-photos', 1);
+      req.onupgradeneeded = function () {
+        if (!req.result.objectStoreNames.contains('photos')) req.result.createObjectStore('photos');
+      };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+    });
+  }
+  function signIdb_(mode, key, value) {
+    return signDb_().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction('photos', mode);
+        var store = tx.objectStore('photos');
+        var req = mode === 'readonly' ? store.get(key) : (value === undefined ? store.delete(key) : store.put(value, key));
+        req.onsuccess = function () { resolve(req.result); };
+        req.onerror = function () { reject(req.error); };
+      });
+    });
+  }
+  function applySignPhoto_(node, url) {
+    if (!node) return;
+    var img = node.querySelector('img');
+    var miss = node.querySelector('.sg-missing');
+    if (url && img) {
+      img.src = url;
+      img.hidden = false;
+      if (miss) miss.hidden = true;
+    } else if (img) {
+      img.removeAttribute('src');
+      img.hidden = true;
+      if (miss) miss.hidden = false;
+    }
+  }
+  function hydrateSignPhotos_() {
+    document.querySelectorAll('#signFit [data-sign-slot]').forEach(function (node) {
+      var slot = node.getAttribute('data-sign-slot');
+      var key = signBranch + '.' + slot;
+      var defaults = SIGN_DEFAULT_PHOTOS[signBranch] || {};
+      signIdb_('readonly', key).then(function (blob) {
+        var current = document.querySelector('#signFit [data-sign-slot="' + slot + '"]');
+        if (!current) return;
+        if (blob) {
+          if (signBlobUrls_[key]) URL.revokeObjectURL(signBlobUrls_[key]);
+          var url = URL.createObjectURL(blob);
+          signBlobUrls_[key] = url;
+          applySignPhoto_(current, url);
+          return;
+        }
+        applySignPhoto_(current, defaults[slot] || '');
+      }).catch(function () {
+        applySignPhoto_(document.querySelector('#signFit [data-sign-slot="' + slot + '"]'), (SIGN_DEFAULT_PHOTOS[signBranch] || {})[slot] || '');
+      });
+    });
+  }
+  function paintSignQr_() {
+    var img = document.querySelector('#signFit .sg-qr img');
+    if (!img || !signs) return Promise.resolve();
+    var url = String(signs[signBranch].qrUrl || '').trim();
+    if (!url) { img.removeAttribute('src'); return Promise.resolve(); }
+    return loadQrCode_().then(function (makeQr) {
+      var qr = makeQr(0, 'M');
+      qr.addData(url);
+      qr.make();
+      return qr.createDataURL(6, 0);
+    }).then(function (dataUrl) {
+      var current = document.querySelector('#signFit .sg-qr img');
+      if (current && dataUrl) current.src = dataUrl;
+    }).catch(function () {});
+  }
+  function flushSignEdits_() {
+    if (!signs) return;
+    var nodes = document.querySelectorAll('#signFit [data-sg]');
+    if (!nodes.length) return;
+    nodes.forEach(function (el) {
+      brochureSetPath_(signs[signBranch], el.getAttribute('data-sg'), brochureFieldText_(el));
+    });
+    saveSigns_();
+  }
+  function showSignView_() {
+    if (!signs) signs = loadSigns_();
+    flushSignEdits_();
+    if (consultBranch === 'yaksu' || consultBranch === 'incheon') signBranch = consultBranch;
+    bindSign_();
+    renderSignBoard_();
+  }
+  function signPx_(cm) { return Math.round(cm / 2.54 * SIGN_DPI); }
+  function fitRaster_(source, w, h) {
+    var c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    var g = c.getContext('2d');
+    g.imageSmoothingEnabled = true;
+    g.imageSmoothingQuality = 'high';
+    g.drawImage(source, 0, 0, w, h);
+    return c;
+  }
+  function captureNode_(node, scale, bg) {
+    var prev = node.style.transform;
+    node.style.transform = 'none';
+    node.style.position = 'fixed';
+    node.style.left = '-20000px';
+    node.style.top = '0';
+    function restore() {
+      node.style.transform = prev;
+      node.style.position = '';
+      node.style.left = '';
+      node.style.top = '';
+    }
+    return new Promise(function (resolve) {
+      requestAnimationFrame(function () { requestAnimationFrame(resolve); });
+    }).then(function () { return loadHtml2Canvas_(); }).then(function (h2c) {
+      return h2c(node, {
+        scale: scale,
+        backgroundColor: bg,
+        useCORS: true,
+        width: node.offsetWidth,
+        height: node.offsetHeight,
+        windowWidth: node.offsetWidth,
+        windowHeight: node.offsetHeight
+      });
+    }).then(function (canvas) {
+      restore();
+      return canvas;
+    }, function (err) {
+      restore();
+      throw err;
+    });
+  }
+  function saveSign_(kind) {
+    flushSignEdits_();
+    var status = $('signStatus');
+    var asPdf = kind === 'pdf';
+    if (status) status.textContent = asPdf ? 'PDF를 만드는 중…' : '이미지를 만드는 중…';
+    var label = signBranch === 'incheon' ? '인천' : '약수';
+    var board = document.querySelector('#signFit .sg-board');
+    if (!board) return;
+    var fonts = (document.fonts && document.fonts.load) ? document.fonts.load('900 40px SCDream').catch(function () {}) : Promise.resolve();
+    Promise.resolve(fonts).then(function () { return paintSignQr_(); }).then(function () {
+      var targetW = signPx_(60);
+      var scale = targetW / (board.offsetWidth || 1);
+      if (scale < 1) scale = 1;
+      if (scale > 2.2) scale = 2.2;
+      return captureNode_(board, scale, '#F7F4EE');
+    }).then(function (canvas) {
+      fitSignSheet_();
+      var sheet = fitRaster_(canvas, signPx_(60), signPx_(180));
+      var base = '입간판-' + label;
+      if (asPdf) {
+        return canvasCmykFlate(sheet).then(function (cmyk) {
+          planDownloadBlob(planBuildPdf([{ cmyk: cmyk, w: sheet.width, h: sheet.height }], bizhowsPt(60), bizhowsPt(180)), base + '.pdf');
+          if (status) status.textContent = base + '.pdf 를 저장했습니다. 60×180cm, ' + SIGN_DPI + 'dpi, CMYK입니다.';
+        });
+      }
+      triggerImageDownload(sheet.toDataURL('image/png'), base + '.png');
+      if (status) status.textContent = base + '.png 를 저장했습니다. 60×180cm, ' + SIGN_DPI + 'dpi입니다.';
+    }).catch(function () {
+      fitSignSheet_();
+      if (status) status.textContent = '파일을 만들지 못했습니다. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.';
+    });
+  }
+  function bindSign_() {
+    if (signBound) return;
+    signBound = true;
+    var fit = $('signFit');
+    if (!fit) return;
+    fit.addEventListener('focusout', function (e) {
+      var el = e.target.closest ? e.target.closest('[data-sg]') : null;
+      if (!el || !signs) return;
+      brochureSetPath_(signs[signBranch], el.getAttribute('data-sg'), brochureFieldText_(el));
+      el.textContent = brochureFieldText_(el);
+      saveSigns_();
+    });
+    fit.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        var edit = e.target.closest ? e.target.closest('[data-sg]') : null;
+        if (edit) e.preventDefault();
+      }
+    });
+    fit.addEventListener('click', function (e) {
+      var slotEl = e.target.closest ? e.target.closest('[data-sign-slot]') : null;
+      if (!slotEl) return;
+      if (e.target.closest && e.target.closest('.sg-edit')) return;
+      signPhotoTarget = slotEl;
+      $('signPhotoPick').click();
+    });
+    $('signPhotoPick').addEventListener('change', function () {
+      var file = this.files && this.files[0];
+      var slotEl = signPhotoTarget;
+      this.value = '';
+      if (!file || !slotEl) return;
+      var slot = slotEl.getAttribute('data-sign-slot');
+      var aspect = slotEl.clientHeight ? slotEl.clientWidth / slotEl.clientHeight : 1;
+      var key = signBranch + '.' + slot;
+      coverPhotoDataUrl(file, aspect).then(function (url) {
+        if (!url) return null;
+        return fetch(url).then(function (res) { return res.blob(); });
+      }).then(function (blob) {
+        if (!blob) return null;
+        return signIdb_('readwrite', key, blob);
+      }).then(function () { hydrateSignPhotos_(); }).catch(function () {
+        var status = $('signStatus');
+        if (status) status.textContent = '사진을 넣지 못했습니다.';
+      });
+    });
+    $('btnSignPng').addEventListener('click', function () { saveSign_('png'); });
+    $('btnSignPdf').addEventListener('click', function () { saveSign_('pdf'); });
+    $('btnSignReset').addEventListener('click', function () {
+      if (!signs) signs = loadSigns_();
+      signs[signBranch] = signDefaults_()[signBranch];
+      saveSigns_();
+      renderSignBoard_();
+      var status = $('signStatus');
+      if (status) status.textContent = '이 지점 문구를 처음 내용으로 되돌렸습니다.';
+    });
+  }
+
+  var PLAQUE_KEY = 'rm-plaque-v1';
+  var PLAQUE_DPI = 200;
+  var plaqueSize = 'a4';
+  var plaqueCopy = null;
+  var plaqueBound = false;
+  var PLAQUE_LOGO = '수료증/IFC학회 로고.png';
+  function plaqueDefaults_() {
+    return { en1: 'INTERNATIONAL', en2: 'FACE CORRECTION', ko: '국제얼굴교정학회', sub: '공식인증점' };
+  }
+  function loadPlaque_() {
+    var base = plaqueDefaults_();
+    try {
+      var saved = JSON.parse(localStorage.getItem(PLAQUE_KEY) || 'null');
+      if (saved && typeof saved === 'object') return mergeBrochure_(base, saved);
+    } catch (e) {}
+    return base;
+  }
+  function savePlaque_() {
+    try { localStorage.setItem(PLAQUE_KEY, JSON.stringify(plaqueCopy)); } catch (e) {}
+  }
+  function plaqueSpec_(size) {
+    if (size === 'a3') return { w: 42, h: 29.7, cls: 'pl-a3', layout: 'row', label: 'A3 가로 420×297mm' };
+    if (size === 'sq') return { w: 30, h: 30, cls: 'pl-sq', layout: 'stack', label: '정사각 300×300mm' };
+    if (size === 'sq-shop') return { w: 30, h: 30, cls: 'pl-sq shop-a', layout: 'shop-a', label: '인증샵 A 300×300mm' };
+    if (size === 'sq-shop-flip') return { w: 30, h: 30, cls: 'pl-sq shop-b', layout: 'shop-b', label: '인증샵 B 300×300mm' };
+    if (size === 'sq-shop-row') return { w: 30, h: 30, cls: 'pl-sq shop-c', layout: 'shop-c', label: '인증샵 C 300×300mm' };
+    return { w: 21, h: 29.7, cls: 'pl-a4', layout: 'portrait', label: 'A4 세로 210×297mm' };
+  }
+  function plaqueCopyHtml_() {
+    if (!plaqueCopy) plaqueCopy = loadPlaque_();
+    var c = plaqueCopy;
+    return '<div class="pl-en"><span class="pl-edit" contenteditable="true" spellcheck="false" data-pg="en1">' + escPrice_(c.en1) + '</span>' +
+      '<span class="pl-edit" contenteditable="true" spellcheck="false" data-pg="en2">' + escPrice_(c.en2) + '</span></div>' +
+      '<div class="pl-rule" aria-hidden="true"><i></i></div>' +
+      '<div class="pl-ko pl-edit" contenteditable="true" spellcheck="false" data-pg="ko">' + escPrice_(c.ko) + '</div>' +
+      '<div class="pl-sub pl-edit" contenteditable="true" spellcheck="false" data-pg="sub">' + escPrice_(c.sub) + '</div>';
+  }
+  function plaqueShopHtml_() {
+    return '<div class="pl-shop">NUON_WELL_BEAUTY_LAB_로고.png<br>없음</div>';
+  }
+  function renderPlaque_() {
+    var fit = $('plaqueFit');
+    var sizes = $('plaqueSizes');
+    if (!fit) return;
+    if (!plaqueCopy) plaqueCopy = loadPlaque_();
+    var spec = plaqueSpec_(plaqueSize);
+    var pins = '<span class="pl-pin tl"></span><span class="pl-pin tr"></span><span class="pl-pin bl"></span><span class="pl-pin br"></span>';
+    var logo = '<div class="pl-logo"><img src="' + PLAQUE_LOGO + '" alt="국제얼굴교정학회"></div>';
+    var copy = '<div class="pl-copy">' + plaqueCopyHtml_() + '</div>';
+    var inner = '';
+    if (spec.layout === 'row') inner = '<div class="pl-layout row">' + logo + copy + '</div>';
+    else if (spec.layout === 'shop-a') inner = '<div class="pl-layout stack"><div class="pl-unit">' + logo + copy + plaqueShopHtml_() + '</div></div>';
+    else if (spec.layout === 'shop-b') inner = '<div class="pl-layout stack"><div class="pl-unit">' + plaqueShopHtml_() + copy + logo + '</div></div>';
+    else if (spec.layout === 'shop-c') inner = '<div class="pl-layout stack"><div class="pl-unit"><div class="pl-pair">' + logo + '<span class="pl-div"></span>' + plaqueShopHtml_() + '</div>' + copy + '</div></div>';
+    else inner = '<div class="pl-layout portrait"><div class="pl-unit">' + logo + copy + '</div></div>';
+    fit.innerHTML = '<article class="pl-board ' + spec.cls + '">' + pins + inner + '</article>';
+    if (sizes) {
+      var opts = [
+        ['a3', 'A3'], ['a4', 'A4'], ['sq', '정사각'],
+        ['sq-shop', '샵 A'], ['sq-shop-flip', '샵 B'], ['sq-shop-row', '샵 C']
+      ];
+      sizes.innerHTML = opts.map(function (item) {
+        return '<button type="button" class="chip' + (item[0] === plaqueSize ? ' active' : '') + '" data-plaque-size="' + item[0] + '">' + item[1] + '</button>';
+      }).join('');
+    }
+    var status = $('plaqueStatus');
+    if (status && status.textContent.indexOf('저장') < 0) status.textContent = spec.label + ' · ' + PLAQUE_DPI + 'dpi';
+    fitPlaqueSheet_();
+    requestAnimationFrame(fitPlaqueSheet_);
+  }
+  function fitPlaqueSheet_() {
+    var fit = $('plaqueFit');
+    var board = fit && fit.querySelector('.pl-board');
+    if (!fit || !board || !fit.clientWidth) return;
+    board.style.transform = 'none';
+    var scale = fit.clientWidth / (board.offsetWidth || 1);
+    if (!scale || scale > 1) scale = 1;
+    board.style.transform = 'scale(' + scale + ')';
+    fit.style.height = Math.ceil(board.offsetHeight * scale) + 'px';
+  }
+  function flushPlaque_() {
+    if (!plaqueCopy) return;
+    document.querySelectorAll('#plaqueFit [data-pg]').forEach(function (el) {
+      brochureSetPath_(plaqueCopy, el.getAttribute('data-pg'), brochureFieldText_(el));
+    });
+    savePlaque_();
+  }
+  function showPlaqueView_() {
+    if (!plaqueCopy) plaqueCopy = loadPlaque_();
+    flushPlaque_();
+    bindPlaque_();
+    renderPlaque_();
+  }
+  function savePlaqueFile_(kind) {
+    flushPlaque_();
+    var status = $('plaqueStatus');
+    var spec = plaqueSpec_(plaqueSize);
+    var board = document.querySelector('#plaqueFit .pl-board');
+    if (!board) return;
+    if (status) status.textContent = kind === 'pdf' ? 'PDF를 만드는 중…' : '이미지를 만드는 중…';
+    var targetW = Math.round(spec.w / 2.54 * PLAQUE_DPI);
+    var targetH = Math.round(spec.h / 2.54 * PLAQUE_DPI);
+    var fonts = (document.fonts && document.fonts.load) ? document.fonts.load('700 48px "Cormorant Garamond"').catch(function () {}) : Promise.resolve();
+    Promise.resolve(fonts).then(function () {
+      var scale = targetW / (board.offsetWidth || 1);
+      if (scale < 1) scale = 1;
+      if (scale > 3) scale = 3;
+      return captureNode_(board, scale, '#ffffff');
+    }).then(function (canvas) {
+      fitPlaqueSheet_();
+      var sheet = fitRaster_(canvas, targetW, targetH);
+      var base = 'IFC현판-' + plaqueSize;
+      if (kind === 'pdf') {
+        return canvasCmykFlate(sheet).then(function (cmyk) {
+          planDownloadBlob(planBuildPdf([{ cmyk: cmyk, w: sheet.width, h: sheet.height }], bizhowsPt(spec.w), bizhowsPt(spec.h)), base + '.pdf');
+          if (status) status.textContent = base + '.pdf · ' + spec.label + ', ' + PLAQUE_DPI + 'dpi, CMYK';
+        });
+      }
+      triggerImageDownload(sheet.toDataURL('image/png'), base + '.png');
+      if (status) status.textContent = base + '.png · ' + spec.label + ', ' + PLAQUE_DPI + 'dpi';
+    }).catch(function () {
+      fitPlaqueSheet_();
+      if (status) status.textContent = '파일을 만들지 못했습니다. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.';
+    });
+  }
+  function bindPlaque_() {
+    if (plaqueBound) return;
+    plaqueBound = true;
+    var fit = $('plaqueFit');
+    if (!fit) return;
+    fit.addEventListener('focusout', function (e) {
+      var el = e.target.closest ? e.target.closest('[data-pg]') : null;
+      if (!el || !plaqueCopy) return;
+      brochureSetPath_(plaqueCopy, el.getAttribute('data-pg'), brochureFieldText_(el));
+      savePlaque_();
+    });
+    fit.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && e.target.closest && e.target.closest('[data-pg]')) e.preventDefault();
+    });
+    $('plaqueSizes').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-plaque-size]');
+      if (!b) return;
+      flushPlaque_();
+      plaqueSize = b.getAttribute('data-plaque-size');
+      renderPlaque_();
+    });
+    $('btnPlaquePng').addEventListener('click', function () { savePlaqueFile_('png'); });
+    $('btnPlaquePdf').addEventListener('click', function () { savePlaqueFile_('pdf'); });
+  }
+
   var appWhich = 'consult';
   var offerView = 'price';
   function setAppTab(which) {
@@ -9973,6 +10809,8 @@
     document.body.classList.toggle('mode-price', false);
     document.body.classList.toggle('offer-price', false);
     document.body.classList.toggle('offer-brochure', false);
+    document.body.classList.toggle('offer-sign', false);
+    document.body.classList.toggle('offer-plaque', false);
     document.body.classList.toggle('mode-receipt', which === 'receipt');
     document.body.classList.toggle('mode-docs', which === 'docs');
     $('panelConsult').classList.toggle('active', which === 'consult');
@@ -9981,6 +10819,8 @@
     $('panelPlan').classList.toggle('active', which === 'plan');
     $('panelPrice').classList.toggle('active', false);
     $('panelBrochure').classList.toggle('active', false);
+    if ($('panelSign')) $('panelSign').classList.toggle('active', false);
+    if ($('panelPlaque')) $('panelPlaque').classList.toggle('active', false);
     $('panelReceipt').classList.toggle('active', which === 'receipt');
     $('panelDocs').classList.toggle('active', which === 'docs');
     $('appTabConsult').classList.toggle('active', which === 'consult');
@@ -9992,7 +10832,7 @@
     if (linkBtn) linkBtn.classList.toggle('active', which === 'links');
     if (docsBtn) docsBtn.classList.toggle('active', which === 'docs');
     $('pageTitle').textContent = which === 'consult' ? '상담 메뉴얼' : which === 'links' ? '링크 모음' : which === 'unbooked' ? '미예약 확인' : which === 'plan' ? '포스터·제안서' : which === 'receipt' ? '영문 영수증' : '세금 서류';
-    $('pageSub').textContent = which === 'plan' ? '약수·인천은 가격표, 브로셔, 리얼무브먼트·리얼페이스입니다. 과정은 포스터, 수료증, 제안서입니다.' : which === 'receipt' ? '발급 기관을 고른 뒤 항목을 입력하세요' : '프리랜서를 고른 뒤 지급액을 입력하세요';
+    $('pageSub').textContent = which === 'plan' ? '약수·인천은 가격표, 브로셔, 입간판, 리얼무브먼트·리얼페이스입니다. 과정은 포스터, 수료증, 제안서, IFC 현판입니다.' : which === 'receipt' ? '발급 기관을 고른 뒤 항목을 입력하세요' : '프리랜서를 고른 뒤 지급액을 입력하세요';
     syncShell();
     if (which === 'receipt') {
       if (receiptPrefillFromQuery && !receiptPrefillApplied) {
@@ -10017,8 +10857,10 @@
     if (!show) return;
     var academy = isAcademyBranch();
     var items = academy
-      ? [{ id: 'poster', label: '포스터' }, { id: 'cert', label: '수료증' }, { id: 'proposal', label: '제안서' }]
-      : [{ id: 'price', label: '가격표' }, { id: 'brochure', label: '브로셔' }, { id: 'movement', label: '리얼무브먼트' }, { id: 'face', label: '리얼페이스' }];
+      ? (consultBranch === 'ifc'
+        ? [{ id: 'poster', label: '포스터' }, { id: 'cert', label: '수료증' }, { id: 'proposal', label: '제안서' }, { id: 'plaque', label: '현판' }]
+        : [{ id: 'poster', label: '포스터' }, { id: 'cert', label: '수료증' }, { id: 'proposal', label: '제안서' }])
+      : [{ id: 'price', label: '가격표' }, { id: 'brochure', label: '브로셔' }, { id: 'sign', label: '입간판' }, { id: 'movement', label: '리얼무브먼트' }, { id: 'face', label: '리얼페이스' }];
     var allowed = items.some(function (item) { return item.id === offerView; });
     if (!allowed) offerView = items[0].id;
     nav.innerHTML = items.map(function (item) {
@@ -10039,26 +10881,39 @@
     var academy = isAcademyBranch();
     var showPrice = !academy && offerView === 'price';
     var showBrochure = !academy && offerView === 'brochure';
+    var showSign = !academy && offerView === 'sign';
+    var showPlaque = academy && consultBranch === 'ifc' && offerView === 'plaque';
     if ($('pageSub')) {
-      $('pageSub').textContent = showBrochure
-        ? '글자와 사진을 브로셔에서 누르면 바로 고칩니다. 고친 내용은 이 브라우저에 남습니다.'
-        : (showPrice
-          ? '금액을 고친 뒤 PNG로 받으세요. 고친 내용은 이 브라우저에 남습니다.'
-          : (academy
-            ? '과정은 포스터, 수료증, 제안서입니다.'
-            : '리얼무브먼트와 리얼페이스는 포스터, 제안서, 프로그램입니다.'));
+      var sub = '리얼무브먼트와 리얼페이스는 포스터, 제안서, 프로그램입니다.';
+      if (showPlaque) sub = '공식인증점 현판입니다. 규격을 고른 뒤 PNG 또는 PDF로 받으세요.';
+      else if (showSign) sub = '글자와 사진을 입간판에서 누르면 바로 고칩니다. 단면 60×180cm입니다.';
+      else if (showBrochure) sub = '글자와 사진을 브로셔에서 누르면 바로 고칩니다. 고친 내용은 이 브라우저에 남습니다.';
+      else if (showPrice) sub = '금액을 고친 뒤 PNG로 받으세요. 고친 내용은 이 브라우저에 남습니다.';
+      else if (academy) sub = consultBranch === 'ifc' ? '과정은 포스터, 수료증, 제안서, 현판입니다.' : '과정은 포스터, 수료증, 제안서입니다.';
+      $('pageSub').textContent = sub;
     }
     document.body.classList.toggle('offer-price', showPrice);
     document.body.classList.toggle('offer-brochure', showBrochure);
-    $('panelPlan').classList.toggle('active', !showPrice && !showBrochure);
+    document.body.classList.toggle('offer-sign', showSign);
+    document.body.classList.toggle('offer-plaque', showPlaque);
+    $('panelPlan').classList.toggle('active', !showPrice && !showBrochure && !showSign && !showPlaque);
     $('panelPrice').classList.toggle('active', showPrice);
     if ($('panelBrochure')) $('panelBrochure').classList.toggle('active', showBrochure);
+    if ($('panelSign')) $('panelSign').classList.toggle('active', showSign);
+    if ($('panelPlaque')) $('panelPlaque').classList.toggle('active', showPlaque);
     var empty = $('planAcademyEmpty');
     var tools = document.querySelector('#panelPlan .plan-tools');
     var seed = $('planSeed');
     if (academy) {
       if (tools) tools.hidden = true;
       if (seed) seed.hidden = true;
+      if (showPlaque) {
+        if (empty) empty.hidden = true;
+        if ($('posterCard')) $('posterCard').hidden = true;
+        if ($('certPanel')) $('certPanel').hidden = true;
+        showPlaqueView_();
+        return;
+      }
       if (empty) {
         empty.hidden = offerView !== 'proposal';
         var text = $('planAcademyEmptyText');
@@ -10083,6 +10938,10 @@
     }
     if (showBrochure) {
       showBrochureView_();
+      return;
+    }
+    if (showSign) {
+      showSignView_();
       return;
     }
     var id = offerView === 'face' ? 'face' : 'movement';
@@ -12188,6 +13047,8 @@
     if (document.body.classList.contains('mode-receipt')) fitPreview();
     if (document.body.classList.contains('offer-price')) fitPriceSheet_();
     if (document.body.classList.contains('offer-brochure')) fitBrochureSheet_();
+    if (document.body.classList.contains('offer-sign')) fitSignSheet_();
+    if (document.body.classList.contains('offer-plaque')) fitPlaqueSheet_();
     if (document.body.classList.contains('mode-plan') && planPart === 'proposal') mountPlanHits_();
   });
   var pageTitle = document.title;
