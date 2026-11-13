@@ -51,6 +51,29 @@ assert.strictEqual(api.memberChipToneClassFromSess_('10/10', { cancelled: true }
 assert.strictEqual(api.memberChipToneClassFromSess_('취소'), '');
 assert.strictEqual(api.memberChipToneClassFromSess_(''), '');
 
+// 기준은 '오늘 출석 전' 남은 회차. 출석 전 2회 남으면 노랑, 1회(이하) 남으면 빨강.
+// 6/8 출석 전 → 2회 남음 → 노랑. 7/8 출석 전 → 1회 남음 → 빨강. 8/8 출석 전 → 0회 → 빨강.
+assert.strictEqual(api.memberChipToneClassFromSess_('6/8', { pendingAttend: true }), 'tone-last-1');
+assert.strictEqual(api.memberChipToneClassFromSess_('7/8', { pendingAttend: true }), 'tone-last');
+assert.strictEqual(api.memberChipToneClassFromSess_('8/8', { pendingAttend: true }), 'tone-last');
+// 출석 처리 후에도 출석 전 색을 그대로 유지. 출석된 칩은 사용회차-1을 출석 전 값으로 본다.
+// 7/8 출석 후 → 출석 전 6/8(2회 남음) → 노랑. 8/8 출석 후 → 출석 전 7/8(1회 남음) → 빨강.
+assert.strictEqual(api.memberChipToneClassFromSess_('6/8'), '');
+assert.strictEqual(api.memberChipToneClassFromSess_('7/8'), 'tone-last-1');
+assert.strictEqual(api.memberChipToneClassFromSess_('7/8', { pendingAttend: false }), 'tone-last-1');
+assert.strictEqual(api.memberChipToneClassFromSess_('8/8'), 'tone-last');
+// 결석은 회색 우선.
+assert.strictEqual(api.memberChipToneClassFromSess_('6/8', { pendingAttend: true, absent: true }), '');
+assert.strictEqual(api.memberChipToneClassFromSess_('7/8', { pendingAttend: true, absent: true }), '');
+assert.strictEqual(api.memberChipToneClassFromSess_('8/8', { absent: true }), '');
+assert.strictEqual(api.memberChipToneClassFromSess_('6/8', { pendingAttend: true, cancelled: true }), '');
+
+assert.match(
+  html,
+  /function memberChipCountsPendingVisit_\(m\) \{\s*if \(!m \|\| isMemberAbsent\(m\) \|\| isMemberCompleted\(m\)\) return false;/
+);
+assert.match(html, /pendingAttend:\s*memberChipCountsPendingVisit_\(m\)/);
+
 assert.match(html, /\.member-chip\.tone-last-1\s*\{[^}]*background:\s*#f6e27a\s*!important/);
 assert.match(html, /\.member-chip\.tone-last\s*\{[^}]*background:\s*#f4b4b4\s*!important/);
 assert.match(html, /color:\s*#1a1a1a\s*!important/);

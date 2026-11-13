@@ -525,11 +525,13 @@
     .member-chip .sess-ph { visibility:hidden; }
     .member-chip.search-selected { outline: 2px dashed var(--zone-members); outline-offset: 1px; }
     /* 남은 회차 톤. 칩의 .sess 가 current/total 일 때만 붙인다.
-       tone-last-1: current == total - 1 (한 회 남음) #f6e27a
-       tone-last: current >= total (마지막·초과) #f4b4b4
+       기준은 '오늘 출석 전' 남은 회차. 칩에 적힌 숫자는 바꾸지 않는다.
+       출석 전 2회 남으면 노랑(tone-last-1) #f6e27a, 1회(이하) 남으면 빨강(tone-last) #f4b4b4.
+       출석 처리 후에도 출석 전 색을 그대로 유지한다.
+       출석된 칩은 사용회차-1을 출석 전 값으로 본다.
        글자는 #1a1a1a. 강사 색은 인라인 background라 !important 로만 덮인다.
        .done 취소선, .sess-note, .on, .dual-partial, .search-selected 는 건드리지 않는다.
-       결석(.absent)은 노랑/빨강보다 회색(#d9d9d9, 테두리 #bdbdbd, 글자 #555)이 우선이다.
+       결석은 회색 우선이다(.absent, #d9d9d9, 테두리 #bdbdbd, 글자 #555).
        결석 칩은 톤 유무와 관계없이 같은 회색이다. 만들 때 톤 클래스를 안 붙이고,
        같이 있어도 아래 규칙이 회색을 유지한다. 취소선과 .on 선택 테두리는 그대로다.
        취소·상담처럼 회차 비가 아닌 문구(.sess-note)는 클래스를 붙이지 않아 취소선만 남긴다. */
@@ -9753,8 +9755,12 @@
       return '';
     }
 
-    /* 칩 .sess 의 current/total 로 톤 클래스를 고른다.
-       absent: 결석. 노랑/빨강 대신 회색을 쓰려고 빈 문자열.
+    /* 기준은 '오늘 출석 전' 남은 회차. 칩에 적힌 숫자는 바꾸지 않는다.
+       출석 전 2회 남으면 노랑(tone-last-1), 1회(이하) 남으면 빨강(tone-last).
+       출석 처리 후에도 출석 전 색을 그대로 유지한다.
+       출석된 칩(pendingAttend 없음)은 사용회차-1을 출석 전 값으로 본다.
+       pendingAttend: 아직 출석·결석 처리 전(취소선 없음). 표시 사용회차가 출석 전 값.
+       absent: 결석은 회색 우선. 노랑/빨강을 붙이지 않는다.
        cancelled: 취소·상담 등 회차 비가 아닌 상태(.sess-note). 취소선만 남긴다.
        출석 완료(.done) 취소선은 여기서 지우지 않고, CSS가 그대로 그린다. */
     function memberChipToneClassFromSess_(sessText, opts) {
@@ -9762,7 +9768,13 @@
       if (opts.absent || opts.cancelled) return '';
       var ratio = parseChipRatio_(sessText);
       if (!ratio) return '';
-      return scheduleChipToneClass_(ratio.current, ratio.total);
+      var usedBefore = ratio.current;
+      if (!opts.pendingAttend) usedBefore -= 1;
+      var remainBefore = ratio.total - usedBefore;
+      if (!isFinite(remainBefore) || ratio.total <= 0) return '';
+      if (remainBefore <= 1) return 'tone-last';
+      if (remainBefore === 2) return 'tone-last-1';
+      return '';
     }
     /* schedule-chip-tone:end */
 
@@ -9776,6 +9788,15 @@
       return parts.filter(Boolean).join(' · ');
     }
 
+    /** 오늘 예약인데 아직 출석·결석 처리 전(취소선 없음).
+        출석 여부는 취소선과 같은 isMemberCompleted·isMemberAbsent.
+        출석 처리 후에는 사용회차-1을 출석 전 값으로 보아 출석 전 색을 유지한다. */
+    function memberChipCountsPendingVisit_(m) {
+      if (!m || isMemberAbsent(m) || isMemberCompleted(m)) return false;
+      if (m.isSearchSelected && !isTodayScheduledMember_(m)) return false;
+      return true;
+    }
+
     function buildMemberChipButtonHtml_(m, opts) {
       opts = opts || {};
       var key = memberKey(m);
@@ -9787,7 +9808,8 @@
       if (cancelledSess) sessClass += ' sess-note';
       var toneCls = memberChipToneClassFromSess_(sessRaw, {
         absent: isMemberAbsent(m),
-        cancelled: cancelledSess
+        cancelled: cancelledSess,
+        pendingAttend: memberChipCountsPendingVisit_(m)
       });
       var chipName = String(m.name || '').trim();
       var timeTag = m.time
