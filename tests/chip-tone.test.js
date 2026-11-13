@@ -4,13 +4,13 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const htmlPath = path.join(__dirname, '..', '강사앱.html');
+const htmlPath = path.join(__dirname, '..', 'index.html');
 const html = fs.readFileSync(htmlPath, 'utf8');
 const startMark = '/* schedule-chip-tone:start */';
 const endMark = '/* schedule-chip-tone:end */';
 const start = html.indexOf(startMark);
 const end = html.indexOf(endMark);
-assert.ok(start !== -1 && end > start, '강사앱.html에 회차 톤 함수가 있어야 한다');
+assert.ok(start !== -1 && end > start, 'index.html에 회차 톤 함수가 있어야 한다');
 
 const source = html.slice(start + startMark.length, end);
 const api = new Function(
