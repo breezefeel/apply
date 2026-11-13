@@ -9213,7 +9213,8 @@
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
     }
-    var BOARD_AUTO_SYNC_IDLE_MS = 12 * 60 * 1000;
+    /** 보이는 동안 마지막 보드 동기화 후 자동으로 다시 받는 간격 */
+    var BOARD_AUTO_SYNC_IDLE_MS = 10 * 60 * 1000;
     var _loadCountdownTimer = null;
     var _loadCountdownStartedAt = 0;
     var _loadCountdownActive = false;
@@ -9221,6 +9222,7 @@
     var _boardLoadAbort = null;
     var _boardLoadGen = 0;
     var _boardSyncInFlight = false;
+    var _boardAutoSyncTimer = null;
 
     function clearLoadCountdown() {
       _loadCountdownActive = false;
@@ -10572,6 +10574,7 @@
                 boardDateLineText_(state.board, requestYmd, '');
             } catch (ignoreLine) {}
           }
+          scheduleNextBoardAutoSync_();
         }
       }
     }
@@ -10598,6 +10601,66 @@
       return false;
     }
 
+    /* board-auto-sync:start */
+    function boardAutoSyncWaitMs_(lastBoardSyncAt, now, idleMs) {
+      if (!lastBoardSyncAt) return idleMs;
+      var remain = lastBoardSyncAt + idleMs - now;
+      if (remain > 0) return remain;
+      // 이미 지났는데 이번 차례를 건너뛰면 0ms로 다시 돌지 않게 한 간격을 더 기다린다.
+      return idleMs;
+    }
+
+    function planBoardAutoSyncTick_(ctx) {
+      if (!ctx || ctx.visible !== true) return { load: false, schedule: false, waitMs: 0 };
+      var idleMs = ctx.idleMs;
+      var elapsed = ctx.now - (ctx.lastBoardSyncAt || 0);
+      var due = elapsed >= idleMs;
+      if (due && ctx.canSync && !ctx.inputBusy) return { load: true, schedule: false, waitMs: 0 };
+      return {
+        load: false,
+        schedule: true,
+        waitMs: boardAutoSyncWaitMs_(ctx.lastBoardSyncAt || 0, ctx.now, idleMs),
+      };
+    }
+
+    function boardAutoSyncFieldBlocks_(tag, type, opts) {
+      opts = opts || {};
+      if (opts.searchPending || opts.searchFocused) return true;
+      tag = String(tag || '').toUpperCase();
+      if (tag === 'TEXTAREA' || tag === 'SELECT') return true;
+      if (tag === 'INPUT') {
+        var t = String(type || 'text').toLowerCase();
+        if (t === 'checkbox' || t === 'radio' || t === 'button' || t === 'submit' || t === 'reset' || t === 'hidden' || t === 'file') return false;
+        return true;
+      }
+      if (opts.contentEditable) return true;
+      return false;
+    }
+    /* board-auto-sync:end */
+
+    function isBoardAutoSyncInputBusy_() {
+      var active = document.activeElement;
+      var search = document.getElementById('memberSearchInput');
+      var searchFocused = !!(search && active && active === search);
+      var usable = active && active !== document.body && active !== document.documentElement;
+      return boardAutoSyncFieldBlocks_(usable ? active.tagName : '', usable ? active.type : '', {
+        searchPending: !!state._memberSearchTimer,
+        searchFocused: searchFocused,
+        contentEditable: !!(usable && active.isContentEditable),
+      });
+    }
+
+    function boardAutoSyncContext_(now) {
+      return {
+        visible: document.visibilityState === 'visible',
+        canSync: canAutoSyncBoard(),
+        inputBusy: isBoardAutoSyncInputBusy_(),
+        lastBoardSyncAt: state.lastBoardSyncAt || 0,
+        now: now,
+        idleMs: BOARD_AUTO_SYNC_IDLE_MS,
+      };
+    }
+
     function canAutoSyncBoard() {
       if (!state.pin) return false;
       if (document.getElementById('pinOverlay').classList.contains('open')) return false;
@@ -10608,10 +10671,32 @@
     }
 
     function tryAutoSyncBoard() {
-      if (!canAutoSyncBoard()) return;
-      var elapsed = Date.now() - (state.lastBoardSyncAt || 0);
-      if (elapsed < BOARD_AUTO_SYNC_IDLE_MS) return;
+      var plan = planBoardAutoSyncTick_(boardAutoSyncContext_(Date.now()));
+      if (!plan.load) return false;
       loadBoard({ silent: true });
+      return true;
+    }
+
+    function scheduleNextBoardAutoSync_(waitMs) {
+      if (_boardAutoSyncTimer) {
+        clearTimeout(_boardAutoSyncTimer);
+        _boardAutoSyncTimer = null;
+      }
+      var wait = typeof waitMs === 'number'
+        ? waitMs
+        : boardAutoSyncWaitMs_(state.lastBoardSyncAt || 0, Date.now(), BOARD_AUTO_SYNC_IDLE_MS);
+      if (!(wait > 0)) wait = BOARD_AUTO_SYNC_IDLE_MS;
+      _boardAutoSyncTimer = setTimeout(runBoardAutoSyncTimer_, wait);
+    }
+
+    function runBoardAutoSyncTimer_() {
+      _boardAutoSyncTimer = null;
+      var plan = planBoardAutoSyncTick_(boardAutoSyncContext_(Date.now()));
+      if (plan.load) {
+        loadBoard({ silent: true });
+        return;
+      }
+      if (plan.schedule) scheduleNextBoardAutoSync_(plan.waitMs);
     }
 
     function renderMemberChips() {
@@ -17265,14 +17350,14 @@
         paintMemberLoadCountdown();
         tickAttendProcessingCountdown_();
         paintEvalSubmitCountdown_();
-        tryAutoSyncBoard();
+        if (!tryAutoSyncBoard() && !_boardAutoSyncTimer) scheduleNextBoardAutoSync_();
       }
     });
     window.addEventListener('focus', function() {
       paintMemberLoadCountdown();
       tickAttendProcessingCountdown_();
       paintEvalSubmitCountdown_();
-      tryAutoSyncBoard();
+      if (!tryAutoSyncBoard() && !_boardAutoSyncTimer) scheduleNextBoardAutoSync_();
     });
     refreshSectionCollapseDefaults();
     paintInstructorBuildBadge_();
