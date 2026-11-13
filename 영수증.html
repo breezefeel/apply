@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="리얼무브먼트_링크_로고.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700&family=Great+Vibes&family=Italianno&family=Montserrat:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Great+Vibes&family=Italianno&family=Montserrat:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
   :root {
@@ -108,6 +108,7 @@
   body.mode-links .app { max-width: 1040px; }
   body.mode-plan .app { max-width: 920px; }
   body.mode-plan.offer-price .app { max-width: 980px; }
+  body.mode-plan.offer-brochure .app { max-width: 1280px; }
 
   .app-tabs {
     display: flex; gap: 6px;
@@ -415,7 +416,8 @@
   body.mode-unbooked .receipt-dock,
   body.mode-docs .receipt-dock,
   body.mode-plan .receipt-dock,
-  body.mode-plan.offer-price .receipt-dock { display: none; }
+  body.mode-plan.offer-price .receipt-dock,
+  body.mode-plan.offer-brochure .receipt-dock { display: none; }
   .unbooked-hd {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
@@ -1113,6 +1115,9 @@
     body:not(.printing-docs):not(.printing-plan) #panelPlan,
     body:not(.printing-docs):not(.printing-plan) #panelUnbooked,
     body:not(.printing-docs):not(.printing-plan) #panelPrice,
+    body:not(.printing-docs):not(.printing-plan) #panelBrochure,
+    body:not(.printing-docs):not(.printing-plan) #panelSign,
+    body:not(.printing-docs):not(.printing-plan) #panelPlaque,
     body:not(.printing-docs):not(.printing-plan) .app-tabs { display: none !important; }
     body:not(.printing-docs):not(.printing-plan) #panelReceipt { display: block !important; }
     body.printing-plan .head,
@@ -1122,6 +1127,9 @@
     body.printing-plan #panelLinks,
     body.printing-plan #panelUnbooked,
     body.printing-plan #panelPrice,
+    body.printing-plan #panelBrochure,
+    body.printing-plan #panelSign,
+    body.printing-plan #panelPlaque,
     body.printing-plan #panelReceipt,
     body.printing-plan #panelDocs,
     body.printing-plan .receipt-dock { display: none !important; }
@@ -1142,6 +1150,9 @@
     body.printing-docs #panelConsult,
     body.printing-docs #panelLinks,
     body.printing-docs #panelPrice,
+    body.printing-docs #panelBrochure,
+    body.printing-docs #panelSign,
+    body.printing-docs #panelPlaque,
     body.printing-docs #panelReceipt,
     body.printing-docs .receipt-dock,
     body.printing-docs .doc-screen { display: none !important; }
@@ -1524,6 +1535,477 @@
   @media (max-width: 860px) {
     #panelPrice .price-wrap { grid-template-columns: 1fr; }
   }
+
+  #panelBrochure .brochure-wrap {
+    display: grid;
+    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+  #panelBrochure .brochure-tools { margin-bottom: 0; }
+  #panelBrochure .brochure-stage { min-width: 0; }
+  #panelBrochure .brochure-sides { margin: 0 0 10px; }
+  #panelBrochure .brochure-qr-label {
+    display: flex; flex-direction: column; gap: 4px;
+    margin-top: 14px; font-size: 11px; font-weight: 800; color: var(--mute);
+  }
+  #panelBrochure .brochure-qr-label input {
+    width: 100%; border: 1.5px solid #d7d0c4; border-radius: 10px;
+    padding: 8px 10px; font-size: 13px; font-weight: 650; color: var(--ink); background: #fff;
+  }
+  #panelBrochure .brochure-hides {
+    display: flex; flex-direction: column; gap: 6px; margin-top: 14px;
+  }
+  #panelBrochure .brochure-hide {
+    display: flex; align-items: flex-start; gap: 6px;
+    font-size: 13px; font-weight: 750; color: var(--ink); line-height: 1.35;
+  }
+  #panelBrochure .brochure-hide input { margin-top: 2px; }
+  .brochure-fit {
+    width: 100%;
+    min-width: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .brochure-sheet {
+    width: 297mm;
+    height: 210mm;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    position: relative;
+    background: #000;
+    transform-origin: top left;
+    overflow: hidden;
+    color: #1f1b18;
+    font-family: Pretendard, "Apple SD Gothic Neo", sans-serif;
+  }
+  .brochure-sheet[hidden] { display: none !important; }
+  .bpanel {
+    width: auto;
+    height: 100%;
+    min-width: 0;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  .bpanel-black { background: #000; color: #f6f4ed; }
+  .bpanel-ivory { background: #f6f4ed; color: #1f1b18; }
+  .brochure-fold {
+    position: absolute;
+    top: 0; bottom: 0;
+    border-left: 1.25px dashed rgba(194, 161, 89, .9);
+    z-index: 6;
+    pointer-events: none;
+  }
+  .b-edit { cursor: text; min-width: 0; }
+  .b-edit:hover, .b-edit:focus {
+    outline: 2px solid #c2a159;
+    outline-offset: 1px;
+    border-radius: 2px;
+  }
+  .b-serif {
+    font-family: "Cormorant Garamond", "Times New Roman", serif;
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+  }
+  .b-script {
+    font-family: "Cormorant Garamond", "Times New Roman", serif;
+    font-style: italic;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #c2a159;
+    font-size: 34px;
+    line-height: 1;
+  }
+  .b-kicker { color: #c2a159; font-size: 13px; line-height: 1; }
+  .b-title { font-weight: 800; letter-spacing: -.03em; line-height: 1.28; }
+  .b-body { font-weight: 500; line-height: 1.5; }
+  .bphoto {
+    background: #c8c0b4;
+    color: #3f3a34;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .bphoto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bphoto.has-photo img { position: absolute; inset: 0; }
+  .bphoto:not(.has-photo) { box-shadow: inset 0 0 0 1px rgba(31,27,24,.14); }
+  .bcover .bphoto:not(.has-photo) { background: #2a2a2a; box-shadow: none; color: #d5d0c8; }
+  .bphoto-hint {
+    position: relative; z-index: 1; font-size: 13px; font-weight: 800;
+    text-align: center; padding: 8px; line-height: 1.35; pointer-events: none;
+  }
+  .bphoto-revert {
+    position: absolute; top: 6px; right: 6px; z-index: 3;
+    background: rgba(255,252,248,.94); color: #1f1b18;
+    border: 0; border-radius: 999px; font-size: 11px; font-weight: 800;
+    padding: 4px 8px; cursor: pointer;
+  }
+  .bflap, .bindesign { display: flex; flex-direction: column; height: 100%; padding: 7mm 5.5mm 5.5mm; }
+  .bflap .b-title, .bindesign .b-title { font-size: 22px; margin-top: 12px; color: #fff; }
+  .bflap .b-lead, .bindesign .b-lead { margin-top: 10px; font-size: 12.5px; line-height: 1.55; color: #f3efe6; font-weight: 500; }
+  .b-who-label { margin-top: 14px; color: #c2a159; font-size: 13px; font-weight: 800; }
+  .b-who, .b-hours ul, .bcred { list-style: none; margin: 0; padding: 0; }
+  .b-who { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+  .b-who li, .b-hours li, .bcred li { position: relative; }
+  .b-who li { padding-left: 14px; font-size: 12.5px; line-height: 1.4; font-weight: 550; }
+  .b-who li:before, .b-hours li:before {
+    content: ""; position: absolute; left: 0; top: .5em;
+    width: 6px; height: 6px; border-radius: 50%; background: #c2a159;
+  }
+  .bflap-box {
+    margin-top: auto;
+    background: #141414;
+    border-left: 3px solid #c2a159;
+    padding: 12px 12px 12px 14px;
+  }
+  .bflap-box .b-boxtitle { font-size: 16px; font-weight: 800; color: #fff; }
+  .btag {
+    display: inline-block; margin-top: 6px;
+    background: #c2a159; color: #1f1b18;
+    font-size: 10px; font-weight: 800; letter-spacing: -.01em;
+    padding: 2px 6px; border-radius: 2px; line-height: 1.35;
+  }
+  .btag:empty { display: none; }
+  .bflap-box .b-boxline { margin-top: 6px; font-size: 12px; line-height: 1.4; color: #f6f4ed; font-weight: 550; }
+  .bback { display: flex; flex-direction: column; background: #f6f4ed; }
+  .bback-photo { flex: 0 0 68mm; height: 68mm; width: 100%; }
+  .bback-body {
+    flex: 1 1 auto; min-height: 0;
+    display: flex; flex-direction: column; gap: 7px;
+    padding: 4mm 4.5mm 3mm;
+  }
+  .bback-name { font-size: 18px; font-weight: 800; letter-spacing: -.03em; line-height: 1.25; }
+  .bback-tag { font-size: 12.5px; font-weight: 650; color: #3f3933; }
+  .b-hours { background: #efebe3; border-radius: 10px; padding: 8px 10px 9px; }
+  .b-hours-label { color: #a68445; font-size: 11.5px; font-weight: 800; }
+  .b-hours ul { margin-top: 5px; display: flex; flex-direction: column; gap: 3px; }
+  .b-hours li { padding-left: 14px; font-size: 12px; line-height: 1.35; font-weight: 650; }
+  .b-address { font-size: 12px; line-height: 1.45; font-weight: 650; color: #1f1b18; }
+  .b-foot { font-size: 11px; line-height: 1.35; color: #5c564e; font-weight: 650; min-height: 1em; }
+  .b-foot:empty:before { content: "한 줄 추가"; color: rgba(31,27,24,.35); font-weight: 650; }
+  .brochure-sheet.is-exporting .b-foot:empty { display: none; }
+  .bback-contact {
+    flex: 0 0 auto;
+    background: #000; color: #f6f4ed;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 3.2mm 4mm;
+  }
+  .bback-contact .b-clabel { font-size: 11px; font-weight: 700; color: #c2a159; }
+  .bback-contact .b-phone { margin-top: 2px; font-size: 16px; font-weight: 800; letter-spacing: -.02em; color: #fff; }
+  .bback-contact .b-cnote { margin-top: 1px; font-size: 11px; font-weight: 550; color: #f3efe6; }
+  .bqr { width: 22mm; height: 22mm; background: #fff; padding: 1.2mm; flex: 0 0 auto; }
+  .bqr img { width: 100%; height: 100%; object-fit: contain; display: block; background: #fff; }
+  .bcover { background: #2a2a2a; }
+  .bcover .bphoto { position: absolute; inset: 0; background: #2a2a2a; color: #c8c2b8; }
+  .bcover-copy {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+    padding: 16mm 4.5mm 6mm;
+    background: linear-gradient(to top, rgba(0,0,0,.9) 0%, rgba(0,0,0,.62) 46%, rgba(0,0,0,0) 100%);
+    color: #fff;
+    pointer-events: none;
+  }
+  .bcover-copy .b-edit { pointer-events: auto; }
+  .bcover-region { color: #c2a159; font-size: 12px; letter-spacing: .18em; }
+  .b-brand {
+    margin-top: 4px;
+    font-family: "Cormorant Garamond", "Times New Roman", serif;
+    font-weight: 700; font-size: 40px; line-height: .92;
+    letter-spacing: .04em; text-transform: uppercase; color: #fff;
+    white-space: pre-line;
+  }
+  .bcover-keys { margin-top: 8px; color: #c2a159; font-size: 12px; font-weight: 700; line-height: 1.35; }
+  .bcover-line { margin-top: 6px; font-size: 14px; font-weight: 750; line-height: 1.35; color: #fff; }
+  .b-summary { margin-top: 8px; font-size: 13px; font-weight: 800; color: #fff; }
+  .bsteps { margin-top: 6px; display: flex; flex-direction: column; justify-content: space-evenly; gap: 8px; flex: 1; }
+  .bstep { display: flex; gap: 8px; align-items: flex-start; }
+  .bstep-ico {
+    width: 28px; height: 28px; border-radius: 50%; flex: 0 0 auto;
+    border: 1.5px solid #c2a159; display: flex; align-items: center; justify-content: center;
+  }
+  .bstep-ico svg { width: 16px; height: 16px; display: block; }
+  .bstep-title { font-size: 12.5px; font-weight: 800; color: #fff; line-height: 1.3; }
+  .bstep-body { margin-top: 1px; font-size: 11.5px; line-height: 1.35; color: #e6e0d6; font-weight: 500; }
+  .bprog-panel { display: flex; flex-direction: column; height: 100%; padding: 4.5mm 3.8mm 3.5mm; background: #f6f4ed; }
+  .bprog-hd { font-size: 16px; font-weight: 800; letter-spacing: -.03em; }
+  .bprog-list { flex: 1; display: flex; flex-direction: column; min-height: 0; margin-top: 2px; }
+  .bprog {
+    flex: 1 1 auto; display: flex; gap: 6px; align-items: center;
+    min-height: 0; padding: 1.5mm 0;
+    border-top: 1px solid rgba(31,27,24,.1);
+  }
+  .bprog-copy { flex: 1; min-width: 0; }
+  .bprog-no { color: #c2a159; font-size: 12px; font-weight: 800; letter-spacing: .04em; }
+  .bprog-title { font-size: 13px; font-weight: 800; line-height: 1.25; letter-spacing: -.02em; }
+  .bprog .btag { margin: 2px 0 0; }
+  .bprog-body { margin-top: 2px; font-size: 10.5px; line-height: 1.35; font-weight: 550; color: #3a342e; }
+  .bprog-side { width: 28mm; flex: 0 0 28mm; display: flex; flex-direction: column; align-items: stretch; }
+  .bprog-photo { width: 28mm; height: 18mm; }
+  .bprog-photo .bphoto-hint { font-size: 10px; }
+  .bcap { margin-top: 2px; font-size: 9.5px; line-height: 1.25; text-align: center; color: #5c564e; font-weight: 650; }
+  .bcap:empty { display: none; }
+  .bnote { margin-top: 2px; font-size: 9.5px; line-height: 1.3; color: #5c564e; font-weight: 600; }
+  .bdir { display: flex; flex-direction: column; height: 100%; padding: 5mm 4.2mm 4mm; background: #f6f4ed; }
+  .bdir-title { font-size: 20px; font-weight: 800; letter-spacing: -.03em; }
+  .bdir-lead { margin-top: 6px; font-size: 12px; line-height: 1.45; font-weight: 550; color: #3a342e; }
+  .bpeople { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; min-height: 0; }
+  .bperson { padding-top: 2mm; }
+  .bperson + .bperson { border-top: 1px solid rgba(31,27,24,.12); }
+  .bperson-top { display: flex; gap: 8px; align-items: center; }
+  .bdir-photo { width: 24mm; height: 28mm; flex: 0 0 24mm; }
+  .bdir-photo .bphoto-hint { font-size: 11px; }
+  .bname { font-size: 15px; font-weight: 800; letter-spacing: -.03em; line-height: 1.2; }
+  .brole { margin-top: 2px; font-size: 11.5px; font-weight: 750; color: #a68445; line-height: 1.3; }
+  .bcred { margin-top: 4px; display: flex; flex-direction: column; gap: 1px; }
+  .bcred li { padding-left: 10px; font-size: 10px; line-height: 1.32; font-weight: 550; color: #3a342e; }
+  .bcred li:before { content: "–"; position: absolute; left: 0; color: #8a7560; }
+  @media (max-width: 860px) {
+    #panelBrochure .brochure-wrap { grid-template-columns: 1fr; }
+  }
+
+  @font-face {
+    font-family: "SCDream";
+    src: url("https://cdn.jsdelivr.net/gh/moonspam/SCDream@master/SCDream5.otf") format("opentype");
+    font-weight: 500; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: "SCDream";
+    src: url("https://cdn.jsdelivr.net/gh/moonspam/SCDream@master/SCDream7.otf") format("opentype");
+    font-weight: 700; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: "SCDream";
+    src: url("https://cdn.jsdelivr.net/gh/moonspam/SCDream@master/SCDream9.otf") format("opentype");
+    font-weight: 800; font-style: normal; font-display: swap;
+  }
+  body.mode-plan.offer-sign .app,
+  body.mode-plan.offer-plaque .app { max-width: 1100px; }
+  #panelSign .sign-wrap,
+  #panelPlaque .plaque-wrap {
+    display: grid;
+    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+  #panelSign .sign-fit,
+  #panelPlaque .plaque-fit {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .sg-miss {
+    margin-top: 12px;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--mute);
+    font-weight: 650;
+  }
+  .sg-board {
+    width: 600mm;
+    height: 1800mm;
+    background: #F7F4EE;
+    color: #000;
+    position: relative;
+    overflow: hidden;
+    padding: 44mm 40mm 40mm;
+    display: flex;
+    flex-direction: column;
+    transform-origin: top left;
+    font-family: "SCDream", Pretendard, "Noto Sans KR", sans-serif;
+  }
+  .sg-kicker {
+    font-size: 12mm; font-weight: 800; letter-spacing: .28em;
+    color: #9A7230; text-align: center;
+  }
+  .sg-headline {
+    margin-top: 10mm;
+    font-size: 36mm; font-weight: 900; line-height: 1.22;
+    letter-spacing: -0.055em; text-align: center;
+  }
+  .sg-headline em { font-style: normal; color: #9A7230; }
+  .sg-sub {
+    margin-top: 10mm; text-align: center;
+    font-size: 14.5mm; font-weight: 800; letter-spacing: -0.04em;
+  }
+  .sg-logo {
+    margin: 26mm auto 28mm; width: 156mm; height: 82mm;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sg-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .sg-bar {
+    background: #000; color: #F3F0E8;
+    border-radius: 16mm; text-align: center;
+    padding: 10mm 10mm;
+    font-size: 20mm; font-weight: 800; letter-spacing: -0.04em; line-height: 1.25;
+  }
+  .sg-bar small, .sg-bar .sg-bar-sub {
+    display: block; margin-top: 2.5mm;
+    font-size: 12mm; font-weight: 700; color: #D9C28A; letter-spacing: 0;
+  }
+  .sg-ph {
+    margin-top: 18mm; height: 340mm; overflow: hidden; border-radius: 12mm;
+    background: #d5cfc4; position: relative; cursor: pointer;
+  }
+  .sg-ph img, .sg-doc-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .sg-missing {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 8mm;
+    color: #3f3a34; font-size: 14mm; font-weight: 800; line-height: 1.35;
+  }
+  .sg-docs-head {
+    margin: 22mm 0 10mm;
+    text-align: center; font-size: 13mm; font-weight: 800;
+    letter-spacing: .18em; color: #9A7230;
+  }
+  .sg-docs { display: flex; flex-direction: column; gap: 12mm; }
+  .sg-doc {
+    display: flex; gap: 20mm; align-items: stretch;
+    background: #EFEBE3; border-radius: 12mm; padding: 10mm 12mm;
+    border-left: 3mm solid #C4A056; height: 228mm;
+  }
+  .sg-doc-photo {
+    width: 42%; flex: none; overflow: hidden; border-radius: 8mm;
+    background: #d5cfc4; position: relative; cursor: pointer;
+  }
+  .sg-doc-text { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 2mm 4mm 2mm 10mm; }
+  .sg-name { font-size: 24mm; font-weight: 900; letter-spacing: -0.045em; line-height: 1.12; }
+  .sg-role { margin-top: 3.5mm; font-size: 13mm; font-weight: 800; color: #9A7230; line-height: 1.35; }
+  .sg-bio { margin-top: 7mm; list-style: none; }
+  .sg-bio li { font-size: 12mm; font-weight: 700; line-height: 1.42; letter-spacing: -0.04em; }
+  .sg-svc {
+    margin-top: 22mm; background: #000; color: #F3F0E8;
+    border-radius: 16mm; padding: 20mm 22mm 22mm;
+  }
+  .sg-svc-head { text-align: center; font-size: 17mm; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 22mm; }
+  .sg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12mm 20mm; }
+  .sg-tag {
+    display: flex; align-items: center; gap: 5.5mm;
+    font-size: 15mm; font-weight: 700; letter-spacing: -0.04em; line-height: 1.3; padding: 2.5mm 0;
+  }
+  .sg-petal { width: 7mm; height: 7mm; flex: none; border-radius: 50%; background: #C4A056; }
+  .sg-solo {
+    display: inline-block; margin-left: 2mm; padding: 1mm 2.6mm;
+    background: #C4A056; color: #000; font-size: 8mm; font-weight: 900; border-radius: 1mm;
+  }
+  .sg-cred {
+    margin-top: 18mm; background: #000; color: #F3F0E8;
+    border-radius: 16mm; padding: 16mm 22mm; list-style: none;
+  }
+  .sg-cred li {
+    display: flex; gap: 7mm; align-items: center;
+    font-size: 16mm; font-weight: 800; letter-spacing: -0.04em; line-height: 1.35; padding: 8mm 0;
+  }
+  .sg-cred li + li { border-top: 0.4mm solid rgba(217,194,138,.28); }
+  .sg-hl { color: #C4A056; }
+  .sg-hours {
+    margin-top: 18mm; text-align: center;
+    font-size: 14mm; font-weight: 800; line-height: 1.55; letter-spacing: -0.03em;
+  }
+  .sg-dot { color: #9A7230; }
+  .sg-contact {
+    margin-top: 16mm;
+    display: flex; align-items: center; justify-content: space-between; gap: 8mm;
+  }
+  .sg-tel { font-size: 26mm; font-weight: 900; letter-spacing: -0.04em; line-height: 1; }
+  .sg-tel-label { display: block; font-size: 11mm; font-weight: 800; color: #9A7230; letter-spacing: .12em; margin-bottom: 2.5mm; }
+  .sg-addr { margin-top: 3.5mm; font-size: 11.5mm; font-weight: 700; line-height: 1.35; }
+  .sg-qr { width: 68mm; height: 68mm; background: #fff; padding: 2.5mm; border: 0.55mm solid #000; }
+  .sg-qr img { width: 100%; height: 100%; display: block; }
+  .sg-qr-cap { display: block; text-align: center; margin-top: 5mm; font-size: 10mm; font-weight: 800; line-height: 1.28; }
+  .sg-edit:hover, .sg-edit:focus { outline: 2px solid #C4A056; outline-offset: 1px; }
+  #panelPlaque .pl-sizes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .pl-board {
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+    transform-origin: top left;
+    color: #1E2126;
+    font-family: Pretendard, "Noto Sans KR", sans-serif;
+    box-shadow: 0 18px 48px rgba(18,20,26,.18);
+  }
+  .pl-pin {
+    position: absolute; z-index: 5;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #E8D5A3 0%, #C4A056 42%, #8A6F2E 100%);
+    box-shadow: 0 2px 4px rgba(0,0,0,.28), inset 0 1px 1px rgba(255,255,255,.55);
+  }
+  .pl-layout {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 3; text-align: center;
+  }
+  .pl-layout.row { flex-direction: row; gap: 3.5%; padding: 4% 4.5%; }
+  .pl-layout.portrait, .pl-layout.stack { flex-direction: column; padding: 6% 5%; }
+  .pl-unit { display: flex; flex-direction: column; align-items: center; width: 100%; }
+  .pl-logo img { width: 100%; height: auto; display: block; }
+  .pl-en {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 700; letter-spacing: .12em; line-height: 1.15;
+    text-transform: uppercase; color: #2C3036;
+  }
+  .pl-en span { display: block; white-space: nowrap; }
+  .pl-rule { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 3% 0 2.4%; }
+  .pl-rule:before, .pl-rule:after { content: ""; width: 56px; height: 1px; background: #B25A4C; opacity: .7; }
+  .pl-rule i { width: 6px; height: 6px; background: #B25A4C; transform: rotate(45deg); }
+  .pl-ko { font-weight: 900; letter-spacing: -.02em; line-height: 1.15; white-space: nowrap; }
+  .pl-sub { margin-top: 2%; font-weight: 700; letter-spacing: .16em; color: #3A3F46; white-space: nowrap; }
+  .pl-shop {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #f3f1ee; color: #6a645c; font-weight: 800; text-align: center; line-height: 1.35;
+  }
+  .pl-a3 { width: 420mm; height: 297mm; }
+  .pl-a3 .pl-pin { width: 15px; height: 15px; }
+  .pl-a3 .pl-pin.tl { top: 11mm; left: 11mm; }
+  .pl-a3 .pl-pin.tr { top: 11mm; right: 11mm; }
+  .pl-a3 .pl-pin.bl { bottom: 11mm; left: 11mm; }
+  .pl-a3 .pl-pin.br { bottom: 11mm; right: 11mm; }
+  .pl-a3 .pl-logo { width: 32%; flex: none; }
+  .pl-a3 .pl-en { font-size: 68px; }
+  .pl-a3 .pl-ko { font-size: 96px; }
+  .pl-a3 .pl-sub { font-size: 52px; }
+  .pl-a4 { width: 210mm; height: 297mm; }
+  .pl-a4 .pl-pin { width: 12px; height: 12px; }
+  .pl-a4 .pl-pin.tl { top: 9.5mm; left: 9.5mm; }
+  .pl-a4 .pl-pin.tr { top: 9.5mm; right: 9.5mm; }
+  .pl-a4 .pl-pin.bl { bottom: 9.5mm; left: 9.5mm; }
+  .pl-a4 .pl-pin.br { bottom: 9.5mm; right: 9.5mm; }
+  .pl-a4 .pl-logo { width: 58%; margin-bottom: 4%; }
+  .pl-a4 .pl-en { font-size: 48px; }
+  .pl-a4 .pl-ko { font-size: 68px; }
+  .pl-a4 .pl-sub { font-size: 40px; }
+  .pl-sq { width: 300mm; height: 300mm; }
+  .pl-sq .pl-pin { width: 14px; height: 14px; }
+  .pl-sq .pl-pin.tl { top: 11mm; left: 11mm; }
+  .pl-sq .pl-pin.tr { top: 11mm; right: 11mm; }
+  .pl-sq .pl-pin.bl { bottom: 11mm; left: 11mm; }
+  .pl-sq .pl-pin.br { bottom: 11mm; right: 11mm; }
+  .pl-sq .pl-logo { width: 54%; margin-bottom: 3%; }
+  .pl-sq .pl-en { font-size: 52px; }
+  .pl-sq .pl-ko { font-size: 72px; }
+  .pl-sq .pl-sub { font-size: 42px; }
+  .pl-sq.shop-a .pl-logo { width: 34%; margin-bottom: 1.5%; }
+  .pl-sq.shop-a .pl-en { font-size: 42px; }
+  .pl-sq.shop-a .pl-ko { font-size: 56px; }
+  .pl-sq.shop-a .pl-sub { font-size: 32px; }
+  .pl-sq.shop-a .pl-shop { width: 52%; min-height: 28mm; margin-top: 4%; padding: 4mm; font-size: 14px; }
+  .pl-sq.shop-b .pl-shop { width: 56%; min-height: 28mm; margin-bottom: 3%; padding: 4mm; font-size: 14px; }
+  .pl-sq.shop-b .pl-logo { width: 32%; margin-top: 3%; }
+  .pl-sq.shop-c .pl-pair { display: flex; align-items: center; justify-content: center; gap: 4%; width: 88%; margin-bottom: 3%; }
+  .pl-sq.shop-c .pl-logo { width: 30%; margin: 0; }
+  .pl-sq.shop-c .pl-shop { width: 46%; min-height: 24mm; padding: 3mm; font-size: 13px; }
+  .pl-sq.shop-c .pl-div { width: 1px; align-self: stretch; background: rgba(196,160,86,.5); }
+  .pl-edit:hover, .pl-edit:focus { outline: 2px solid #C4A056; outline-offset: 2px; }
+  @media (max-width: 860px) {
+    #panelSign .sign-wrap,
+    #panelPlaque .plaque-wrap { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body class="mode-consult">
@@ -1578,6 +2060,9 @@
         사이즈 <strong>A4</strong><br>
         코팅 <strong>무광</strong><br>
         한두 장만 뽑는다면 종이 포스터에서 사이즈만 <strong>A4</strong>로 해도 됩니다.</p>
+        <p><strong>브로셔(3단 리플렛, A4 가로)</strong>는 앞뒤 두 면입니다. 세 칸으로 접습니다.<br>
+        사이즈 <strong>A4 가로</strong><br>
+        파일 <strong>30.0×21.3cm</strong> · 300dpi · CMYK</p>
         <div class="print-guide-actions">
           <a href="https://www.bizhows.com/ko/v/option?mock=4000_200_4001" target="_blank" rel="noopener noreferrer">포스터 A3</a>
           <a href="https://www.bizhows.com/ko/v/option?mock=8100_200_8001" target="_blank" rel="noopener noreferrer">가격표 A4</a>
@@ -2130,6 +2615,64 @@
             <article class="pcard" id="priceCard"></article>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div id="panelBrochure" class="panel">
+      <div class="brochure-wrap">
+        <section class="card no-print brochure-tools">
+          <div class="poster-actions">
+            <button type="button" class="btn btn-print" id="btnBrochurePng">PNG 저장</button>
+            <button type="button" class="btn btn-ghost" id="btnBrochurePdf">PDF 저장</button>
+          </div>
+          <p class="cert-note" id="brochureStatus">30.0×21.3cm, 300dpi, CMYK</p>
+          <div id="brochureTools"></div>
+          <div class="price-actions">
+            <button type="button" class="btn btn-ghost" id="btnBrochureReset">이 지점 처음 문구</button>
+          </div>
+        </section>
+        <div class="brochure-stage" id="brochureStage">
+          <div class="chips brochure-sides" id="brochureSides">
+            <button type="button" class="chip active" data-brochure-side="outside">겉면</button>
+            <button type="button" class="chip" data-brochure-side="inside">안쪽</button>
+          </div>
+          <div class="brochure-fit" id="brochureFit"></div>
+        </div>
+      </div>
+      <input id="brochurePhotoPick" type="file" accept="image/*" hidden>
+    </div>
+
+    <div id="panelSign" class="panel">
+      <div class="sign-wrap">
+        <section class="card no-print">
+          <div class="poster-actions">
+            <button type="button" class="btn btn-print" id="btnSignPng">PNG 저장</button>
+            <button type="button" class="btn btn-ghost" id="btnSignPdf">PDF 저장</button>
+          </div>
+          <p class="cert-note" id="signStatus">60×180cm, 120dpi, CMYK</p>
+          <p class="sg-miss" id="signMissing"></p>
+          <div class="price-actions">
+            <button type="button" class="btn btn-ghost" id="btnSignReset">이 지점 처음 문구</button>
+          </div>
+        </section>
+        <div class="sign-fit" id="signFit"></div>
+      </div>
+      <input id="signPhotoPick" type="file" accept="image/*" hidden>
+    </div>
+
+    <div id="panelPlaque" class="panel">
+      <div class="plaque-wrap">
+        <section class="card no-print">
+          <p class="cert-lead">국제얼굴교정학회 공식인증점 현판입니다. 규격을 고른 뒤 받으세요.</p>
+          <div class="poster-actions">
+            <button type="button" class="btn btn-print" id="btnPlaquePng">PNG 저장</button>
+            <button type="button" class="btn btn-ghost" id="btnPlaquePdf">PDF 저장</button>
+          </div>
+          <p class="cert-note" id="plaqueStatus">규격을 고르면 그 크기로 저장합니다.</p>
+          <div class="pl-sizes" id="plaqueSizes"></div>
+          <p class="sg-miss">샵 로고 파일 NUON_WELL_BEAUTY_LAB_로고.png 은 저장소에 없습니다.</p>
+        </section>
+        <div class="plaque-fit" id="plaqueFit"></div>
       </div>
     </div>
 
@@ -8475,11 +9018,11 @@
         sigItem: '시그니처 1회',
         sigPrice: '12.5만원',
         pace: '초기에는 주2회를 추천합니다.\n홈트가 가능해지면 주1회도 괜찮습니다.',
-        notes: ['한 번에 한 분씩, 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'],
+        notes: ['1:1로, 한 분께 온전히 집중합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'],
         foot: '움직임이 편해지는 시간 | REAL MOVEMENT',
         programs: [
           {
-            title: '50분 · 1:1 리얼 무브먼트 / 리얼 페이스',
+            title: '50분 · 1:1 리얼무브먼트',
             sub: '레슨 25분, 온열 돔 25분',
             note: '다치지 않게 움직임을 익히고, 따뜻하게 마무리합니다.',
             rows: [
@@ -8489,9 +9032,9 @@
             ]
           },
           {
-            title: '80분 · 1:1 리얼 무브먼트 / 리얼 페이스',
+            title: '80분 · 1:1 리얼무브먼트 + 페이스',
             sub: '레슨 55분, 온열 돔 25분',
-            note: '프리미엄 집중 레슨으로 진행합니다.',
+            note: '움직임 레슨에 페이스 셀프 케어, 습관 코칭, 스마일 트레이닝을 더합니다.',
             rows: [
               { name: '8회권', total: '62만원', unit: '회당 7.75만원', save: '', recommend: false },
               { name: '24회권', total: '174만원', unit: '회당 7.25만원', save: '8회권을 세 번 등록하는 것보다 약 12만원 적습니다', recommend: true }
@@ -8512,27 +9055,10 @@
           '주 2회가 적당합니다.\n한 주를 쉬어도, 남은 수업은 그대로입니다.'
         ];
         var newPace = '초기에는 주2회를 추천합니다.\n홈트가 가능해지면 주1회도 괜찮습니다.';
-        var oldNotes = ['한 번에 한 분입니다. 오늘 컨디션에 맞춰 진행합니다.', '끝나면 집에서 할 동작 하나를 가져갑니다.'];
-        var prevNotes = ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 끝난 뒤에도 스스로 유지할 수 있습니다.'];
-        var shortNotes = ['한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'];
-        var longNotes = ['한 번에 한 분씩, 한 분에게 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'];
-        var newNotes = ['한 번에 한 분씩, 최선을 다합니다.', '배우는 마음으로 오시면, 세션 종료 후에도 스스로 유지할 수 있습니다.'];
-        var priorFirst = [oldNotes[0], prevNotes[0], shortNotes[0], longNotes[0]];
         var changed = false;
         ['yaksu', 'incheon'].forEach(function (key) {
           var card = saved[key];
           if (oldPaces.indexOf(card.pace) >= 0) { card.pace = newPace; changed = true; }
-          var notes = card.notes || [];
-          var notesKey = JSON.stringify(notes);
-          var knownPair = !notes.length || notesKey === JSON.stringify(oldNotes) || notesKey === JSON.stringify(prevNotes) || notesKey === JSON.stringify(shortNotes) || notesKey === JSON.stringify(longNotes);
-          if (knownPair && notesKey !== JSON.stringify(newNotes)) {
-            card.notes = newNotes.slice();
-            changed = true;
-          } else if (priorFirst.indexOf(notes[0]) >= 0 && notes[0] !== newNotes[0]) {
-            card.notes[0] = newNotes[0];
-            changed = true;
-            if (card.notes[1] === prevNotes[1]) card.notes[1] = newNotes[1];
-          }
         });
         (saved.yaksu.programs || []).forEach(function (p) {
           var spaced = String(p.title || '').replace(/리얼무브먼트/g, '리얼 무브먼트').replace(/리얼페이스/g, '리얼 페이스');
@@ -8563,8 +9089,6 @@
           });
         });
         (saved.incheon.programs || []).forEach(function (p) {
-          var spacedIn = String(p.title || '').replace(/리얼무브먼트/g, '리얼 무브먼트').replace(/리얼페이스/g, '리얼 페이스');
-          if (spacedIn !== p.title) { p.title = spacedIn; changed = true; }
           if (p.title === '50분 · 1:1') { p.title = '50분 · 1:1 리얼 무브먼트 / 리얼 페이스'; changed = true; }
           if (p.title === '80분 · 1:1') { p.title = '80분 · 1:1 리얼 무브먼트 / 리얼 페이스'; changed = true; }
           var old50 = ['레슨 25분 뒤 돔 25분', '1:1 레슨 25분, 온열 돔 25분. 움직인 뒤를 따뜻하게 마무리합니다.'];
@@ -8590,7 +9114,7 @@
             changed = true;
           }
           if (p.title.indexOf('80분') === 0 && (!String(p.note || '').trim() || p.note === '다치지 않게 움직임을 익히고, 온열로 마무리합니다.')) {
-            p.note = '프리미엄 집중 레슨으로 진행합니다.';
+            p.note = '움직임 레슨에 페이스 셀프 케어, 습관 코칭, 스마일 트레이닝을 더합니다.';
             changed = true;
           }
           if (p.title.indexOf('80분') === 0) {
@@ -8606,6 +9130,29 @@
             });
           }
         });
+        var p2Flag = 'incheon-p2-1';
+        var p2Done = '';
+        try { p2Done = localStorage.getItem('rm-price-card-mig-v') || ''; } catch (eMig) {}
+        if (p2Done.indexOf(p2Flag) < 0) {
+          var p2 = (saved.incheon.programs || [])[1];
+          if (p2) {
+            var oldP2Titles = [
+              '80분 · 1:1 리얼 무브먼트 / 리얼 페이스',
+              '80분 · 1:1 리얼무브먼트 / 리얼페이스',
+              '80분 · 1:1 리얼 무브먼트 / 리얼페이스',
+              '80분 · 1:1 리얼무브먼트 / 리얼 페이스'
+            ];
+            if (oldP2Titles.indexOf(p2.title) >= 0) {
+              p2.title = '80분 · 1:1 리얼무브먼트 + 페이스';
+              changed = true;
+            }
+            if ((p2.note || '') === '프리미엄 집중 레슨으로 진행합니다.') {
+              p2.note = '움직임 레슨에 페이스 셀프 케어, 습관 코칭, 스마일 트레이닝을 더합니다.';
+              changed = true;
+            }
+          }
+          try { localStorage.setItem('rm-price-card-mig-v', (p2Done + ' ' + p2Flag).trim()); } catch (eMigSet) {}
+        }
         if (changed) {
           try { localStorage.setItem(PRICE_CARD_KEY, JSON.stringify(saved)); } catch (eSave) {}
         }
@@ -8954,6 +9501,1289 @@
     });
   }
 
+
+  var BROCHURE_KEY = 'rm-brochure-v1';
+  var brochureBranch = 'yaksu';
+  var brochureSide = 'outside';
+  var brochures = null;
+  var brochureBound = false;
+  var brochurePhotoTarget = null;
+  var brochureBlobUrls_ = {};
+  var brochureHydrateToken = 0;
+  var BROCHURE_PHOTO_DEFAULTS = {
+    yaksu: {
+      'outside.back': 'brochure-photos/yaksu-studio.jpg',
+      'inside.program.1': 'brochure-photos/yaksu-space-02.jpg',
+      'inside.program.2': 'brochure-photos/yaksu-space-03.jpg',
+      'inside.program.3': 'brochure-photos/yaksu-space-04.jpg',
+      'inside.director.0': 'brochure-photos/director-choi.jpg',
+      'inside.director.1': 'brochure-photos/director-park.jpg'
+    },
+    incheon: {
+      'inside.director.0': 'brochure-photos/director-lee.jpg',
+      'inside.director.1': 'brochure-photos/director-park.jpg'
+    }
+  };
+
+  function brochureDefaults_() {
+    var parkCreds = [
+      '미국 카이로프랙틱 닥터 (D.C.)',
+      '대한민국 물리치료사 (P.T.)',
+      '前 미국 LA 월턴 메디컬센터 부원장',
+      '前 잠실 롯데월드타워 정형외과 부원장',
+      '現 CMT 임상도수치료 아카데미 부회장',
+      '現 IFC 국제얼굴교정학회 학회장',
+      '미국 브릿지포트 대학교 졸업',
+      '특허: 요추 만곡·골반 수평위치 교정용 의자 (제10-2606537호)'
+    ];
+    function one(branch) {
+      var incheon = branch === 'incheon';
+      var place = incheon ? '인천점' : '약수점';
+      return {
+        outside: {
+          flap: {
+            kicker: 'REAL MOVEMENT',
+            title: '편안한 움직임, 스스로 이어 가도록.',
+            intro: incheon
+              ? '리얼무브먼트 인천점은 힐스테이트자이 계양 커뮤니티 안에서 운영하는 1:1 움직임 · 셀프 케어 스튜디오입니다.'
+              : '리얼무브먼트 약수점은 약수역 가까이에서 운영하는 1:1 움직임 · 셀프 케어 스튜디오입니다.',
+            whoLabel: '이런 분들께',
+            who: [
+              '목과 어깨를 가볍게 쓰고 싶은 분',
+              '운동을 처음 시작해 기초부터 차근차근 배우고 싶은 분',
+              '집에서도 이어 갈 나만의 루틴을 갖고 싶은 분'
+            ],
+            boxTitle: '리:얼 페이스 셀프 케어',
+            boxTag: place + ' 클래스',
+            boxLines: [
+              '괄사 사용법 · 표정 · 습관 · 스마일 트레이닝',
+              '거울 앞에서 내 손으로 직접 배웁니다.'
+            ]
+          },
+          back: {
+            name: '리얼무브먼트 ' + place,
+            tagline: '1:1 움직임 & 셀프 케어 스튜디오',
+            hoursLabel: '운영시간 · 1:1 예약제',
+            hours: [
+              '평일 AM 09:00 – PM 21:00',
+              '토요일 AM 09:00 – PM 16:00',
+              '일요일 및 법정공휴일 휴무'
+            ],
+            address: incheon
+              ? ['힐스테이트자이 계양 1층 커뮤니티 (도서관 옆)', '인천광역시 계양구 봉오대로651번길 9']
+              : ['서울특별시 중구 동호로7길 32', '더약수빌딩 4층', '약수역 5·6·7번 출구 도보 3분'],
+            contactLabel: '전화 · 네이버 톡톡',
+            phone: incheon ? '0507-1312-4596' : '0507-1359-4596',
+            contactNote: '편하게 물어보세요.',
+            qrUrl: incheon ? 'https://talk.naver.com/ct/w46xopt?frm=qr' : 'https://talk.naver.com/profile/c/real_movement_y',
+            foot: ''
+          },
+          cover: {
+            region: incheon ? 'GYEYANG · COMMUNITY' : 'SEOUL · YAKSU',
+            brand: 'REAL\nMOVEMENT',
+            keywords: '1:1 패시브 스트레칭 · 기능운동 · 셀프 케어',
+            line: '기초부터, 내 몸에 맞는 순서로 시작합니다.'
+          }
+        },
+        inside: {
+          design: {
+            kicker: 'DESIGN',
+            script: 'Your Body',
+            title: '당신의 움직임에 맞는 1:1 맞춤 순서',
+            intro: '지금 내 몸을 먼저 살피고, 왜 그렇게 움직이는지 함께 찾습니다. 리얼무브먼트 ' + place + '은 안전한 범위에서 기초부터 움직임을 쌓아 갑니다.',
+            summary: '▸ 1:1 맞춤 · 4단계 움직임 평가',
+            steps: [
+              { title: 'STEP 1. 상담 · 히스토리', body: '생활 습관과 목표를 듣고 방향을 정합니다.' },
+              { title: 'STEP 2. 자세 · 움직임 평가', body: '서기 · 앉기 · 걷기를 보며 움직임의 균형을 확인합니다.' },
+              { title: 'STEP 3. 프로그램 설계', body: '나에게 맞는 1:1 순서를 만듭니다.' },
+              { title: 'STEP 4. 맞춤 운동 · 다시 확인', body: '안전한 범위에서 운동하고, 달라진 움직임을 함께 확인합니다.' }
+            ]
+          },
+          programs: {
+            heading: '— 프로그램 안내',
+            items: [
+              { no: '01', title: '기능운동 1:1', tag: '', body: '일상 동작을 편하게 쓰도록, 안전한 범위를 먼저 정하고 동작을 하나씩 익힙니다.', hidden: false },
+              { no: '02', title: '실버 트레이닝', tag: '', body: '근력 · 균형 · 유연성을 지금의 몸 상태에 맞춰 조절합니다. 걷고 오르는 일상을 오래 즐기도록 돕습니다.', hidden: false },
+              { no: '03', title: '바른 자세 습관', tag: '', body: '앉고 서고 걷는 습관을 살피고, 바른 자세를 몸에 익힙니다.', hidden: false },
+              { no: '04', title: '선수 트레이닝', tag: '', body: '종목별 움직임에 맞춰 근력 · 파워 · 가동범위 · 안정성을 올립니다. 평가 후 단계적으로 진행합니다.', hidden: false },
+              { no: '05', title: '리:얼 페이스 셀프 케어', tag: place + ' 클래스', body: '괄사 사용법, 표정, 생활 습관, 스마일 트레이닝을 거울 앞에서 내 손으로 직접 배웁니다. 집에서 이어 갈 셀프 윤곽 관리 루틴을 가져갑니다.', caption: '내 손으로 익히는 셀프 괄사', hidden: false }
+            ],
+            footnote: '* 모든 프로그램은 리얼무브먼트의 4단계 움직임 평가 후 진행합니다.'
+          },
+          directors: {
+            title: '원장 소개',
+            intro: '자세 · 움직임 평가를 바탕으로 원장이 1:1로 움직임과 셀프 케어 방법을 지도합니다.',
+            people: incheon ? [
+              {
+                name: '이상민 원장',
+                role: '인천점 원장 · D.C. / P.T.',
+                creds: [
+                  '미국 카이로프랙틱 닥터 (D.C.)',
+                  '대한민국 물리치료사 (P.T.)',
+                  '前 서울아산재활의학과 도수치료과장',
+                  '前 연세제일병원 도수운동치료실장',
+                  '前 연세척추재활의학과 도수운동치료센터장',
+                  '한서대 건강관리학과 · 수안재활복지학 석사 수료',
+                  '웨스트민스터 대학원 카이로건강교육학과 석사 졸업',
+                  '논문: 카이로프랙틱·운동의 자세교정 시너지 효과 (2010)'
+                ]
+              },
+              { name: '박준규 원장', role: '약수 · 인천 원장 · D.C. / P.T.', creds: parkCreds.slice() }
+            ] : [
+              {
+                name: '최진옥 원장',
+                role: '약수점 원장 · D.C.',
+                creds: [
+                  '미국 카이로프랙틱 닥터 (D.C.)',
+                  '前 한서대 건강관리학과 전임조교수',
+                  '前 인천아시안게임 세팍타크로 팀닥터',
+                  '前 MPI 바른자세교정센터 원장',
+                  '前 대한카이로프랙틱협회(KAC) 재무이사·사무총장',
+                  '前 IBCE(국제카이로시험위원회) 이사',
+                  '한서대 카이로프랙틱학과 박사과정 수료',
+                  '공저: 카이로프랙틱 임상실습 매뉴얼'
+                ]
+              },
+              { name: '박준규 원장', role: '약수 · 인천 원장 · D.C. / P.T.', creds: parkCreds.slice() }
+            ]
+          }
+        }
+      };
+    }
+    return { yaksu: one('yaksu'), incheon: one('incheon') };
+  }
+  function cloneBrochure_(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+  function mergeBrochure_(base, over) {
+    if (over == null) return cloneBrochure_(base);
+    if (Array.isArray(base)) {
+      if (!Array.isArray(over)) return cloneBrochure_(base);
+      var out = base.map(function (item, i) {
+        return i < over.length && over[i] != null ? mergeBrochure_(item, over[i]) : cloneBrochure_(item);
+      });
+      for (var j = base.length; j < over.length; j++) out.push(over[j]);
+      return out;
+    }
+    if (base && typeof base === 'object') {
+      var obj = {};
+      Object.keys(base).forEach(function (k) {
+        obj[k] = over[k] != null ? mergeBrochure_(base[k], over[k]) : cloneBrochure_(base[k]);
+      });
+      return obj;
+    }
+    return over;
+  }
+  function loadBrochures_() {
+    var defaults = brochureDefaults_();
+    try {
+      var saved = JSON.parse(localStorage.getItem(BROCHURE_KEY) || 'null');
+      if (saved && typeof saved === 'object') {
+        return {
+          yaksu: mergeBrochure_(defaults.yaksu, saved.yaksu),
+          incheon: mergeBrochure_(defaults.incheon, saved.incheon)
+        };
+      }
+    } catch (e) {}
+    return defaults;
+  }
+  function saveBrochures_() {
+    try { localStorage.setItem(BROCHURE_KEY, JSON.stringify(brochures)); } catch (e) {}
+  }
+  function brochureSetPath_(root, path, value) {
+    var parts = String(path || '').split('.');
+    var cur = root;
+    for (var i = 0; i < parts.length - 1; i++) {
+      var key = /^\d+$/.test(parts[i]) ? +parts[i] : parts[i];
+      if (cur == null || cur[key] == null) return;
+      cur = cur[key];
+    }
+    var last = parts[parts.length - 1];
+    if (cur == null) return;
+    cur[/^\d+$/.test(last) ? +last : last] = value;
+  }
+  function brochureFieldText_(el) {
+    var text = (el.innerText || '').replace(/\u00a0/g, ' ').replace(/\r/g, '');
+    if (el.classList.contains('b-brand')) return text.replace(/^[ \t]+|[ \t]+$/gm, '').replace(/^\n+|\n+$/g, '');
+    return text.replace(/\n+/g, ' ').replace(/[ \t]{2,}/g, ' ').replace(/^\s+|\s+$/g, '');
+  }
+  function flushBrochureEdits_() {
+    if (!brochures) return;
+    var nodes = document.querySelectorAll('#brochureFit [data-bk]');
+    if (!nodes.length) return;
+    var card = brochures[brochureBranch];
+    nodes.forEach(function (el) {
+      brochureSetPath_(card, el.getAttribute('data-bk'), brochureFieldText_(el));
+    });
+    var qr = $('brochureQrUrl');
+    if (qr) card.outside.back.qrUrl = qr.value;
+    saveBrochures_();
+  }
+  function bEdit_(tag, cls, path, text) {
+    return '<' + tag + ' class="' + cls + ' b-edit" contenteditable="true" spellcheck="false" data-bk="' + path + '">' + escPrice_(text || '') + '</' + tag + '>';
+  }
+  function bPhoto_(slot, cls) {
+    return '<div class="bphoto ' + cls + '" data-slot="' + slot + '" role="button" tabindex="0">' +
+      '<img alt="" hidden>' +
+      '<span class="bphoto-hint brochure-screen">눌러서 사진 넣기</span>' +
+      '<button type="button" class="bphoto-revert brochure-screen" data-photo-revert hidden>원래 사진</button></div>';
+  }
+  function brochureIcon_(kind) {
+    var paths = {
+      note: '<rect x="7" y="5" width="10" height="14" rx="1.5"/><path d="M10 9h4M10 12h4M10 15h2.5"/>',
+      person: '<circle cx="12" cy="9" r="2.2"/><path d="M7.6 17.2c.5-2.3 2.2-3.5 4.4-3.5s3.9 1.2 4.4 3.5"/>',
+      spark: '<path d="M12 4.8l1.1 3.1 3.2 1.1-3.2 1.2L12 13.4l-1.1-3.2-3.2-1.2 3.2-1.1z"/>',
+      check: '<path d="M6.2 12.4l3.1 3.2L17.8 8"/>'
+    };
+    return '<span class="bstep-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#c2a159" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + (paths[kind] || paths.note) + '</svg></span>';
+  }
+  function brochureFolds_() {
+    return '<div class="brochure-fold" style="left:33.333%"></div><div class="brochure-fold" style="left:66.666%"></div>';
+  }
+  function brochureOutsideHtml_(card) {
+    var flap = card.outside.flap;
+    var back = card.outside.back;
+    var cover = card.outside.cover;
+    var who = (flap.who || []).map(function (line, i) {
+      return '<li class="b-edit" contenteditable="true" spellcheck="false" data-bk="outside.flap.who.' + i + '">' + escPrice_(line) + '</li>';
+    }).join('');
+    var boxLines = (flap.boxLines || []).map(function (line, i) {
+      return bEdit_('p', 'b-boxline', 'outside.flap.boxLines.' + i, line);
+    }).join('');
+    var hours = (back.hours || []).map(function (line, i) {
+      return '<li class="b-edit" contenteditable="true" spellcheck="false" data-bk="outside.back.hours.' + i + '">' + escPrice_(line) + '</li>';
+    }).join('');
+    var address = (back.address || []).map(function (line, i) {
+      return bEdit_('div', 'b-address', 'outside.back.address.' + i, line);
+    }).join('');
+    return '<div class="brochure-sheet" data-side="outside">' +
+      '<section class="bpanel bpanel-black bflap">' +
+        bEdit_('div', 'b-serif b-kicker', 'outside.flap.kicker', flap.kicker) +
+        bEdit_('div', 'b-title', 'outside.flap.title', flap.title) +
+        bEdit_('p', 'b-lead', 'outside.flap.intro', flap.intro) +
+        bEdit_('div', 'b-who-label', 'outside.flap.whoLabel', flap.whoLabel) +
+        '<ul class="b-who">' + who + '</ul>' +
+        '<div class="bflap-box">' +
+          bEdit_('div', 'b-boxtitle', 'outside.flap.boxTitle', flap.boxTitle) +
+          bEdit_('span', 'btag', 'outside.flap.boxTag', flap.boxTag) +
+          boxLines +
+        '</div>' +
+      '</section>' +
+      '<section class="bpanel bpanel-ivory bback">' +
+        bPhoto_('outside.back', 'bback-photo') +
+        '<div class="bback-body">' +
+          bEdit_('div', 'bback-name', 'outside.back.name', back.name) +
+          bEdit_('div', 'bback-tag', 'outside.back.tagline', back.tagline) +
+          '<div class="b-hours">' + bEdit_('div', 'b-hours-label', 'outside.back.hoursLabel', back.hoursLabel) + '<ul>' + hours + '</ul></div>' +
+          address +
+          bEdit_('p', 'b-foot', 'outside.back.foot', back.foot) +
+        '</div>' +
+        '<div class="bback-contact">' +
+          '<div>' +
+            bEdit_('div', 'b-clabel', 'outside.back.contactLabel', back.contactLabel) +
+            bEdit_('div', 'b-phone', 'outside.back.phone', back.phone) +
+            bEdit_('div', 'b-cnote', 'outside.back.contactNote', back.contactNote) +
+          '</div>' +
+          '<div class="bqr"><img alt=""></div>' +
+        '</div>' +
+      '</section>' +
+      '<section class="bpanel bcover">' +
+        bPhoto_('outside.cover', '') +
+        '<div class="bcover-copy">' +
+          bEdit_('div', 'b-serif bcover-region', 'outside.cover.region', cover.region) +
+          bEdit_('div', 'b-brand', 'outside.cover.brand', cover.brand) +
+          bEdit_('div', 'bcover-keys', 'outside.cover.keywords', cover.keywords) +
+          bEdit_('div', 'bcover-line', 'outside.cover.line', cover.line) +
+        '</div>' +
+      '</section>' +
+      brochureFolds_() +
+    '</div>';
+  }
+  function brochureInsideHtml_(card) {
+    var design = card.inside.design;
+    var programs = card.inside.programs;
+    var directors = card.inside.directors;
+    var icons = ['note', 'person', 'spark', 'check'];
+    var steps = (design.steps || []).map(function (step, i) {
+      return '<div class="bstep">' + brochureIcon_(icons[i] || 'note') + '<div>' +
+        bEdit_('div', 'bstep-title', 'inside.design.steps.' + i + '.title', step.title) +
+        bEdit_('div', 'bstep-body', 'inside.design.steps.' + i + '.body', step.body) +
+      '</div></div>';
+    }).join('');
+    var progHtml = (programs.items || []).map(function (item, i) {
+      if (item.hidden) return '';
+      var tag = item.tag ? bEdit_('span', 'btag', 'inside.programs.items.' + i + '.tag', item.tag) : '';
+      var cap = item.caption != null ? bEdit_('div', 'bcap', 'inside.programs.items.' + i + '.caption', item.caption) : '';
+      return '<article class="bprog">' +
+        '<div class="bprog-copy">' +
+          bEdit_('div', 'bprog-no', 'inside.programs.items.' + i + '.no', item.no) +
+          bEdit_('div', 'bprog-title', 'inside.programs.items.' + i + '.title', item.title) +
+          tag +
+          bEdit_('p', 'bprog-body', 'inside.programs.items.' + i + '.body', item.body) +
+        '</div>' +
+        '<div class="bprog-side">' + bPhoto_('inside.program.' + i, 'bprog-photo') + cap + '</div>' +
+      '</article>';
+    }).join('');
+    var people = (directors.people || []).map(function (person, i) {
+      var creds = (person.creds || []).map(function (line, ci) {
+        return '<li class="b-edit" contenteditable="true" spellcheck="false" data-bk="inside.directors.people.' + i + '.creds.' + ci + '">' + escPrice_(line) + '</li>';
+      }).join('');
+      return '<div class="bperson"><div class="bperson-top">' +
+        bPhoto_('inside.director.' + i, 'bdir-photo') +
+        '<div>' +
+          bEdit_('div', 'bname', 'inside.directors.people.' + i + '.name', person.name) +
+          bEdit_('div', 'brole', 'inside.directors.people.' + i + '.role', person.role) +
+        '</div></div><ul class="bcred">' + creds + '</ul></div>';
+    }).join('');
+    return '<div class="brochure-sheet" data-side="inside"' + (brochureSide === 'inside' ? '' : ' hidden') + '>' +
+      '<section class="bpanel bpanel-black bindesign">' +
+        bEdit_('div', 'b-serif b-kicker', 'inside.design.kicker', design.kicker) +
+        bEdit_('div', 'b-script', 'inside.design.script', design.script) +
+        bEdit_('div', 'b-title', 'inside.design.title', design.title) +
+        bEdit_('p', 'b-lead', 'inside.design.intro', design.intro) +
+        bEdit_('div', 'b-summary', 'inside.design.summary', design.summary) +
+        '<div class="bsteps">' + steps + '</div>' +
+      '</section>' +
+      '<section class="bpanel bprog-panel">' +
+        bEdit_('div', 'bprog-hd', 'inside.programs.heading', programs.heading) +
+        '<div class="bprog-list">' + progHtml + '</div>' +
+        bEdit_('p', 'bnote', 'inside.programs.footnote', programs.footnote) +
+      '</section>' +
+      '<section class="bpanel bdir">' +
+        bEdit_('div', 'bdir-title', 'inside.directors.title', directors.title) +
+        bEdit_('p', 'bdir-lead', 'inside.directors.intro', directors.intro) +
+        '<div class="bpeople">' + people + '</div>' +
+      '</section>' +
+      brochureFolds_() +
+    '</div>';
+  }
+  function renderBrochureTools_() {
+    var root = $('brochureTools');
+    if (!root || !brochures) return;
+    var card = brochures[brochureBranch];
+    var html = '<label class="brochure-qr-label">네이버 톡톡 주소<input type="url" id="brochureQrUrl" value="' + escPrice_(card.outside.back.qrUrl || '') + '" autocomplete="off" spellcheck="false"></label>';
+    html += '<div class="brochure-hides">';
+    (card.inside.programs.items || []).forEach(function (item, i) {
+      html += '<label class="brochure-hide"><input type="checkbox" data-hide-prog="' + i + '"' + (item.hidden ? ' checked' : '') + '> ' +
+        escPrice_((item.no || ('0' + (i + 1))) + ' ' + (item.title || '프로그램')) + ' 숨기기</label>';
+    });
+    html += '</div>';
+    root.innerHTML = html;
+  }
+  function paintBrochureSide_() {
+    var fit = $('brochureFit');
+    if (!fit) return;
+    fit.querySelectorAll('.brochure-sheet').forEach(function (sheet) {
+      sheet.hidden = sheet.getAttribute('data-side') !== brochureSide;
+    });
+    document.querySelectorAll('#brochureSides [data-brochure-side]').forEach(function (btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-brochure-side') === brochureSide);
+    });
+  }
+  function renderBrochurePreview_() {
+    var fit = $('brochureFit');
+    if (!fit) return;
+    if (!brochures) brochures = loadBrochures_();
+    var card = brochures[brochureBranch];
+    var outsideHidden = brochureSide === 'outside' ? '' : ' hidden';
+    fit.innerHTML = brochureOutsideHtml_(card).replace('data-side="outside"', 'data-side="outside"' + outsideHidden) + brochureInsideHtml_(card);
+    paintBrochureSide_();
+    hydrateBrochurePhotos_();
+    paintBrochureQr_();
+    fitBrochureSheet_();
+    requestAnimationFrame(fitBrochureSheet_);
+  }
+  function fitBrochureSheet_() {
+    var fit = $('brochureFit');
+    if (!fit || !fit.clientWidth) return;
+    var sheet = fit.querySelector('.brochure-sheet:not([hidden])');
+    if (!sheet) return;
+    sheet.style.transform = 'none';
+    var natural = sheet.offsetWidth || 1;
+    var scale = fit.clientWidth / natural;
+    if (!scale || scale > 1) scale = 1;
+    sheet.style.transform = 'scale(' + scale + ')';
+    fit.style.height = Math.ceil(sheet.offsetHeight * scale) + 'px';
+  }
+  function brochureDb_() {
+    return new Promise(function (resolve, reject) {
+      var req = indexedDB.open('rm-brochure-photos', 1);
+      req.onupgradeneeded = function () {
+        if (!req.result.objectStoreNames.contains('photos')) req.result.createObjectStore('photos');
+      };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+    });
+  }
+  function brochureIdb_(mode, key, value) {
+    return brochureDb_().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction('photos', mode);
+        var store = tx.objectStore('photos');
+        var req;
+        if (mode === 'readonly') req = store.get(key);
+        else if (value === undefined) req = store.delete(key);
+        else req = store.put(value, key);
+        req.onsuccess = function () { resolve(req.result); };
+        req.onerror = function () { reject(req.error); };
+      });
+    });
+  }
+  function applyBrochurePhotoNode_(node, url, custom) {
+    if (!node) return;
+    var img = node.querySelector('img');
+    var hint = node.querySelector('.bphoto-hint');
+    var revert = node.querySelector('[data-photo-revert]');
+    if (url && img) {
+      img.src = url;
+      img.hidden = false;
+      if (hint) hint.hidden = true;
+      node.classList.add('has-photo');
+    } else if (img) {
+      img.removeAttribute('src');
+      img.hidden = true;
+      if (hint) hint.hidden = false;
+      node.classList.remove('has-photo');
+    }
+    if (revert) revert.hidden = !custom;
+  }
+  function hydrateBrochurePhotos_() {
+    var token = ++brochureHydrateToken;
+    var nodes = document.querySelectorAll('#brochureFit [data-slot]');
+    nodes.forEach(function (node) {
+      var slot = node.getAttribute('data-slot');
+      var key = brochureBranch + '.' + slot;
+      var defaults = BROCHURE_PHOTO_DEFAULTS[brochureBranch] || {};
+      brochureIdb_('readonly', key).then(function (blob) {
+        if (token !== brochureHydrateToken) return;
+        var current = document.querySelector('#brochureFit [data-slot="' + slot + '"]');
+        if (!current) return;
+        if (blob) {
+          if (brochureBlobUrls_[key]) URL.revokeObjectURL(brochureBlobUrls_[key]);
+          var url = URL.createObjectURL(blob);
+          brochureBlobUrls_[key] = url;
+          applyBrochurePhotoNode_(current, url, true);
+          return;
+        }
+        applyBrochurePhotoNode_(current, defaults[slot] || '', false);
+      }).catch(function () {
+        if (token !== brochureHydrateToken) return;
+        var current = document.querySelector('#brochureFit [data-slot="' + slot + '"]');
+        applyBrochurePhotoNode_(current, defaults[slot] || '', false);
+      });
+    });
+  }
+  function loadQrCode_() {
+    if (typeof window.qrcode === 'function') return Promise.resolve(window.qrcode);
+    if (loadQrCode_._p) return loadQrCode_._p;
+    loadQrCode_._p = new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
+      s.onload = function () {
+        if (typeof window.qrcode === 'function') resolve(window.qrcode);
+        else reject(new Error('qr'));
+      };
+      s.onerror = function () { loadQrCode_._p = null; reject(new Error('qr')); };
+      document.head.appendChild(s);
+    });
+    return loadQrCode_._p;
+  }
+  function paintBrochureQr_() {
+    var img = document.querySelector('#brochureFit .bqr img');
+    if (!img || !brochures) return Promise.resolve();
+    var url = String(brochures[brochureBranch].outside.back.qrUrl || '').trim();
+    if (!url) {
+      img.removeAttribute('src');
+      return Promise.resolve();
+    }
+    return loadQrCode_().then(function (makeQr) {
+      var qr = makeQr(0, 'M');
+      qr.addData(url);
+      qr.make();
+      return qr.createDataURL(6, 0);
+    }).then(function (dataUrl) {
+      var current = document.querySelector('#brochureFit .bqr img');
+      if (current && dataUrl) current.src = dataUrl;
+    }).catch(function () {});
+  }
+  function syncBrochureBranchFromConsult() {
+    if (consultBranch !== 'yaksu' && consultBranch !== 'incheon') return;
+    if (brochureBranch === consultBranch) return;
+    brochureBranch = consultBranch;
+  }
+  function showBrochureView_() {
+    if (!brochures) brochures = loadBrochures_();
+    flushBrochureEdits_();
+    syncBrochureBranchFromConsult();
+    bindBrochure_();
+    renderBrochureTools_();
+    renderBrochurePreview_();
+  }
+  function brochureImagesReady_() {
+    var imgs = Array.prototype.slice.call(document.querySelectorAll('#brochureFit img'));
+    return Promise.all(imgs.map(function (img) {
+      if (!img.getAttribute('src')) return Promise.resolve();
+      if (img.complete && img.naturalWidth) return Promise.resolve();
+      return new Promise(function (resolve) {
+        img.onload = img.onerror = function () { resolve(); };
+      });
+    }));
+  }
+  function captureBrochureSheet_(sheet, h2c) {
+    var wasHidden = sheet.hidden;
+    var prevTransform = sheet.style.transform;
+    sheet.hidden = false;
+    sheet.classList.add('is-exporting');
+    sheet.style.transform = 'none';
+    sheet.style.position = 'fixed';
+    sheet.style.left = '-16000px';
+    sheet.style.top = '0';
+    function restore() {
+      sheet.classList.remove('is-exporting');
+      sheet.hidden = wasHidden;
+      sheet.style.transform = prevTransform;
+      sheet.style.position = '';
+      sheet.style.left = '';
+      sheet.style.top = '';
+    }
+    return new Promise(function (resolve) {
+      requestAnimationFrame(function () { requestAnimationFrame(resolve); });
+    }).then(function () {
+      return h2c(sheet, {
+        scale: 4,
+        backgroundColor: sheet.getAttribute('data-side') === 'inside' ? '#f6f4ed' : '#000000',
+        useCORS: true,
+        width: sheet.offsetWidth,
+        height: sheet.offsetHeight,
+        windowWidth: sheet.offsetWidth,
+        windowHeight: sheet.offsetHeight,
+        ignoreElements: function (el) {
+          return !!(el.classList && (el.classList.contains('brochure-fold') || el.classList.contains('brochure-screen')));
+        }
+      });
+    }).then(function (canvas) {
+      restore();
+      return canvas;
+    }, function (err) {
+      restore();
+      throw err;
+    });
+  }
+  function saveBrochure_(kind) {
+    flushBrochureEdits_();
+    var status = $('brochureStatus');
+    var asPdf = kind === 'pdf';
+    if (status) status.textContent = asPdf ? 'PDF를 만드는 중…' : '이미지를 만드는 중…';
+    var label = brochureBranch === 'incheon' ? '인천' : '약수';
+    var fonts = (document.fonts && document.fonts.load) ? Promise.all([
+      document.fonts.load('700 40px "Cormorant Garamond"'),
+      document.fonts.load('italic 700 34px "Cormorant Garamond"'),
+      document.fonts.load('700 16px Pretendard')
+    ]).catch(function () {}) : Promise.resolve();
+    Promise.resolve(fonts).then(function () {
+      return paintBrochureQr_();
+    }).then(function () {
+      return brochureImagesReady_();
+    }).then(function () {
+      return loadHtml2Canvas_();
+    }).then(function (h2c) {
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+      var outside = document.querySelector('#brochureFit [data-side="outside"]');
+      var inside = document.querySelector('#brochureFit [data-side="inside"]');
+      return captureBrochureSheet_(outside, h2c).then(function (front) {
+        return captureBrochureSheet_(inside, h2c).then(function (back) {
+          return [front, back];
+        });
+      });
+    }).then(function (pages) {
+      fitBrochureSheet_();
+      var fitted = pages.map(function (canvas) { return bizhowsFitCanvas(canvas, 'a4l'); });
+      if (asPdf) {
+        return Promise.all(fitted.map(function (sheet) {
+          return canvasCmykFlate(sheet).then(function (cmyk) {
+            return { cmyk: cmyk, w: sheet.width, h: sheet.height };
+          });
+        })).then(function (images) {
+          var name = '브로셔-' + label + '.pdf';
+          planDownloadBlob(planBuildPdf(images, bizhowsPt(30.0), bizhowsPt(21.3)), name);
+          if (status) status.textContent = name + ' 를 저장했습니다. 30.0×21.3cm, 2쪽, 300dpi, CMYK입니다.';
+        });
+      }
+      var names = ['브로셔-' + label + '-겉면.png', '브로셔-' + label + '-안쪽.png'];
+      triggerImageDownload(fitted[0].toDataURL('image/png'), names[0]);
+      setTimeout(function () { triggerImageDownload(fitted[1].toDataURL('image/png'), names[1]); }, 450);
+      if (status) status.textContent = names[0] + ', ' + names[1] + ' 를 저장했습니다. 각 30.0×21.3cm, 300dpi입니다.';
+    }).catch(function () {
+      fitBrochureSheet_();
+      if (status) status.textContent = '파일을 만들지 못했습니다. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.';
+    });
+  }
+  function bindBrochure_() {
+    if (brochureBound) return;
+    brochureBound = true;
+    var stage = $('brochureStage');
+    if (!stage) return;
+    stage.addEventListener('focusout', function (e) {
+      var el = e.target.closest ? e.target.closest('[data-bk]') : null;
+      if (!el || !stage.contains(el) || !brochures) return;
+      var path = el.getAttribute('data-bk');
+      var text = brochureFieldText_(el);
+      brochureSetPath_(brochures[brochureBranch], path, text);
+      el.textContent = text;
+      saveBrochures_();
+      if (/^inside\.programs\.items\.\d+\.title$/.test(path)) renderBrochureTools_();
+    });
+    stage.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') return;
+      var slotEl = e.target.closest ? e.target.closest('[data-slot]') : null;
+      if (slotEl && e.target === slotEl) {
+        e.preventDefault();
+        brochurePhotoTarget = slotEl;
+        $('brochurePhotoPick').click();
+        return;
+      }
+      var edit = e.target.closest ? e.target.closest('[data-bk]') : null;
+      if (edit && !edit.classList.contains('b-brand')) e.preventDefault();
+    });
+    stage.addEventListener('click', function (e) {
+      var revert = e.target.closest ? e.target.closest('[data-photo-revert]') : null;
+      if (revert) {
+        e.preventDefault();
+        e.stopPropagation();
+        var slot = revert.closest('[data-slot]');
+        if (!slot) return;
+        var key = brochureBranch + '.' + slot.getAttribute('data-slot');
+        brochureIdb_('readwrite', key).then(function () {
+          if (brochureBlobUrls_[key]) {
+            URL.revokeObjectURL(brochureBlobUrls_[key]);
+            delete brochureBlobUrls_[key];
+          }
+          hydrateBrochurePhotos_();
+        }).catch(function () {});
+        return;
+      }
+      var slotEl = e.target.closest ? e.target.closest('[data-slot]') : null;
+      if (!slotEl || !stage.contains(slotEl)) return;
+      if (e.target.closest && e.target.closest('.b-edit')) return;
+      brochurePhotoTarget = slotEl;
+      $('brochurePhotoPick').click();
+    });
+    $('brochureSides').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-brochure-side]');
+      if (!b) return;
+      flushBrochureEdits_();
+      brochureSide = b.getAttribute('data-brochure-side');
+      paintBrochureSide_();
+      fitBrochureSheet_();
+    });
+    $('brochureTools').addEventListener('input', function (e) {
+      if (e.target.id !== 'brochureQrUrl' || !brochures) return;
+      brochures[brochureBranch].outside.back.qrUrl = e.target.value;
+      saveBrochures_();
+      paintBrochureQr_();
+    });
+    $('brochureTools').addEventListener('change', function (e) {
+      var idx = e.target.getAttribute('data-hide-prog');
+      if (idx == null || !brochures) return;
+      flushBrochureEdits_();
+      brochures[brochureBranch].inside.programs.items[+idx].hidden = !!e.target.checked;
+      saveBrochures_();
+      renderBrochurePreview_();
+    });
+    $('brochurePhotoPick').addEventListener('change', function () {
+      var file = this.files && this.files[0];
+      var slotEl = brochurePhotoTarget;
+      this.value = '';
+      if (!file || !slotEl) return;
+      var slot = slotEl.getAttribute('data-slot');
+      var aspect = slotEl.clientHeight ? (slotEl.clientWidth / slotEl.clientHeight) : 1;
+      var key = brochureBranch + '.' + slot;
+      coverPhotoDataUrl(file, aspect).then(function (url) {
+        if (!url) return null;
+        return fetch(url).then(function (res) { return res.blob(); });
+      }).then(function (blob) {
+        if (!blob) return null;
+        return brochureIdb_('readwrite', key, blob);
+      }).then(function (saved) {
+        if (!saved && saved !== undefined) return;
+        hydrateBrochurePhotos_();
+        var status = $('brochureStatus');
+        if (status) status.textContent = '사진을 넣었습니다. 이 브라우저에 남습니다.';
+      }).catch(function () {
+        var status = $('brochureStatus');
+        if (status) status.textContent = '사진을 넣지 못했습니다. 다른 사진으로 다시 눌러 주세요.';
+      });
+    });
+    $('btnBrochurePng').addEventListener('click', function () { saveBrochure_('png'); });
+    $('btnBrochurePdf').addEventListener('click', function () { saveBrochure_('pdf'); });
+    $('btnBrochureReset').addEventListener('click', function () {
+      if (!brochures) brochures = loadBrochures_();
+      brochures[brochureBranch] = brochureDefaults_()[brochureBranch];
+      saveBrochures_();
+      renderBrochureTools_();
+      renderBrochurePreview_();
+      var status = $('brochureStatus');
+      if (status) status.textContent = '이 지점 문구를 처음 내용으로 되돌렸습니다.';
+    });
+  }
+
+
+  var SIGN_KEY = 'rm-sign-v1';
+  var SIGN_DPI = 120;
+  var signBranch = 'yaksu';
+  var signs = null;
+  var signBound = false;
+  var signPhotoTarget = null;
+  var signBlobUrls_ = {};
+  var SIGN_DEFAULT_PHOTOS = {
+    incheon: { 'person.0': 'brochure-photos/director-lee.jpg', 'person.1': 'brochure-photos/director-park.jpg' },
+    yaksu: { 'person.0': 'brochure-photos/director-choi.jpg', 'person.1': 'brochure-photos/director-park.jpg' }
+  };
+  var SIGN_LOGO = 'poster-photos/rm-logo.png';
+  var SIGN_MISSING = {
+    incheon: ['cover.jpg', 'lee-wide.jpg', 'activity.jpg', 'talk-qr.png', 'logo-rm.png', 'print-cmyk PDF/JPG'],
+    yaksu: ['cover.jpg', 'choi.jpg', 'park.png', 'talk-qr.png', 'logo-rm.png', 'print-cmyk PDF/JPG']
+  };
+
+  function signOne_(branch) {
+    var incheon = branch === 'incheon';
+    var place = incheon ? '인천점' : '약수점';
+    return {
+      kicker: incheon ? 'INCHEON · JAKJEON' : 'SEOUL · YAKSU',
+      headline1: incheon ? '편안한 움직임,' : '기능운동과 셀프 케어,',
+      headline2: incheon ? '스스로 이어 가도록' : '기초부터 시작합니다',
+      sub: '1:1 움직임 · 셀프 케어 스튜디오',
+      bar: '원장 직접 1:1 지도',
+      barSmall: '미국 카이로프랙틱 닥터 · 물리치료사',
+      docsHead: '원장 소개',
+      people: incheon ? [
+        {
+          name: '이상민 원장',
+          role: '인천점 원장 · D.C. / P.T.',
+          creds: [
+            '미국 카이로프랙틱 닥터 (D.C.)',
+            '대한민국 물리치료사 (P.T.)',
+            '前 서울아산재활의학과 도수치료과장',
+            '前 연세제일병원 도수운동치료실장',
+            '前 연세척추재활의학과 도수운동치료센터장'
+          ]
+        },
+        {
+          name: '박준규 원장',
+          role: '약수 · 인천 원장 · D.C. / P.T.',
+          creds: [
+            '미국 카이로프랙틱 닥터 (D.C.)',
+            '대한민국 물리치료사 (P.T.)',
+            '前 미국 LA 월턴 메디컬센터 부원장',
+            '前 잠실 롯데월드타워 정형외과 부원장',
+            '現 IFC 국제얼굴교정학회 학회장'
+          ]
+        }
+      ] : [
+        {
+          name: '최진옥 원장',
+          role: '약수점 원장 · D.C.',
+          creds: [
+            '카이로프랙틱 닥터 (D.C.)',
+            '前 한서대 건강관리학과 전임조교수',
+            '前 인천아시안게임 세팍타크로 팀닥터',
+            '前 대한카이로프랙틱협회(KAC) 재무이사·사무총장',
+            '한서대 카이로프랙틱학과 박사과정 수료'
+          ]
+        },
+        {
+          name: '박준규 원장',
+          role: '약수 · 인천 원장 · D.C. / P.T.',
+          creds: [
+            '미국 카이로프랙틱 닥터 (D.C.)',
+            '대한민국 물리치료사 (P.T.)',
+            '前 미국 LA 월턴 메디컬센터 부원장',
+            '前 잠실 롯데월드타워 정형외과 부원장',
+            '現 IFC 국제얼굴교정학회 학회장'
+          ]
+        }
+      ],
+      svcHead: '1:1 맞춤 움직임 ㅣ 셀프 케어',
+      tags: [
+        { text: '기능운동 1:1', badge: '' },
+        { text: '패시브 스트레칭', badge: '' },
+        { text: '실버 트레이닝', badge: '' },
+        { text: '선수 트레이닝', badge: '' },
+        { text: '바른 자세 습관', badge: '' },
+        { text: '리:얼 페이스 셀프 케어', badge: place + ' 클래스' }
+      ],
+      lines: [
+        { text: '원장 직접 1:1 · 4단계 움직임 평가 후 진행', hl: '' },
+        { text: '약력과 경력을 공개합니다', hl: '' },
+        { text: '리:얼 페이스 셀프 케어', hl: place + ' 클래스' }
+      ],
+      hours: ['평일 09:00 – 21:00', '토 09:00 – 16:00 · 일·공휴일 휴무'],
+      placeLine: incheon ? '힐스테이트자이계양 커뮤니티(도서관 옆)' : '약수역 5·6·7번 출구 도보 3분',
+      phoneLabel: '문의 · 예약',
+      phone: incheon ? '0507-1312-4596' : '0507-1359-4596',
+      addr: '네이버 톡톡으로 문의하세요',
+      qrUrl: incheon ? 'https://talk.naver.com/ct/w46xopt?frm=qr' : 'https://talk.naver.com/profile/c/real_movement_y',
+      qrCap1: '네이버 톡톡',
+      qrCap2: '문의 · 예약'
+    };
+  }
+  function signDefaults_() {
+    return { yaksu: signOne_('yaksu'), incheon: signOne_('incheon') };
+  }
+  function loadSigns_() {
+    var defaults = signDefaults_();
+    try {
+      var saved = JSON.parse(localStorage.getItem(SIGN_KEY) || 'null');
+      if (saved && typeof saved === 'object') {
+        return {
+          yaksu: mergeBrochure_(defaults.yaksu, saved.yaksu),
+          incheon: mergeBrochure_(defaults.incheon, saved.incheon)
+        };
+      }
+    } catch (e) {}
+    return defaults;
+  }
+  function saveSigns_() {
+    try { localStorage.setItem(SIGN_KEY, JSON.stringify(signs)); } catch (e) {}
+  }
+  function sgEdit_(tag, cls, path, text) {
+    return '<' + tag + ' class="' + cls + ' sg-edit" contenteditable="true" spellcheck="false" data-sg="' + path + '">' + escPrice_(text || '') + '</' + tag + '>';
+  }
+  function signPhotoBox_(slot, cls, missingName) {
+    return '<div class="' + cls + '" data-sign-slot="' + slot + '" role="button" tabindex="0">' +
+      '<img alt="" hidden>' +
+      '<span class="sg-missing">' + escPrice_(missingName) + '</span></div>';
+  }
+  function renderSignBoard_() {
+    var fit = $('signFit');
+    if (!fit) return;
+    if (!signs) signs = loadSigns_();
+    var card = signs[signBranch];
+    var people = (card.people || []).map(function (person, i) {
+      var creds = (person.creds || []).map(function (line, ci) {
+        return '<li class="sg-edit" contenteditable="true" spellcheck="false" data-sg="people.' + i + '.creds.' + ci + '">' + escPrice_(line) + '</li>';
+      }).join('');
+      var missing = signBranch === 'incheon' ? (i === 0 ? 'lee-wide.jpg 없음' : 'activity.jpg 없음') : (i === 0 ? 'choi.jpg 없음' : 'park.png 없음');
+      return '<div class="sg-doc"><div class="sg-doc-photo" data-sign-slot="person.' + i + '" role="button" tabindex="0"><img alt="" hidden><span class="sg-missing">' + missing + '</span></div><div class="sg-doc-text">' +
+        sgEdit_('div', 'sg-name', 'people.' + i + '.name', person.name) +
+        sgEdit_('div', 'sg-role', 'people.' + i + '.role', person.role) +
+        '<ul class="sg-bio">' + creds + '</ul></div></div>';
+    }).join('');
+    var tags = (card.tags || []).map(function (tag, i) {
+      var badge = tag.badge ? '<span class="sg-solo sg-edit" contenteditable="true" spellcheck="false" data-sg="tags.' + i + '.badge">' + escPrice_(tag.badge) + '</span>' : '';
+      return '<div class="sg-tag"><span class="sg-petal"></span>' + sgEdit_('span', '', 'tags.' + i + '.text', tag.text) + badge + '</div>';
+    }).join('');
+    var lines = (card.lines || []).map(function (line, i) {
+      var hl = line.hl ? ' <span class="sg-hl sg-edit" contenteditable="true" spellcheck="false" data-sg="lines.' + i + '.hl">' + escPrice_(line.hl) + '</span>' : '';
+      return '<li><span class="sg-petal"></span><span>' + sgEdit_('span', '', 'lines.' + i + '.text', line.text) + hl + '</span></li>';
+    }).join('');
+    var hours = (card.hours || []).map(function (line, i) {
+      return '<span class="sg-dot">●</span> ' + sgEdit_('span', '', 'hours.' + i, line);
+    }).join('<br>');
+    fit.innerHTML = '<article class="sg-board" aria-label="' + (signBranch === 'incheon' ? '인천' : '약수') + '점 입간판">' +
+      sgEdit_('div', 'sg-kicker', 'kicker', card.kicker) +
+      '<h1 class="sg-headline">' + sgEdit_('div', '', 'headline1', card.headline1) +
+        '<div>' + sgEdit_('span', '', 'headline2', card.headline2) + '<em>.</em></div></h1>' +
+      sgEdit_('p', 'sg-sub', 'sub', card.sub) +
+      '<div class="sg-logo"><img src="' + SIGN_LOGO + '" alt="REAL MOVEMENT"></div>' +
+      '<div class="sg-bar">' + sgEdit_('div', '', 'bar', card.bar) + sgEdit_('div', 'sg-bar-sub', 'barSmall', card.barSmall) + '</div>' +
+      signPhotoBox_('hero', 'sg-ph', 'cover.jpg 없음') +
+      sgEdit_('div', 'sg-docs-head', 'docsHead', card.docsHead) +
+      '<div class="sg-docs">' + people + '</div>' +
+      '<div class="sg-svc">' + sgEdit_('div', 'sg-svc-head', 'svcHead', card.svcHead) + '<div class="sg-grid">' + tags + '</div></div>' +
+      '<ul class="sg-cred">' + lines + '</ul>' +
+      '<p class="sg-hours">' + hours + '<br>' + sgEdit_('span', '', 'placeLine', card.placeLine) + '</p>' +
+      '<div class="sg-contact"><div>' +
+        '<div class="sg-tel">' + sgEdit_('span', 'sg-tel-label', 'phoneLabel', card.phoneLabel) + sgEdit_('div', '', 'phone', card.phone) + '</div>' +
+        sgEdit_('p', 'sg-addr', 'addr', card.addr) +
+      '</div><div><div class="sg-qr"><img alt=""></div>' +
+        sgEdit_('span', 'sg-qr-cap', 'qrCap1', card.qrCap1) + '<br>' + sgEdit_('span', 'sg-qr-cap', 'qrCap2', card.qrCap2) +
+      '</div></div></article>';
+    var note = $('signMissing');
+    if (note) note.textContent = '원본에만 있고 저장소에 없는 파일: ' + (SIGN_MISSING[signBranch] || []).join(', ') + '. 로고와 원장 얼굴은 저장소에 있는 파일을 씁니다. QR은 여기서 만듭니다.';
+    hydrateSignPhotos_();
+    paintSignQr_();
+    fitSignSheet_();
+    requestAnimationFrame(fitSignSheet_);
+  }
+  function fitSignSheet_() {
+    var fit = $('signFit');
+    var board = fit && fit.querySelector('.sg-board');
+    if (!fit || !board || !fit.clientWidth) return;
+    board.style.transform = 'none';
+    var scale = fit.clientWidth / (board.offsetWidth || 1);
+    if (!scale || scale > 1) scale = 1;
+    board.style.transform = 'scale(' + scale + ')';
+    fit.style.height = Math.ceil(board.offsetHeight * scale) + 'px';
+  }
+  function signDb_() {
+    return new Promise(function (resolve, reject) {
+      var req = indexedDB.open('rm-sign-photos', 1);
+      req.onupgradeneeded = function () {
+        if (!req.result.objectStoreNames.contains('photos')) req.result.createObjectStore('photos');
+      };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+    });
+  }
+  function signIdb_(mode, key, value) {
+    return signDb_().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction('photos', mode);
+        var store = tx.objectStore('photos');
+        var req = mode === 'readonly' ? store.get(key) : (value === undefined ? store.delete(key) : store.put(value, key));
+        req.onsuccess = function () { resolve(req.result); };
+        req.onerror = function () { reject(req.error); };
+      });
+    });
+  }
+  function applySignPhoto_(node, url) {
+    if (!node) return;
+    var img = node.querySelector('img');
+    var miss = node.querySelector('.sg-missing');
+    if (url && img) {
+      img.src = url;
+      img.hidden = false;
+      if (miss) miss.hidden = true;
+    } else if (img) {
+      img.removeAttribute('src');
+      img.hidden = true;
+      if (miss) miss.hidden = false;
+    }
+  }
+  function hydrateSignPhotos_() {
+    document.querySelectorAll('#signFit [data-sign-slot]').forEach(function (node) {
+      var slot = node.getAttribute('data-sign-slot');
+      var key = signBranch + '.' + slot;
+      var defaults = SIGN_DEFAULT_PHOTOS[signBranch] || {};
+      signIdb_('readonly', key).then(function (blob) {
+        var current = document.querySelector('#signFit [data-sign-slot="' + slot + '"]');
+        if (!current) return;
+        if (blob) {
+          if (signBlobUrls_[key]) URL.revokeObjectURL(signBlobUrls_[key]);
+          var url = URL.createObjectURL(blob);
+          signBlobUrls_[key] = url;
+          applySignPhoto_(current, url);
+          return;
+        }
+        applySignPhoto_(current, defaults[slot] || '');
+      }).catch(function () {
+        applySignPhoto_(document.querySelector('#signFit [data-sign-slot="' + slot + '"]'), (SIGN_DEFAULT_PHOTOS[signBranch] || {})[slot] || '');
+      });
+    });
+  }
+  function paintSignQr_() {
+    var img = document.querySelector('#signFit .sg-qr img');
+    if (!img || !signs) return Promise.resolve();
+    var url = String(signs[signBranch].qrUrl || '').trim();
+    if (!url) { img.removeAttribute('src'); return Promise.resolve(); }
+    return loadQrCode_().then(function (makeQr) {
+      var qr = makeQr(0, 'M');
+      qr.addData(url);
+      qr.make();
+      return qr.createDataURL(6, 0);
+    }).then(function (dataUrl) {
+      var current = document.querySelector('#signFit .sg-qr img');
+      if (current && dataUrl) current.src = dataUrl;
+    }).catch(function () {});
+  }
+  function flushSignEdits_() {
+    if (!signs) return;
+    var nodes = document.querySelectorAll('#signFit [data-sg]');
+    if (!nodes.length) return;
+    nodes.forEach(function (el) {
+      brochureSetPath_(signs[signBranch], el.getAttribute('data-sg'), brochureFieldText_(el));
+    });
+    saveSigns_();
+  }
+  function showSignView_() {
+    if (!signs) signs = loadSigns_();
+    flushSignEdits_();
+    if (consultBranch === 'yaksu' || consultBranch === 'incheon') signBranch = consultBranch;
+    bindSign_();
+    renderSignBoard_();
+  }
+  function signPx_(cm) { return Math.round(cm / 2.54 * SIGN_DPI); }
+  function fitRaster_(source, w, h) {
+    var c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    var g = c.getContext('2d');
+    g.imageSmoothingEnabled = true;
+    g.imageSmoothingQuality = 'high';
+    g.drawImage(source, 0, 0, w, h);
+    return c;
+  }
+  function captureNode_(node, scale, bg) {
+    var prev = node.style.transform;
+    node.style.transform = 'none';
+    node.style.position = 'fixed';
+    node.style.left = '-20000px';
+    node.style.top = '0';
+    function restore() {
+      node.style.transform = prev;
+      node.style.position = '';
+      node.style.left = '';
+      node.style.top = '';
+    }
+    return new Promise(function (resolve) {
+      requestAnimationFrame(function () { requestAnimationFrame(resolve); });
+    }).then(function () { return loadHtml2Canvas_(); }).then(function (h2c) {
+      return h2c(node, {
+        scale: scale,
+        backgroundColor: bg,
+        useCORS: true,
+        width: node.offsetWidth,
+        height: node.offsetHeight,
+        windowWidth: node.offsetWidth,
+        windowHeight: node.offsetHeight
+      });
+    }).then(function (canvas) {
+      restore();
+      return canvas;
+    }, function (err) {
+      restore();
+      throw err;
+    });
+  }
+  function saveSign_(kind) {
+    flushSignEdits_();
+    var status = $('signStatus');
+    var asPdf = kind === 'pdf';
+    if (status) status.textContent = asPdf ? 'PDF를 만드는 중…' : '이미지를 만드는 중…';
+    var label = signBranch === 'incheon' ? '인천' : '약수';
+    var board = document.querySelector('#signFit .sg-board');
+    if (!board) return;
+    var fonts = (document.fonts && document.fonts.load) ? document.fonts.load('900 40px SCDream').catch(function () {}) : Promise.resolve();
+    Promise.resolve(fonts).then(function () { return paintSignQr_(); }).then(function () {
+      var targetW = signPx_(60);
+      var scale = targetW / (board.offsetWidth || 1);
+      if (scale < 1) scale = 1;
+      if (scale > 2.2) scale = 2.2;
+      return captureNode_(board, scale, '#F7F4EE');
+    }).then(function (canvas) {
+      fitSignSheet_();
+      var sheet = fitRaster_(canvas, signPx_(60), signPx_(180));
+      var base = '입간판-' + label;
+      if (asPdf) {
+        return canvasCmykFlate(sheet).then(function (cmyk) {
+          planDownloadBlob(planBuildPdf([{ cmyk: cmyk, w: sheet.width, h: sheet.height }], bizhowsPt(60), bizhowsPt(180)), base + '.pdf');
+          if (status) status.textContent = base + '.pdf 를 저장했습니다. 60×180cm, ' + SIGN_DPI + 'dpi, CMYK입니다.';
+        });
+      }
+      triggerImageDownload(sheet.toDataURL('image/png'), base + '.png');
+      if (status) status.textContent = base + '.png 를 저장했습니다. 60×180cm, ' + SIGN_DPI + 'dpi입니다.';
+    }).catch(function () {
+      fitSignSheet_();
+      if (status) status.textContent = '파일을 만들지 못했습니다. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.';
+    });
+  }
+  function bindSign_() {
+    if (signBound) return;
+    signBound = true;
+    var fit = $('signFit');
+    if (!fit) return;
+    fit.addEventListener('focusout', function (e) {
+      var el = e.target.closest ? e.target.closest('[data-sg]') : null;
+      if (!el || !signs) return;
+      brochureSetPath_(signs[signBranch], el.getAttribute('data-sg'), brochureFieldText_(el));
+      el.textContent = brochureFieldText_(el);
+      saveSigns_();
+    });
+    fit.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        var edit = e.target.closest ? e.target.closest('[data-sg]') : null;
+        if (edit) e.preventDefault();
+      }
+    });
+    fit.addEventListener('click', function (e) {
+      var slotEl = e.target.closest ? e.target.closest('[data-sign-slot]') : null;
+      if (!slotEl) return;
+      if (e.target.closest && e.target.closest('.sg-edit')) return;
+      signPhotoTarget = slotEl;
+      $('signPhotoPick').click();
+    });
+    $('signPhotoPick').addEventListener('change', function () {
+      var file = this.files && this.files[0];
+      var slotEl = signPhotoTarget;
+      this.value = '';
+      if (!file || !slotEl) return;
+      var slot = slotEl.getAttribute('data-sign-slot');
+      var aspect = slotEl.clientHeight ? slotEl.clientWidth / slotEl.clientHeight : 1;
+      var key = signBranch + '.' + slot;
+      coverPhotoDataUrl(file, aspect).then(function (url) {
+        if (!url) return null;
+        return fetch(url).then(function (res) { return res.blob(); });
+      }).then(function (blob) {
+        if (!blob) return null;
+        return signIdb_('readwrite', key, blob);
+      }).then(function () { hydrateSignPhotos_(); }).catch(function () {
+        var status = $('signStatus');
+        if (status) status.textContent = '사진을 넣지 못했습니다.';
+      });
+    });
+    $('btnSignPng').addEventListener('click', function () { saveSign_('png'); });
+    $('btnSignPdf').addEventListener('click', function () { saveSign_('pdf'); });
+    $('btnSignReset').addEventListener('click', function () {
+      if (!signs) signs = loadSigns_();
+      signs[signBranch] = signDefaults_()[signBranch];
+      saveSigns_();
+      renderSignBoard_();
+      var status = $('signStatus');
+      if (status) status.textContent = '이 지점 문구를 처음 내용으로 되돌렸습니다.';
+    });
+  }
+
+  var PLAQUE_KEY = 'rm-plaque-v1';
+  var PLAQUE_DPI = 200;
+  var plaqueSize = 'a4';
+  var plaqueCopy = null;
+  var plaqueBound = false;
+  var PLAQUE_LOGO = '수료증/IFC학회 로고.png';
+  function plaqueDefaults_() {
+    return { en1: 'INTERNATIONAL', en2: 'FACE CORRECTION', ko: '국제얼굴교정학회', sub: '공식인증점' };
+  }
+  function loadPlaque_() {
+    var base = plaqueDefaults_();
+    try {
+      var saved = JSON.parse(localStorage.getItem(PLAQUE_KEY) || 'null');
+      if (saved && typeof saved === 'object') return mergeBrochure_(base, saved);
+    } catch (e) {}
+    return base;
+  }
+  function savePlaque_() {
+    try { localStorage.setItem(PLAQUE_KEY, JSON.stringify(plaqueCopy)); } catch (e) {}
+  }
+  function plaqueSpec_(size) {
+    if (size === 'a3') return { w: 42, h: 29.7, cls: 'pl-a3', layout: 'row', label: 'A3 가로 420×297mm' };
+    if (size === 'sq') return { w: 30, h: 30, cls: 'pl-sq', layout: 'stack', label: '정사각 300×300mm' };
+    if (size === 'sq-shop') return { w: 30, h: 30, cls: 'pl-sq shop-a', layout: 'shop-a', label: '인증샵 A 300×300mm' };
+    if (size === 'sq-shop-flip') return { w: 30, h: 30, cls: 'pl-sq shop-b', layout: 'shop-b', label: '인증샵 B 300×300mm' };
+    if (size === 'sq-shop-row') return { w: 30, h: 30, cls: 'pl-sq shop-c', layout: 'shop-c', label: '인증샵 C 300×300mm' };
+    return { w: 21, h: 29.7, cls: 'pl-a4', layout: 'portrait', label: 'A4 세로 210×297mm' };
+  }
+  function plaqueCopyHtml_() {
+    if (!plaqueCopy) plaqueCopy = loadPlaque_();
+    var c = plaqueCopy;
+    return '<div class="pl-en"><span class="pl-edit" contenteditable="true" spellcheck="false" data-pg="en1">' + escPrice_(c.en1) + '</span>' +
+      '<span class="pl-edit" contenteditable="true" spellcheck="false" data-pg="en2">' + escPrice_(c.en2) + '</span></div>' +
+      '<div class="pl-rule" aria-hidden="true"><i></i></div>' +
+      '<div class="pl-ko pl-edit" contenteditable="true" spellcheck="false" data-pg="ko">' + escPrice_(c.ko) + '</div>' +
+      '<div class="pl-sub pl-edit" contenteditable="true" spellcheck="false" data-pg="sub">' + escPrice_(c.sub) + '</div>';
+  }
+  function plaqueShopHtml_() {
+    return '<div class="pl-shop">NUON_WELL_BEAUTY_LAB_로고.png<br>없음</div>';
+  }
+  function renderPlaque_() {
+    var fit = $('plaqueFit');
+    var sizes = $('plaqueSizes');
+    if (!fit) return;
+    if (!plaqueCopy) plaqueCopy = loadPlaque_();
+    var spec = plaqueSpec_(plaqueSize);
+    var pins = '<span class="pl-pin tl"></span><span class="pl-pin tr"></span><span class="pl-pin bl"></span><span class="pl-pin br"></span>';
+    var logo = '<div class="pl-logo"><img src="' + PLAQUE_LOGO + '" alt="국제얼굴교정학회"></div>';
+    var copy = '<div class="pl-copy">' + plaqueCopyHtml_() + '</div>';
+    var inner = '';
+    if (spec.layout === 'row') inner = '<div class="pl-layout row">' + logo + copy + '</div>';
+    else if (spec.layout === 'shop-a') inner = '<div class="pl-layout stack"><div class="pl-unit">' + logo + copy + plaqueShopHtml_() + '</div></div>';
+    else if (spec.layout === 'shop-b') inner = '<div class="pl-layout stack"><div class="pl-unit">' + plaqueShopHtml_() + copy + logo + '</div></div>';
+    else if (spec.layout === 'shop-c') inner = '<div class="pl-layout stack"><div class="pl-unit"><div class="pl-pair">' + logo + '<span class="pl-div"></span>' + plaqueShopHtml_() + '</div>' + copy + '</div></div>';
+    else inner = '<div class="pl-layout portrait"><div class="pl-unit">' + logo + copy + '</div></div>';
+    fit.innerHTML = '<article class="pl-board ' + spec.cls + '">' + pins + inner + '</article>';
+    if (sizes) {
+      var opts = [
+        ['a3', 'A3'], ['a4', 'A4'], ['sq', '정사각'],
+        ['sq-shop', '샵 A'], ['sq-shop-flip', '샵 B'], ['sq-shop-row', '샵 C']
+      ];
+      sizes.innerHTML = opts.map(function (item) {
+        return '<button type="button" class="chip' + (item[0] === plaqueSize ? ' active' : '') + '" data-plaque-size="' + item[0] + '">' + item[1] + '</button>';
+      }).join('');
+    }
+    var status = $('plaqueStatus');
+    if (status && status.textContent.indexOf('저장') < 0) status.textContent = spec.label + ' · ' + PLAQUE_DPI + 'dpi';
+    fitPlaqueSheet_();
+    requestAnimationFrame(fitPlaqueSheet_);
+  }
+  function fitPlaqueSheet_() {
+    var fit = $('plaqueFit');
+    var board = fit && fit.querySelector('.pl-board');
+    if (!fit || !board || !fit.clientWidth) return;
+    board.style.transform = 'none';
+    var scale = fit.clientWidth / (board.offsetWidth || 1);
+    if (!scale || scale > 1) scale = 1;
+    board.style.transform = 'scale(' + scale + ')';
+    fit.style.height = Math.ceil(board.offsetHeight * scale) + 'px';
+  }
+  function flushPlaque_() {
+    if (!plaqueCopy) return;
+    document.querySelectorAll('#plaqueFit [data-pg]').forEach(function (el) {
+      brochureSetPath_(plaqueCopy, el.getAttribute('data-pg'), brochureFieldText_(el));
+    });
+    savePlaque_();
+  }
+  function showPlaqueView_() {
+    if (!plaqueCopy) plaqueCopy = loadPlaque_();
+    flushPlaque_();
+    bindPlaque_();
+    renderPlaque_();
+  }
+  function savePlaqueFile_(kind) {
+    flushPlaque_();
+    var status = $('plaqueStatus');
+    var spec = plaqueSpec_(plaqueSize);
+    var board = document.querySelector('#plaqueFit .pl-board');
+    if (!board) return;
+    if (status) status.textContent = kind === 'pdf' ? 'PDF를 만드는 중…' : '이미지를 만드는 중…';
+    var targetW = Math.round(spec.w / 2.54 * PLAQUE_DPI);
+    var targetH = Math.round(spec.h / 2.54 * PLAQUE_DPI);
+    var fonts = (document.fonts && document.fonts.load) ? document.fonts.load('700 48px "Cormorant Garamond"').catch(function () {}) : Promise.resolve();
+    Promise.resolve(fonts).then(function () {
+      var scale = targetW / (board.offsetWidth || 1);
+      if (scale < 1) scale = 1;
+      if (scale > 3) scale = 3;
+      return captureNode_(board, scale, '#ffffff');
+    }).then(function (canvas) {
+      fitPlaqueSheet_();
+      var sheet = fitRaster_(canvas, targetW, targetH);
+      var base = 'IFC현판-' + plaqueSize;
+      if (kind === 'pdf') {
+        return canvasCmykFlate(sheet).then(function (cmyk) {
+          planDownloadBlob(planBuildPdf([{ cmyk: cmyk, w: sheet.width, h: sheet.height }], bizhowsPt(spec.w), bizhowsPt(spec.h)), base + '.pdf');
+          if (status) status.textContent = base + '.pdf · ' + spec.label + ', ' + PLAQUE_DPI + 'dpi, CMYK';
+        });
+      }
+      triggerImageDownload(sheet.toDataURL('image/png'), base + '.png');
+      if (status) status.textContent = base + '.png · ' + spec.label + ', ' + PLAQUE_DPI + 'dpi';
+    }).catch(function () {
+      fitPlaqueSheet_();
+      if (status) status.textContent = '파일을 만들지 못했습니다. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.';
+    });
+  }
+  function bindPlaque_() {
+    if (plaqueBound) return;
+    plaqueBound = true;
+    var fit = $('plaqueFit');
+    if (!fit) return;
+    fit.addEventListener('focusout', function (e) {
+      var el = e.target.closest ? e.target.closest('[data-pg]') : null;
+      if (!el || !plaqueCopy) return;
+      brochureSetPath_(plaqueCopy, el.getAttribute('data-pg'), brochureFieldText_(el));
+      savePlaque_();
+    });
+    fit.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && e.target.closest && e.target.closest('[data-pg]')) e.preventDefault();
+    });
+    $('plaqueSizes').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-plaque-size]');
+      if (!b) return;
+      flushPlaque_();
+      plaqueSize = b.getAttribute('data-plaque-size');
+      renderPlaque_();
+    });
+    $('btnPlaquePng').addEventListener('click', function () { savePlaqueFile_('png'); });
+    $('btnPlaquePdf').addEventListener('click', function () { savePlaqueFile_('pdf'); });
+  }
+
   var appWhich = 'consult';
   var offerView = 'price';
   function setAppTab(which) {
@@ -8977,6 +10807,10 @@
     document.body.classList.toggle('mode-unbooked', which === 'unbooked');
     document.body.classList.toggle('mode-plan', which === 'plan');
     document.body.classList.toggle('mode-price', false);
+    document.body.classList.toggle('offer-price', false);
+    document.body.classList.toggle('offer-brochure', false);
+    document.body.classList.toggle('offer-sign', false);
+    document.body.classList.toggle('offer-plaque', false);
     document.body.classList.toggle('mode-receipt', which === 'receipt');
     document.body.classList.toggle('mode-docs', which === 'docs');
     $('panelConsult').classList.toggle('active', which === 'consult');
@@ -8984,6 +10818,9 @@
     $('panelUnbooked').classList.toggle('active', which === 'unbooked');
     $('panelPlan').classList.toggle('active', which === 'plan');
     $('panelPrice').classList.toggle('active', false);
+    $('panelBrochure').classList.toggle('active', false);
+    if ($('panelSign')) $('panelSign').classList.toggle('active', false);
+    if ($('panelPlaque')) $('panelPlaque').classList.toggle('active', false);
     $('panelReceipt').classList.toggle('active', which === 'receipt');
     $('panelDocs').classList.toggle('active', which === 'docs');
     $('appTabConsult').classList.toggle('active', which === 'consult');
@@ -8995,7 +10832,7 @@
     if (linkBtn) linkBtn.classList.toggle('active', which === 'links');
     if (docsBtn) docsBtn.classList.toggle('active', which === 'docs');
     $('pageTitle').textContent = which === 'consult' ? '상담 메뉴얼' : which === 'links' ? '링크 모음' : which === 'unbooked' ? '미예약 확인' : which === 'plan' ? '포스터·제안서' : which === 'receipt' ? '영문 영수증' : '세금 서류';
-    $('pageSub').textContent = which === 'plan' ? '약수·인천은 가격표와 리얼무브먼트·리얼페이스입니다. 과정은 포스터, 수료증, 제안서입니다.' : which === 'receipt' ? '발급 기관을 고른 뒤 항목을 입력하세요' : '프리랜서를 고른 뒤 지급액을 입력하세요';
+    $('pageSub').textContent = which === 'plan' ? '약수·인천은 가격표, 브로셔, 입간판, 리얼무브먼트·리얼페이스입니다. 과정은 포스터, 수료증, 제안서, IFC 현판입니다.' : which === 'receipt' ? '발급 기관을 고른 뒤 항목을 입력하세요' : '프리랜서를 고른 뒤 지급액을 입력하세요';
     syncShell();
     if (which === 'receipt') {
       if (receiptPrefillFromQuery && !receiptPrefillApplied) {
@@ -9020,8 +10857,10 @@
     if (!show) return;
     var academy = isAcademyBranch();
     var items = academy
-      ? [{ id: 'poster', label: '포스터' }, { id: 'cert', label: '수료증' }, { id: 'proposal', label: '제안서' }]
-      : [{ id: 'price', label: '가격표' }, { id: 'movement', label: '리얼무브먼트' }, { id: 'face', label: '리얼페이스' }];
+      ? (consultBranch === 'ifc'
+        ? [{ id: 'poster', label: '포스터' }, { id: 'cert', label: '수료증' }, { id: 'proposal', label: '제안서' }, { id: 'plaque', label: '현판' }]
+        : [{ id: 'poster', label: '포스터' }, { id: 'cert', label: '수료증' }, { id: 'proposal', label: '제안서' }])
+      : [{ id: 'price', label: '가격표' }, { id: 'brochure', label: '브로셔' }, { id: 'sign', label: '입간판' }, { id: 'movement', label: '리얼무브먼트' }, { id: 'face', label: '리얼페이스' }];
     var allowed = items.some(function (item) { return item.id === offerView; });
     if (!allowed) offerView = items[0].id;
     nav.innerHTML = items.map(function (item) {
@@ -9041,22 +10880,40 @@
     if (appWhich !== 'plan') return;
     var academy = isAcademyBranch();
     var showPrice = !academy && offerView === 'price';
+    var showBrochure = !academy && offerView === 'brochure';
+    var showSign = !academy && offerView === 'sign';
+    var showPlaque = academy && consultBranch === 'ifc' && offerView === 'plaque';
     if ($('pageSub')) {
-      $('pageSub').textContent = showPrice
-        ? '금액을 고친 뒤 PNG로 받으세요. 고친 내용은 이 브라우저에 남습니다.'
-        : (academy
-          ? '과정은 포스터, 수료증, 제안서입니다.'
-          : '리얼무브먼트와 리얼페이스는 포스터, 제안서, 프로그램입니다.');
+      var sub = '리얼무브먼트와 리얼페이스는 포스터, 제안서, 프로그램입니다.';
+      if (showPlaque) sub = '공식인증점 현판입니다. 규격을 고른 뒤 PNG 또는 PDF로 받으세요.';
+      else if (showSign) sub = '글자와 사진을 입간판에서 누르면 바로 고칩니다. 단면 60×180cm입니다.';
+      else if (showBrochure) sub = '글자와 사진을 브로셔에서 누르면 바로 고칩니다. 고친 내용은 이 브라우저에 남습니다.';
+      else if (showPrice) sub = '금액을 고친 뒤 PNG로 받으세요. 고친 내용은 이 브라우저에 남습니다.';
+      else if (academy) sub = consultBranch === 'ifc' ? '과정은 포스터, 수료증, 제안서, 현판입니다.' : '과정은 포스터, 수료증, 제안서입니다.';
+      $('pageSub').textContent = sub;
     }
     document.body.classList.toggle('offer-price', showPrice);
-    $('panelPlan').classList.toggle('active', !showPrice);
+    document.body.classList.toggle('offer-brochure', showBrochure);
+    document.body.classList.toggle('offer-sign', showSign);
+    document.body.classList.toggle('offer-plaque', showPlaque);
+    $('panelPlan').classList.toggle('active', !showPrice && !showBrochure && !showSign && !showPlaque);
     $('panelPrice').classList.toggle('active', showPrice);
+    if ($('panelBrochure')) $('panelBrochure').classList.toggle('active', showBrochure);
+    if ($('panelSign')) $('panelSign').classList.toggle('active', showSign);
+    if ($('panelPlaque')) $('panelPlaque').classList.toggle('active', showPlaque);
     var empty = $('planAcademyEmpty');
     var tools = document.querySelector('#panelPlan .plan-tools');
     var seed = $('planSeed');
     if (academy) {
       if (tools) tools.hidden = true;
       if (seed) seed.hidden = true;
+      if (showPlaque) {
+        if (empty) empty.hidden = true;
+        if ($('posterCard')) $('posterCard').hidden = true;
+        if ($('certPanel')) $('certPanel').hidden = true;
+        showPlaqueView_();
+        return;
+      }
       if (empty) {
         empty.hidden = offerView !== 'proposal';
         var text = $('planAcademyEmptyText');
@@ -9077,6 +10934,14 @@
       paintPriceBranch_();
       renderPriceEditor_();
       renderPricePreview_();
+      return;
+    }
+    if (showBrochure) {
+      showBrochureView_();
+      return;
+    }
+    if (showSign) {
+      showSignView_();
       return;
     }
     var id = offerView === 'face' ? 'face' : 'movement';
@@ -9802,7 +11667,7 @@
   function bizhowsPx(cm) { return Math.round(cm / 2.54 * 300); }
   function bizhowsPt(cm) { return cm / 2.54 * 72; }
   function bizhowsFitCanvas(source, which) {
-    var spec = which === 'a4' ? [21.3, 30.0] : [30.0, 42.6];
+    var spec = which === 'a4' ? [21.3, 30.0] : which === 'a4l' ? [30.0, 21.3] : [30.0, 42.6];
     var bleed = bizhowsPx(0.15);
     var W = bizhowsPx(spec[0]);
     var H = bizhowsPx(spec[1]);
@@ -9810,6 +11675,66 @@
     c.width = W;
     c.height = H;
     var g = c.getContext('2d');
+    g.imageSmoothingEnabled = true;
+    g.imageSmoothingQuality = 'high';
+    if (which === 'a4l') {
+      var iw = W - bleed * 2;
+      var ih = H - bleed * 2;
+      var sw0 = source.width;
+      var sh0 = source.height;
+      var sl = 0, sr = 0, st = 0, sb = 0;
+      try {
+        var sg = source.getContext('2d');
+        function fringeAt(side, i) {
+          var spots = [0.18, 0.4, 0.62, 0.84];
+          var odd = 0;
+          for (var s = 0; s < spots.length; s++) {
+            var x, y, ix, iy;
+            if (side === 'left' || side === 'right') {
+              y = Math.min(sh0 - 1, Math.floor(sh0 * spots[s]));
+              x = side === 'left' ? i : sw0 - 1 - i;
+              ix = side === 'left' ? Math.min(sw0 - 1, x + 8) : Math.max(0, x - 8);
+              iy = y;
+            } else {
+              x = Math.min(sw0 - 1, Math.floor(sw0 * spots[s]));
+              y = side === 'top' ? i : sh0 - 1 - i;
+              ix = x;
+              iy = side === 'top' ? Math.min(sh0 - 1, y + 8) : Math.max(0, y - 8);
+            }
+            var a = sg.getImageData(x, y, 1, 1).data;
+            var b = sg.getImageData(ix, iy, 1, 1).data;
+            var delta = Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]);
+            if (delta > 36) odd++;
+          }
+          return odd;
+        }
+        function inset(side) {
+          var n = 0;
+          for (var i = 0; i < 10; i++) {
+            if (fringeAt(side, i) >= 2) n = i + 1;
+            else break;
+          }
+          return n;
+        }
+        sl = inset('left');
+        sr = inset('right');
+        st = inset('top');
+        sb = inset('bottom');
+      } catch (eEdge) {}
+      var cropW = Math.max(1, sw0 - sl - sr);
+      var cropH = Math.max(1, sh0 - st - sb);
+      g.drawImage(source, sl, st, cropW, cropH, bleed, bleed, iw, ih);
+      g.imageSmoothingEnabled = false;
+      g.drawImage(source, sl, st, 1, cropH, 0, bleed, bleed, ih);
+      g.drawImage(source, sl + cropW - 1, st, 1, cropH, bleed + iw, bleed, bleed, ih);
+      g.drawImage(source, sl, st, cropW, 1, bleed, 0, iw, bleed);
+      g.drawImage(source, sl, st + cropH - 1, cropW, 1, bleed, bleed + ih, iw, bleed);
+      g.drawImage(source, sl, st, 1, 1, 0, 0, bleed, bleed);
+      g.drawImage(source, sl + cropW - 1, st, 1, 1, bleed + iw, 0, bleed, bleed);
+      g.drawImage(source, sl, st + cropH - 1, 1, 1, 0, bleed + ih, bleed, bleed);
+      g.drawImage(source, sl + cropW - 1, st + cropH - 1, 1, 1, bleed + iw, bleed + ih, bleed, bleed);
+      return c;
+    }
     var paper = which === 'a4' ? '#3c342f' : '#FBF8F2';
     try {
       var px = source.getContext('2d').getImageData(2, 2, 1, 1).data;
@@ -9817,8 +11742,6 @@
     } catch (e) {}
     g.fillStyle = paper;
     g.fillRect(0, 0, W, H);
-    g.imageSmoothingEnabled = true;
-    g.imageSmoothingQuality = 'high';
     g.drawImage(source, bleed, bleed, W - bleed * 2, H - bleed * 2);
     return c;
   }
@@ -11123,6 +13046,9 @@
     fitFaqBox();
     if (document.body.classList.contains('mode-receipt')) fitPreview();
     if (document.body.classList.contains('offer-price')) fitPriceSheet_();
+    if (document.body.classList.contains('offer-brochure')) fitBrochureSheet_();
+    if (document.body.classList.contains('offer-sign')) fitSignSheet_();
+    if (document.body.classList.contains('offer-plaque')) fitPlaqueSheet_();
     if (document.body.classList.contains('mode-plan') && planPart === 'proposal') mountPlanHits_();
   });
   var pageTitle = document.title;
