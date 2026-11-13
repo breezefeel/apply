@@ -466,16 +466,18 @@
       text-decoration-color: currentColor;
     }
     .member-chip.absent {
-      background:#fee2e2 !important;
-      border-color:#fca5a5 !important;
-      color:#991b1b;
+      background:#d9d9d9 !important;
+      border-color:#bdbdbd !important;
+      color:#555;
     }
-    .member-chip.absent .chip-name {
-      color:#991b1b !important;
+    .member-chip.absent .chip-name,
+    .member-chip.absent .sess,
+    .member-chip.absent .time-tag,
+    .member-chip.absent .dual-tag {
+      color:#555 !important;
     }
     .member-chip.absent .sess,
     .member-chip.absent .time-tag {
-      color:#991b1b;
       opacity:.82;
     }
     .member-chip.absent.on {
@@ -527,8 +529,9 @@
        tone-last: current >= total (마지막·초과) #f4b4b4
        글자는 #1a1a1a. 강사 색은 인라인 background라 !important 로만 덮인다.
        .done 취소선, .sess-note, .on, .dual-partial, .search-selected 는 건드리지 않는다.
-       결석(.absent)은 톤보다 결석 색이 우선이다. 만들 때 클래스를 안 붙이고,
-       같이 있어도 아래 규칙이 결석 배경·글자색을 유지한다.
+       결석(.absent)은 노랑/빨강보다 회색(#d9d9d9, 테두리 #bdbdbd, 글자 #555)이 우선이다.
+       결석 칩은 톤 유무와 관계없이 같은 회색이다. 만들 때 톤 클래스를 안 붙이고,
+       같이 있어도 아래 규칙이 회색을 유지한다. 취소선과 .on 선택 테두리는 그대로다.
        취소·상담처럼 회차 비가 아닌 문구(.sess-note)는 클래스를 붙이지 않아 취소선만 남긴다. */
     .member-chip.tone-last-1 {
       background:#f6e27a !important;
@@ -556,17 +559,19 @@
     }
     .member-chip.absent.tone-last-1,
     .member-chip.absent.tone-last {
-      background:#fee2e2 !important;
-      border-color:#fca5a5 !important;
-      color:#991b1b;
+      background:#d9d9d9 !important;
+      border-color:#bdbdbd !important;
+      color:#555;
     }
     .member-chip.absent.tone-last-1 .chip-name,
     .member-chip.absent.tone-last .chip-name,
     .member-chip.absent.tone-last-1 .sess,
     .member-chip.absent.tone-last .sess,
     .member-chip.absent.tone-last-1 .time-tag,
-    .member-chip.absent.tone-last .time-tag {
-      color:#991b1b !important;
+    .member-chip.absent.tone-last .time-tag,
+    .member-chip.absent.tone-last-1 .dual-tag,
+    .member-chip.absent.tone-last .dual-tag {
+      color:#555 !important;
     }
     .members-hd {
       display: flex;
@@ -821,11 +826,18 @@
       .member-chip .sess { font-size:10px; }
       .member-chip.tone-last-1 { background:#f6e27a !important; color:#1a1a1a; }
       .member-chip.tone-last { background:#f4b4b4 !important; color:#1a1a1a; }
+      .member-chip.absent,
       .member-chip.absent.tone-last-1,
       .member-chip.absent.tone-last {
-        background:#fee2e2 !important;
-        border-color:#fca5a5 !important;
-        color:#991b1b;
+        background:#d9d9d9 !important;
+        border-color:#bdbdbd !important;
+        color:#555;
+      }
+      .member-chip.absent .chip-name,
+      .member-chip.absent .sess,
+      .member-chip.absent .time-tag,
+      .member-chip.absent .dual-tag {
+        color:#555 !important;
       }
     }
     @media (min-width:900px) {
@@ -9742,7 +9754,7 @@
     }
 
     /* 칩 .sess 의 current/total 로 톤 클래스를 고른다.
-       absent: 결석. 노랑/빨강 대신 기존 결석 색을 유지하려고 빈 문자열.
+       absent: 결석. 노랑/빨강 대신 회색을 쓰려고 빈 문자열.
        cancelled: 취소·상담 등 회차 비가 아닌 상태(.sess-note). 취소선만 남긴다.
        출석 완료(.done) 취소선은 여기서 지우지 않고, CSS가 그대로 그린다. */
     function memberChipToneClassFromSess_(sessText, opts) {

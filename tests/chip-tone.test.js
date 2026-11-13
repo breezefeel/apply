@@ -56,7 +56,20 @@ assert.match(html, /\.member-chip\.tone-last\s*\{[^}]*background:\s*#f4b4b4\s*!i
 assert.match(html, /color:\s*#1a1a1a\s*!important/);
 assert.match(html, /@media \(min-width:520px\)[\s\S]*\.member-chip\.tone-last-1\s*\{[^}]*#f6e27a/);
 assert.match(html, /@media \(min-width:520px\)[\s\S]*\.member-chip\.tone-last\s*\{[^}]*#f4b4b4/);
-assert.match(html, /\.member-chip\.absent\.tone-last-1[\s\S]*#fee2e2\s*!important/);
+assert.match(
+  html,
+  /\.member-chip\.absent\s*\{\s*background:\s*#d9d9d9\s*!important;\s*border-color:\s*#bdbdbd\s*!important;\s*color:\s*#555;/
+);
+assert.match(html, /\.member-chip\.absent \.chip-name,\s*\n\s*\.member-chip\.absent \.sess[\s\S]*?color:\s*#555\s*!important/);
+assert.match(html, /\.member-chip\.absent\.tone-last-1[\s\S]*?#d9d9d9\s*!important/);
+assert.match(html, /\.member-chip\.absent\.tone-last[\s\S]*?color:\s*#555\s*!important/);
+assert.match(
+  html,
+  /@media \(min-width:520px\)[\s\S]*\.member-chip\.absent,\s*\n\s*\.member-chip\.absent\.tone-last-1[\s\S]*?#d9d9d9\s*!important[\s\S]*?#bdbdbd[\s\S]*?#555/
+);
+assert.doesNotMatch(html, /\.member-chip\.absent[^{]*\{[^}]*background:\s*#fee2e2/);
+assert.match(html, /\.member-chip\.absent\.on\s*\{[^}]*box-shadow:/);
+assert.match(html, /\.member-chip\.absent\.done \.chip-name\s*\{[^}]*text-decoration:\s*line-through/);
 assert.match(html, /\.member-chip\.done \.chip-name\s*\{[^}]*text-decoration:\s*line-through/);
 assert.match(html, /memberChipToneClassFromSess_\(sessRaw/);
 assert.doesNotMatch(source, /text-decoration/);
