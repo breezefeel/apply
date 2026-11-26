@@ -891,6 +891,8 @@
   .poster-preview canvas + canvas { margin-top: 10px; }
   #posterCard [hidden] { display: none !important; }
   .poster-layouts { margin-top: -2px; }
+  .poster-modes { margin-top: -2px; }
+  .poster-chip-gap { width: 8px; }
   .poster-page-btns { flex-wrap: wrap; }
   .poster-page-btns .btn { flex: 1 1 30%; }
   .poster-preview.is-template canvas { max-width: 520px; margin-left: auto; margin-right: auto; }
@@ -2459,6 +2461,7 @@
         <p class="cert-lead" id="posterLead">첫 장은 수업 사진과 한 문장입니다. 설명과 수강료는 다음 장입니다.</p>
         <div class="chips poster-tracks" id="posterTracks"></div>
         <div class="chips poster-tracks poster-layouts" id="posterLayouts" hidden></div>
+        <div class="chips poster-tracks poster-modes" id="posterModes" hidden></div>
         <div class="cert-fields" id="posterFieldsTpl" hidden></div>
         <div class="cert-fields" id="posterFields">
           <label class="span2"><span>일정 한 줄</span><input data-k="ribbon" autocomplete="off"></label>
@@ -3197,7 +3200,7 @@
   </div>
 
 <script src="sms-history.js?v=2"></script>
-<script src="poster-carousel.js?v=1"></script>
+<script src="poster-carousel.js?v=3"></script>
 <script>
 (function () {
   var DESC = '1:1 personalized functional rehabilitation training (passive stretching, postural correction, and functional exercise).';
@@ -6340,10 +6343,28 @@
    * 데이터 샘플은 RM_POSTER_TPL.SAMPLES['지점:트랙']에 있습니다. 샘플이 있는 트랙에만 템플릿이 보입니다. */
   var posterLayoutId = {};
   var posterTplEdits = {};
+  var posterStyle = {};
+  var posterCompose = {};
   var posterTplBound = false;
   var posterTplWarn = [];
-  function posterTplKey() {
+  function posterBaseKey() {
     return consultBranch + ':' + (posterTrackId[consultBranch] || posterTrackList()[0].id);
+  }
+  function posterStyleNow() {
+    return posterStyle[posterBaseKey()] === '2' ? '2' : '1';
+  }
+  function posterComposeMode() {
+    return posterCompose[posterBaseKey()] === 'waitlist' ? 'waitlist' : 'open';
+  }
+  function posterTplKey() {
+    var base = posterBaseKey();
+    var tpl = window.RM_POSTER_TPL;
+    if (posterCompose[base] === 'waitlist' && tpl && tpl.hasSample(base + ':wait')) return base + ':wait';
+    return base;
+  }
+  function posterPageLabel(page) {
+    if (posterComposeMode() === 'waitlist' && page.labelWait) return page.labelWait;
+    return page.label;
   }
   function posterLayoutList() {
     var list = [{ id: 'print', label: '인쇄 3장' }];
@@ -6373,6 +6394,27 @@
     box.innerHTML = list.map(function (l) {
       return '<button type="button" class="chip' + (l.id === cur ? ' active' : '') + '" data-poster-layout="' + l.id + '">' + l.label + '</button>';
     }).join('');
+    paintPosterModes(list);
+  }
+  function paintPosterModes(list) {
+    var box = $('posterModes');
+    if (!box) return;
+    var carousel = (list || posterLayoutList()).some(function (l) { return l.id === 'carousel'; });
+    box.hidden = !carousel;
+    if (!carousel) { box.innerHTML = ''; return; }
+    var on = !!posterTplLayout();
+    var style = posterStyleNow();
+    var mode = posterComposeMode();
+    function chip(attr, val, label, active) {
+      return '<button type="button" class="chip' + (active ? ' active' : '') + '" ' + attr + '="' + val + '">' + label + '</button>';
+    }
+    box.innerHTML = [
+      chip('data-poster-style', '1', '스타일 1', on && style === '1'),
+      chip('data-poster-style', '2', '스타일 2', on && style === '2'),
+      '<span class="poster-chip-gap"></span>',
+      chip('data-poster-compose', 'open', '수강 신청', on && mode === 'open'),
+      chip('data-poster-compose', 'waitlist', '대기 신청', on && mode === 'waitlist')
+    ].join('');
   }
   function posterTplFileName(m, i, page) {
     return m.file + '-' + (page.id === 'story' ? '스토리' : '캐러셀' + (i + 1)) + '.png';
@@ -6387,24 +6429,27 @@
     $('posterTplBtns').hidden = !on;
     $('posterPreviewTpl').hidden = !on;
     $('btnPosterSaveAll').textContent = on ? L.pages.length + '장 모두 저장' : '이미지 저장';
+    var mode = posterComposeMode();
     if ($('posterLead')) $('posterLead').textContent = on
-      ? L.note + ' 칸을 고치면 바로 반영되고, 장마다 PNG로 받을 수 있습니다.'
+      ? (mode === 'waitlist'
+        ? '대기 신청 구성입니다. 일정은 문장으로 적고, 마지막 장은 신청 페이지로 이어집니다. 칸을 고치면 바로 반영됩니다.'
+        : L.note + ' 칸을 고치면 바로 반영되고, 장마다 PNG로 받을 수 있습니다.')
       : '첫 장은 수업 사진과 한 문장입니다. 설명과 수강료는 다음 장입니다.';
     if (!on) return;
     var m = posterTplModel();
     var esc = function (t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
-    $('posterFieldsTpl').innerHTML = window.RM_POSTER_TPL.FIELDS.map(function (f) {
+    $('posterFieldsTpl').innerHTML = window.RM_POSTER_TPL.fieldsFor(mode).map(function (f) {
       var input = f.area
         ? '<textarea data-tk="' + f.k + '" rows="' + (f.k === 'support' || f.k === 'days' ? 4 : 3) + '"></textarea>'
         : '<input data-tk="' + f.k + '" autocomplete="off">';
       return '<label' + (f.span || f.area ? ' class="span2"' : '') + '><span>' + esc(f.label) + '</span>' + input + '</label>';
     }).join('');
     $('posterTplBtns').innerHTML = L.pages.map(function (page, i) {
-      return '<button type="button" class="btn btn-ghost" data-poster-page="' + i + '">' + esc(page.label) + ' PNG</button>';
+      return '<button type="button" class="btn btn-ghost" data-poster-page="' + i + '">' + esc(posterPageLabel(page)) + ' PNG</button>';
     }).join('') + '<button type="button" class="btn btn-ghost" data-poster-tpl-reset>샘플 값으로</button>';
     var prev = $('posterPreviewTpl');
     prev.innerHTML = L.pages.map(function (page, i) {
-      return '<p class="poster-tpl-cap">' + esc(page.label) + ' · ' + page.w + '×' + page.h + '</p>' +
+      return '<p class="poster-tpl-cap">' + esc(posterPageLabel(page)) + ' · ' + page.w + '×' + page.h + '</p>' +
         '<canvas data-poster-tpl-page="' + i + '" width="' + page.w * L.scale + '" height="' + page.h * L.scale + '"></canvas>';
     }).join('');
     fillPosterTplInputs(m);
@@ -6425,7 +6470,7 @@
       v[el.getAttribute('data-tk')] = el.value;
     });
     posterTplEdits[posterTplKey()] = v;
-    var miss = window.RM_POSTER_TPL.missing(v);
+    var miss = window.RM_POSTER_TPL.missing(v, posterComposeMode());
     var status = $('posterStatus');
     if (status) status.textContent = miss.length ? miss.join(', ') + '을(를) 넣으면 미리보기와 저장이 됩니다.' : posterTplStatusText();
     document.querySelectorAll('#posterTplBtns [data-poster-page]').forEach(function (b) { b.disabled = !!miss.length; });
@@ -6445,11 +6490,11 @@
       ctx.setTransform(L.scale, 0, 0, L.scale, 0, 0);
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
-      tpl.draw(L, page, ctx, m);
+      tpl.draw(L, page, ctx, m, { style: posterStyleNow() });
     });
     posterTplWarn = tpl.check(L);
     var status = $('posterStatus');
-    if (status && !tpl.missing(posterTplEdits[posterTplKey()] || {}).length && !/저장했습니다/.test(status.textContent)) status.textContent = posterTplStatusText();
+    if (status && !tpl.missing(posterTplEdits[posterTplKey()] || {}, posterComposeMode()).length && !/저장했습니다/.test(status.textContent)) status.textContent = posterTplStatusText();
   }
   function posterTplReady() {
     var imgs = window.RM_POSTER_TPL.imagesFor(posterTplModel());
@@ -6513,6 +6558,20 @@
       var layout = e.target.closest('[data-poster-layout]');
       if (layout) {
         posterLayoutId[consultBranch] = layout.getAttribute('data-poster-layout');
+        refreshPosterLayout();
+        return;
+      }
+      var styleBtn = e.target.closest('[data-poster-style]');
+      if (styleBtn) {
+        posterStyle[posterBaseKey()] = styleBtn.getAttribute('data-poster-style') === '2' ? '2' : '1';
+        if (!posterTplLayout()) posterLayoutId[consultBranch] = 'carousel';
+        refreshPosterLayout();
+        return;
+      }
+      var composeBtn = e.target.closest('[data-poster-compose]');
+      if (composeBtn) {
+        posterCompose[posterBaseKey()] = composeBtn.getAttribute('data-poster-compose') === 'waitlist' ? 'waitlist' : 'open';
+        if (!posterTplLayout()) posterLayoutId[consultBranch] = 'carousel';
         refreshPosterLayout();
         return;
       }
