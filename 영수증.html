@@ -9852,7 +9852,7 @@
           },
           directors: {
             title: '원장 소개',
-            intro: '자세 · 움직임 평가를 바탕으로 원장이 1:1로 움직임과 셀프 케어 방법을 지도합니다.',
+            intro: '자세 · 움직임 평가를 바탕으로 원장이 1:1로 움직임과\n셀프 케어 방법을 지도합니다.',
             people: incheon ? [
               {
                 name: '이상민 원장',
@@ -9933,19 +9933,39 @@
     }
     return changed;
   }
+  function brochureMigrateDirectorBreak_(saved) {
+    var changed = false;
+    var oldIntro = '자세 · 움직임 평가를 바탕으로 원장이 1:1로 움직임과 셀프 케어 방법을 지도합니다.';
+    var newIntro = '자세 · 움직임 평가를 바탕으로 원장이 1:1로 움직임과\n셀프 케어 방법을 지도합니다.';
+    ['yaksu', 'incheon'].forEach(function (branch) {
+      var directors = saved[branch] && saved[branch].inside && saved[branch].inside.directors;
+      if (directors && directors.intro === oldIntro) {
+        directors.intro = newIntro;
+        changed = true;
+      }
+    });
+    return changed;
+  }
   function loadBrochures_() {
     var defaults = brochureDefaults_();
-    var migFlag = 'copy1';
     var migDone = '';
     try { migDone = localStorage.getItem('rm-brochure-mig-v') || ''; } catch (eMig) {}
-    var runMig = migDone.indexOf(migFlag) < 0;
+    var runCopy1 = migDone.indexOf('copy1') < 0;
+    var runCopy2 = migDone.indexOf('copy2') < 0;
+    function markMig_() {
+      if (!runCopy1 && !runCopy2) return;
+      var next = migDone;
+      if (runCopy1) next = (next + ' copy1').trim();
+      if (runCopy2) next = (next + ' copy2').trim();
+      try { localStorage.setItem('rm-brochure-mig-v', next); } catch (eMigSet) {}
+    }
     try {
       var saved = JSON.parse(localStorage.getItem(BROCHURE_KEY) || 'null');
       if (saved && typeof saved === 'object') {
-        var changed = runMig && brochureMigrateStoredCopy_(saved);
-        if (runMig) {
-          try { localStorage.setItem('rm-brochure-mig-v', (migDone + ' ' + migFlag).trim()); } catch (eMigSet) {}
-        }
+        var changed = false;
+        if (runCopy1 && brochureMigrateStoredCopy_(saved)) changed = true;
+        if (runCopy2 && brochureMigrateDirectorBreak_(saved)) changed = true;
+        markMig_();
         if (changed) {
           try { localStorage.setItem(BROCHURE_KEY, JSON.stringify(saved)); } catch (eSave) {}
         }
@@ -9955,9 +9975,7 @@
         };
       }
     } catch (e) {}
-    if (runMig) {
-      try { localStorage.setItem('rm-brochure-mig-v', (migDone + ' ' + migFlag).trim()); } catch (eMigSet) {}
-    }
+    markMig_();
     return defaults;
   }
   function saveBrochures_() {
@@ -9978,7 +9996,7 @@
   function brochureFieldText_(el) {
     var text = (el.innerText || '').replace(/\u00a0/g, ' ').replace(/\r/g, '');
     if (el.classList.contains('b-brand')) return text.replace(/^[ \t]+|[ \t]+$/gm, '').replace(/^\n+|\n+$/g, '');
-    if (el.classList.contains('btl-b')) return text.replace(/[ \t]*\n[ \t]*/g, '\n').replace(/^\n+|\n+$/g, '');
+    if (el.classList.contains('btl-b') || el.classList.contains('bdir-lead')) return text.replace(/[ \t]*\n[ \t]*/g, '\n').replace(/^\n+|\n+$/g, '');
     return text.replace(/\n+/g, ' ').replace(/[ \t]{2,}/g, ' ').replace(/^\s+|\s+$/g, '');
   }
   function brochureGetPath_(root, path) {
@@ -9993,7 +10011,7 @@
   }
   function brochurePaintField_(el, value) {
     var text = String(value == null ? '' : value);
-    if (el.classList.contains('btl-b')) {
+    if (el.classList.contains('btl-b') || el.classList.contains('bdir-lead')) {
       el.innerHTML = escPrice_(text).replace(/\n/g, '<br>');
       return;
     }
@@ -10201,7 +10219,7 @@
       '</section>' +
       '<section class="bpanel bdir">' +
         bEdit_('div', 'bdir-title', 'inside.directors.title', directors.title) +
-        bEdit_('p', 'bdir-lead', 'inside.directors.intro', directors.intro) +
+        bEditBr_('p', 'bdir-lead', 'inside.directors.intro', directors.intro) +
         '<div class="bpeople">' + brochurePeopleHtml_(directors) + '</div>' +
       '</section>' +
       brochureFolds_() +
