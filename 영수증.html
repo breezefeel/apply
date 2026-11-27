@@ -1701,7 +1701,7 @@
   .bback-contact .b-clabel { font-size: 11px; font-weight: 700; color: #c2a159; }
   .bback-contact .b-phone { margin-top: 2px; font-size: 16px; font-weight: 800; letter-spacing: -.02em; color: #fff; }
   .bback-contact .b-cnote { margin-top: 1px; font-size: 11px; font-weight: 550; color: #f3efe6; }
-  .bqr { width: 22mm; height: 22mm; background: #fff; padding: 1.2mm; flex: 0 0 auto; }
+  .bqr { width: 22mm; height: 22mm; background: #fff; padding: 3mm; flex: 0 0 auto; }
   .bqr img { width: 100%; height: 100%; object-fit: contain; display: block; background: #fff; }
   .bcover { background: #2a2a2a; }
   .bcover .bphoto { position: absolute; inset: 0; background: #2a2a2a; color: #c8c2b8; }
@@ -9819,7 +9819,7 @@
             intro: '지금 내 몸을 먼저 살피고, 왜 그렇게 움직이는지 함께 찾습니다. 리얼무브먼트 ' + place + '은 안전한 범위에서 기초부터 움직임을 쌓아 갑니다.',
             summary: '▸ 몸 상태 확인 · 4단계 평가',
             steps: [
-              { no: '01', title: '상담 · 히스토리', body: '궁금한 몸 상태, 생활 패턴, 목표를 편하게 말씀해 주세요.\n대화 중에 나에게 맞는 운동 방향을 함께 찾아요.' },
+              { no: '01', title: '상담 · 히스토리', body: '궁금한 몸 상태, 생활 패턴, 목표를 편하게 말씀해 주세요.\n대화 중에 회원에게 맞는 운동 방향을 함께 찾아요.' },
               { no: '02', title: '자세 · 생활습관 평가', body: '서 있는 모습과 하루 습관을 함께 살펴봐요.\n내 몸의 틀어짐을 눈으로 직접 확인하실 수 있어요.' },
               { no: '03', title: '움직임 평가', body: '굽히고, 돌리고, 걸어 보시면 돼요.\n잘 움직이는 부위와 더 개선해야 할 부분을 짚어 드려요.' },
               { no: '04', title: '촉진 평가', body: '원장이 직접 손으로 근육과 관절을 살펴 드려요.\n눈으로 보기 어려운 부분까지 꼼꼼히 확인해요.' }
@@ -9841,7 +9841,7 @@
               },
               {
                 no: '2단계', tag: '약 12주', title: '자세·생활습관 코칭', lead: '건강한 몸 유지를 위한 단계',
-                points: ['바르게 앉고 서고 걷는 습관', '코어 기반의 자세 운동', '얼굴 라인까지 바르게 (80분 클래스)']
+                points: ['바르게 앉고 서고 걷는 습관', '코어 기반의 자세 운동', incheon ? '리얼페이스 셀프케어 클래스 (80분)' : '얼굴 라인까지 바르게 (80분 클래스)']
               },
               {
                 no: '3단계', tag: '약 24주', title: '재활 기능 운동', lead: '더 건강한 몸 만들기',
@@ -9914,17 +9914,50 @@
     }
     return over;
   }
+  function brochureMigrateStoredCopy_(saved) {
+    var changed = false;
+    var oldStep = '궁금한 몸 상태, 생활 패턴, 목표를 편하게 말씀해 주세요.\n대화 중에 나에게 맞는 운동 방향을 함께 찾아요.';
+    var newStep = '궁금한 몸 상태, 생활 패턴, 목표를 편하게 말씀해 주세요.\n대화 중에 회원에게 맞는 운동 방향을 함께 찾아요.';
+    ['yaksu', 'incheon'].forEach(function (branch) {
+      var card = saved[branch];
+      var step = card && card.inside && card.inside.design && card.inside.design.steps && card.inside.design.steps[0];
+      if (step && step.body === oldStep) {
+        step.body = newStep;
+        changed = true;
+      }
+    });
+    var inch = saved.incheon && saved.incheon.inside && saved.incheon.inside.programs && saved.incheon.inside.programs.items && saved.incheon.inside.programs.items[1];
+    if (inch && inch.points && inch.points[2] === '얼굴 라인까지 바르게 (80분 클래스)') {
+      inch.points[2] = '리얼페이스 셀프케어 클래스 (80분)';
+      changed = true;
+    }
+    return changed;
+  }
   function loadBrochures_() {
     var defaults = brochureDefaults_();
+    var migFlag = 'copy1';
+    var migDone = '';
+    try { migDone = localStorage.getItem('rm-brochure-mig-v') || ''; } catch (eMig) {}
+    var runMig = migDone.indexOf(migFlag) < 0;
     try {
       var saved = JSON.parse(localStorage.getItem(BROCHURE_KEY) || 'null');
       if (saved && typeof saved === 'object') {
+        var changed = runMig && brochureMigrateStoredCopy_(saved);
+        if (runMig) {
+          try { localStorage.setItem('rm-brochure-mig-v', (migDone + ' ' + migFlag).trim()); } catch (eMigSet) {}
+        }
+        if (changed) {
+          try { localStorage.setItem(BROCHURE_KEY, JSON.stringify(saved)); } catch (eSave) {}
+        }
         return {
           yaksu: mergeBrochure_(defaults.yaksu, saved.yaksu),
           incheon: mergeBrochure_(defaults.incheon, saved.incheon)
         };
       }
     } catch (e) {}
+    if (runMig) {
+      try { localStorage.setItem('rm-brochure-mig-v', (migDone + ' ' + migFlag).trim()); } catch (eMigSet) {}
+    }
     return defaults;
   }
   function saveBrochures_() {
