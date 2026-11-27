@@ -9237,7 +9237,7 @@
             ]
           },
           {
-            title: '80분 · 1:1 리얼무브먼트 + 페이스',
+            title: '80분 · 1:1 리얼 무브먼트 + 리얼 페이스',
             sub: '레슨 55분, 온열 돔 25분',
             note: '움직임 레슨에 페이스 셀프 케어, 습관 코칭, 스마일 트레이닝을 더합니다.',
             rows: [
@@ -9357,6 +9357,21 @@
             }
           }
           try { localStorage.setItem('rm-price-card-mig-v', (p2Done + ' ' + p2Flag).trim()); } catch (eMigSet) {}
+        }
+        var titleFlag = 'incheon-80-title-1';
+        var titleDone = '';
+        try { titleDone = localStorage.getItem('rm-price-card-mig-v') || ''; } catch (eTitle) {}
+        if (titleDone.indexOf(titleFlag) < 0) {
+          var p80 = (saved.incheon.programs || [])[1];
+          var old80Titles = [
+            '80분 · 1:1 리얼무브먼트 + 페이스',
+            '80분 · 1:1 리얼 무브먼트 + 페이스'
+          ];
+          if (p80 && old80Titles.indexOf(p80.title) >= 0) {
+            p80.title = '80분 · 1:1 리얼 무브먼트 + 리얼 페이스';
+            changed = true;
+          }
+          try { localStorage.setItem('rm-price-card-mig-v', (titleDone + ' ' + titleFlag).trim()); } catch (eTitleSet) {}
         }
         if (changed) {
           try { localStorage.setItem(PRICE_CARD_KEY, JSON.stringify(saved)); } catch (eSave) {}
